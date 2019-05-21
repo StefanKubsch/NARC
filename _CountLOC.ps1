@@ -1,0 +1,1 @@
+(gci -include *.cpp,*.hpp,*.vertexshader,*.fragmentshader -recurse | select-string .).Count

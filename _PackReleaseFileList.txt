@@ -1,0 +1,7 @@
+x64\Release\DATA\*
+x64\Release\Fonts\*
+x64\Release\GFX\*
+x64\Release\SFX\*
+x64\Release\Shader\*
+x64\Release\NARC.exe
+x64\Release\*.dll
