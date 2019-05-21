@@ -28,9 +28,8 @@ public:
 	bool Enabled{ true };
 
 private:
-	SDL_Rect IconRect{};
-
-	PointInt Pos{};
+	lwmf::IntRectStruct IconRect{};
+	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t StartPosY{};
 	std::int_fast32_t PlayerColor{};
 	std::int_fast32_t EnemyColor{};
@@ -78,8 +77,8 @@ inline void Game_MinimapClass::PreRender()
 
 	// Generate the "icon" textures which indicate the entities...
 
-	IconRect.w = TileSize;
-	IconRect.h = TileSize;
+	IconRect.Width = TileSize;
+	IconRect.Height = TileSize;
 
 	// Set map position
 	StartPosY = lwmf::ViewportHeight - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
@@ -87,48 +86,45 @@ inline void Game_MinimapClass::PreRender()
 
 inline void Game_MinimapClass::Display()
 {
-	for (std::int_fast32_t x{ Pos.X }, MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY, x += IconRect.w)
+	for (std::int_fast32_t x{ Pos.X }, MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY, x += IconRect.Width)
 	{
-		for (std::int_fast32_t y{ StartPosY }, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX, y += IconRect.h)
+		for (std::int_fast32_t y{ StartPosY }, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX, y += IconRect.Height)
 		{
-			IconRect.x = x;
-			IconRect.y = y;
-
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(IconRect.x, IconRect.y, IconRect.w, IconRect.h, WallColor);
+				lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, WallColor);
 			}
 
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(IconRect.x, IconRect.y, IconRect.w, IconRect.h, DoorColor);
+				lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, DoorColor);
 			}
 
 			switch (Game_EntityHandling::EntityMap[MapPosX][MapPosY])
 			{
 				case Game_EntityHandling::EntityTypes::Player:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.w, IconRect.h, PlayerColor);
+					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, PlayerColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Enemy:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.w, IconRect.h, EnemyColor); //-V1037
+					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, EnemyColor); //-V1037
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Turret:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.w, IconRect.h, EnemyColor);
+					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, EnemyColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Neutral:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.w, IconRect.h, NeutralColor);
+					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, NeutralColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::AmmoBox:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.w, IconRect.h, AmmoBoxColor);
+					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, AmmoBoxColor);
 					break;
 				}
 				default: {}

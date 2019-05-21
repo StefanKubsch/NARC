@@ -26,10 +26,10 @@ class GFX_OpenGLShaderClass final
 {
 public:
 	void LoadShader(const std::string& ShaderName);
-	void LoadTextureInGPU(const TextureStruct& TextureData, GLuint* Texture);
+	void LoadTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture);
 	void LoadSurfaceInGPU(const SDL_Surface* Surface, GLuint* Texture);
 	void RenderTexture(const GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-	void LoadStaticTextureInGPU(const TextureStruct& TextureData, GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
+	void LoadStaticTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
 	void RenderStaticTexture(const GLuint* Texture);
 	void PreparePixelBufferTexture(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
 	void RenderPixelBufferTexture();
@@ -183,7 +183,7 @@ inline void GFX_OpenGLShaderClass::LoadShader(const std::string& ShaderName)
 	glCheckError();
 }
 
-inline void GFX_OpenGLShaderClass::LoadTextureInGPU(const TextureStruct& TextureData, GLuint* Texture)
+inline void GFX_OpenGLShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture)
 {
 	glGenTextures(1, Texture);
 	glCheckError();
@@ -218,7 +218,7 @@ inline void GFX_OpenGLShaderClass::RenderTexture(const GLuint* Texture, const st
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 
-inline void GFX_OpenGLShaderClass::LoadStaticTextureInGPU(const TextureStruct& TextureData, GLuint* Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
+inline void GFX_OpenGLShaderClass::LoadStaticTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
 {
 	UpdateVertices(PosX, PosY, Width, Height);
 	LoadTextureInGPU(TextureData, Texture);

@@ -12,30 +12,11 @@
 #include <cstdint>
 #include <random>
 
-struct TextureStruct final
-{
-	std::vector<std::int_fast32_t> Texture;
-	std::int_fast32_t Width{};
-	std::int_fast32_t Height{};
-};
-
-struct PointFloat final
-{
-	float X{};
-	float Y{};
-};
-
-struct PointInt final
-{
-	std::int_fast32_t X{};
-	std::int_fast32_t Y{};
-};
-
 inline bool Debug{};
 
 // Setting planes/viewport for raycaster
-inline PointFloat Plane{};
-inline PointFloat PlaneStartValue{};
+inline lwmf::FloatPointStruct Plane{};
+inline lwmf::FloatPointStruct PlaneStartValue{};
 
 // Settings for looking up/down
 inline float VerticalLookCamera{};

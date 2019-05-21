@@ -10,7 +10,6 @@
 #pragma once
 
 #include <string>
-#include <SDL.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -27,8 +26,8 @@ namespace HID_Mouse
 	// Variables and constants
 	//
 
-	inline SDL_Point MousePos{};
-	inline SDL_Point OldMousePos{};
+	inline lwmf::IntPointStruct MousePos{};
+	inline lwmf::IntPointStruct OldMousePos{};
 
 	inline float MouseSensitivity{};
 	inline float MouseSensitivityLowerLimit{};

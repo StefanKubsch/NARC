@@ -51,7 +51,7 @@ namespace Game_LevelHandling
 	//
 
 	inline std::vector<std::vector<std::vector<std::int_fast32_t>>> LevelMap;
-	inline std::vector<TextureStruct> LevelTextures;
+	inline std::vector<lwmf::TextureStruct> LevelTextures;
 
 	inline std::vector<GFX_LightingClass> StaticLights;
 

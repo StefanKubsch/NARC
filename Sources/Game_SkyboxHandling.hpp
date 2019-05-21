@@ -13,7 +13,6 @@
 
 #include <cstdint>
 #include <string>
-#include <SDL.h>
 #include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
@@ -58,7 +57,7 @@ namespace Game_SkyboxHandling
 
 			if (SkyBoxEnabled)
 			{
-				const TextureStruct TempTexture { GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "SKYBOX", "SkyBoxImageName"))	};
+				const lwmf::TextureStruct TempTexture { GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "SKYBOX", "SkyBoxImageName"))	};
 
 				SkyboxWidth = TempTexture.Width;
 				SkyboxHeight = TempTexture.Height;

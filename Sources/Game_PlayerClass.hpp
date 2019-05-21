@@ -36,10 +36,10 @@ public:
 	void PlayAudio(PlayerSounds Sound);
 	void CloseAudio();
 
-	PointInt FuturePos{};
-	PointFloat Pos{};
-	PointFloat Dir{};
-	PointFloat StepWidth{};
+	lwmf::IntPointStruct FuturePos{};
+	lwmf::FloatPointStruct Pos{};
+	lwmf::FloatPointStruct Dir{};
+	lwmf::FloatPointStruct StepWidth{};
 	std::int_fast32_t SelectedWeapon{};
 	std::int_fast32_t Hitpoints{};
 	float MoveSpeed{};

@@ -182,7 +182,7 @@ namespace Game_EntityHandling
 		{
 			if (!Entities[EntityOrder[Index]].IsDead)
 			{
-				const PointFloat EntityPos{ Entities[EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[EntityOrder[Index]].Pos.Y - Player.Pos.Y };
+				const lwmf::FloatPointStruct EntityPos{ Entities[EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[EntityOrder[Index]].Pos.Y - Player.Pos.Y };
 				const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
 				const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[EntityOrder[Index]].MoveV / TransY) };
 				const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(lwmf::ViewportHeight / TransY) };
@@ -226,7 +226,7 @@ namespace Game_EntityHandling
 		// Get angle between player and entity without atan2
 		// Returns TextureIndex (0..7) for adressing correct texture
 
-		const PointFloat EntityTemp{ Entities[Entities[EntityOrder[EntityNumber]].Number].Pos.X - Player.Pos.X, Entities[Entities[EntityOrder[EntityNumber]].Number].Pos.Y - Player.Pos.Y };
+		const lwmf::FloatPointStruct EntityTemp{ Entities[Entities[EntityOrder[EntityNumber]].Number].Pos.X - Player.Pos.X, Entities[Entities[EntityOrder[EntityNumber]].Number].Pos.Y - Player.Pos.Y };
 		const float CosTheta1{ (EntityTemp.X + EntityTemp.Y) * lwmf::SQRT1_2 };
 		const float CosTheta3{ (EntityTemp.Y - EntityTemp.X) * lwmf::SQRT1_2 };
 		float ClosestTheta{ EntityTemp.X };
@@ -657,7 +657,7 @@ namespace Game_EntityHandling
 
 	inline void MarkEntityPositionOnMap(const EntityStruct& Entity)
 	{
-		const PointInt EntityPos{ static_cast<std::int_fast32_t>(Entity.Pos.X), static_cast<std::int_fast32_t>(Entity.Pos.Y) };
+		const lwmf::IntPointStruct EntityPos{ static_cast<std::int_fast32_t>(Entity.Pos.X), static_cast<std::int_fast32_t>(Entity.Pos.Y) };
 
 		switch (Entity.Type)
 		{

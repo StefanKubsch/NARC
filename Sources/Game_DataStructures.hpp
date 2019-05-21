@@ -14,7 +14,6 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <SDL.h>
 #include <SDL_mixer.h>
 
 #include "Game_GlobalDefinitions.hpp"
@@ -28,10 +27,10 @@
 
 struct EntityStruct final
 {
-	std::list<PointInt> PathFindingWayPoints;
+	std::list<lwmf::IntPointStruct> PathFindingWayPoints;
 	std::map<std::string, std::int_fast32_t> ContainedItem;
-	PointFloat Pos{};
-	PointFloat Dir{};
+	lwmf::FloatPointStruct Pos{};
+	lwmf::FloatPointStruct Dir{};
 	std::string TypeName;
 	std::int_fast32_t Number{};
 	std::int_fast32_t Type{};
@@ -74,8 +73,8 @@ struct WeaponStruct final
 	std::vector<Mix_Chunk*> Sounds;
 	GFX_OpenGLShaderClass WeaponShader{};
 	GFX_OpenGLShaderClass MuzzleFlashShader{};
-	SDL_Rect WeaponRect{};
-	SDL_Rect MuzzleFlashRect{};
+	lwmf::IntRectStruct WeaponRect{};
+	lwmf::IntRectStruct MuzzleFlashRect{};
 	std::string HUDAmmoInfo;
 	std::string HUDCarriedAmmoInfo;
 	std::string Name;
@@ -104,9 +103,9 @@ struct WeaponStruct final
 
 struct EntityAssetStruct final
 {
-	std::vector<std::vector<TextureStruct>> WalkingTextures;
-	std::vector<TextureStruct> AttackTextures;
-	std::vector<TextureStruct> KillTextures;
+	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures;
+	std::vector<lwmf::TextureStruct> AttackTextures;
+	std::vector<lwmf::TextureStruct> KillTextures;
 	std::vector<Mix_Chunk*> Sounds;
 	std::string Name;
 	std::int_fast32_t Number{};
@@ -118,9 +117,9 @@ struct EntityAssetStruct final
 
 struct DoorStruct final
 {
-	TextureStruct AnimTexture;
+	lwmf::TextureStruct AnimTexture;
 	std::vector<Mix_Chunk*> Sounds;
-	PointInt Pos{};
+	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t Number{};
 	std::int_fast32_t OriginalTexture{};
 	std::int_fast32_t OpenCloseWidth{};

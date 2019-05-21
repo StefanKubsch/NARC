@@ -12,6 +12,7 @@
 
 #include "Windows.h"
 #include <cstdint>
+#include <vector>
 
 namespace lwmf
 {
@@ -21,16 +22,31 @@ namespace lwmf
 	// Variables and constants
 	//
 
+	struct TextureStruct final
+	{
+		std::vector<std::int_fast32_t> Texture;
+		std::int_fast32_t Width{};
+		std::int_fast32_t Height{};
+	};
+
 	struct IntPointStruct final
 	{
-		std::int_fast32_t x{};
-		std::int_fast32_t y{};
+		std::int_fast32_t X{};
+		std::int_fast32_t Y{};
 	};
 
 	struct FloatPointStruct final
 	{
-		float x{};
-		float y{};
+		float X{};
+		float Y{};
+	};
+
+	struct IntRectStruct final
+	{
+		std::int_fast32_t X{};
+		std::int_fast32_t Y{};
+		std::int_fast32_t Width{};
+		std::int_fast32_t Height{};
 	};
 
 	inline std::int_fast32_t FullscreenFlag{};

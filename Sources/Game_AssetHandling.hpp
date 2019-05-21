@@ -30,7 +30,7 @@ namespace Game_AssetHandling
 
 	void InitAssets();
 	void LoadWalkAnimTextures(std::int_fast32_t AssetIndex, const std::string& AssetTypeName);
-	void LoadAdditionalAnimTextures(const std::string& AnimType, const std::string& AssetTypeName, std::vector<TextureStruct>& AnimVector);
+	void LoadAdditionalAnimTextures(const std::string& AnimType, const std::string& AssetTypeName, std::vector<lwmf::TextureStruct>& AnimVector);
 	void CloseAudio();
 
 	//
@@ -141,7 +141,7 @@ namespace Game_AssetHandling
 		}
 	}
 
-	inline void LoadAdditionalAnimTextures(const std::string& AnimType, const std::string& AssetTypeName, std::vector<TextureStruct>& AnimVector)
+	inline void LoadAdditionalAnimTextures(const std::string& AnimType, const std::string& AssetTypeName, std::vector<lwmf::TextureStruct>& AnimVector)
 	{
 		std::int_fast32_t TextureIndex{};
 

@@ -121,12 +121,12 @@ namespace Game_WeaponHandling
 
 				Weapons[Index].CarriedAmmo = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "DATA", "CarriedAmmo");
 				Weapons[Index].Cadence = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "DATA", "Cadence");
-				Weapons[Index].WeaponRect.x = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "PosX");
-				Weapons[Index].WeaponRect.y = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "PosY");
+				Weapons[Index].WeaponRect.X = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "PosX");
+				Weapons[Index].WeaponRect.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "PosY");
 				Weapons[Index].FadeInOutSpeed = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "FadeInOutSpeed");
 				Weapons[Index].MuzzleFlashDuration = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashDuration");
-				Weapons[Index].MuzzleFlashRect.x = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosX");
-				Weapons[Index].MuzzleFlashRect.y = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosY");
+				Weapons[Index].MuzzleFlashRect.X = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosX");
+				Weapons[Index].MuzzleFlashRect.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosY");
 
 				// pre-load weapon
 				Weapons[Index].LoadedRounds = Weapons[Index].Capacity;
@@ -166,10 +166,10 @@ namespace Game_WeaponHandling
 
 				while (std::getline(WeaponTexturesData, Line))
 				{
-					const TextureStruct TempTextureWeapon{ GFX_ImageHandling::ImportImage(Line) };
+					const lwmf::TextureStruct TempTextureWeapon{ GFX_ImageHandling::ImportImage(Line) };
 
-					Weapon.WeaponRect.w = TempTextureWeapon.Width;
-					Weapon.WeaponRect.h = TempTextureWeapon.Height;
+					Weapon.WeaponRect.Width = TempTextureWeapon.Width;
+					Weapon.WeaponRect.Height = TempTextureWeapon.Height;
 
 					Weapon.WeaponShader.LoadTextureInGPU(TempTextureWeapon, &Weapon.WeaponTexture);
 				}
@@ -183,10 +183,10 @@ namespace Game_WeaponHandling
 
 				while (std::getline(MuzzleFlashTextureData, Line))
 				{
-					const TextureStruct TempTextureMuzzleFlash{ GFX_ImageHandling::ImportImage(Line) };
+					const lwmf::TextureStruct TempTextureMuzzleFlash{ GFX_ImageHandling::ImportImage(Line) };
 
-					Weapon.MuzzleFlashRect.w = TempTextureMuzzleFlash.Width;
-					Weapon.MuzzleFlashRect.h = TempTextureMuzzleFlash.Height;
+					Weapon.MuzzleFlashRect.Width = TempTextureMuzzleFlash.Width;
+					Weapon.MuzzleFlashRect.Height = TempTextureMuzzleFlash.Height;
 
 					Weapon.MuzzleFlashShader.LoadTextureInGPU(TempTextureMuzzleFlash, &Weapon.MuzzleFlashTexture);
 				}
@@ -230,11 +230,11 @@ namespace Game_WeaponHandling
 			//
 
 			const float Camera{ (lwmf::ViewportWidthMid << 1) / static_cast<float>(lwmf::ViewportWidth) - 1 };
-			const PointFloat RayDir{ Player.Dir.X + Plane.X * Camera , Player.Dir.Y + Plane.Y * Camera };
-			PointInt MapPos{ static_cast<std::int_fast32_t>(Player.Pos.X), static_cast<std::int_fast32_t>(Player.Pos.Y) };
-			const PointFloat DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
-			PointFloat SideDist;
-			PointInt Step;
+			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera , Player.Dir.Y + Plane.Y * Camera };
+			lwmf::IntPointStruct MapPos{ static_cast<std::int_fast32_t>(Player.Pos.X), static_cast<std::int_fast32_t>(Player.Pos.Y) };
+			const lwmf::FloatPointStruct DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
+			lwmf::FloatPointStruct SideDist;
+			lwmf::IntPointStruct Step;
 
 			RayDir.X < 0.0F ? (Step.X = -1, SideDist.X = (Player.Pos.X - MapPos.X) * DeltaDist.X) : (Step.X = 1, SideDist.X = (MapPos.X + 1 - Player.Pos.X) * DeltaDist.X);
 			RayDir.Y < 0.0F ? (Step.Y = -1, SideDist.Y = (Player.Pos.Y - MapPos.Y) * DeltaDist.Y) : (Step.Y = 1, SideDist.Y = (MapPos.Y + 1 - Player.Pos.Y) * DeltaDist.Y);
@@ -265,7 +265,7 @@ namespace Game_WeaponHandling
 						if (!Entities[Game_EntityHandling::EntityOrder[Index]].IsDead && !Endloop)
 						{
 							const std::int_fast32_t TextureIndex{ Game_EntityHandling::GetEntityTextureIndex(Index) };
-							const PointFloat EntityPos{ Entities[Game_EntityHandling::EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[Game_EntityHandling::EntityOrder[Index]].Pos.Y - Player.Pos.Y };
+							const lwmf::FloatPointStruct EntityPos{ Entities[Game_EntityHandling::EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[Game_EntityHandling::EntityOrder[Index]].Pos.Y - Player.Pos.Y };
 							const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
 							const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[Game_EntityHandling::EntityOrder[Index]].MoveV / TransY) };
 							const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(lwmf::ViewportHeight / TransY) };
@@ -447,7 +447,7 @@ namespace Game_WeaponHandling
 	{
 		if ((CurrentWeaponState == WeaponState::ChangeUp || CurrentWeaponState == WeaponState::ChangeDown) && WeaponHeightFadeInOut == 0)
 		{
-			WeaponHeightFadeInOut = Weapons[Player.SelectedWeapon].WeaponRect.h;
+			WeaponHeightFadeInOut = Weapons[Player.SelectedWeapon].WeaponRect.Height;
 		}
 		else if (WeaponHeightFadeInOut > 0)
 		{
@@ -466,7 +466,7 @@ namespace Game_WeaponHandling
 					Player.SelectedWeapon > 0 ? --Player.SelectedWeapon : Player.SelectedWeapon = Weapons.back().Number;
 				}
 
-				WeaponFadeInOutY = Weapons[Player.SelectedWeapon].WeaponRect.h;
+				WeaponFadeInOutY = Weapons[Player.SelectedWeapon].WeaponRect.Height;
 			}
 		}
 		else if (WeaponFadeInOutY > 0)
@@ -503,15 +503,15 @@ namespace Game_WeaponHandling
 		const float PaceWeightProduct{ WeaponPace * Weapons[Player.SelectedWeapon].Weight };
 
 		// Swaypattern is some kind of simple Lissajous figure...
-		const PointInt Sway{ Weapons[Player.SelectedWeapon].WeaponRect.x + static_cast<std::int_fast32_t>(std::cosf(PaceWeightProduct) * 6.0F), Weapons[Player.SelectedWeapon].WeaponRect.y + static_cast<std::int_fast32_t>(std::sinf(PaceWeightProduct * 1.5F) * 6.0F) }; //-V807
+		const lwmf::IntPointStruct Sway{ Weapons[Player.SelectedWeapon].WeaponRect.X + static_cast<std::int_fast32_t>(std::cosf(PaceWeightProduct) * 6.0F), Weapons[Player.SelectedWeapon].WeaponRect.Y + static_cast<std::int_fast32_t>(std::sinf(PaceWeightProduct * 1.5F) * 6.0F) }; //-V807
 
 		// Draw muzzle flash if weapon is fired
 		if (WeaponMuzzleFlashFlag)
 		{
-			Weapons[Player.SelectedWeapon].MuzzleFlashShader.RenderTexture(&Weapons[Player.SelectedWeapon].MuzzleFlashTexture, Sway.X + Weapons[Player.SelectedWeapon].MuzzleFlashRect.x, Sway.Y - Weapons[Player.SelectedWeapon].MuzzleFlashRect.y, Weapons[Player.SelectedWeapon].MuzzleFlashRect.w, Weapons[Player.SelectedWeapon].MuzzleFlashRect.h); //-V807
+			Weapons[Player.SelectedWeapon].MuzzleFlashShader.RenderTexture(&Weapons[Player.SelectedWeapon].MuzzleFlashTexture, Sway.X + Weapons[Player.SelectedWeapon].MuzzleFlashRect.X, Sway.Y - Weapons[Player.SelectedWeapon].MuzzleFlashRect.Y, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Width, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Height); //-V807
 		}
 		// Draw weapon
-		Weapons[Player.SelectedWeapon].WeaponShader.RenderTexture(&Weapons[Player.SelectedWeapon].WeaponTexture, Sway.X, Sway.Y + WeaponFadeInOutY, Weapons[Player.SelectedWeapon].WeaponRect.w, Weapons[Player.SelectedWeapon].WeaponRect.h);
+		Weapons[Player.SelectedWeapon].WeaponShader.RenderTexture(&Weapons[Player.SelectedWeapon].WeaponTexture, Sway.X, Sway.Y + WeaponFadeInOutY, Weapons[Player.SelectedWeapon].WeaponRect.Width, Weapons[Player.SelectedWeapon].WeaponRect.Height);
 	}
 
 	inline void PlayAudio(const std::int_fast32_t SelectedPlayerWeapon, const WeaponsSounds WeaponSound)

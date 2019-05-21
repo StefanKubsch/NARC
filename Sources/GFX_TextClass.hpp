@@ -28,7 +28,7 @@ public:
 	void RenderText(const std::string& Text, std::int_fast32_t x, std::int_fast32_t y);
 	void RenderTextCentered(const std::string& Text, std::int_fast32_t y);
 
-	PointInt Offset{};
+	lwmf::IntPointStruct Offset{};
 	std::int_fast32_t FontHeight{};
 
 private:
@@ -84,8 +84,8 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 
 			for (char Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
 			{
-				PointInt i0{};
-				PointInt i1{};
+				lwmf::IntPointStruct i0{};
+				lwmf::IntPointStruct i1{};
 
 				stbtt_GetCodepointBitmapBox(&FontInfo, Char, 1.0F, 1.0F, &i0.X, &i0.Y, &i1.X, &i1.Y);
 				Width += 1 + static_cast<std::int_fast32_t>((i1.X * FontSize / 1000.0F) + 1.0F) - static_cast<std::int_fast32_t>(i0.X * FontSize / 1000.0F);
@@ -106,7 +106,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 
 			for (std::int_fast32_t Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
 			{
-				PointFloat QuadPos{};
+				lwmf::FloatPointStruct QuadPos{};
 				stbtt_aligned_quad Quad;
 				stbtt_GetBakedQuad(CharData, Width, Height, Char - FirstASCIIChar, &QuadPos.X, &QuadPos.Y, &Quad, 1);
 
@@ -118,7 +118,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				Glyphs[Char].Baseline = static_cast<std::int_fast32_t>(-Quad.y0);
 
 				// Blit single glyphs to individual textures
-				TextureStruct TempGlyphTexture;
+				lwmf::TextureStruct TempGlyphTexture;
 				TempGlyphTexture.Texture.resize(Glyphs[Char].Width * Glyphs[Char].Height);
 				TempGlyphTexture.Width = Glyphs[Char].Width;
 				TempGlyphTexture.Height = Glyphs[Char].Height;

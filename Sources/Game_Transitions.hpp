@@ -111,7 +111,7 @@ namespace Game_Transitions
 					}
 
 					const std::int_fast32_t FnResult{ Right << HalfBits | (Left & (LastFrame - 1)) };
-					const PointInt Pixel{FnResult % lwmf::ViewportWidth, static_cast<std::int_fast32_t>(FnResult / lwmf::ViewportWidth) };
+					const lwmf::IntPointStruct Pixel{FnResult % lwmf::ViewportWidth, static_cast<std::int_fast32_t>(FnResult / lwmf::ViewportWidth) };
 
 					if (Pixel.X < lwmf::ViewportWidth && Pixel.Y < lwmf::ViewportHeight)
 					{

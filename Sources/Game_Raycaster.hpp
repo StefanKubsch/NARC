@@ -88,12 +88,12 @@ namespace Game_Raycaster
 		for (std::int_fast32_t x{ Start }; x < End; ++x)
 		{
 			const float Camera{ (x + x) / static_cast<float>(lwmf::ViewportWidth) - 1.0F };
-			const PointFloat RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
-			const PointFloat DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
+			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
+			const lwmf::FloatPointStruct DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
 
-			PointFloat SideDist;
-			PointInt Step;
-			PointInt MapPos{ static_cast<std::int_fast32_t>(Player.Pos.X), static_cast<std::int_fast32_t>(Player.Pos.Y) };
+			lwmf::FloatPointStruct SideDist;
+			lwmf::IntPointStruct Step;
+			lwmf::IntPointStruct MapPos{ static_cast<std::int_fast32_t>(Player.Pos.X), static_cast<std::int_fast32_t>(Player.Pos.Y) };
 
 			RayDir.X < 0.0F ? (Step.X = -1, SideDist.X = (Player.Pos.X - MapPos.X) * DeltaDist.X) : (Step.X = 1, SideDist.X = (MapPos.X + 1 - Player.Pos.X) * DeltaDist.X);
 			RayDir.Y < 0.0F ? (Step.Y = -1, SideDist.Y = (Player.Pos.Y - MapPos.Y) * DeltaDist.Y) : (Step.Y = 1, SideDist.Y = (MapPos.Y + 1 - Player.Pos.Y) * DeltaDist.Y);
@@ -168,7 +168,7 @@ namespace Game_Raycaster
 			}
 			else
 			{
-				PointFloat FloorWall;
+				lwmf::FloatPointStruct FloorWall;
 
 				if (!WallSide && RayDir.X > 0.0F)
 				{
@@ -207,7 +207,7 @@ namespace Game_Raycaster
 				{
 					const float CurrentDist{ VerticalLookTemp / static_cast<float>(y + y - VerticalLookTemp) };
 					const float FactorW{ CurrentDist / WallDistTemp };
-					const PointFloat Floor{ FactorW * FloorWall.X + (1.0F - FactorW) * Player.Pos.X, FactorW * FloorWall.Y + (1.0F - FactorW) * Player.Pos.Y };
+					const lwmf::FloatPointStruct Floor{ FactorW * FloorWall.X + (1.0F - FactorW) * Player.Pos.X, FactorW * FloorWall.Y + (1.0F - FactorW) * Player.Pos.Y };
 
 					switch (Part)
 					{

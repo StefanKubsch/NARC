@@ -76,9 +76,9 @@ namespace lwmf
 			CenterPoints = Stack.back();
 			Stack.pop_back();
 
-			std::int_fast32_t x1{ CenterPoints.x };
+			std::int_fast32_t x1{ CenterPoints.X };
 
-			while (x1 >= 0 && PixelBuffer[CenterPoints.y * ViewportWidth + x1] != BorderColor)
+			while (x1 >= 0 && PixelBuffer[CenterPoints.Y * ViewportWidth + x1] != BorderColor)
 			{
 				--x1;
 			}
@@ -88,28 +88,28 @@ namespace lwmf
 			bool Above{};
 			bool Below{};
 
-			const std::int_fast32_t TempY{ CenterPoints.y * ViewportWidth };
+			const std::int_fast32_t TempY{ CenterPoints.Y * ViewportWidth };
 
 			while (x1 < ViewportWidth && PixelBuffer[TempY + x1] != BorderColor)
 			{
 				PixelBuffer[TempY + x1] = FillColor;
 
-				if (!Above && CenterPoints.y > 0 && PixelBuffer[(CenterPoints.y - 1) * ViewportWidth + x1] != BorderColor)
+				if (!Above && CenterPoints.Y > 0 && PixelBuffer[(CenterPoints.Y - 1) * ViewportWidth + x1] != BorderColor)
 				{
-					Stack.push_back({ x1, CenterPoints.y - 1 });
+					Stack.push_back({ x1, CenterPoints.Y - 1 });
 					Above = true;
 				}
-				else if (Above && CenterPoints.y > 0 && PixelBuffer[(CenterPoints.y - 1) * ViewportWidth + x1] != BorderColor)
+				else if (Above && CenterPoints.Y > 0 && PixelBuffer[(CenterPoints.Y - 1) * ViewportWidth + x1] != BorderColor)
 				{
 					Above = false;
 				}
 
-				if (!Below && CenterPoints.y < ViewportHeight - 1 && PixelBuffer[(CenterPoints.y + 1) * ViewportWidth + x1] != BorderColor)
+				if (!Below && CenterPoints.Y < ViewportHeight - 1 && PixelBuffer[(CenterPoints.Y + 1) * ViewportWidth + x1] != BorderColor)
 				{
-					Stack.push_back({ x1, CenterPoints.y + 1 });
+					Stack.push_back({ x1, CenterPoints.Y + 1 });
 					Below = true;
 				}
-				else if (Below && CenterPoints.y < ViewportHeight - 1 && PixelBuffer[(CenterPoints.y + 1) * ViewportWidth + x1] != BorderColor)
+				else if (Below && CenterPoints.Y < ViewportHeight - 1 && PixelBuffer[(CenterPoints.Y + 1) * ViewportWidth + x1] != BorderColor)
 				{
 					Below = false;
 				}
@@ -134,14 +134,14 @@ namespace lwmf
 		else if (x1 >= 0 && x1 <= ViewportWidth && y1 >= 0 && y1 < ViewportHeight && x2 >= 0 && x2 <= ViewportWidth && y2 >= 0 && y2 < ViewportHeight)
 		{
 			const IntPointStruct d{ x2 - x1, y2 - y1 };
-			const IntPointStruct d1{ std::abs(d.x), std::abs(d.y) };
+			const IntPointStruct d1{ std::abs(d.X), std::abs(d.Y) };
 
-			if (std::int_fast32_t x{}, y{}; d1.y <= d1.x)
+			if (std::int_fast32_t x{}, y{}; d1.Y <= d1.X)
 			{
-				std::int_fast32_t px{ (d1.y << 1) - d1.x };
+				std::int_fast32_t px{ (d1.Y << 1) - d1.X };
 				std::int_fast32_t xe{};
 
-				d.x >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
+				d.X >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
 				PixelBuffer[y * ViewportWidth + x] = Color;
 
 				for (std::int_fast32_t i{}; x < xe; ++i)
@@ -150,12 +150,12 @@ namespace lwmf
 
 					if (px < 0)
 					{
-						px += d1.y << 1;
+						px += d1.Y << 1;
 					}
 					else
 					{
-						(d.x < 0 && d.y < 0) || (d.x > 0 && d.y > 0) ? ++y : --y;
-						px += (d1.y - d1.x) << 1;
+						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++y : --y;
+						px += (d1.Y - d1.X) << 1;
 					}
 
 					PixelBuffer[y * ViewportWidth + x] = Color;
@@ -163,10 +163,10 @@ namespace lwmf
 			}
 			else
 			{
-				std::int_fast32_t py{ (d1.x << 1) - d1.y };
+				std::int_fast32_t py{ (d1.X << 1) - d1.Y };
 				std::int_fast32_t ye{};
 
-				d.y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
+				d.Y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
 				PixelBuffer[y * ViewportWidth + x] = Color;
 
 				for (std::int_fast32_t i{}; y < ye; ++i)
@@ -175,12 +175,12 @@ namespace lwmf
 
 					if (py <= 0)
 					{
-						py += d1.x << 1;
+						py += d1.X << 1;
 					}
 					else
 					{
-						(d.x < 0 && d.y < 0) || (d.x > 0 && d.y > 0) ? ++x : --x;
-						py += (d1.x - d1.y) << 1;
+						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++x : --x;
+						py += (d1.X - d1.Y) << 1;
 					}
 
 					PixelBuffer[y * ViewportWidth + x] = Color;
@@ -191,14 +191,14 @@ namespace lwmf
 		else
 		{ //-V523
 			const IntPointStruct d{ x2 - x1, y2 - y1 };
-			const IntPointStruct d1{ std::abs(d.x), std::abs(d.y) };
+			const IntPointStruct d1{ std::abs(d.X), std::abs(d.Y) };
 
-			if (std::int_fast32_t x{}, y{}; d1.y <= d1.x)
+			if (std::int_fast32_t x{}, y{}; d1.Y <= d1.X)
 			{
-				std::int_fast32_t px{ (d1.y << 1) - d1.x };
+				std::int_fast32_t px{ (d1.Y << 1) - d1.X };
 				std::int_fast32_t xe{};
 
-				d.x >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
+				d.X >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
 				SetPixelSafe(x, y, Color);
 
 				for (std::int_fast32_t i{}; x < xe; ++i)
@@ -207,12 +207,12 @@ namespace lwmf
 
 					if (px < 0)
 					{
-						px += d1.y << 1;
+						px += d1.Y << 1;
 					}
 					else
 					{
-						(d.x < 0 && d.y < 0) || (d.x > 0 && d.y > 0) ? ++y : --y;
-						px += (d1.y - d1.x) << 1;
+						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++y : --y;
+						px += (d1.Y - d1.X) << 1;
 					}
 
 					SetPixelSafe(x, y, Color);
@@ -220,10 +220,10 @@ namespace lwmf
 			}
 			else
 			{
-				std::int_fast32_t py{ (d1.x << 1) - d1.y };
+				std::int_fast32_t py{ (d1.X << 1) - d1.Y };
 				std::int_fast32_t ye{};
 
-				d.y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
+				d.Y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
 				SetPixelSafe(x, y, Color);
 
 				for (std::int_fast32_t i{}; y < ye; ++i)
@@ -232,12 +232,12 @@ namespace lwmf
 
 					if (py <= 0)
 					{
-						py += d1.x << 1;
+						py += d1.X << 1;
 					}
 					else
 					{
-						(d.x < 0 && d.y < 0) || (d.x > 0 && d.y > 0) ? ++x : --x;
-						py += (d1.x - d1.y) << 1;
+						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++x : --x;
+						py += (d1.X - d1.Y) << 1;
 					}
 
 					SetPixelSafe(x, y, Color);
@@ -367,16 +367,16 @@ namespace lwmf
 
 		for (std::int_fast32_t i{}; i < NumberOfPoints; ++i)
 		{
-			const FloatPointStruct AreaPoint{ static_cast<float>(Points[(i + 1) & (NumberOfPoints - 1)].x), static_cast<float>(Points[(i + 1) & (NumberOfPoints - 1)].y) };
-			const float Area{ Points[i].x * AreaPoint.y - AreaPoint.x * Points[i].y };
+			const FloatPointStruct AreaPoint{ static_cast<float>(Points[(i + 1) & (NumberOfPoints - 1)].X), static_cast<float>(Points[(i + 1) & (NumberOfPoints - 1)].Y) };
+			const float Area{ Points[i].X * AreaPoint.Y - AreaPoint.X * Points[i].Y };
 			SignedArea += Area;
-			Centroid.x += (Points[i].x + AreaPoint.x) * Area;
-			Centroid.y += (Points[i].y + AreaPoint.y) * Area;
+			Centroid.X += (Points[i].X + AreaPoint.X) * Area;
+			Centroid.Y += (Points[i].Y + AreaPoint.Y) * Area;
 		}
 
 		const float TempArea{ 3.0F * SignedArea };
 
-		return { static_cast<std::int_fast32_t>(Centroid.x /= TempArea), static_cast<std::int_fast32_t>(Centroid.y /= TempArea) };
+		return { static_cast<std::int_fast32_t>(Centroid.X /= TempArea), static_cast<std::int_fast32_t>(Centroid.Y /= TempArea) };
 	}
 
 	inline bool PointInsidePolygon(const std::vector<IntPointStruct>& Points, const IntPointStruct& Point)
@@ -389,9 +389,9 @@ namespace lwmf
 		{
 			IntPointStruct Point2{ Points[i & (NumberOfPoints - 1)] };
 
-			if ((Point.y > (std::min)(Point1.y, Point2.y)) && (Point.y <= (std::max)(Point1.y, Point2.y)) && (Point.x <= (std::max)(Point1.x, Point2.x)))
+			if ((Point.Y > (std::min)(Point1.Y, Point2.Y)) && (Point.Y <= (std::max)(Point1.Y, Point2.Y)) && (Point.X <= (std::max)(Point1.X, Point2.X)))
 			{
-				if ((Point1.y != Point2.y) && (Point1.x == Point2.x || Point.x <= (Point.y - Point1.y) * (Point2.x - Point1.x) / (Point2.y - Point1.y) + Point1.x))
+				if ((Point1.Y != Point2.Y) && (Point1.X == Point2.X || Point.X <= (Point.Y - Point1.Y) * (Point2.X - Point1.X) / (Point2.Y - Point1.Y) + Point1.X))
 				{
 					++Counter;
 				}
@@ -409,10 +409,10 @@ namespace lwmf
 
 		for (Index; Index < Points.size() - 1; ++Index)
 		{
-			Line(Points[Index].x, Points[Index].y, Points[Index + 1].x, Points[Index + 1].y, BorderColor);
+			Line(Points[Index].X, Points[Index].Y, Points[Index + 1].X, Points[Index + 1].Y, BorderColor);
 		}
 
-		Line(Points[Index].x, Points[Index].y, Points[0].x, Points[0].y, BorderColor);
+		Line(Points[Index].X, Points[Index].Y, Points[0].X, Points[0].Y, BorderColor);
 	}
 
 	inline void FilledPolygon(const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)

@@ -26,7 +26,7 @@ class HID_GameControllerClass final
 public:
 	void Init();
 
-	SDL_Point RightStickPos{};
+	lwmf::IntPointStruct RightStickPos{};
 	std::int_fast32_t JoystickDeadZone{};
 	std::int_fast32_t RightStickValue{};
 	float Sensitivity{};

@@ -196,15 +196,15 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 								if (Event.caxis.value < -GameController.JoystickDeadZone)
 								{
-									GameController.RightStickPos.x = -1;
+									GameController.RightStickPos.X = -1;
 								}
 								else if (Event.caxis.value > GameController.JoystickDeadZone)
 								{
-									GameController.RightStickPos.x = 1;
+									GameController.RightStickPos.X = 1;
 								}
 								else
 								{
-									GameController.RightStickPos.x = 0;
+									GameController.RightStickPos.X = 0;
 								}
 								break;
 							}
@@ -213,15 +213,15 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 							{
 								if (Event.caxis.value < -GameController.JoystickDeadZone)
 								{
-									GameController.RightStickPos.y = -1;
+									GameController.RightStickPos.Y = -1;
 								}
 								else if (Event.caxis.value > GameController.JoystickDeadZone)
 								{
-									GameController.RightStickPos.y = 1;
+									GameController.RightStickPos.Y = 1;
 								}
 								else
 								{
-									GameController.RightStickPos.y = 0;
+									GameController.RightStickPos.Y = 0;
 								}
 								break;
 							}
@@ -389,8 +389,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				case RIM_TYPEMOUSE:
 				{
-					HID_Mouse::MousePos.x = RawDev.data.mouse.lLastX;
-					HID_Mouse::MousePos.y = RawDev.data.mouse.lLastY;
+					HID_Mouse::MousePos.X = RawDev.data.mouse.lLastX;
+					HID_Mouse::MousePos.Y = RawDev.data.mouse.lLastY;
 
 					if ((RawDev.data.mouse.ulButtons & RI_MOUSE_LEFT_BUTTON_DOWN) != 0)
 					{
@@ -644,48 +644,48 @@ void ControlPlayerMovement()
 
 	if (GameControllerFlag)
 	{
-		switch (GameController.RightStickPos.x)
+		switch (GameController.RightStickPos.X)
 		{
 			case -1:
 			{
-				--HID_Mouse::MousePos.x;
+				--HID_Mouse::MousePos.X;
 				break;
 			}
 			case 1:
 			{
-				++HID_Mouse::MousePos.x;
+				++HID_Mouse::MousePos.X;
 				break;
 			}
 			default:
 			{
-				HID_Mouse::MousePos.x = 0;
+				HID_Mouse::MousePos.X = 0;
 			}
 		}
 
-		switch (GameController.RightStickPos.y)
+		switch (GameController.RightStickPos.Y)
 		{
 			case -1:
 			{
-				--HID_Mouse::MousePos.y;
+				--HID_Mouse::MousePos.Y;
 				break;
 			}
 			case 1:
 			{
-				++HID_Mouse::MousePos.y;
+				++HID_Mouse::MousePos.Y;
 				break;
 			}
 			default:
 			{
-				HID_Mouse::MousePos.y = 0;
+				HID_Mouse::MousePos.Y = 0;
 			}
 		}
 	}
 
 	const float InputSensitivity { GameControllerFlag ? GameController.Sensitivity : HID_Mouse::MouseSensitivity };
 
-	if (HID_Mouse::MousePos.x != HID_Mouse::OldMousePos.x)
+	if (HID_Mouse::MousePos.X != HID_Mouse::OldMousePos.X)
 	{
-		const float RotationX{ GameControllerFlag ? GameController.RotationXLimit * (GameController.RightStickValue / 8000) : HID_Mouse::MousePos.x * InputSensitivity * (lwmf::PI / 180.0F) };
+		const float RotationX{ GameControllerFlag ? GameController.RotationXLimit * (GameController.RightStickValue / 8000) : HID_Mouse::MousePos.X * InputSensitivity * (lwmf::PI / 180.0F) };
 		const float oldDirX{ Player.Dir.X };
 		const float TmpCos{ std::cosf(-RotationX) };
 		const float TmpSin{ std::sinf(-RotationX) };
@@ -697,16 +697,16 @@ void ControlPlayerMovement()
 		Plane.Y = oldPlaneX * TmpSin + Plane.Y * TmpCos;
 	}
 
-	if (HID_Mouse::MousePos.y != HID_Mouse::OldMousePos.y)
+	if (HID_Mouse::MousePos.Y != HID_Mouse::OldMousePos.Y)
 	{
 		// Check if "future" view is in given boundaries and apply if true!
-		if (HID_Mouse::MousePos.y < 0 && VerticalLookCamera + VerticalLookStep * -(HID_Mouse::MousePos.y * InputSensitivity) < VerticalLookUpLimit)
+		if (HID_Mouse::MousePos.Y < 0 && VerticalLookCamera + VerticalLookStep * -(HID_Mouse::MousePos.Y * InputSensitivity) < VerticalLookUpLimit)
 		{
-			VerticalLookCamera += VerticalLookStep * -(HID_Mouse::MousePos.y * InputSensitivity);
+			VerticalLookCamera += VerticalLookStep * -(HID_Mouse::MousePos.Y * InputSensitivity);
 		}
-		else if (HID_Mouse::MousePos.y > 0 && -(VerticalLookCamera - VerticalLookStep * (HID_Mouse::MousePos.y * InputSensitivity)) < VerticalLookDownLimit)
+		else if (HID_Mouse::MousePos.Y > 0 && -(VerticalLookCamera - VerticalLookStep * (HID_Mouse::MousePos.Y * InputSensitivity)) < VerticalLookDownLimit)
 		{
-			VerticalLookCamera -= VerticalLookStep * (HID_Mouse::MousePos.y * InputSensitivity);
+			VerticalLookCamera -= VerticalLookStep * (HID_Mouse::MousePos.Y * InputSensitivity);
 		}
 
 		VerticalLook = static_cast<std::int_fast32_t>(lwmf::ViewportHeight * VerticalLookCamera);

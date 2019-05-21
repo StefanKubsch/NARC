@@ -26,16 +26,16 @@ namespace GFX_ImageHandling
 {
 
 
-	TextureStruct ImportImage(const std::string& ImageFileName);
-	TextureStruct ImportTexture(const std::string& ImageFileName, std::int_fast32_t Size);
+	lwmf::TextureStruct ImportImage(const std::string& ImageFileName);
+	lwmf::TextureStruct ImportTexture(const std::string& ImageFileName, std::int_fast32_t Size);
 
 	//
 	// Functions
 	//
 
-	inline TextureStruct ImportImage(const std::string& ImageFileName)
+	inline lwmf::TextureStruct ImportImage(const std::string& ImageFileName)
 	{
-		TextureStruct TempTexture;
+		lwmf::TextureStruct TempTexture;
 
 		if (Tools_ErrorHandling::CheckFileExistence(ImageFileName, ShowMessage, StopOnError))
 		{
@@ -56,9 +56,9 @@ namespace GFX_ImageHandling
 		return TempTexture;
 	}
 
-	inline TextureStruct ImportTexture(const std::string& ImageFileName, const std::int_fast32_t Size)
+	inline lwmf::TextureStruct ImportTexture(const std::string& ImageFileName, const std::int_fast32_t Size)
 	{
-		TextureStruct TempTexture;
+		lwmf::TextureStruct TempTexture;
 
 		if (Tools_ErrorHandling::CheckFileExistence(ImageFileName, ShowMessage, StopOnError))
 		{

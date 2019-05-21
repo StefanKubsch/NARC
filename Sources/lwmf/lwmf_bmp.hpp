@@ -138,11 +138,11 @@ namespace lwmf
 
 			for (std::int_fast32_t Offset{}, i{}; i < TargetHeight; ++i)
 			{
-				const std::int_fast32_t TempY{ ((i * Ratio.y) >> 16) * Bitmap.Width };
+				const std::int_fast32_t TempY{ ((i * Ratio.Y) >> 16) * Bitmap.Width };
 
 				for (std::int_fast32_t j{}; j < TargetWidth; ++j)
 				{
-					TempBuffer[Offset++] = Bitmap.BitmapData[TempY + ((j * Ratio.x) >> 16)];
+					TempBuffer[Offset++] = Bitmap.BitmapData[TempY + ((j * Ratio.X) >> 16)];
 				}
 			}
 		}
@@ -152,20 +152,20 @@ namespace lwmf
 
 			for (std::int_fast32_t Offset{}, i{}; i < TargetHeight; ++i)
 			{
-				const std::int_fast32_t PosY{ static_cast<std::int_fast32_t>(Ratio.y * i) };
+				const std::int_fast32_t PosY{ static_cast<std::int_fast32_t>(Ratio.Y * i) };
 				const std::int_fast32_t TempY{ PosY * Bitmap.Width };
-				const float Height{ Ratio.y * i - PosY };
+				const float Height{ Ratio.Y * i - PosY };
 
 				for (std::int_fast32_t j{}; j < TargetWidth; ++j)
 				{
-					const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(Ratio.x * j) };
+					const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(Ratio.X * j) };
 					const std::int_fast32_t Index{ TempY + PosX };
 					const std::int_fast32_t P1{ Bitmap.BitmapData[Index] };
 					const std::int_fast32_t P2{ Bitmap.BitmapData[Index + 1] };
 					const std::int_fast32_t P3{ Bitmap.BitmapData[Index + Bitmap.Width] };
 					const std::int_fast32_t P4{ Bitmap.BitmapData[Index + Bitmap.Width + 1] };
 
-					const float Width{ Ratio.x * j - PosX };
+					const float Width{ Ratio.X * j - PosX };
 					const float t1{ (1.0F - Width) * (1.0F - Height) };
 					const float t2{ Width * (1.0F - Height) };
 					const float t3{ Height * (1.0F - Width) };

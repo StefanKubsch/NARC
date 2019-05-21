@@ -11,7 +11,6 @@
 
 #include <cstdint>
 #include <string>
-#include <SDL.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -26,12 +25,12 @@ public:
 	void Display();
 
 private:
-	SDL_Rect RectRed{};
-	SDL_Rect RectOrange{};
-	SDL_Rect RectBlack1{};
-	SDL_Rect RectBlack2{};
+	lwmf::IntRectStruct RectRed{};
+	lwmf::IntRectStruct RectOrange{};
+	lwmf::IntRectStruct RectBlack1{};
+	lwmf::IntRectStruct RectBlack2{};
 
-	PointInt Pos{};
+	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t HealthBarWidth{};
 	std::int_fast32_t HealthBarFactor{};
 
@@ -65,12 +64,12 @@ inline void Game_HealthBarClass::Init()
 
 inline void Game_HealthBarClass::Display()
 {
-	const SDL_Rect RectHealthGreen{ Pos.X, Pos.Y, Player.Hitpoints * HealthBarFactor, HealthBarWidth };
+	const lwmf::IntRectStruct RectHealthGreen{ Pos.X, Pos.Y, Player.Hitpoints * HealthBarFactor, HealthBarWidth };
 
-	lwmf::FilledRectangle(RectBlack2.x, RectBlack2.y, RectBlack2.w, RectBlack2.h, Black);
-	lwmf::FilledRectangle(RectOrange.x, RectOrange.y, RectOrange.w, RectOrange.h, Orange);
-	lwmf::FilledRectangle(RectBlack1.x, RectBlack1.y, RectBlack1.w, RectBlack1.h, Black);
-	lwmf::FilledRectangle(RectRed.x, RectRed.y, RectRed.w, RectRed.h, Red);
-	lwmf::FilledRectangle(RectHealthGreen.x, RectHealthGreen.y, RectHealthGreen.w, RectHealthGreen.h, Green);
+	lwmf::FilledRectangle(RectBlack2.X, RectBlack2.Y, RectBlack2.Width, RectBlack2.Height, Black);
+	lwmf::FilledRectangle(RectOrange.X, RectOrange.Y, RectOrange.Width, RectOrange.Height, Orange);
+	lwmf::FilledRectangle(RectBlack1.X, RectBlack1.Y, RectBlack1.Width, RectBlack1.Height, Black);
+	lwmf::FilledRectangle(RectRed.X, RectRed.Y, RectRed.Width, RectRed.Height, Red);
+	lwmf::FilledRectangle(RectHealthGreen.X, RectHealthGreen.Y, RectHealthGreen.Width, RectHealthGreen.Height, Green);
 }
 

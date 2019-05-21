@@ -24,7 +24,7 @@ public:
 	std::int_fast32_t Location{};
 
 private:
-	PointFloat Pos{};
+	lwmf::FloatPointStruct Pos{};
 	float Radius{};
 	float Intensity{};
 };

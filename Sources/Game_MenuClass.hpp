@@ -47,7 +47,7 @@ private:
 	GFX_TextClass Text{};
 	GFX_TextClass TextHighlight{};
 
-	PointInt Pos{};
+	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t HighLightedItem{};
 	std::int_fast32_t SelectedLevel{};
 	std::int_fast32_t SelectedItem{};
