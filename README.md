@@ -60,9 +60,9 @@ The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textu
   - autoupdates via web/HTTPS for e.g. "gamecontrollerdb.txt" (using libcurl)
   - really fast & lightweight text rendering via stb_truetype.h and pre-generated glyph textures (OpenGL)
 
-![NARC_SDL_PIC1](https://github.com/StefanKubsch/NARC_SDL/blob/master/Documentation/NARC_SDL.png)
+![NARC_PIC1](https://github.com/StefanKubsch/NARC/blob/master/Documentation/NARC.png)
 
-![NARC_SDL_PIC1](https://github.com/StefanKubsch/NARC_SDL/blob/master/Documentation/NARC_SDL1.png)
+![NARC_PIC2](https://github.com/StefanKubsch/NARC/blob/master/Documentation/NARC1.png)
 
 **Used libraries/APIs:**
 
