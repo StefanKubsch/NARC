@@ -729,3 +729,7 @@ x64/Release/NARC.tlog/link.read.1.tlog
 x64/Release/NARC.tlog/link.write.1.tlog
 x64/Release/NARC.tlog/NARC.lastbuildstate
 x64/Release/NARC.tlog/NARC.write.1u.tlog
+.vs/NARC/v16/ipch/AutoPCH/ca35a5fea90c76f2/GAME_ASSETHANDLING.ipch
+x64/Release/NARC.Build.CppClean.log
+x64/Release/NARC.exe.lastcodeanalysissucceeded
+x64/Release/NARC.vcxproj.FileListAbsolute.txt
