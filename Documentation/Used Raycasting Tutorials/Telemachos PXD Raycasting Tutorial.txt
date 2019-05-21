@@ -1,0 +1,2542 @@
+
+ 
+
+ 
+
+                  |====================================|
+
+                  |                                    |
+
+                  |   TELEMACHOS proudly presents :    |
+
+                  |                                    |
+
+                  |    Part 7 of the PXD trainers  -   |
+
+                  |                                    |
+
+                  |       RAYCASTING - WOLFENSTEIN     |
+
+                  |               STYLE                |
+
+                  |                                    |
+
+                  |====================================|
+
+ 
+
+         ___---__-->   The Peroxide Programming Tips   <--__---___
+
+ 
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
+
+ 
+
+ 
+
+Intoduction
+
+-----------
+
+ 
+
+Hi folks! It's been awhile as usual but here goes - part 7 of the PXDTUT
+
+trainer serie.
+
+ 
+
+In part 6 I promised to do some SoundBlaster code - but it seems that people
+
+are more interrested in some graphical effects so I'll leave the sound code
+
+for later.
+
+I have also promised to show you how to code the MARS effect (the VOXEL-effect
+
+for those of you who has not seen MARS) but that will have to wait until my
+
+next tutorial or something....
+
+ 
+
+So, the topic of this tutorial is raycasting. In this particular trainer I'll
+
+show you how to do the basic raycasting. This means NO doors, NO floor /
+
+ceiling and NO monsters. I thought about including the door-code in this
+
+tutorial but I found it to confusing in the raycasting procedures. Doing doors
+
+requires you to extend your raycasting procedures quite a bit so I left it out
+
+for simplicity.
+
+If there is enough interrest I might release another tutorial on doors, floors
+
+and ceilings - mail me!
+
+ 
+
+ 
+
+If you want to get in contact with me, there are several ways of doing it :
+
+ 
+
+1) E-mail me               :      tm@image.dk
+
+ 
+
+2) Snail mail me           :      Kasper Fauerby
+
+                                  Saloparken 226
+
+                                  8300 Odder
+
+                                  Denmark
+
+ 
+
+3) Call me  (Voice ! )     :    +45 86 54 07 60
+
+ 
+
+ 
+
+Get this serie from the major demo-related FTP-sites - currently :
+
+ 
+
+  GARBO ARCHIVES  (forgot the address)  :  /pc/programming/
+
+ 
+
+  ftp.teeri.oulu.fi  :   /msdos/programming/docs/
+
+ 
+
+  ftp.cdrom.com      :  something with demos/incomming/code.....
+
+ 
+
+Or grap it from my homepage :
+
+ 
+
+   Telemachos' Codin' Corner   http://www.image.dk/~tm
+
+ 
+
+ 
+
+ 
+
+WHAT IS RAYCASTING ?
+
+---------------------
+
+ 
+
+OK, as most of you know the classic "3D" games as WOLFENSTEIN and DOOM is'nt
+
+3D at all!
+
+They are just 2D games with a faked 3rd dimension. What does this means ? It
+
+means that WOLF and DOOM are based on 2D maps - in DOOM this map show where
+
+the walls are and how high the walls are.
+
+WOLF is much more simple! First of all : In WOLF all walls are ortogonal (ie.
+
+at 90 degree angles to each other) and all walls have the same height.
+
+If you look at a map from wolfenstein from above it looks like a grid made
+
+from square cells - some of the cells are "filled" - others are not. Those
+
+which is filled are the walls.
+
+Now - the trick is to fool the player into thinking he is walking in a real
+
+3D virtual reality world. This is done in a very clever way called raycasting
+
+which involves NO 3D calculations at all! All the walls are just scaled into
+
+looking 3D.
+
+ 
+
+We need some information on the player to actually make this 3D illusion.
+
+First of all we need to know what the player sees of the 2D map.
+
+Therefore we need to know how wide his "field of vision" is. In most 3D engines
+
+the player has a 60 degree field of vision - so that is the number we'll use
+
+too :)
+
+So to find out what the player sees of the map we need to know his (X,Y)
+
+position on the 2D map and his viewangle.
+
+ 
+
+To visualize I'll draw a small ASCII map below. The squares filled with x's
+
+are the cells which contains a wall  and P symbolizes the player with his
+
+field of vision
+
+ 
+
+ 
+
+    |------------------------------------------------------------|
+
+    | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    |------------------------------------------------------------|
+
+    | xxxxxxx \         |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    | xxxxxxx | \       |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    | xxxxxxx |   \     |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    | xxxxxxx |     \   |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    |-----------------\-------------------------------/----------|
+
+    | xxxxxxx |         \         |         |       / | xxxxxxxx |
+
+    | xxxxxxx |         | \       |         |     /   | xxxxxxxx |
+
+    | xxxxxxx |         |   \     |         |   /     | xxxxxxxx |
+
+    | xxxxxxx |         |     \   |         | /       | xxxxxxxx |
+
+    |---------------------------\-----------/--------------------|
+
+    | xxxxxxx |         |         \       / |         |          |
+
+    | xxxxxxx |         |         | \ × /   |         |          |
+
+    | xxxxxxx |         |         |   P     |         |          |
+
+    | xxxxxxx |         |         |         |         |          |
+
+    |------------------------------------------------------------|
+
+ 
+
+ 
+
+So - to render this view we need to find out what part of the 2d map that
+
+is in the players field of vision.
+
+We do that by tracing along virtual "rays" across the 2D map. Each time a
+
+ray enters a new square on the map we check if the ray has hit a cell which
+
+contains a wall. Each ray originates from the player but has a different
+
+direction. In total we want our rays to cover the 60 degree field of vision
+
+we have decided our player should have.
+
+If we want our game screen to take up 320 rows of graphic we cast 320 rays
+
+within our 60 degree field of vision. This way we get information on what to
+
+draw for each of our 320 rows of graphic.
+
+When we hit a wall we calculate the distance the wall is from the player and
+
+from this information we find out how big this part of the wall should be -
+
+the greater distance, the smaller wall.
+
+ 
+
+ 
+
+ 
+
+HOW TO CODE IT !
+
+-----------------
+
+ 
+
+First of all we have to decide how big each cell on the 2D map should be in our
+
+3D world - ie how many "units" each cell is on both its X and Y side.
+
+The most classic number used is 64 ('cause WOLFENSTEIN used 64X64 cells 8) ) -
+
+so 64 is the number we settle for.
+
+The size of the cells is important because we move our player around the world
+
+using global X and Y coordinates and a viewangle.
+
+If our player is positioned at fx.
+
+ 
+
+               X =  352
+
+               Y =  384
+
+       ViewAngle =  90
+
+ 
+
+and we have cells which is 64 units on each side we can find out where on the
+
+2D map the player is. In the example above the player would be located at :
+
+ 
+
+         XMap = 352 / 64 = 5.5
+
+         YMap = 384 / 64 = 6.5
+
+ 
+
+ie. the player would be standing in the middle of Map(5,6) looking directly to
+
+the south.
+
+ 
+
+Speaking of orientation I think it's time to introduce you to how we define
+
+our directions on the 2D map  :
+
+ 
+
+ 
+
+  degrees :          North                     map :
+
+                      270
+
+ 
+
+                                                 | --------------> X-axis
+
+                                                 |
+
+       West  180                 0/360 East      |
+
+                                                 |
+
+                                                 |
+
+                                                 |
+
+                       90                        V  Y-axis
+
+                     South
+
+ 
+
+ 
+
+ 
+
+OK - we have decided to use 320 rows of graphic to cover a 60 degree field of
+
+vision. So we start by looking 30 degrees to the LEFT of the direction the
+
+player is looking.
+
+After each ray we increase the raycasting angle by  :
+
+ 
+
+         60 degrees / 320 rows = 0.1875 degrees/row
+
+ 
+
+This way our 320 rows of graphic covers 60 degrees on the 2D map starting
+
+30 degrees to the left of the player and ending 30 degrees to the right of
+
+the player.
+
+ 
+
+ 
+
+Great! Now this is pretty easy - we start tracing along the 2D map 30 degrees
+
+to the left of the player and continues the ray until it hits a wall. Then
+
+we draw the sliver of the wall and increase our raycasting angle by 0.1875
+
+until we have drawn 320 rows of graphic right ??
+
+Now quite! Because if we had to trace along 320 rays - and each ray had to
+
+trace along the 2D map and check for a wall-hit for every single X,Y position
+
+of the ray the game would run terribly slow.
+
+So the first (and most important) optimization we'll make in our 3d-engine
+
+is to split the ray-casting procedure up in TWO procedures. On that checks if
+
+the ray has hit a cell containing a wall on the X-side - and one checking
+
+if the ray has hit a cell containing a wall on the Y-side.
+
+ 
+
+ 
+
+                                             Y-side
+
+             _______                       _________
+
+            |       |                     |         |
+
+X-side ---> |       | <--- X-side         |         |
+
+            |-------|                     |---------|
+
+                                             Y-side
+
+ 
+
+ 
+
+Now we can advance the rays in jumps of 64 units and therefore only check if
+
+the ray has hit something interresting each time the ray enters a NEW cell.
+
+Now we just have to fire TWO rays for each row of graphic - one checking for
+
+X-walls and one checking for Y-walls.
+
+To visualize how big a optimization this is :
+
+ 
+
+Imagine we have world that is 100X100 cells with each cell being 64X64 units.
+
+Then the farthest distance on the map would be SQRT((100*64)^2 + (100*64)^2) =
+
+9050 units (the length of the diagonal on the map) - ie. without using two rays
+
+we would have to check for wall-hits 9050 times - using the other method each
+
+ray would have to check max. 100 times.
+
+ 
+
+Lets take a look at the sample world I showed you before. If we consider the
+
+two rays drawn on the map as X-rays we would only have to check the ray the
+
+places I have marked with a '*' :
+
+ 
+
+    |------------------------------------------------------------|
+
+   | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    | xxxxxxx | xxxxxxx | xxxxxxx | xxxxxxx |         |          |
+
+    |------------------------------------------------------------|
+
+    | xxxxxxx *         |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    | xxxxxxx | \       |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    | xxxxxxx |   \     |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    | xxxxxxx |     \   |         | xxxxxxx | xxxxxxx | xxxxxxxx |
+
+    |-----------------\-------------------------------*----------|
+
+    | xxxxxxx |         *         |         |       / | xxxxxxxx |
+
+    | xxxxxxx |         | \       |         |     /   | xxxxxxxx |
+
+    | xxxxxxx |         |   \     |         |   /     | xxxxxxxx |
+
+    | xxxxxxx |         |     \   |         | /       | xxxxxxxx |
+
+    |---------------------------\-----------*--------------------|
+
+    | xxxxxxx |         |         *       / |         |          |
+
+    | xxxxxxx |         |         | \ × /   |         |          |
+
+    | xxxxxxx |         |         |   P     |         |          |
+
+    | xxxxxxx |         |         |         |         |          |
+
+    |------------------------------------------------------------|
+
+ 
+
+So when we trace along the ray we increase (or decrease if we're looking to
+
+the left) the X-position of the ray by 64.
+
+Same thing with the Y-rays - but here we only check at Y-borders.
+
+ 
+
+ 
+
+ 
+
+THE X-RAY PROCEDURE
+
+--------------------
+
+ 
+
+I'll descripe the working of the X-ray procedure. The Y-ray procedure is pretty
+
+much the same - so I'll let you figure it out for yourself.
+
+ 
+
+The first place to check for a wall-hit is the place where the ray crosses the
+
+X-border of the cell where the player is standing. So we calculate our starting
+
+X,Y coordinates of the ray like this :
+
+ 
+
+  The X-coordinate : PlayerX DIV 64 MUL 64. This gives us the world X-coord
+
+                     of the left side of the cell the player is standing in.
+
+                     If the player looks to the right we add 64 to this value.
+
+ 
+
+  The Y-coordinate : (StartX - PlayerX) * tan(RayAngle) + PlayerY.
+
+                     Well - I guess this needs an explanation :)
+
+                     First of all - All the math I use here is standard trig
+
+                     from school. If you don't know trig I suggest you go get
+
+                     a good book on the subject - 'cause I can't / won't
+
+                     explain it to you in this text :)
+
+ 
+
+                     Lets say we have this square to check :
+
+ 
+
+                      P  = player at some position I just made up. (83,106)
+
+                      RA = RayAngle = 225 degrees.
+
+                      V  = RA - 180 = 45 degrees.
+
+ 
+
+                       --------------------------
+
+                      |                          |
+
+                      * (64, ?? )                |
+
+                      | \                        |
+
+                      |  /\                      |
+
+                      | | V \  (83,106)          |
+
+             (64,106) B-|--- P ----|--- 0 degree |
+
+                      |  \  RA    /              |
+
+                      |    \ ___/                |
+
+                       --------------------------
+
+ 
+
+                     The first thought you get when looking at this is to use
+
+                     the good old formula :
+
+ 
+
+                          |*B| = Tan(V) * |BP|
+
+ 
+
+                     But Tan(V) = Tan(180 + V) so there is no need to calculate
+
+                     V - we just use RA.
+
+                     The clever thing about using tangens here is that you
+
+                     don't have to think about what direction you are looking.
+
+                     If we (as in the case above) is looking up AND to the
+
+                     left (ie. is between 180 and 270 degrees) tangens is
+
+                     always positive. But by calculating |BP| as :
+
+                     StartX - PlayerX we always gets a negative value to
+
+                     multiply the positive tangens with when looking to the
+
+                     left - so the result is the negative length of |*B|.
+
+                     So we just have to add this value (but by adding a
+
+                     negative value we actually subtract it) to PlayerY to
+
+                     get the Y-value of '*'.
+
+                     Had we been looking DOWN but still to the left (ie. is
+
+                     between 90 and 180 degrees) tangens would have been
+
+                     negative - but when multiplied with the negative |BP|
+
+                     the result would have been positive - and a positive
+
+                     value would have been added to PlayerY. Just as it
+
+                     should be !
+
+                     The same way it fits with the right side.
+
+ 
+
+ 
+
+OK... now we know where to start our trace across the map. The next step is
+
+to calculate the step-values with which we trace along the map.
+
+ 
+
+  The X-step    :    This is easy! If we are looking to the right the X-step
+
+                     is of cause 64 - if we are looking to the left the
+
+                     X-step is -64.
+
+ 
+
+  The Y-step    :    The Y-step is calculated as Ystep = 64 * TAN(RayAngle)
+
+                     I'll illustrate this by showing you an example :
+
+ 
+
+                     -----------------------------
+
+                    |                             |
+
+                    |                             |
+
+                    *2                            |
+
+                    |     \                       |
+
+                    |           \                 |
+
+                    |             /   \           |
+
+                    |            | RA       \     |
+
+                    B - - - - - - - - - - - - - - *1
+
+                    |                             |
+
+                     -----------------------------
+
+ 
+
+                     The ray enters the square at '*1' and leaves it at '*2'.
+
+                     Y-step is the length |B*2| - ie. it's amount to add to
+
+                     the Y-position of the ray for each step in the raytrace.
+
+                     |B*2| is calculated exactly the same way as we calculated
+
+                     the starting Y-position above.
+
+ 
+
+                           |B*2| = |B*1| * TAN(RA) = 64 * TAN(RA)
+
+ 
+
+                     There is just one thing to notice here. As we define the
+
+                     length of |B*1| as postive no matter what the RA is we
+
+                     have to make the result negative ourself when looking to
+
+                     the left (In the case above with the starting Y-position
+
+                     we do this by always defining |B*1| as B - *1.
+
+                     So if we are looking to the left Ystep = -YStep.
+
+ 
+
+OK.. now we have everything set up for the raytrace. We have an inner loop
+
+which traces along the map using the calculated starting X,Y values and the
+
+calculated X-Step and Y-Step values.
+
+Each time we advance the ray we calculate the XMap,YMap positions on the 2D map
+
+and check if we have hit a wall.
+
+We calculate the Xmap and Ymap positions like this :
+
+ 
+
+  The Xmap    :      Xmap = XRayPos DIV 64. If we are looking to the left we
+
+                     want the square to the LEFT of the X-border we have hit.
+
+                     And so long we define our world as :
+
+ 
+
+                        World : Array[1..Size,1..Size] of byte
+
+ 
+
+                     the formula above works fine.
+
+                     If we are looking to the right we want the square to the
+
+                     RIGHT of the X-border we have hit. Therefore we add one
+
+                     to the Xmap if we are looking to the right.
+
+ 
+
+  The Ymap    :      Ymap = YRayPos DIV 64 + 1  -  this is ALWAYS true no
+
+                     matter which way we look.
+
+ 
+
+ 
+
+If we DON'T hit a wall we advance the ray one step and check again. We keep
+
+advancing the ray until we hit a wall or gets outside the borders of the 2D
+
+map.
+
+ 
+
+IF we have hit a wall there is a few things we need to do. We need to save the
+
+information on where we hit the wall - ie. the XRayPos and YRayPos of the hit.
+
+These coordinates are used to calculate the distance between the player and
+
+the hit.
+
+We also need to know the Y-position in the cell we have hit. We use this value
+
+to find the X-index in the texturemap. Notice that using raycasting we get
+
+texturemapping *WITH CORRECT PERSPECTIVE* - not that shitty linear texturemap-
+
+ping we used in tutorial 4 where we texturemapped rotating 3D objects.
+
+Anyway - the texture column is :
+
+ 
+
+        TexCol = YRayPos - ((YMapPos - 1) * 64)
+
+ 
+
+Now, using this method all textures will have the same orientation. What does
+
+that mean ? It means that if we fx. were looking at a door from one side (fx.
+
+looking left on the 2D map) then walks through it, turn around and take a look
+
+again (now looking to the right on the 2D map) the door-handle would appear on
+
+the same side of the screen on both sides of the door !
+
+Hmm... this won't do - so we decide that if we look to the left we mirror the
+
+texture index by doing :
+
+ 
+
+        TexCol = 64 - (YrayPos - ((YmapPos - 1) * 64))
+
+ 
+
+OK - this is about all there is to say about the X-ray procedure. The Y-ray
+
+is pretty much the same besides we now checks on the Y-borders of the 2D map.
+
+The trig needed for calculating Xstart, Ystart and Xstep, Ystep is NOT the
+
+same as the one needed for the X-ray procedure.
+
+Figure it out for yourself (preferrable - also for you) or check out the
+
+sample program to get the math needed.
+
+Also there are certain angles where it is'nt wise to try and take the Tangens
+
+of the value - unless you want to crash your computer :) Check out the sample
+
+program if you are having trouble sorting these angles out :)
+
+ 
+
+ 
+
+ 
+
+THE RENDER-VIEW PROCEDURE
+
+--------------------------
+
+ 
+
+Now - this procedure is the heart of the engine. This is where the rays are
+
+fired and the screen drawn.
+
+ 
+
+Basicly this procedure is a loop that loops through the 320 rows on the screen
+
+and fires the 320 X 2 rays.
+
+We start firing rays 30 degrees left of the Players ViewAngle (as mentioned
+
+before). For all rows on the screen we fire TWO rays - one for the X-walls and
+
+one for the Y-walls.
+
+ 
+
+Both of these procedures will probably return information on a hit - so which
+
+ray do we use ?? We'll use the closest wall of cause - so we need to calculate
+
+the distance to the hit.
+
+For now I'll give you the slow but precise way of calculating the distance :
+
+ 
+
+  Dist := SQRT((XRayXpos - PlayerX)^2 + (XRayYpos - PlayerY)^2);
+
+ 
+
+Calculate the distance of both the Xray and the Yray and use the one with the
+
+shortest distance.
+
+ 
+
+Now we calculate how big the sliver of wall should be based on the distance to
+
+it. The greater distance, the smaller wall of cause. Now we do a linear scale
+
+of the texture-index we found in the XRay or YRay procedure (centering it
+
+around the horizon of cause) - and HEY PRESTO! we have drawn one of the 320
+
+rows of graphic needed to fill our viewport.
+
+ 
+
+Now advance the ray 60/320 = 0.1875 degrees and fire two more rays....
+
+ 
+
+ 
+
+ 
+
+THE FISH-EYE EFFECT - AND HOW TO KILL THAT UGLY FISH!
+
+------------------------------------------------------
+
+ 
+
+If you have build your own engine by now (which I guess quite a few of you
+
+has'nt 8) ) you'll have discovered that the view is strangly twisted. It looks
+
+like the walls "bulge" out towards you in the middle of the screen.
+
+No - it's not those 20 beers you just down'ed that twists your vision - or the
+
+fun stuff you just smoke :)
+
+It's the FISH-EYE EFFECT !!
+
+ 
+
+Fish-eye effect happens when you raycast from a fixed point - ie. ONE single
+
+eye-point. To visualize the effect :
+
+ 
+
+ 
+
+                       VA
+
+        -------A-----------------B----------    <-- a wall on the 2D map.
+
+                 \      |      /
+
+                   \    |    /
+
+                     \  |  /
+
+                       \|/
+
+                        P
+
+ 
+
+ 
+
+P is the player that looks straigt ahead at a wall. When one looks straight
+
+ahead at a wall it should appear as a square right ?? (Same as if you were
+
+looking directly at a CD cover you hold out before you - it sure does'nt
+
+"bulge" towards you in the middle right ?? )
+
+But the height of the wall-slivers are calculated by looking at the length of
+
+the ray - the father the distance the smaller wall-sliver. And as we all can
+
+see the rays are longer near the edges of the wall than in the middle. The
+
+father away from the ViewAngle of the Player we get - the greater ray-lengths.
+
+Therefore of cause we get the fisheye effect.
+
+ 
+
+What we really need is to calculate the distances so |P VA| = |PA| = |PB|
+
+Take a look at this new situation :
+
+ 
+
+VA = View Angle of the Player
+
+V  = The angle between the RayAngle and the plane ortogonal on the player.
+
+ 
+
+                       VA
+
+        -------A-----------------B----------    <-- a wall on the 2D map.
+
+               | \      |      / |
+
+               |   \  V | V  /   |
+
+               |     \  |  /     |
+
+               |    U  \|/   U   |
+
+          -----C--------P--------D------
+
+ 
+
+When calculating |PA| we actually want |CA|.
+
+We get this by :
+
+ 
+
+          |CA| = |PA| * SIN(U)
+
+ 
+
+We get the value U from 90 - V.
+
+ 
+
+The Angle V varies from 30 degrees (maximum difference from the ViewAngle)
+
+to 0 degrees (when the RayAngle is the same as the ViewAngle)
+
+ 
+
+As we ALWAYS use 320 rows for our graphic we know that V can only have 320
+
+different values - 160 of these when tracing to the left of the Player Angle
+
+and 160 when tracing to the right of the Player Angle.
+
+ 
+
+The easiest way of handling the fish-eye effect is the store these 320 different
+
+Sin(U) values in a table we calculate before starting our engine up.
+
+We calculate this table like this :
+
+ 
+
+Angle = the V-value.
+
+ 
+
+ 
+
+  angle := 30;
+
+  for i := 0 to 159 do    {i is a counter for the screen coulumn}
+
+   begin
+
+    ScaleTable[i] := SinDrg(90-angle);
+
+    angle := angle - 0.1875;
+
+   end;
+
+  for i := 160 to 319 do
+
+   begin
+
+    ScaleTable[i] := SinDrg(90-angle);
+
+    angle := angle + 0.1875;
+
+   end;
+
+ 
+
+ 
+
+Now - when you have decided which ray to use based on the REAL lengths of the
+
+rays - ie. before using this table - you just multiply the distance by the
+
+value in ScaleTable[ScreenCoulumn].
+
+ 
+
+If fx. we have a hit at ScreenCoulumn 200 at distance 750 we do :
+
+ 
+
+Distance := 750 * ScaleTable[200]
+
+ 
+
+ 
+
+ 
+
+SOME TALK OF OPTIMIZING - USING TABLES
+
+---------------------------------------
+
+ 
+
+The ScaleTable above is the fist of many tables I use in the sample program.
+
+When doing a raycasting engine you perform quite alot of calculations for each
+
+screen column - and some of the slowest procedures in Pascal are the trig-
+
+functions (cos, sin and tan), the Round function and the SQRT function. And
+
+in addition using 'reals' are much slower than using integer values.
+
+In the raycasting procedures we use quite alot of tangens calculations - plus
+
+we use lots of reals.
+
+So without using tables the game will run slow - even on a pentium :)
+
+ 
+
+In our world we advance the rays by 0.1875 degrees. If we have a total of 360
+
+degrees it gives us a total of : 360 / 0.1875 = 1920 possible angles in the
+
+game!
+
+In other words - we only use 1920 DIFFERENT tangens values! If we store these
+
+1920 tangens values as reals we use 1920 * 6 = 11520 bytes of memory - but
+
+we save ALOT of time.
+
+ 
+
+I use the following tables :
+
+ 
+
+YnextTable : From the Xray-procedure. It stores the 1920 possible values of
+
+             64 * Tangens(ViewAngle)
+
+ 
+
+XnextTable : From the Yray-procedure. It stores the 1920 possible values of
+
+             64 / Tangens(ViewAngle)
+
+ 
+
+TanTable   : Guess....
+
+ 
+
+FishEye    : Just told you above...
+
+ 
+
+Height     : This table contains information on how high a wall-sliver should
+
+             be when at a certain distance. Experiment with this table - I
+
+             found that using 10000 / dist works OK...
+
+ 
+
+ 
+
+ 
+
+ 
+
+MOVEMENT - AND CLIPPING THE PLAYER TO THE WALLS
+
+------------------------------------------------
+
+ 
+
+OK - so now you have your engine up and running and all you need is to be
+
+able to move around in it.
+
+ 
+
+First some talk of how we handle the keypresses. My first attempt at reading
+
+the keys was simply to use the readkey procedure in pascal. If the player
+
+pressed FORWARD I would move the player forward and if he pressed turn I
+
+would turn him.
+
+The problem with this is that when you press a new key the other keypress is
+
+no longer visible.
+
+If fx. we were walking forward in our world and then - while still pressing
+
+forward - we press turn left the player would stop moving and start turning.
+
+But in all the famous games you can turn while still moving!
+
+The solution is to write a keyboard handler which takes care of the keys used
+
+in your game.
+
+If you are new to programming keyboard handlers I suggest you take a look
+
+at my previous tutorial - PXDTUT6.ZIP - which descripes interrupts, handlers
+
+and the PIT closk chip.
+
+ 
+
+First of all remember that when we press a key a certain scancode is sent to
+
+the keyboards data-port - and when we release the key the same value+128 is
+
+sent to the port.
+
+If we use these inputs to set (or un-set) some flags we can achive our goal
+
+to do both a turn AND a move at the same time.
+
+ 
+
+If fx. the player presses forward our handler sets the flag which indicates
+
+moving forwards and the inner loop will know it has to move the player. If
+
+the player then presses 'turn' a new flag is set - but the old still remains
+
+(until the forward key is released) - so the inner loop will know that it
+
+has to do BOTH a turn and a move.
+
+ 
+
+If a key is released the interrupt un-sets the according flag.
+
+ 
+
+OK - this done all we have to is to move the player.
+
+We calculate the player movement as DeltaX and DeltaY values - ie. how much
+
+has the player moved along the X-plane, and how much has he moved along the
+
+Y-plane.
+
+ 
+
+We calculate the values by :
+
+ 
+
+      DeltaX = cos(2*pi * PlayerAngle / 1920) * speed
+
+      DeltaY = sin(2*pi * PlayerAngle / 1920) * speed
+
+ 
+
+We divide by 1920 'cause this is the values of 360 degrees in OUR world.
+
+The speed variable is used to scale movement up - the greater speed the
+
+greater DeltaX and DeltaY values.
+
+I use 8 as a normal speed in my engine.
+
+ 
+
+ 
+
+OK - to move the player we just add these Delta values to his X,Y position
+
+in the world and updates the graphics according to this new position.
+
+ 
+
+Now to the last problem - clipping the player to the walls!
+
+This is fortunately VERY easy to do. We just check if the player when moved
+
+is in a square containing a wall. If he is - only allow him to move as close
+
+to the wall as you desires.
+
+In my engine I have a constant called CLOSEST_WALL which is the minimun units
+
+I will accept between the player and a wall at any time during play.
+
+So when cheking if the player is in a wall you have to add or subtract this
+
+constant to the player position you check on.
+
+If this gives you trouble take a look at the sample program - it's easier to
+
+demonstrate than to explain :)
+
+ 
+
+ 
+
+ 
+
+LAST REMARKS
+
+------------
+
+ 
+
+Well, that's about all for now.
+
+Hope you found this doc useful - and BTW : If you DO make anything public using
+
+these techniques please mention me in your greets or where ever you se fit.
+
+I DO love to see my name in a greeting :=)
+
+ 
+
+If you find any of the above confusing take a look at the sample program - it
+
+has LOTS of comments in it compared to my other sample programs.
+
+The engine should run OK on most machines but as it uses lots of reals for
+
+simplicity it might run a little slow on older machines.
+
+In your own engine you could convert some of the tables/math to fixed point
+
+and/or assemler code to get some speed-ups.
+
+ 
+
+If you take a look at my first tutorial (the one on doing step-mode 3d-worlds)
+
+you'll see that I have used the same world for both engines. But the graphic
+
+is looking a little more "ugly" in this new engine. This is because even though
+
+I use 128X128 textures in both engines the texture resolution is only 64X64 in
+
+this new engine. This is because I use 64X64 cells - and uses the Y/X-positions
+
+in these cells as texture index. If I wanted at smoother graphic I should have
+
+used 128X128 cells in this engine but as I guessed you would be looking into
+
+other engines as well - and as those mostly uses 64X64 textures - I stayed at
+
+64X64 cells in this engine as well.
+
+ 
+
+Also you could try and experiment with giving the player a wider field of
+
+vision - or not using all 320 rows on the screen for the 3d-view. This would
+
+squeeze the walls a little more and make them look better when viewed close
+
+up.
+
+ 
+
+Anyway - as always send me some mail telling me what to do next....
+
+ 
+
+´
+
+
+
+ 
+                  |====================================|
+                  |                                    |
+                  |   TELEMACHOS proudly presents :    |
+                  |                                    |
+                  |    Part 8 of the PXD trainers  -   |
+                  |                                    |
+                  |       Advanced Raycasting          |
+                  |                                    |
+                  |                                    |
+                  |====================================|
+ 
+         ___---__-->   The Peroxide Programming Tips   <--__---___
+ 
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
+ 
+ 
+Intoduction
+-----------
+ 
+Hi folks! As usual it has been a LOOOONG time since my last tutorial. This time
+in fact, the delay has been so long that people has started mailing me asking
+why I have stopped the serie!
+This won't do of course - so here goes PXDTUT8 :)
+ 
+This time it'll be on the more advanced points in raycasting. Actually this
+tutorial should be considered as PXDTUT7 - part II as I'll use the code from
+PXDTUT7 as base in the new engine. So if you have'nt read PXDTUT7 I suggest
+you download and read it before continuing with this text.
+ 
+To all of you who have mailed me asking me to do tutorials on various subjects :
+Don't despair even if it seems that I have trashed your ideas for now. I have'nt
+forgotten about them - but sometimes time can be hard to find. So have patience
+with me - or figure the stuff out yourself!
+ 
+ 
+ 
+If you want to get in contact with me, there are several ways of doing it :
+ 
+1) E-mail me               :      tm@image.dk
+ 
+2) Snail mail me           :      Kasper Fauerby
+                                  Saloparken 226
+                                  8300 Odder
+                                  Denmark
+ 
+3) Call me  (Voice ! )     :    +45 86 54 07 60
+ 
+ 
+Get this serie from the major demo-related FTP-sites - currently :
+ 
+  GARBO ARCHIVES  (forgot the address)  :  /pc/programming/
+  ftp.teeri.oulu.fi  :   /msdos/programming/docs/
+  ftp.cdrom.com      :  something with demos/incomming/code.....
+ 
+Hmmm.. by now the list have grown too long for me to list here, I think! Use
+FTP-search to search for the files. (they are all named PXDTUT#.ZIP where #
+is the number you wish to find) If you are not familiar with FTP search :
+FTP Search is a search engine that can search the Inet for files - just like
+the search machines like Yahoo or Lycos search the net for web pages. You can
+find the FTP Search web page by searching for it on fx. Yahoo.
+You should get a list of about 50 FTP sites that carries the PXDTUT serie - so
+pick one near you!
+ 
+Or grap it from my homepage :
+ 
+   Telemachos' Codin' Corner   http://peroxide.home.ml.org
+ 
+ 
+ 
+FEATURES OF THIS TUTORIAL :
+----------------------------
+ 
+This tutorial will deal with :
+ 
+   - Your homework from PXDTUT7. How does your engine progress ?? Have you all
+     fixed the visual bug, I left for you to catch ? If not you'll get the
+     answer in this tutorial.
+ 
+   - Mayor speed-up in the raycasting procedures. Lets face it - PXDTUT7 runs
+     very slow on most machines. That's because it uses LOTS of Rounds and
+     SQRT calls. And that kind of stuff takes a long time. In this text I'll
+     show you how to speed things up considerably.
+ 
+   - Doors! The use of PXDTUT7 was very limited as no doors was implemented.
+     Therefore only simple mazes could be implemented. With doors implemented
+     we can better use the engine as a game engine.
+ 
+   - Resizeable game window. This allows you to fit the game engine to whatever
+     frame you might want to surround your 3d-view.
+ 
+   - Floor / Ceiling mapping! This will give your engine a boost upwards in
+     image quality and realism.
+ 
+   - World physics. In the more famous 3d engines as DOOM, QUAKE and such
+     movement seems so much more fluid than when playing with PXDTUT7.
+     It is NOT because DOOM and QUAKE runs at 1000000 FPS (frames per second) -
+     it's because things such as acceleration on both movement and turning has
+     been added. In this tutorial I'll show you how to implement this!
+ 
+ 
+ 
+ 
+YOUR HOMEWORK - THE ANSWER
+---------------------------
+ 
+OK - in my last tutorial I left a visual bug for you to find and fix.
+Now I think the time is right for the answer to be revealed. The bug
+was :
+ 
+    -   When you look at some corners in PXDTUT7 the engine will not find
+        the wall and continue tracing beyond the map-square until it hits
+        another wall behind the one we want to hit. This results in "gaps"
+        between the walls - and the visual effekt of this is VERY ugly!
+ 
+ 
+Solution :
+ 
+The problem lies in precision when our rays hit the borders of a map-cell.
+Lets take a look at our tracing routines :
+ 
+The Xray uses the following formulas to calculate the map position of a hit :
+ 
+  Xmap := Xpos shr 6;
+  Ymap := Ypos shr 6 + 1;
+ 
+It is obvious that the problem lies in the position that IS'NT moving with a
+constant delta value - in this case that's the Xmap position! The Xmap position
+always moves with GRID_SIZE or -GRID_SIZE.
+This leaves us with the Y-position... so lets take a look at that equation.
+ 
+As long as the y-position is somewhere BETWEEN the grid borders everything
+works out fine - but what if the y-position lies on a grid border and the
+player looks to the north ?? Let's try and visualize that situation :
+ 
+ 
+XXXX = the grid position is filled with a wall.
+!!!! = This is the grid position in question
+P    = Player looking to the north.
+ 
+  1    2    3    4    5    6
+*******************************   Ypos : 0
+*XXXX*XXXX*XXXX*XXXX*    *    *
+*******************************          64
+*    *    *    *!!!!*XXXX*XXXX*
+*******************************          128
+*    *    * P  *    *    *    *
+*******************************          192
+*    *    *    *    *    *    *
+*******************************          256
+ 
+ 
+Now - when the ray hits the border from (4,2) to (4,3) the y-position will be
+128.... And therefore the map-position checked is : 128 shr 6 + 1 = 3!!
+Now take a look at the map above. The tile at (4,3) is empty - so of course the
+engine does'nt find the wall we want (which is (4,2)).
+This problem is fortunately VERY easy to fix - without loosing noticable speed
+in the engine.
+Here is how I did it :
+ 
+ 
+ Ymap := Ypos shr 6+1; {which cell have we hit with our ray ??}
+ If (RYpos MOD 64 = 0) AND (angle > ANG_180) then
+  begin  {if we are on a cell border and looking north}
+   Dec(YmapPos);
+   if (map.map[XmapPos,YmapPos] = 0) then Inc(YmapPos);
+  end;
+ 
+ 
+This way we check first the correct map position (4,2) and if this tile is
+empty we check the other map-tile (4,3).
+We do this because it COULD be the case that we have hit the UPPER border of
+a cell - and NOT the lower border.
+ 
+This fixes the Xray procedure. The fix for the Yray procedure is made the same
+way - check the sample program if you have trouble doing the fix!
+ 
+ 
+ 
+ 
+ 
+SPEED OPTIMIZATIONS
+--------------------
+ 
+OK - lets take a look at the performance of the PXDTUT7 sample program. Even
+though everything looks pretty nice the engine runs somewhat slow.
+Now - why is that you might wonder. The first place people tends to look when
+optimizing for speed is the inner-most loop. In this case, this loop is the
+texturemapping loop which draws the screen actually displayed. But as you might
+remember this loop was done in rather tight assembler code - so it is not HERE
+you'll have to look for optimization.
+ 
+ 
+Just to give an example of what can be achieved through a little optimization :
+ 
+My Computer :
+  AMD K6 266Mhz
+  64 MD SDRam
+  Matrox Millenium 2MB GFX card
+ 
+ 
+On my computer the PXDTUT7.EXE program runs at 65 FPS - and this is only after
+I borrowed the Matrox Millenium card from ZeeGate. As some of you might
+remember from PXDTUT5 I was otherwise stuck with a Cirrus Logic 1MB card - on
+which video-access is SLOOOOW!!
+ 
+After we are through optimizing, the new engine will run better than that -
+even with the floor / ceiling texturing and all the other neat stuff covered in
+this tutorial added.
+ 
+After optimization :
+     PXDTUT7.EXE - 209 FPS (well not actually PXDTUT7.EXE - but PXDTUT8.EXE
+                            without the floor/ceiling.. but WITH doors and
+                            all the other stuff added! Run 'PXDTUT8 -nofloor')
+     PXDTUT8.EXE - 71  FPS
+ 
+Well - enough talk... on with the optimization!
+ 
+Now - in the old days one obvious point of optimization would be to convert
+some of the tables containing real numbers to fixed point tables and then
+use fixed point math in the engine. This is no longer always the case.
+With the pentium processors the FPU (floating point unit) has been improved
+so much that "real" operations now is even FASTER than using fixed point.
+(because of all the extra math required to convert from float to fixed and from
+fixed to integer)
+But the ROUND routine and the SQRT routine are still ***VERY*** slow in TP.
+ 
+Ok - it's time we take a look at our target computer :
+In these days it's pretty safe to assume that almost EVERYONE owns a pentium
+computer. The smallest Pentium computer sold in danish hardware shops these
+days are something like 200Mhz MMX machines - but it might be wise to aim a
+little lower than that because there is still lots of Pentium 100-133 Mhz
+floating around out there.
+But where am I going with all this, you might ask! What I mean to point out is
+that EVERY SINGLE computer-owner out there these days has a build-in
+co-processor! And we can make use of that co-processor to speed up floating
+point in TP considerably! To enable the co-processor we do the following :
+ 
+Click "Options", then "Compiler" and then mark the field "8087/80287"
+ 
+That's all! Now you have told TP to compile for computers with co-processors.
+You can also make this setting by setting the {$N+} compiler directive in the
+program.
+Now lets take a look on what TP has to say about the {$N} directive :
+ 
+ 
+The $N- state : (Co-processor disabled)
+  In the $N- state, the compiler generates code to perform all real-type
+  calculations in software by calling the run-time library routines.
+ 
+The $N+ state : (Co-processor enabled)
+  In the $N+ state, the compiler generates code to perform all real-type
+  calculations using the 80x87 numeric coprocessor and gives you access to
+  four additional real types : Single, Double, Extended, and Comp.
+ 
+Hey! That means that when we can use a new improved floating-type in TP with
+the co-processor! Namely the double-type!
+So - what we do is change ALL 'real'-variables to 'double'-variables. This
+makes ALL our floating point calculations run faster - and on my computer this
+alone gives us about 10-15 extra FPS!!
+ 
+Ok, if more is to be said about rounds : We can cut down the use of rounds
+in two places. The first place is in the inner loop of the Xray and Yray
+procedure. Here we do a round on the same variable twice! It's faster to only
+do it once and then store the result in a new variable. (In the sample program
+these are called RYpos and RXpos).
+The second place is in the height calculations. As we want to change our SQRT
+routine from using floats to integer (more on this later - consider this a
+FORWARD statement 8] ) we can also change our Xdist and Ydist variables from
+real-type to word-type.
+Now, as the height is calculated as Round(dist * ScaleTable[row]) the only
+thing to be rounded now is the ScaleTable. So in THIS case we make use of
+fixed point math to speed things up!
+Simply convert the HeightTable to 22.10 fixed point values! Then the height
+calculation becomes :
+ 
+ Height := (dist * ScaleTable[row]) shr 10;
+ 
+ 
+OK - now to the point of the SQRT function.
+As you might remember we use the SQRT to calculate the distance between two
+points - namely the player and the wall we have hit. If one word is to be
+said about the SQRT function in TP - then it must be SLOOOOOOOW!!
+And because we are actually only interrested in an integer result we make
+the slowdown even greater by having to ROUND the result after we calculate it!
+Now this WON'T do! There are several INTEGER_SQRT functions 'floating' around
+the net (OK - that was a BAD joke :)  ) - so I grabbed one from the file
+demostu3.zip for you guys to use and abuse.
+If we replace the SQRT with this new function (INTSQRT, it's called) and we
+change the Xdist and Ydist type from real to word we actually gets a GREAT
+speedup - combined with the other things mentioned above we actually gets
+pretty close to the 200 FPS that was our goal.
+ 
+But we soon find out that what the INTSQRT has in speed it looses in precision.
+To gain speed we have sacrificed precision so much that the walls looks kinda
+'fuzzy' because the heights of the different wall-slivers does'nt follow a
+constant slope. This leads us to the next point I want to talk about :
+Linear interpolation of wall-heights!
+ 
+ 
+ 
+ 
+ 
+LINEAR INTERPOLATION OF WALL-HEIGHTS!
+--------------------------------------
+ 
+Whoa! That last section was pretty tough to get through I know, and this one
+won't be much better. But HEY! - no pain, no gain!
+ 
+The idea behind linear interpolation of wall heights is that the walls follows
+constant slopes defined by the heights in the two sides of the walls.
+So, if we calculate the height each time we LEAVES a map-cell and each time
+we ENTERS a map-cell then we can interpolate between those heights to get a
+smooth and good looking display!
+But how do we keep track of when we leaves and enters the different squares?
+Well, the fist step is to split the procedure CalcView from PXDTUT7 up into
+TWO Procedures! One that calculates WHAT to be drawn - and one that actually
+DRAWS the stuff!
+Using this aproach we will need some kind of a buffer to hold the information
+we need for each column on the screen.
+ 
+For the drawing we need to know :
+ 
+              - The Texture number to be used
+              - The Texture Column to be used
+              - The distance (we actually won't need that for each column in
+                this tutorial - but we need it later for light-shading of the
+                textures! So we calculate it anyway.)
+              - The height
+ 
+And for the height calculation stuff :
+              - Xmap position
+              - Ymap position
+              - side (an Yray or a Xray)
+ 
+ 
+So in the CalcView we'll try and fill this buffer up with the needed info!
+We'll use the Xray and Yray functions to fill the following fields :
+Texture Number, Texture Column, distance, Xmap, Ymap and side!
+Notice that we only have ONE buffer, so the comparing of distances will happen
+right after the two rays has been cast!
+ 
+After all the rays have been cast it's time to calculate the heights. But before
+we can do this we must make a record of WHEN new map-cells were entered!
+We use an array called NewHeightArray to store information on what the
+column numbers are for the beginning and ending of the different walls.
+We index this array with a variable called NewHeightPos.
+ 
+Now we start scanning through the DrawBuffer containing all the data from
+the raycasting and whenever we find that a column belongs to a different
+map-cell than the column before, we save that column position in NewHeightArray
+and advance the NewHeightPos by one! Each time we enters a new map-cell we
+calculate the height of THAT screen-column and the height of the column
+BEFORE that (we do this because that will be the ending height of the last
+wall we scanned!).
+Here is some code :
+ 
+ 
+ 
+XLastXmap := 255;
+XLastYmap := 255;   {these are set to impossible values to make sure column 0}
+XnewHeightPos := 0; {always is recorded as a new wall                               }
+ 
+  for i := 0 to SCREEN_SIZE do
+   begin
+     if (DrawBuffer[i].Xmap <> XLastXmap) or (DrawBuffer[i].Ymap <> XLastYmap)
+         or (DrawBuffer[i].side <> LastSide)
+      then
+       begin
+        XlastXmap := Drawbuffer[i].Xmap;
+        XlastYmap := Drawbuffer[i].Ymap;
+        LastSide := DrawBuffer[i].side;
+ 
+        XnewHeight[XnewHeightPos] := i;
+        inc(XNewHeightPos);
+        DrawBuffer[i].height :=
+         HeightTable^[(DrawBuffer[i].dist*ScaleTable[i]) shr 10];
+ 
+        if (i>0) then
+        {calc last height in last wall}
+        DrawBuffer[i-1].height :=
+         HeightTable^[(Drawbuffer[i-1].dist*ScaleTable[i-1]) shr 10];
+       end;
+   end;
+ 
+ {deal with column 319 / 318}
+ {we do this to make sure column 319 is recorded as last entry in the table}
+ 
+ XnewHeight[XnewHeightPos] := 319;
+ inc(XnewHeightPos);
+ DrawBuffer[319].height :=
+    HeightTable^[(Drawbuffer[319].dist*ScaleTable[319]) shr 10];
+ DrawBuffer[318].height :=
+    HeightTable^[(Drawbuffer[318].dist*ScaleTable[318]) shr 10];
+ 
+ 
+When we are done doing this we'll have an array containing the positions of
+somewhere between 3 and 20 different map-cells - now all we have to do is
+interpolate between the calculated heights of those positions using fixed
+point math - and Voila! the DrawBuffer is filled with smootly changing wall-
+heights making the graphic output look VERY nice !
+ 
+ 
+Here is how the interpolation is done :
+NOTE! StepValue and Position are calculated in TWO steps. This is because
+somehow the compiler fucks up if we calculate them in one step.... gave me
+grey hairs until I discovered this :)
+ 
+ 
+ for i := 0 to XnewHeightPos-2 do
+  begin
+   if((XnewHeight[i+1] - XNewHeight[i]) > 2) then
+    begin
+     StepValue := ((DrawBuffer[XnewHeight[i+1]-1].height -
+                   DrawBuffer[XNewHeight[i]].height));
+     StepValue := (StepValue * 65536) DIV (XnewHeight[i+1]-1 - XnewHeight[i]);
+     Position := DrawBuffer[XNewHeight[i]].height;
+     Position := Position * 65536;
+ 
+       for j := XnewHeight[i]+1 to XnewHeight[i+1]-2 do
+        begin
+          Position := Position + StepValue;
+          DrawBuffer[j].height := Position shr 16;
+        end;
+    end;
+  end;
+ 
+ 
+ 
+I know! This engine has turned into using some rather "strange" rendering
+methods (interpolate between heigths, using SQRT to calculate dists and
+so on)  - but hey! I like those methods 'cause they are my own - and then
+at least I'll be able to see which engines are PXDTUT clones :)
+And YOUR engines won't look like everybody elses :)
+ 
+But seriously! If you are having trouble understanding exactly what's going
+on take a break, read the stuff again and have a look at the sample program!
+ 
+ 
+ 
+ 
+ 
+OK - TIME FOR SOME NEW STUFF : THE DOORS!
+------------------------------------------
+ 
+Yeah, yeah you might say... This is all very nice - but so far all the above
+has led me to nothing really NEW!
+ 
+True enough, so perhaps it's time to get started on what this tutorial is
+REALLY about : namely all the new stuff as doors, floors, ceilings and world
+physics! It's about time anyway - I can feel this tutorial is going to be
+HUGE! 8)
+ 
+ 
+Let's start with the easiest part - the doors! While this is a very impressive
+addition to a 3d-engine it is actually pretty easy to code / understand!
+Basicly we have two different kinds of doors in our engine : the ACTIVE doors
+and the STATIC doors.
+The active doors are the doors, which are currently opening or closing - those
+are the doors that are the hardest to deal with. The static doors are actually
+just textures that are displaced a little.
+ 
+First of all : I'm going to descripe the basic type of door know from WOLF3D -
+namely the SLIDING doors.
+The first thing one could do when trying to implement doors is to add the door
+textures to the world map. This is piece of cake as doors are just textures as
+any other wall might be!
+But there is one mayor problem when dealing withs doors as wall-textures. As
+a wall is represented as a square on the map all walls are very thick! As
+a matter of fact walls can be considered as huge blocks of stone used to form
+the world with. If we treat the doors as wall-textures it'll also look like
+doors are one BIIIG chunk of stone :)  Not something you open easily :)
+What we want is the effect know from WOLF3D where doors are placed in the
+MIDDLE of a cell making them look farther away than the walls!
+This is done by 'cheating' a little with the distance when we hit a door in
+the Xray and Yray functions.
+Whenever a door is hit we add ** HALF A STEP ** to both the Xposition AND the
+Yposition!! Now this is VERY important that you understand why we are doing
+this! We do this because that way, the distance to the door (in the case below
+this will be the distance to the Y-ray hit) will only become shorter than the
+distance to the wall when we're HALFWAY down the wall!
+And that way we'll only draw the door when half a wall has been draw next to
+the door!
+I think the time is right for one of my neat ASCII drawings to visualize
+this !!
+ 
+W  = Wall
+D  = Door
+\  = ray - this represent BOTH the Xray & Yray.
+Y  = Place of Y - hit.
+Y2 = Place of Y-hit AFTER we add the half step.
+X  = Place of X - hit.
+ 
+ 
+  ***************************************************************************
+  *  WWWWWWWWWW  *  WWWWWWWWWW  *              *  WWWWWWWWWW  *  WWWWWWWWW  *
+  *  WWWWWWWWWW  *  WWWWWWWW    *              *  WWWWWWWWWW  *  WWWWWWWWW  *
+  *  WWWWWWWWWW  *  WWWWWW  Y2  * DDDDDDDDDDDD *  WWWWWWWWWW  *  WWWWWWWWW  *
+  *  WWWWWWWWWW  *  WWWWWWWW  \ * DDDDDDDDDDDD *  WWWWWWWWWW  *  WWWWWWWWW  *
+  *  WWWWWWWWWW  *  WWWWWWWWWW  X              *  WWWWWWWWWW  *  WWWWWWWWW  *
+  *  WWWWWWWWWW  *  WWWWWWWWWW  * \            *  WWWWWWWWWW  *  WWWWWWWWW  *
+  **********************************Y****************************************
+  *              *              *     \        *              *             *
+  *              *              *       \      *              *             *
+  *              *              *         \    *              *             *
+  *              *              *           \  *              *             *
+  *              *              *             \*              *             *
+  *              *              *              *\             *             *
+  ************************************************\**************************
+ 
+ 
+So, you see that even though the Yray would normally return the shortest
+distance (the Y hit) now the Xray becomes shorter (the X hit) because the
+Yray was displaced by half a step (to Y2).
+ 
+What we see on the screen is something like this :
+ 
+ 
+ 
+ ------------------------                 ----------------------
+ |                       |\             /|                     |
+ |                       |  \ _______ /  |                     |
+ |    An Y-wall          |   |       |   |   An Y-wall         |
+ |                       |≪X |  Y-   |≪X |                     |
+ |                       |wall Door  |wall                     |
+ |                       |   |_______|   |                     |
+ |                       |  /         \  |                     |
+ |                       |/             \|                     |
+ ------------------------                 ----------------------
+ 
+Yeah, yeah - laugh it out... I never claimed to be an artist :) The important
+thing is that you get the idea!
+ 
+ 
+OK, that was the actual DRAWING of the doors. But now we want to be able to
+actually OPEN them, go through them and see beyond them!
+ 
+For that we need an array to contain information on which doors are currently
+active. And for each active door we need to know :
+ 
+    - It's status : Is it opening?? Is it closing? Is it open so we can go
+      through it ??
+    - The Xmap and Ymap position of the door.
+    - The texture number of the door.
+    - How much is the door opened (only used while door is opening and closing)
+ 
+ 
+Ok, so we have to modify our Xray and Yray functions to do the following :
+ 
+ 
+    - If something was hit check if
+                                a) it's a wall - deal with it as usual.
+                                b) it's a door.
+ 
+    - If a door was hit we check if
+                                a) The door is not active - displace hit
+                                   position by half a step, otherwise treat
+                                   it like a normal wall.
+                                b) The door is active.
+ 
+    - If the door was active we check if
+                                a) The column of the screen where we hit the
+                                   door is STILL covered by the door-texture.
+                                   Displace the Texture position by the amount
+                                   the door has opened, and hit position by
+                                   half a step -  otherwise treat it as a
+                                   normal wall.
+                                b) The column of the screen where we hit the
+                                   door is NOT covered by the door-texture.
+                                   Save the Map position of the door in a temp
+                                   variable and set that map position to 0.
+                                   This way we cheats the engine into thinking
+                                   that no wall is present - and we continue
+                                   to trace along the ray until we hit a wall.
+                                   Now put the door back on the map, and deal
+                                   with the wall behind the door.
+ 
+This is basicly it!
+Take a look at the sample program to see how Xray and Yray has been changed
+into dealing with doors!
+ 
+ 
+ 
+ 
+HANDLING THE DOORS
+-------------------
+ 
+Ok, now we have some door code implemented and we're able to cast rays beyond
+the doors.
+But now we need to actually set up our engine to deal with the doors.
+First of all - we want our engine to be able to deal with multiple active doors
+at a time.
+This way we can open a door, walk through it, open another door, turn around
+and see the first door closing through the second door.
+So as mentioned before we have an array of active doors - but how do we set a
+door active ??
+We do that by :
+               1) Add a new key to our keyboard handler - an OPEN key.
+               2) If that key is pressed we check if there is a STATIC door
+                  in front of the player. If there is we set it to ACTIVE and
+                  put it into the active array.
+ 
+Here is some code to do this :
+ 
+TYPE
+ 
+  DoorInfoT = RECORD
+                door_offset : byte;
+                status : byte;           {1 = open, 2 = close, 0 = still}
+                delay : integer;
+                XMapPos, YMapPos : byte;
+                DoorType : byte;
+              End;
+ 
+ 
+VAR
+ 
+  DoorArray : Array[1..MAX_DOORS+1] of DoorInfoT;
+  NumberOfActiveDoors : byte;
+ 
+ 
+ 
+This first function simply scans through the door-array to check if a specific
+map position allready is in the active list.
+ 
+ 
+FUNCTION FindActiveDoor(X,Y : byte) : byte;
+VAR
+ i : byte;
+ found : boolean;
+BEGIN
+ i := 0;
+ Found := false;
+ repeat
+  inc(i);
+  if (DoorArray[i].XmapPos = X) AND (DoorArray[i].YmapPos = Y) then
+   begin
+    found := true;
+    FindActiveDoor := i;
+   end;
+ until (i = NumberOfActiveDoors) or (found = true);
+if not(found) then FindActiveDoor := 0;
+END;
+ 
+ 
+ 
+This procedure do the actual check. We use the Xray and Yray functions to see
+if a door is in front of the player.
+The stuff about (Xdist < GRID_SIZE DIV 2 + CLOSEST_WALL + 10) is to allow the
+door to be activated even if the player is not standing DIRECTLY in front of
+it.
+ 
+ 
+PROCEDURE CheckDoor(x,y : integer; ang : integer);
+VAR
+ Xcheck, Ycheck : byte;
+ XrayXhit, XrayYhit, YrayXhit, YrayYhit : word;
+ XtexCol, YTexCol : byte;
+ Xdist, Ydist : word;
+ Doornr : byte;
+ XReturnXmap,XReturnYmap : integer;
+ YReturnXmap,YReturnYmap : integer;
+ 
+BEGIN
+ Xcheck := Xray(x,y,Ang,XrayXhit,XrayYhit,XtexCol,XReturnXmap,XReturnYmap);
+ Ycheck := Yray(x,y,Ang,YrayXhit,YrayYhit,YtexCol,YReturnXmap,YReturnYmap);
+ Xdist := INTSQRT((XrayXhit - X)*(XrayXhit - X) + (XrayYhit - Y)*(XrayYhit - Y));
+ Ydist := INTSQRT((YrayXhit - X)*(YrayXhit - X) + (YrayYhit - Y)*(YrayYhit - Y));
+ 
+ If (Xcheck = DOOR_CODE) AND (Xdist < GRID_SIZE DIV 2 + CLOSEST_WALL+10) then
+  begin
+   Doornr := FindActiveDoor(XmapPos,YmapPos);
+      If(map.map[XReturnXmap,XReturnYmap] = DOOR_CODE) AND (DoorNr = 0) then
+       begin  {activate door - but only new doors (DoorNr = 0)}
+         inc(NumberOfActiveDoors);
+         DoorArray[NumberOfActiveDoors].status := 1; {now opening}
+         DoorArray[NumberOfActiveDoors].Door_offset := 0; {still closed}
+         DoorArray[NumberOfActiveDoors].XmapPos := XReturnXmap;
+         DoorArray[NumberOfActiveDoors].YmapPos := XReturnYmap;
+         DoorArray[NumberOfActiveDoors].DoorType := DOOR_CODE;
+       end;
+  end;
+ 
+ If (Ycheck = DOOR_CODE) AND (Ydist < GRID_SIZE DIV 2 + CLOSEST_WALL+10) then
+  begin
+   DoorNr := FindActiveDoor(XmapPos,YmapPos);
+      If(map.map[YReturnXmap,YReturnYmap] = DOOR_CODE) AND (DoorNr = 0) then
+       begin  {activate door}
+         inc(NumberOfActiveDoors);
+         DoorArray[NumberOfActiveDoors].status := 1;
+         DoorArray[NumberOfActiveDoors].Door_offset := 0;
+         DoorArray[NumberOfActiveDoors].XmapPos := YReturnXmap;
+         DoorArray[NumberOfActiveDoors].YmapPos := YReturnYmap;
+         DoorArray[NumberOfActiveDoors].DoorType := DOOR_CODE;
+       end;
+  end;
+END;
+ 
+ 
+OK - now all that remains is to actually animate the doors in the active list.
+We do that by calling a new procedure UpdateDoors each frame.
+This procedure scans through the DoorArray and update each active door acording
+to its status. The status can be :
+                      - 0 : The door is not moving at the moment. (either fully
+                            open or fully closed)
+                      - 1 : The door is opening.
+                      - 2 : The door is closing.
+ 
+ 
+ 
+PROCEDURE UpdateDoors;
+VAR
+ i,j : byte;
+ 
+BEGIN
+ for i := 1 to NumberOfActiveDoors do
+   begin
+ 
+    if (DoorArray[i].Door_offset = 128) AND (DoorArray[i].status = 1) then
+     begin {door is fully open (offset = 128) - initialize delay before close}
+      DoorArray[i].status := 0;
+      DoorArray[i].delay := 150;
+      Map.map[DoorArray[i].Xmappos,DoorArray[i].Ymappos] := 0;
+      {clear map position to allow player to go through the door}
+     end;
+ 
+    if (DoorArray[i].status = 0) then  {door is currently not moving}
+     begin
+      dec(DoorArray[i].delay);
+      if (DoorArray[i].delay = 0) then
+       begin {begin close door}
+ 
+        DoorArray[i].status := 2;
+        Map.Map[DoorArray[i].XmapPos, DoorArray[i].YMapPos] :=
+                DoorArray[i].Doortype;
+        {put the door back on the map - players can no longer walk through it}
+       end;
+     end;
+ 
+    if (DoorArray[i].status = 2) and (DoorArray[i].Door_offset = 0) then
+     begin {door is closed.... remove from active list}
+ 
+      for j := i to NumberOfActiveDoors do
+            DoorArray[j] := DoorArray[j+1];
+ 
+      Dec(i);  {so we'll check the new active door on current pos in array}
+      Dec(NumberOfActiveDoors);
+     end;
+ 
+    if (DoorArray[i].status = 1) and (DoorArray[i].Door_offset < 128)
+     then Inc(DoorArray[i].Door_offset,DOOR_SPEED);
+    if (DoorArray[i].status = 2) and (DoorArray[i].Door_offset > 0)
+     then Dec(DoorArray[i].Door_offset,DOOR_SPEED);
+    end;
+END;
+ 
+ 
+ 
+That's it!! To see all this put together check out the sample program...
+ 
+ 
+ 
+ 
+FLOOR / CEILING MAPPING
+------------------------
+ 
+OK - now time has come to add a little texture to the floor and ceiling of our
+engine. This is the step that will give your engine the most important boost
+upwards in visual quality - and the most important boost DOWNWARDS in speed :)
+ 
+The method that I'm going to show you today is FAR from the fastest available.
+But it's pretty easy to understand - AND to code.
+And I think it's fast enough to run smooth on most of todays computers.
+ 
+We draw the floor/ceiling as we draw the walls - namely in vertical strips.
+The main idea is to calculate the distance from the player to the pixel on
+screen that we want to draw.
+Then we use the ray angle, the distance and the player position to determine
+ 
+     1) Which map tile the pixel is in.
+     2) The texture coordinates in that map-tile.
+ 
+We calculate these things by using standard high-school trig-math.
+ 
+To speed things up we'll use quite a few look-up tables  -  and the first I'm
+going to talk about is the one called FLOOR_ROW_TABLE. This table contains the
+distance to each Screen row, straight ahead from the player. We can then use
+this straight-ahead distance to calculate the distance to ANY pixel on that
+screen-row by using trig and the angle to the screen-COLUMN that contains that
+pixel - but more on that later!
+ 
+To calculate the FLOOR_ROW_TABLE we do : (explaination follows....)
+ 
+VAR
+ Floor_Row_Table : Array[0..200] of longint;
+ 
+ 
+ for i := 200 downto 101 do
+  begin
+    Floor_Row_Table[i] := Round((5100 * 1024) / (i-100));
+  end;
+ for i := 99 downto 0 do
+  begin
+    Floor_Row_Table[i] := Round((5100 * 1024) / (100-i));
+  end;
+ 
+ 
+This gives us the distance to all the screen-rows - EXCEPT the HORIZON ( in
+this case I set that to 100 - like in the sample program).
+But what is actually happening here ?
+ 
+The first 'for' run calculates the distance to the 100 rows belows the horizon.
+In other words : it calculates the distance to the rows occupied by the floor.
+The second run we actually does'nt need because in our case we just "mirror"
+the floor-coordinates around the horizon to get the ceiling coordinates.
+ 
+Remember how we calculated the height of the walls ?? We just did a simple
+ 
+ Height := Round(10000 / dist);
+ 
+It's basicly the same thing here - the nearer we gets to the horizon - the
+farther away is the screen-row. The * 1024 in the formula is because we want
+our table in 22.10 fixed point math - and the 5100 is the calibration constant.
+What on earth do I mean by that you might ask! Well - That constant is what
+determines both the farthest and the nearest distance we can get from a row.
+The higher we set this constant - the smaller is the floor-tiles, so we just
+mess around with it until everything looks nice :)
+I found that 5100 does the trick in OUR engine.
+ 
+ 
+Ok, with that out of the way I think it's time we calculate the distance to
+a specific pixel on the screen. OK, we can do that by using standard trig :
+Take a look at the drawing below.
+ 
+ 
+                |a|
+        B----------------C
+         \               |
+           \             |
+             \           |
+               \         | |b|
+            |c|  \     __|
+                   \ /   |
+                     \ A |
+                       \ |
+ 
+ 
+We have :
+ - The length b : this is the distance straigt ahead from the FLOOR_ROW_TABLE
+ - the angle A  : this is the angle to the screen-column in question
+ 
+We want :
+ - c : the actual distance to the pixel B
+ 
+ 
+Looking through our notes from high-school we find that :
+ 
+ c = b / COS(A)
+ 
+But on the PC a floating point divide is BAD! It's even BADDER than a floating
+point mul... So we rewrite that equation to :
+ 
+ c = b * (1/COS(A)) =  b * INV_COS(A)
+ 
+ 
+This leads us to the next look-up table we'll need to do our floor/ceiling
+mapping - The INV_COS table. We store these values as 22.10 fixed point values
+too.
+ 
+Ok, so now we have the distance to a specific point on the screen - and only at
+the cost of 2 table look-ups and a mul. Now it's time to calculate the actual
+world coordinate occupied by the pixel - and the texture coordinate we're going
+to map that pixel with.
+Combining the direction angle A with the distance gives us the vector to the
+pixel :
+ 
+ 
+Xvector = ((distance * Cos(A)) SHR 20)
+Yvector = ((distance * Sin(A)) SHR 20)
+ 
+ 
+The 'SHR 20' is because both the distance and the Cos/Sin values are in 22.10
+fixed point - and we don't want the vector in fixed point.
+Wait a minute, the clever reader might ask! Does this means that.....
+YES - we store the cos & Sin values in tables as 22.10 fixed point values too!
+ 
+Now all we have to do to get the world coordinates of the pixel is add the
+player position to the vectors like this :
+ 
+ 
+Xworld = Xvector + Xplayer
+Yworld = Yvector + Yplayer
+ 
+ 
+And to get these values from world space to texture space we do :
+ 
+ 
+Xtexture = (Xworld AND 63) * 2
+Ytexture = (Yworld AND 63) * 2
+ 
+(Again we do the * 2 because I only got 128 X 128 textures to demonstrate
+these techniques with :)  )
+ 
+ 
+OK, as you might have noticed only ONE of the values used above changes as
+long as you stay in the same screen-column - and that is the value 'c'.
+All the other values depends on the angle A which remains constant for the
+screen-column.
+Also notice that we only calculate the floor. The Texture coordinates are the
+same in both floor and ceiling so we just mirror the SCREEN position around
+the horizon - and use different textures for floor and ceiling.
+So we only have to calculate those values ONCE for each screen-column.
+Here is some code to do the actual rendering of the floor/ceiling :
+ 
+ 
+{*********************************************************}
+{**                                                     **}
+{**        FLOOR & CEILING RENDERING AND DRAWING        **}
+{**                                                     **}
+{*********************************************************}
+ 
+ 
+PROCEDURE DoFloorCeiling(x,y : integer; PlayerA : integer);
+VAR
+ ViewAngle : integer;
+ i,j       : integer;
+ SinVal, CosVal, InvCosVal : longint;
+ Ytop, Ybot : integer;
+ distance : longint;
+ xv,yv    : longint;
+ TexOfs : word;
+ BotScrOfs, TopScrOfs : word;
+ BotStartOfs, TopStartOfs : word;
+ FloorAdd, CeilingAdd : word;
+ 
+ 
+BEGIN
+ ViewAngle := PlayerA - ANG_30; {start looking 30 degrees left from player}
+ If (ViewAngle < ANG_0) then ViewAngle := viewangle + ANG_360;
+ Flooradd := TexAddr[FLOOR_NR];
+ Ceilingadd := TexAddr[CEILING_NR];
+ 
+ BotStartOfs := (YBOTCLIP shl 8) + (YBOTCLIP shl 6) + SCREEN_X_START;
+ TopStartOfs := (YTOPCLIP shl 8) + (YTOPCLIP shl 6) + SCREEN_X_START;
+ 
+ 
+ for i:=0 to SCREEN_SIZE do    {cast 320 rays...}
+ begin
+   SinVal    := Floor_Sin_Table^[ViewAngle];
+   CosVal    := Floor_Cos_Table^[ViewAngle];
+   InvCosVal := Floor_Inv_Cos_Table[i];
+   TopScrOfs := TopStartOfs;
+   BotScrOfs := BotStartOfs;
+   Ybot      := HORIZON + (DrawBuffer[i].height shr 1);
+   YTop      := Ybot - DrawBuffer[i].height;
+ 
+      for j := YBOTCLIP downto Ybot do
+        begin
+          distance := (Floor_Row_Table[j] * InvCosVal) SHR 10;
+          yv := ((distance * SinVal) SHR 20) + y;
+          xv := ((distance * CosVal) SHR 20) + x;
+          asm
+           MOV cx, ds                 {push ds                            }
+ 
+           MOV ax, Vaddr
+           MOV es, ax                 {es:[di] = target screen - vaddr    }
+           MOV di, BotScrOfs          {di = offset to Floor-pixel         }
+           MOV ax, FloorAdd
+           MOV ds,ax                  {ds:[si] = texture space            }
+           MOV ax, WORD ptr yv
+           MOV bx, WORD ptr xv
+           AND ax,63                  {AND the textureCoords to get them  }
+           AND bx,63                  {from World-space to texture space  }
+           ADD ax,ax
+           ADD bx,bx                  {MUL by 2 because texture is 128X128}
+           SHL ax,7
+           ADD ax,bx
+           MOV si, ax                 {si = offset in texture space       }
+           MOV al, ds:[si]            {get floor color from floor texture }
+           MOV bx, CeilingAdd
+           MOV ds, bx                 {ds:[si] is now Ceiling texture     }
+ 
+           MOV es:[di], al            {draw floor pixel                   }
+           SUB BotScrOfs,320
+           ADD TopScrOfs,320          {Move target pixel pos in Vaddr     }
+           MOV al, ds:[si]            {Load Ceiling color - notice that si}
+                                      {is the same for floor/ceiling      }
+           MOV di, TopScrOfs
+           MOV es:[di], al            {draw the ceiling pixel             }
+ 
+           MOV ds,cx                  {pop ds                             }
+          end;
+        end;
+ 
+  Inc(TopStartOfs);
+  Inc(BotStartOfs);
+  inc(ViewAngle);
+  If (ViewAngle > ANG_360) then ViewAngle := ViewAngle - ANG_360;
+ end;
+END;
+ 
+ 
+ 
+OK - this is actually all there is to drawing floor / ceilings. As you might
+have noticed I have only used ONE texture for the floor and ONE for the ceiling.
+This is NOT because the method is limited to that - no, you could just as
+easily have a floor-map and a ceiling-map containing texture numbers for the
+different positions in the world. Remember that the values 'xv' and 'yv'
+values in the procedure above are WORLD coordinates. So to get the map-position
+you would just have to divide those values by 64 - and then you could set
+the variables FloorAdd and CeilingAdd to the right values according to a
+floor/ceiling map.
+ 
+"So, why have'nt you done that ?", you might ask.... Well,
+ 
+ 1) I'm to lazy to do an editor for a floor/ceiling map - do that yourself :)
+ 2) We're getting low on memory. Using more textures and adding two more maps
+    of 100X100 = 10K each would mean that most people won't be able to run
+    the program from within the IDE of Turbo Pascal.
+ 
+ 
+The method decriped above is'nt really the fastest one around. It takes
+3 '*'s pr. pixel + the drawing + some other stuff...
+So one might want to optimize it a bit by not actually CALCULATING all
+texture coordinates. The best method would probably be to only calculate
+texture positions for the edges of the map-tiles and then do some
+interpolation.
+ 
+ 
+ 
+ 
+ 
+GAME PHYSICS
+--------------
+ 
+Whoa.. we have reached the final section of this tutorial. And in this section
+I'm going to talk about game physics.
+By that I mean adding a little realism to the movement.
+ 
+Fire up DOOM, then start walking around. Notice what happens when you stop
+walking ? Or stop turning ?
+Even AFTER you have released the key the game will continue to move a little.
+This is because ACCELERATION has been added.
+When walking around in fx. PXDTUT7.EXE movement are very stiff. Either you move,
+or you don't!
+ 
+This can be a problem when the framerate gets too low. Especially when dealing
+with turning! You want your game to run FAST - so if the framerate is low we
+just makes the turning/moving values greater... right ??
+Yeah - that works fine as long as the player just keeps the turn-key pressed
+down. Whoa, he might think... this game is FAST!! Look how fast I'm turning !!!
+But then he stands still and wants to aim at a little switch somewhere in front
+of him - but no matter how much he tries, no matter how gently he presses the
+key he CAN'T seem to target it. 'Cause the engine ALWAYS turns fx. 6 degrees
+at a time. And to target that switch he needs to turn only - say 3 degrees.
+ 
+So, what do we do to make sure this will never happen in OUR engine ? We add
+accelleration to our turning.
+When the turn-key first is pressed we set our turning value to 1. Then each
+time we update the player position we accellerates this value by multiplying
+it with some accelleration constant - say 1.2. We keep doing this until the
+turning rate has reached the upper limit - say 6 degrees.
+When the key is released we de-accellerates the value by multiplying it with
+fx. 0.85 until it has reached 1 again. Then - and first then - we set the
+turnrate to 0.
+The result is that if you hold the key down for a long time you turn fast -
+and in big steps. But if you only taps the key lightly you turn by very small
+angles - and therefore you can easily target anything you want in your engine.
+ 
+The same thing can be added to movement. You both accellerates and de-accel-
+lerates the speed the player is moving with.
+Combined two effects adds alot to realism in your game.
+ 
+This is easily added to your game-engine. Take a look at the sample program to
+see how it COULD be done. I strongly suggest that you experiment with the
+game physics yourself - it's good for learning... and it's great fun too :)
+(fx. add bouncing off the walls - great fun :)
+ 
+ 
+ 
+FUN STUFF TO DO WITH GAME PHYSICS :
+ 
+ 
+By setting both your accelleration and de-accelleration to be very slow you can
+create the effect of walking on ice. You can set up your own "rules" for moving
+on ice but here is what I have done :
+ 
+      - I set the accelleration constants to both slow accelleration AND slow
+        de-accelleration. This creates the effect of having trouble stopping
+        moving.
+ 
+      - I add a variable I have called Ice_MoveAngle. This defines the angle
+        that the player actually moves along. The player can still turn his
+        head to look around in the world - but he'll continue moving in the
+        direction he is gliding until he stands still again - or bumps into a
+        wall. (Then he either slides down the wall - or stops moving. Depends
+        on the angle he hits the wall at.)
+        To sum things up : we have TWO direction vectors. One for viewing and
+        one for moving. Pretty cool ehh ?? 8)
+ 
+      - The Ice_MoveAngle is set equal to the ViewAngle when :
+          1) The player stands still. (accelleration = 0)
+          2) The player hits a wall.
+ 
+To see all this in effect start up PXDTUT8.EXE
+and press 'I' - have fun :)
+ 
+If you create other nice game physics settings please mail them to me :) It's
+always interresting to explore a new effect.
+ 
+Here are some ideas for you to play with :
+ - sticky floor / slow movement (easy enough ehh ?? )
+ - Force field : when player hits a force field he is hurled backwards with
+   advanced speed.
+ - Great mean sucker! : The player gets sucked agains some point in the room.
+   This force affects the player movement. If he stands still he slowly moves
+   towards the point, if he walks towards it he moves at greater speed and if
+   he tries to move away from it slows the movement down :)
+ 
+ 
+Also remember that these effects can be combined by having a floor-map. Then
+you could fx. have SOME squares filled with ice where the player glides and
+SOME squares with a normal surface where the player could regain his footing.
+Experiment!
+ 
+ 
+ 
+ 
+LAST REMARKS
+-------------
+ 
+Well, that's about all for now.
+Hope you found this doc useful - and BTW : If you DO make anything public using
+these techniques please mention me in your greets or where ever you se fit.
+I DO love to see my name in a greeting :=)
+ 
+ 
+This has turned out to be one BIG tutorial. By far my biggest yet.
+But OK - you guys also had to wait quite a while for it.... hope it was worth
+the waiting time.
+I think this is the tutorial with less lines of code pr. line of actual text.
+So if you find some of this stuff confusing have a look at the sample program.
+As with PXDTUT7 I have tried to comment almost every single line - so the
+program/game should be easy enough to follow.
+ 
+ 
+I have learned by now that I should not write here what my next tutorial will
+be about - but I guess I can tell you that I have plans about the following
+subjects :
+ 
+         - Using the stuff from PXDTUT3 and PXDTUT4 (the 3d ones) to actually
+           build a 3d-world.... Adding camera, clipping and all that shit..
+           (happy now Pop?? 8] )
+         - Using 15,16 and 24 color modes in TP 7.0.... using the VBE 2.0
+           standard I guess - even though VBE 1.2 will be enough for most
+           of the stuff as we won't go into LFB and that stuff (we're not in
+           protected mode - and we don't have easy access to the 386 registers
+           in TP) Might include a few lines on LFB using flat mode in TP..
+           dunno yet.
+         - Coding the SB16 card : Sound mixing and auto-initialized playback.
+         - If nothing else I guess I could write about some more raycasting
+           stuff like : light-shading, objects and monsters
+ 
+If anything else interrests you mail me :)
+ 
+ 
+Anyway - I think that I can PROMISE you that my next tutorial won't be as
+delayed as this one :) So now I'm stuck with a new problem : What to call
+the files when I reach tut #10 :)  I would like to keep the name down to
+8 character as DOS rulez, and WINDOWS sucks :)
+ 
+BTW : good news for all you Watcom C++ coders out there. Soon all the previous
+tutorials (and this one) will be released in Watcom C++ versions. Either done
+by me or by my good friend X-oTiC
+ 
+ 
+Keep on codin'
+ 
+Telemachos
+ june, 1998
+ 

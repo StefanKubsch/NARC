@@ -1,0 +1,24 @@
+Supported audio formats:
+
+SFX & Music
+	Ogg Vorbis
+
+
+Other audio formats can be enabled in "SFX_SDL.hpp"...
+
+Why I prefer Ogg Vorbis:
+
+	- license free
+	- small file sizes
+	- fast decoding
+
+
+The audio-engine actually works with
+
+	Samplerate=22050
+	StereoChannels=2
+	ChunkSize=2048
+	MaxChannels=64
+
+
+configured in "./Data/AudioConfg.ini"

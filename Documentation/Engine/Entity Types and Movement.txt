@@ -1,0 +1,25 @@
+Entity Types:
+-------------
+
+Neutral
+	Can be shot, won´t attack player
+	Once attacked by player, neutral will turn into enemy and will attack the player
+
+Enemy
+	Can be shot, will attack player
+
+Turret
+	Can be shot, will attack player
+
+Ammo
+	Can be collected
+
+
+
+
+Movement Types:
+---------------
+
+0 - stationary, not moving (e.g. Ammo or "stuff" around level)
+1 - stationary, direction follows player (e.g. Turret)
+2 - AutoMovement (e.g. Enemy or Neutral)

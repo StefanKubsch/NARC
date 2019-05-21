@@ -1,0 +1,9 @@
+Accepted image format:
+
+PNG, 32bit
+
+Alpha is needed.
+
+All other image formats are disabled in "GFX_ImageHandling.hpp".
+
+See comments in "stb_image.h" on how to enable other decoders...

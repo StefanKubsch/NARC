@@ -1,0 +1,55 @@
+Development:
+
+	Microsoft Visual Studio 2017 Community Edition
+		https://visualstudio.microsoft.com/de/vs/community/
+
+	PVS Studio (Static Code Analyzer)
+		https://www.viva64.com/en/pvs-studio/
+
+	CLANG Power Tools (-> Tidy, Static Code Analyzer)
+		https://marketplace.visualstudio.com/items?itemName=caphyon.ClangPowerTools
+
+	cppcheck (Static Code Analyzer)
+		http://cppcheck.sourceforge.net/
+
+	nvidia NSight
+		https://developer.nvidia.com/tools-overview
+
+	git
+		https://git-scm.com/
+
+	Github Desktop
+		https://desktop.github.com/
+
+
+3D Models:
+
+	Blender
+		https://www.blender.org/
+
+
+Graphics:
+
+	IrfanView
+		https://www.irfanview.com/
+
+	GIMP
+		https://www.gimp.org/
+
+	PNGGauntlet (excellent PNG compression!)
+		https://pnggauntlet.com/
+
+	xnConvert (Image batch processing)
+		https://www.xnview.com/de/xnconvert/
+
+
+Audio:
+
+	Audacity
+		https://www.audacityteam.org/
+
+
+Zip:
+
+	7Zip Standalone
+		https://www.7-zip.org/
