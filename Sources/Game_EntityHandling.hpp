@@ -101,7 +101,7 @@ namespace Game_EntityHandling
 		EntityDistance.clear();
 		EntityDistance.shrink_to_fit();
 		ZBuffer.clear();
-		ZBuffer.resize(lwmf::ViewportWidth);
+		ZBuffer.resize(ScreenTexture.Width);
 
 		EntityMap = std::vector<std::vector<EntityTypes>>(Game_LevelHandling::LevelMapWidth, std::vector<EntityTypes>(Game_LevelHandling::LevelMapHeight, EntityTypes::Clear));
 
@@ -175,7 +175,7 @@ namespace Game_EntityHandling
 	inline void RenderEntities()
 	{
 		const float InverseMatrix{ 1.0F / (Plane.X * Player.Dir.Y - Player.Dir.X * Plane.Y) };
-		const std::int_fast32_t VerticalLookTemp{ lwmf::ViewportHeight + VerticalLook };
+		const std::int_fast32_t VerticalLookTemp{ ScreenTexture.Height + VerticalLook };
 		const std::int_fast32_t NumberOfEntities{ static_cast<std::int_fast32_t>(Entities.size()) };
 
 		for (std::int_fast32_t Index{}; Index < NumberOfEntities; ++Index)
@@ -185,12 +185,12 @@ namespace Game_EntityHandling
 				const lwmf::FloatPointStruct EntityPos{ Entities[EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[EntityOrder[Index]].Pos.Y - Player.Pos.Y };
 				const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
 				const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[EntityOrder[Index]].MoveV / TransY) };
-				const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(lwmf::ViewportHeight / TransY) };
+				const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
 				const std::int_fast32_t Temp{ (VerticalLookTemp >> 1) + vScreen };
 				const std::int_fast32_t LineStartY{ (std::max)(-(EntitySizeTemp >> 1) + Temp, 0) };
-				const std::int_fast32_t LineEndY{ (std::min)((EntitySizeTemp >> 1) + Temp, lwmf::ViewportHeight) };
-				const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(lwmf::ViewportWidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
-				const std::int_fast32_t LineEndX{ (std::min)((EntitySizeTemp >> 1) + EntitySX, lwmf::ViewportWidth) };
+				const std::int_fast32_t LineEndY{ (std::min)((EntitySizeTemp >> 1) + Temp, ScreenTexture.Height) };
+				const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(ScreenTexture.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
+				const std::int_fast32_t LineEndX{ (std::min)((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
 				const std::int_fast32_t Temp1{ (-EntitySizeTemp >> 1) + EntitySX };
 				const std::int_fast32_t Temp2{ VerticalLookTemp << 7 };
 				const std::int_fast32_t Temp3{ EntitySizeTemp << 7 };
@@ -198,21 +198,21 @@ namespace Game_EntityHandling
 
 				for (std::int_fast32_t x{ (-EntitySizeTemp >> 1) + EntitySX }; x < LineEndX; ++x)
 				{
-					if (TransY > 0.0F && x > 0 && x < lwmf::ViewportWidth && TransY < ZBuffer[x])
+					if (TransY > 0.0F && x > 0 && x < ScreenTexture.Width && TransY < ZBuffer[x])
 					{
 						const std::int_fast32_t TextureX{ (x - Temp1) * EntitySize / EntitySizeTemp };
 
 						for (std::int_fast32_t y{ LineStartY }; y < LineEndY; ++y)
 						{
 							const std::int_fast32_t Color{ Entities[Entities[EntityOrder[Index]].Number].AttackAnimEnabled ?
-								EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].AttackTextures[Entities[EntityOrder[Index]].AttackAnimStep].Texture[((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX] :
-								EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[EntityOrder[Index]].WalkAnimStep].Texture[((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX] };
+								EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].AttackTextures[Entities[EntityOrder[Index]].AttackAnimStep].Pixels[((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX] :
+								EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[EntityOrder[Index]].WalkAnimStep].Pixels[((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX] };
 
 							// Check if alphachannel of pixel ist not transparent and draw pixel
 							if ((Color & lwmf::AMask) != 0)
 							{
-								Entities[EntityOrder[Index]].IsHit ? lwmf::SetPixel(x, y, Color | 0xFFFFFF00) :
-									(Game_LevelHandling::LightingFlag ? lwmf::SetPixel(x, y, GFX_Shading::ShadeColor(Color, TransY, FogOfWarDistance)) : lwmf::SetPixel(x, y, Color));
+								Entities[EntityOrder[Index]].IsHit ? lwmf::SetPixel(ScreenTexture, x, y, Color | 0xFFFFFF00) :
+									(Game_LevelHandling::LightingFlag ? lwmf::SetPixel(ScreenTexture, x, y, GFX_Shading::ShadeColor(Color, TransY, FogOfWarDistance)) : lwmf::SetPixel(ScreenTexture, x, y, Color));
 							}
 						}
 					}

@@ -29,7 +29,7 @@ namespace GFX_Window
 	// Variables and constants
 	//
 
-	inline GFX_OpenGLShaderClass PixelBufferToScreen;
+	inline GFX_OpenGLShaderClass ScreenTextureShader;
 
 	//
 	// Functions
@@ -45,6 +45,7 @@ namespace GFX_Window
 			{
 				// Create fullscreen "window"
 				lwmf::CreateOpenGLWindow(GetModuleHandle(nullptr),
+					ScreenTexture,
 					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
 					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
 					Tools_INIFile::ReadValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), true);
@@ -56,6 +57,7 @@ namespace GFX_Window
 			{
 				// create normal window
 				lwmf::CreateOpenGLWindow(GetModuleHandle(nullptr),
+					ScreenTexture,
 					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
 					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
 					Tools_INIFile::ReadValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), false);
@@ -66,8 +68,8 @@ namespace GFX_Window
 
 			lwmf::InitOpenGLLoader();
 
-			PixelBufferToScreen.LoadShader("Default");
-			PixelBufferToScreen.PreparePixelBufferTexture(0, 0, lwmf::ViewportWidth, lwmf::ViewportHeight);
+			ScreenTextureShader.LoadShader("Default");
+			ScreenTextureShader.PrepareLWMFTexture(ScreenTexture, 0, 0);
 
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_MOUSE);
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_KEYBOARD);

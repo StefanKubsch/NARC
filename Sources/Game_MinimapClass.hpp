@@ -70,7 +70,7 @@ inline void Game_MinimapClass::PreRender()
 	}
 
 	// ...and the lower the resolution, the smaller the whole map...
-	if (TileSize > 6 && lwmf::ViewportWidth <= 640)
+	if (TileSize > 6 && ScreenTexture.Width <= 640)
 	{
 		TileSize >>= 1;
 	}
@@ -81,7 +81,7 @@ inline void Game_MinimapClass::PreRender()
 	IconRect.Height = TileSize;
 
 	// Set map position
-	StartPosY = lwmf::ViewportHeight - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
+	StartPosY = ScreenTexture.Height - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
 }
 
 inline void Game_MinimapClass::Display()
@@ -92,39 +92,39 @@ inline void Game_MinimapClass::Display()
 		{
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, WallColor);
+				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, WallColor);
 			}
 
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, DoorColor);
+				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, DoorColor);
 			}
 
 			switch (Game_EntityHandling::EntityMap[MapPosX][MapPosY])
 			{
 				case Game_EntityHandling::EntityTypes::Player:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, PlayerColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, PlayerColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Enemy:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, EnemyColor); //-V1037
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor); //-V1037
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Turret:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, EnemyColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Neutral:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, NeutralColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, NeutralColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::AmmoBox:
 				{
-					lwmf::FilledRectangle(x, y, IconRect.Width, IconRect.Height, AmmoBoxColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, AmmoBoxColor);
 					break;
 				}
 				default: {}

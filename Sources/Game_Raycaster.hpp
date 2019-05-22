@@ -64,18 +64,18 @@ namespace Game_Raycaster
 	inline void CastGraphics(const Renderpart Part)
 	{
 		std::int_fast32_t Start{};
-		std::int_fast32_t End{ lwmf::ViewportWidth };
+		std::int_fast32_t End{ ScreenTexture.Width };
 
 		switch (Part)
 		{
 			case Renderpart::WallLeft:
 			{
-				End = lwmf::ViewportWidthMid;
+				End = ScreenTexture.WidthMid;
 				break;
 			}
 			case Renderpart::WalLRight:
 			{
-				Start = lwmf::ViewportWidthMid;
+				Start = ScreenTexture.WidthMid;
 				break;
 			}
 
@@ -83,11 +83,11 @@ namespace Game_Raycaster
 		}
 
 		const float FloorCeilingShading{ FogOfWarDistance + FogOfWarDistance * VerticalLookCamera };
-		const std::int_fast32_t VerticalLookTemp{ lwmf::ViewportHeight + VerticalLook };
+		const std::int_fast32_t VerticalLookTemp{ ScreenTexture.Height + VerticalLook };
 
 		for (std::int_fast32_t x{ Start }; x < End; ++x)
 		{
-			const float Camera{ (x + x) / static_cast<float>(lwmf::ViewportWidth) - 1.0F };
+			const float Camera{ (x + x) / static_cast<float>(ScreenTexture.Width) - 1.0F };
 			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
 			const lwmf::FloatPointStruct DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
 
@@ -124,10 +124,10 @@ namespace Game_Raycaster
 			}
 
 			const float WallDist{ WallSide ? (MapPos.Y - Player.Pos.Y + (1 - Step.Y) * 0.5F) / RayDir.Y : (MapPos.X - Player.Pos.X + (1 - Step.X) * 0.5F) / RayDir.X };
-			const std::int_fast32_t LineHeight{ static_cast<std::int_fast32_t>(lwmf::ViewportHeight / WallDist) };
+			const std::int_fast32_t LineHeight{ static_cast<std::int_fast32_t>(ScreenTexture.Height / WallDist) };
 			const std::int_fast32_t Temp{ VerticalLookTemp >> 1 };
 			const std::int_fast32_t LineStart{ (std::max)(-(LineHeight >> 1) + Temp, 0) };
-			std::int_fast32_t LineEnd{ (std::min)((LineHeight >> 1) + Temp, lwmf::ViewportHeight) };
+			std::int_fast32_t LineEnd{ (std::min)((LineHeight >> 1) + Temp, ScreenTexture.Height) };
 			float WallX{ WallSide ? Player.Pos.X + WallDist * RayDir.X : Player.Pos.Y + WallDist * RayDir.Y };
 			WallX -= static_cast<std::int_fast32_t>(WallX);
 
@@ -140,8 +140,8 @@ namespace Game_Raycaster
 					float WallY{ static_cast<std::int_fast32_t>((y + y - VerticalLookTemp + LineHeight) / LineHeight) * 0.5F };
 					WallY -= static_cast<std::int_fast32_t>(WallY);
 					const std::int_fast32_t TextureY{ ((y + y - VerticalLookTemp + LineHeight) * TextureSize / LineHeight) >> 1 };
-					const std::int_fast32_t WallTexel = DoorNumber > -1 ? Doors[DoorNumber].AnimTexture.Texture[TextureY * TextureSize + TextureX] :
-						Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPos.X][MapPos.Y] - 1].Texture[TextureY * TextureSize + TextureX];
+					const std::int_fast32_t WallTexel = DoorNumber > -1 ? Doors[DoorNumber].AnimTexture.Pixels[TextureY * TextureSize + TextureX] :
+						Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPos.X][MapPos.Y] - 1].Pixels[TextureY * TextureSize + TextureX];
 
 					if (Game_LevelHandling::LightingFlag)
 					{
@@ -158,11 +158,11 @@ namespace Game_Raycaster
 							}
 						}
 
-						lwmf::SetPixel(x, y, ShadedTexel);
+						lwmf::SetPixel(ScreenTexture, x, y, ShadedTexel);
 					}
 					else
 					{
-						lwmf::SetPixel(x, y, WallTexel);
+						lwmf::SetPixel(ScreenTexture, x, y, WallTexel);
 					}
 				}
 			}
@@ -197,10 +197,10 @@ namespace Game_Raycaster
 
 				if (LineEnd < 0)
 				{
-					LineEnd = lwmf::ViewportHeight;
+					LineEnd = ScreenTexture.Height;
 				}
 
-				const std::int_fast32_t TotalHeight{ lwmf::ViewportHeight + std::abs(VerticalLook) };
+				const std::int_fast32_t TotalHeight{ ScreenTexture.Height + std::abs(VerticalLook) };
 				const float WallDistTemp{ WallDist + WallDist * VerticalLookCamera };
 
 				for (std::int_fast32_t y{ LineEnd + 1 }; y <= TotalHeight; ++y)
@@ -214,9 +214,9 @@ namespace Game_Raycaster
 						case Renderpart::Floor:
 						{
 							// Draw floor
-							if (y < lwmf::ViewportHeight)
+							if (y < ScreenTexture.Height)
 							{
-								const std::int_fast32_t FloorTexel{ Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Floor)][static_cast<std::int_fast32_t>(Floor.X)][static_cast<std::int_fast32_t>(Floor.Y)] - 1].Texture[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & TextureSizeBitwiseAnd) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & TextureSizeBitwiseAnd)] };
+								const std::int_fast32_t FloorTexel{ Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Floor)][static_cast<std::int_fast32_t>(Floor.X)][static_cast<std::int_fast32_t>(Floor.Y)] - 1].Pixels[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & TextureSizeBitwiseAnd) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & TextureSizeBitwiseAnd)] };
 
 								if (Game_LevelHandling::LightingFlag)
 								{
@@ -233,11 +233,11 @@ namespace Game_Raycaster
 										}
 									}
 
-									lwmf::SetPixel(x, y, ShadedTexel);
+									lwmf::SetPixel(ScreenTexture, x, y, ShadedTexel);
 								}
 								else
 								{
-									lwmf::SetPixel(x, y, FloorTexel);
+									lwmf::SetPixel(ScreenTexture, x, y, FloorTexel);
 								}
 							}
 
@@ -253,7 +253,7 @@ namespace Game_Raycaster
 							// Transparent ceiling tile is marked as "-1" in "Level_MapCeilingData.conf"
 							if (LevelCeilingMapPos >= 0 && (TempY >= 0 && TempY <= LineStart))
 							{
-								const std::int_fast32_t CeilingTexel{ Game_LevelHandling::LevelTextures[LevelCeilingMapPos].Texture[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & TextureSizeBitwiseAnd) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & TextureSizeBitwiseAnd)] };
+								const std::int_fast32_t CeilingTexel{ Game_LevelHandling::LevelTextures[LevelCeilingMapPos].Pixels[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & TextureSizeBitwiseAnd) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & TextureSizeBitwiseAnd)] };
 
 								if (Game_LevelHandling::LightingFlag)
 								{
@@ -270,11 +270,11 @@ namespace Game_Raycaster
 										}
 									}
 
-									lwmf::SetPixel(x, TempY, ShadedTexel);
+									lwmf::SetPixel(ScreenTexture, x, TempY, ShadedTexel);
 								}
 								else
 								{
-									lwmf::SetPixel(x, TempY, CeilingTexel);
+									lwmf::SetPixel(ScreenTexture, x, TempY, CeilingTexel);
 								}
 							}
 

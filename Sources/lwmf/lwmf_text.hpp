@@ -13,13 +13,13 @@
 #include <cstdint>
 #include <vector>
 
-#include "lwmf_pixelbuffer.hpp"
+#include "lwmf_texture.hpp"
 
 namespace lwmf
 {
 
 
-	void RenderText(const std::string& Text, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Color);
+	void RenderText(TextureStruct& Texture, const std::string& Text, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Color);
 
 	//
 	// Variables and constants
@@ -135,7 +135,7 @@ namespace lwmf
 	// Functions
 	//
 
-	inline void RenderText(const std::string& Text, std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
+	inline void RenderText(TextureStruct& Texture, const std::string& Text, std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
 	{
 		for (const std::int_fast32_t& Char : Text)
 		{
@@ -143,14 +143,14 @@ namespace lwmf
 			{
 				for (std::int_fast32_t y{}; y < 8; ++y)
 				{
-					const std::int_fast32_t TempY{ (PosY + y) * ViewportWidth };
+					const std::int_fast32_t TempY{ (PosY + y) * Texture.Width };
 					const std::int_fast32_t TempChar{ ASCIIFont8x8[Char - 32][y] };
 
 					for (std::int_fast32_t x{}; x < 8; ++x)
 					{
 						if ((TempChar & 1 << x) != 0)
 						{
-							PixelBuffer[TempY + PosX + x] = Color;
+							Texture.Pixels[TempY + PosX + x] = Color;
 						}
 					}
 				}

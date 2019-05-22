@@ -26,13 +26,12 @@ class GFX_OpenGLShaderClass final
 {
 public:
 	void LoadShader(const std::string& ShaderName);
-	void LoadTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture);
-	void LoadSurfaceInGPU(const SDL_Surface* Surface, GLuint* Texture);
+	void LoadTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID);
 	void RenderTexture(const GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-	void LoadStaticTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-	void RenderStaticTexture(const GLuint* Texture);
-	void PreparePixelBufferTexture(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-	void RenderPixelBufferTexture();
+	void LoadStaticTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
+	void RenderStaticTexture(const GLuint* TextureID);
+	void PrepareLWMFTexture(const lwmf::TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY);
+	void RenderLWMFTexture(const lwmf::TextureStruct& Texture);
 
 private:
 	enum class Components : std::int_fast32_t
@@ -50,7 +49,7 @@ private:
 	GLfloat Vertices[16]{};
 	GLuint VertexArrayObject{};
 	GLuint VertexBufferObject{};
-	GLuint PixelBufferTexture{};
+	GLuint LWMFTextureID{};
 };
 
 inline void GFX_OpenGLShaderClass::LoadShader(const std::string& ShaderName)
@@ -161,7 +160,7 @@ inline void GFX_OpenGLShaderClass::LoadShader(const std::string& ShaderName)
 	glCheckError();
 
 	float ProjectionMatrix[16];
-	Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(lwmf::ViewportWidth), static_cast<GLfloat>(lwmf::ViewportHeight), 0.0F);
+	Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(ScreenTexture.Width), static_cast<GLfloat>(ScreenTexture.Height), 0.0F);
 	const GLint Projection{ glGetUniformLocation(ShaderProgram, "MVP") };
 	glCheckError();
 	glUniformMatrix4fv(Projection, 1, GL_FALSE, ProjectionMatrix);
@@ -183,13 +182,13 @@ inline void GFX_OpenGLShaderClass::LoadShader(const std::string& ShaderName)
 	glCheckError();
 }
 
-inline void GFX_OpenGLShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture)
+inline void GFX_OpenGLShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID)
 {
-	glGenTextures(1, Texture);
+	glGenTextures(1, TextureID);
 	glCheckError();
-	glBindTexture(GL_TEXTURE_2D, *Texture);
+	glBindTexture(GL_TEXTURE_2D, *TextureID);
 	glCheckError();
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TextureData.Width, TextureData.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, TextureData.Texture.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 	glCheckError();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glCheckError();
@@ -197,49 +196,35 @@ inline void GFX_OpenGLShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& T
 	glCheckError();
 }
 
-inline void GFX_OpenGLShaderClass::LoadSurfaceInGPU(const SDL_Surface* Surface, GLuint* Texture)
-{
-	glGenTextures(1, Texture);
-	glCheckError();
-	glBindTexture(GL_TEXTURE_2D, *Texture);
-	glCheckError();
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Surface->w, Surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, Surface->pixels);
-	glCheckError();
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glCheckError();
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glCheckError();
-}
-
-inline void GFX_OpenGLShaderClass::RenderTexture(const GLuint* Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
+inline void GFX_OpenGLShaderClass::RenderTexture(const GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
 {
 	UpdateVertices(PosX, PosY, Width, Height);
-	glBindTexture(GL_TEXTURE_2D, *Texture);
+	glBindTexture(GL_TEXTURE_2D, *TextureID);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 
-inline void GFX_OpenGLShaderClass::LoadStaticTextureInGPU(const lwmf::TextureStruct& TextureData, GLuint* Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
+inline void GFX_OpenGLShaderClass::LoadStaticTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
 {
 	UpdateVertices(PosX, PosY, Width, Height);
-	LoadTextureInGPU(TextureData, Texture);
+	LoadTextureInGPU(Texture, TextureID);
 }
 
-inline void GFX_OpenGLShaderClass::RenderStaticTexture(const GLuint* Texture)
+inline void GFX_OpenGLShaderClass::RenderStaticTexture(const GLuint* TextureID)
 {
 	glBindVertexArray(VertexArrayObject);
-	glBindTexture(GL_TEXTURE_2D, *Texture);
+	glBindTexture(GL_TEXTURE_2D, *TextureID);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 
-inline void GFX_OpenGLShaderClass::PreparePixelBufferTexture(const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
+inline void GFX_OpenGLShaderClass::PrepareLWMFTexture(const lwmf::TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY)
 {
-	UpdateVertices(PosX, PosY, Width, Height);
+	UpdateVertices(PosX, PosY, Texture.Width, Texture.Height);
 	glCheckError();
-	glGenTextures(1, &PixelBufferTexture);
+	glGenTextures(1, &LWMFTextureID);
 	glCheckError();
-	glBindTexture(GL_TEXTURE_2D, PixelBufferTexture);
+	glBindTexture(GL_TEXTURE_2D, LWMFTextureID);
 	glCheckError();
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, Width, Height);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, Texture.Width, Texture.Height);
 	glCheckError();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glCheckError();
@@ -247,11 +232,11 @@ inline void GFX_OpenGLShaderClass::PreparePixelBufferTexture(const std::int_fast
 	glCheckError();
 }
 
-inline void GFX_OpenGLShaderClass::RenderPixelBufferTexture()
+inline void GFX_OpenGLShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture)
 {
 	glBindVertexArray(VertexArrayObject);
-	glBindTexture(GL_TEXTURE_2D, PixelBufferTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,lwmf::ViewportWidth, lwmf::ViewportHeight, GL_RGBA, GL_UNSIGNED_BYTE, lwmf::PixelBuffer.data());
+	glBindTexture(GL_TEXTURE_2D, LWMFTextureID);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 

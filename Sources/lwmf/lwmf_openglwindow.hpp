@@ -14,34 +14,43 @@
 #include <cstdint>
 #include <vector>
 
+#include "lwmf_texture.hpp"
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 namespace lwmf
 {
 
 
-	void ResizeViewportAndPixelBuffer(std::int_fast32_t Width, std::int_fast32_t Height);
-	void CreateOpenGLWindow(HINSTANCE hInstance, std::int_fast32_t Width, std::int_fast32_t Height, LPCSTR WindowName, bool Fullscreen);
-	void ResizeOpenGLWindow();
+	void ResizeViewportAndRenderTarget(TextureStruct& Texture, std::int_fast32_t Width, std::int_fast32_t Height);
+	void CreateOpenGLWindow(HINSTANCE hInstance, TextureStruct& RenderTarget, std::int_fast32_t Width, std::int_fast32_t Height, LPCSTR WindowName, bool Fullscreen);
+	void ResizeOpenGLWindow(TextureStruct& RenderTarget);
+
+	//
+	// Variables and constants
+	//
+
+	inline HDC WindowHandle;
+	inline HWND MainWindow;
 
 	//
 	// Functions
 	//
 
-	inline void ResizeViewportAndPixelBuffer(const std::int_fast32_t Width, const std::int_fast32_t Height)
+	inline void ResizeViewportAndRenderTarget(TextureStruct& Texture, const std::int_fast32_t Width, const std::int_fast32_t Height)
 	{
-		ViewportWidth = Width;
-		ViewportHeight = Height;
-		ViewportWidthMid = ViewportWidth >> 1;
-		ViewportHeightMid = ViewportHeight >> 1;
-		glViewport(0, 0, ViewportWidth, ViewportHeight);
+		Texture.Width = Width;
+		Texture.Height = Height;
+		Texture.WidthMid = Texture.Width >> 1;
+		Texture.HeightMid = Texture.Height >> 1;
+		glViewport(0, 0, Texture.Width, Texture.Height);
 
-		PixelBuffer.clear();
-		PixelBuffer.shrink_to_fit();
-		PixelBuffer.resize(static_cast<size_t>(ViewportWidth) * static_cast<size_t>(ViewportHeight), 0);
+		Texture.Pixels.clear();
+		Texture.Pixels.shrink_to_fit();
+		Texture.Pixels.resize(static_cast<size_t>(Width) * static_cast<size_t>(Height), 0);
 	}
 
-	inline void CreateOpenGLWindow(const HINSTANCE hInstance, const std::int_fast32_t Width, const std::int_fast32_t Height, const LPCSTR WindowName, const bool Fullscreen)
+	inline void CreateOpenGLWindow(const HINSTANCE hInstance, TextureStruct& RenderTarget, const std::int_fast32_t Width, const std::int_fast32_t Height, const LPCSTR WindowName, const bool Fullscreen)
 	{
 		// Create window
 
@@ -106,14 +115,14 @@ namespace lwmf
 		ShowWindow(MainWindow, SW_SHOW);
 		SetForegroundWindow(MainWindow);
 		SetFocus(MainWindow);
-		ResizeViewportAndPixelBuffer(Width, Height);
+		ResizeViewportAndRenderTarget(RenderTarget, Width, Height);
 	}
 
-	inline void ResizeOpenGLWindow()
+	inline void ResizeOpenGLWindow(TextureStruct& RenderTarget)
 	{
 		RECT WinRect{};
 		GetClientRect(MainWindow, &WinRect);
-		ResizeViewportAndPixelBuffer(WinRect.right, WinRect.bottom);
+		ResizeViewportAndRenderTarget(RenderTarget, WinRect.right, WinRect.bottom);
 	}
 
 

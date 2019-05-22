@@ -229,7 +229,7 @@ namespace Game_WeaponHandling
 			// but deleted anything used for drawing lines...
 			//
 
-			const float Camera{ (lwmf::ViewportWidthMid << 1) / static_cast<float>(lwmf::ViewportWidth) - 1 };
+			const float Camera{ (ScreenTexture.WidthMid << 1) / static_cast<float>(ScreenTexture.Width) - 1 };
 			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera , Player.Dir.Y + Plane.Y * Camera };
 			lwmf::IntPointStruct MapPos{ static_cast<std::int_fast32_t>(Player.Pos.X), static_cast<std::int_fast32_t>(Player.Pos.Y) };
 			const lwmf::FloatPointStruct DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
@@ -268,10 +268,10 @@ namespace Game_WeaponHandling
 							const lwmf::FloatPointStruct EntityPos{ Entities[Game_EntityHandling::EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[Game_EntityHandling::EntityOrder[Index]].Pos.Y - Player.Pos.Y };
 							const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
 							const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[Game_EntityHandling::EntityOrder[Index]].MoveV / TransY) };
-							const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(lwmf::ViewportHeight / TransY) };
-							const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(lwmf::ViewportWidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
-							const std::int_fast32_t LineEndX{ (std::min)((EntitySizeTemp >> 1) + EntitySX, lwmf::ViewportWidth) };
-							const std::int_fast32_t TextureY{ (((((lwmf::ViewportHeightMid - vScreen) << 8) - ((lwmf::ViewportHeight + VerticalLook) << 7) + (EntitySizeTemp << 7)) * EntitySize) / EntitySizeTemp) >> 8 };
+							const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
+							const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(ScreenTexture.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
+							const std::int_fast32_t LineEndX{ (std::min)((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
+							const std::int_fast32_t TextureY{ (((((ScreenTexture.HeightMid - vScreen) << 8) - ((ScreenTexture.Height + VerticalLook) << 7) + (EntitySizeTemp << 7)) * EntitySize) / EntitySizeTemp) >> 8 };
 
 							for (std::int_fast32_t x{ -(EntitySizeTemp >> 1) + EntitySX }; x < LineEndX; ++x)
 							{
@@ -280,8 +280,8 @@ namespace Game_WeaponHandling
 
 								const std::int_fast32_t TextureX{ ((x - ((-EntitySizeTemp >> 1) + EntitySX)) * EntitySize / EntitySizeTemp) };
 
-								if ((x == lwmf::ViewportWidthMid && TransY < Game_EntityHandling::ZBuffer[x]) &&
-									((EntityAssets[Entities[Entities[Game_EntityHandling::EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[Game_EntityHandling::EntityOrder[Index]].WalkAnimStep].Texture[TextureY * TextureSize + TextureX] & lwmf::AMask) != 0))
+								if ((x == ScreenTexture.WidthMid && TransY < Game_EntityHandling::ZBuffer[x]) &&
+									((EntityAssets[Entities[Entities[Game_EntityHandling::EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[Game_EntityHandling::EntityOrder[Index]].WalkAnimStep].Pixels[TextureY * TextureSize + TextureX] & lwmf::AMask) != 0))
 								{
 									Game_EntityHandling::HandleEntityHit(Entities[Entities[Game_EntityHandling::EntityOrder[Index]].Number]);
 

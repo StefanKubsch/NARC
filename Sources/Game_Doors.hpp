@@ -101,13 +101,13 @@ namespace Game_Doors
 					Door.OpenCloseCounter += Door.OpenCloseSpeed;
 
 					// TODO(Stefan): Of course, you have to see what´s behind the door when opening/closing...Rendering needs to be changed for that!
-					std::fill(Door.AnimTexture.Texture.begin(), Door.AnimTexture.Texture.end(), lwmf::AMask);
+					std::fill(Door.AnimTexture.Pixels.begin(), Door.AnimTexture.Pixels.end(), lwmf::AMask);
 
 					for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < Door.OpenCloseWidth; ++x, ++SourceTextureX)
 					{
 						for (std::int_fast32_t y{}; y < TextureSize; ++y)
 						{
-							Door.AnimTexture.Texture[y * TextureSize + x] = Game_LevelHandling::LevelTextures[Door.OriginalTexture].Texture[y * TextureSize + SourceTextureX];
+							Door.AnimTexture.Pixels[y * TextureSize + x] = Game_LevelHandling::LevelTextures[Door.OriginalTexture].Pixels[y * TextureSize + SourceTextureX];
 						}
 					}
 				}
@@ -145,7 +145,7 @@ namespace Game_Doors
 						{
 							for (std::int_fast32_t y{}; y < TextureSize; ++y)
 							{
-								Door.AnimTexture.Texture[y * TextureSize + x] = Game_LevelHandling::LevelTextures[Door.OriginalTexture].Texture[y * TextureSize + SourceTextureX];
+								Door.AnimTexture.Pixels[y * TextureSize + x] = Game_LevelHandling::LevelTextures[Door.OriginalTexture].Pixels[y * TextureSize + SourceTextureX];
 							}
 						}
 					}

@@ -16,25 +16,25 @@
 
 #include "lwmf_general.hpp"
 #include "lwmf_math.hpp"
-#include "lwmf_pixelbuffer.hpp"
+#include "lwmf_texture.hpp"
 
 namespace lwmf
 {
 
 
-	void SetPixel(std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
-	void SetPixelSafe(std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
-	std::int_fast32_t GetPixel(std::int_fast32_t x, std::int_fast32_t y);
-	void BoundaryFill(IntPointStruct& CenterPoints, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
-	void Line(std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
-	void Rectangle(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
-	void FilledRectangle(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
-	void Circle(std::int_fast32_t CenterX, std::int_fast32_t CenterY, std::int_fast32_t Radius, std::int_fast32_t Color);
-	void FilledCircle(std::int_fast32_t CenterX, std::int_fast32_t CenterY, std::int_fast32_t Radius, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
+	void SetPixel(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
+	void SetPixelSafe(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
+	std::int_fast32_t GetPixel(const TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y);
+	void BoundaryFill(TextureStruct& Texture, IntPointStruct& CenterPoints, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
+	void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
+	void Rectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
+	void FilledRectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
+	void Circle(TextureStruct& Texture, std::int_fast32_t CenterX, std::int_fast32_t CenterY, std::int_fast32_t Radius, std::int_fast32_t Color);
+	void FilledCircle(TextureStruct& Texture, std::int_fast32_t CenterX, std::int_fast32_t CenterY, std::int_fast32_t Radius, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
 	IntPointStruct GetPolygonCentroid(const std::vector<IntPointStruct>& Points);
 	bool PointInsidePolygon(const std::vector<IntPointStruct>& Points, const IntPointStruct& Point);
-	void Polygon(const std::vector<IntPointStruct>& Points, std::int_fast32_t BorderColor);
-	void FilledPolygon(const std::vector<IntPointStruct>& Points, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
+	void Polygon(TextureStruct& Texture, const std::vector<IntPointStruct>& Points, std::int_fast32_t BorderColor);
+	void FilledPolygon(TextureStruct& Texture, const std::vector<IntPointStruct>& Points, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
 
 	//
 	// Functions
@@ -44,29 +44,29 @@ namespace lwmf
 	// Pixel operations
 	//
 
-	inline void SetPixel(const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color)
+	inline void SetPixel(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color)
 	{
-		PixelBuffer[y * ViewportWidth + x] = Color;
+		Texture.Pixels[y * Texture.Width + x] = Color;
 	}
 
-	inline void SetPixelSafe(const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color)
+	inline void SetPixelSafe(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color)
 	{
-		if (x >= 0 && x <= ViewportWidth && y >= 0 && y < ViewportHeight)
+		if (x >= 0 && x <= Texture.Width && y >= 0 && y < Texture.Height)
 		{
-			PixelBuffer[y * ViewportWidth + x] = Color;
+			Texture.Pixels[y * Texture.Width + x] = Color;
 		}
 	}
 
-	inline std::int_fast32_t GetPixel(const std::int_fast32_t x, const std::int_fast32_t y)
+	inline std::int_fast32_t GetPixel(const TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y)
 	{
-		return PixelBuffer[y * ViewportWidth + x];
+		return Texture.Pixels[y * Texture.Width + x];
 	}
 
 	//
 	// Flood Fill
 	//
 
-	inline void BoundaryFill(IntPointStruct& CenterPoints, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
+	inline void BoundaryFill(TextureStruct& Texture, IntPointStruct& CenterPoints, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
 		std::vector<IntPointStruct> Stack;
 		Stack.push_back(CenterPoints);
@@ -78,7 +78,7 @@ namespace lwmf
 
 			std::int_fast32_t x1{ CenterPoints.X };
 
-			while (x1 >= 0 && PixelBuffer[CenterPoints.Y * ViewportWidth + x1] != BorderColor)
+			while (x1 >= 0 && Texture.Pixels[CenterPoints.Y * Texture.Width + x1] != BorderColor)
 			{
 				--x1;
 			}
@@ -88,28 +88,28 @@ namespace lwmf
 			bool Above{};
 			bool Below{};
 
-			const std::int_fast32_t TempY{ CenterPoints.Y * ViewportWidth };
+			const std::int_fast32_t TempY{ CenterPoints.Y * Texture.Width };
 
-			while (x1 < ViewportWidth && PixelBuffer[TempY + x1] != BorderColor)
+			while (x1 < Texture.Width && Texture.Pixels[TempY + x1] != BorderColor)
 			{
-				PixelBuffer[TempY + x1] = FillColor;
+				Texture.Pixels[TempY + x1] = FillColor;
 
-				if (!Above && CenterPoints.Y > 0 && PixelBuffer[(CenterPoints.Y - 1) * ViewportWidth + x1] != BorderColor)
+				if (!Above && CenterPoints.Y > 0 && Texture.Pixels[(CenterPoints.Y - 1) * Texture.Width + x1] != BorderColor)
 				{
 					Stack.push_back({ x1, CenterPoints.Y - 1 });
 					Above = true;
 				}
-				else if (Above && CenterPoints.Y > 0 && PixelBuffer[(CenterPoints.Y - 1) * ViewportWidth + x1] != BorderColor)
+				else if (Above && CenterPoints.Y > 0 && Texture.Pixels[(CenterPoints.Y - 1) * Texture.Width + x1] != BorderColor)
 				{
 					Above = false;
 				}
 
-				if (!Below && CenterPoints.Y < ViewportHeight - 1 && PixelBuffer[(CenterPoints.Y + 1) * ViewportWidth + x1] != BorderColor)
+				if (!Below && CenterPoints.Y < Texture.Height - 1 && Texture.Pixels[(CenterPoints.Y + 1) * Texture.Width + x1] != BorderColor)
 				{
 					Stack.push_back({ x1, CenterPoints.Y + 1 });
 					Below = true;
 				}
-				else if (Below && CenterPoints.Y < ViewportHeight - 1 && PixelBuffer[(CenterPoints.Y + 1) * ViewportWidth + x1] != BorderColor)
+				else if (Below && CenterPoints.Y < Texture.Height - 1 && Texture.Pixels[(CenterPoints.Y + 1) * Texture.Width + x1] != BorderColor)
 				{
 					Below = false;
 				}
@@ -123,15 +123,15 @@ namespace lwmf
 	// Lines
 	//
 
-	inline void Line(const std::int_fast32_t x1, const std::int_fast32_t y1, const std::int_fast32_t x2, const std::int_fast32_t y2, const std::int_fast32_t Color)
+	inline void Line(TextureStruct& Texture, const std::int_fast32_t x1, const std::int_fast32_t y1, const std::int_fast32_t x2, const std::int_fast32_t y2, const std::int_fast32_t Color)
 	{
 		// Case 1: Straight horizontal line within screen boundaries
-		if ((y1 == y2) && (x2 > x1) && (x1 >= 0 && x2 <= ViewportWidth && y1 >= 0 && y1 < ViewportHeight))
+		if ((y1 == y2) && (x2 > x1) && (x1 >= 0 && x2 <= Texture.Width && y1 >= 0 && y1 < Texture.Height))
 		{
-			std::fill(PixelBuffer.begin() + y1 * ViewportWidth + x1, PixelBuffer.begin() + y1 * ViewportWidth + x2, Color);
+			std::fill(Texture.Pixels.begin() + y1 * Texture.Width + x1, Texture.Pixels.begin() + y1 * Texture.Width + x2, Color);
 		}
 		// Case 2: Line is within screen boundaries, so no further checking if pixel can be set
-		else if (x1 >= 0 && x1 <= ViewportWidth && y1 >= 0 && y1 < ViewportHeight && x2 >= 0 && x2 <= ViewportWidth && y2 >= 0 && y2 < ViewportHeight)
+		else if (x1 >= 0 && x1 <= Texture.Width && y1 >= 0 && y1 < Texture.Height && x2 >= 0 && x2 <= Texture.Width && y2 >= 0 && y2 < Texture.Height)
 		{
 			const IntPointStruct d{ x2 - x1, y2 - y1 };
 			const IntPointStruct d1{ std::abs(d.X), std::abs(d.Y) };
@@ -142,7 +142,7 @@ namespace lwmf
 				std::int_fast32_t xe{};
 
 				d.X >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
-				PixelBuffer[y * ViewportWidth + x] = Color;
+				Texture.Pixels[y * Texture.Width + x] = Color;
 
 				for (std::int_fast32_t i{}; x < xe; ++i)
 				{
@@ -158,7 +158,7 @@ namespace lwmf
 						px += (d1.Y - d1.X) << 1;
 					}
 
-					PixelBuffer[y * ViewportWidth + x] = Color;
+					Texture.Pixels[y * Texture.Width + x] = Color;
 				}
 			}
 			else
@@ -167,7 +167,7 @@ namespace lwmf
 				std::int_fast32_t ye{};
 
 				d.Y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
-				PixelBuffer[y * ViewportWidth + x] = Color;
+				Texture.Pixels[y * Texture.Width + x] = Color;
 
 				for (std::int_fast32_t i{}; y < ye; ++i)
 				{
@@ -183,7 +183,7 @@ namespace lwmf
 						py += (d1.X - d1.Y) << 1;
 					}
 
-					PixelBuffer[y * ViewportWidth + x] = Color;
+					Texture.Pixels[y * Texture.Width + x] = Color;
 				}
 			}
 		}
@@ -199,7 +199,7 @@ namespace lwmf
 				std::int_fast32_t xe{};
 
 				d.X >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
-				SetPixelSafe(x, y, Color);
+				SetPixelSafe(Texture, x, y, Color);
 
 				for (std::int_fast32_t i{}; x < xe; ++i)
 				{
@@ -215,7 +215,7 @@ namespace lwmf
 						px += (d1.Y - d1.X) << 1;
 					}
 
-					SetPixelSafe(x, y, Color);
+					SetPixelSafe(Texture, x, y, Color);
 				}
 			}
 			else
@@ -224,7 +224,7 @@ namespace lwmf
 				std::int_fast32_t ye{};
 
 				d.Y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
-				SetPixelSafe(x, y, Color);
+				SetPixelSafe(Texture, x, y, Color);
 
 				for (std::int_fast32_t i{}; y < ye; ++i)
 				{
@@ -240,7 +240,7 @@ namespace lwmf
 						py += (d1.X - d1.Y) << 1;
 					}
 
-					SetPixelSafe(x, y, Color);
+					SetPixelSafe(Texture, x, y, Color);
 				}
 			}
 		}
@@ -251,20 +251,20 @@ namespace lwmf
 	// Rectangles
 	//
 
-	inline void Rectangle(const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
+	inline void Rectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
-		Line(PosX, PosY, PosX + Width, PosY, Color);
-		Line(PosX, PosY, PosX, PosY + Height, Color);
-		Line(PosX, PosY + Height, PosX + Width, PosY + Height, Color);
-		Line(PosX + Width, PosY, PosX + Width, PosY + Height, Color);
+		Line(Texture, PosX, PosY, PosX + Width, PosY, Color);
+		Line(Texture, PosX, PosY, PosX, PosY + Height, Color);
+		Line(Texture, PosX, PosY + Height, PosX + Width, PosY + Height, Color);
+		Line(Texture, PosX + Width, PosY, PosX + Width, PosY + Height, Color);
 	}
 
-	inline void FilledRectangle(const std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, const std::int_fast32_t Color)
+	inline void FilledRectangle(TextureStruct& Texture, const std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
 		for (std::int_fast32_t y{ PosY }; y <= PosY + Height; ++y)
 		{
-			const std::int_fast32_t TempWidth{ y * ViewportWidth + PosX };
-			std::fill(PixelBuffer.begin() + TempWidth, PixelBuffer.begin() + TempWidth + Width, Color);
+			const std::int_fast32_t TempWidth{ y * Texture.Width + PosX };
+			std::fill(Texture.Pixels.begin() + TempWidth, Texture.Pixels.begin() + TempWidth + Width, Color);
 		}
 	}
 
@@ -272,24 +272,24 @@ namespace lwmf
 	// Circles
 	//
 
-	inline void Circle(const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, std::int_fast32_t Radius, const std::int_fast32_t Color)
+	inline void Circle(TextureStruct& Texture, const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, std::int_fast32_t Radius, const std::int_fast32_t Color)
 	{
 		std::int_fast32_t y{};
 		std::int_fast32_t Error{};
 
 		// if complete circle is within screen boundaries, there is no reason to use SetPixelSafe...
-		if (CenterX - Radius >= 0 && CenterX + Radius <= ViewportWidth && CenterY - Radius >= 0 && CenterY + Radius < ViewportHeight)
+		if (CenterX - Radius >= 0 && CenterX + Radius <= Texture.Width && CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)
 		{
 			while (Radius >= y)
 			{
-				PixelBuffer[(CenterY + y) * ViewportWidth + CenterX + Radius] = Color;
-				PixelBuffer[(CenterY + Radius) * ViewportWidth + CenterX + y] = Color;
-				PixelBuffer[(CenterY + Radius) * ViewportWidth + CenterX - y] = Color;
-				PixelBuffer[(CenterY + y) * ViewportWidth + CenterX - Radius] = Color;
-				PixelBuffer[(CenterY - y) * ViewportWidth + CenterX - Radius] = Color;
-				PixelBuffer[(CenterY - Radius) * ViewportWidth + CenterX - y] = Color;
-				PixelBuffer[(CenterY - Radius) * ViewportWidth + CenterX + y] = Color;
-				PixelBuffer[(CenterY - y) * ViewportWidth + CenterX + Radius] = Color;
+				Texture.Pixels[(CenterY + y) * Texture.Width + CenterX + Radius] = Color;
+				Texture.Pixels[(CenterY + Radius) * Texture.Width + CenterX + y] = Color;
+				Texture.Pixels[(CenterY + Radius) * Texture.Width + CenterX - y] = Color;
+				Texture.Pixels[(CenterY + y) * Texture.Width + CenterX - Radius] = Color;
+				Texture.Pixels[(CenterY - y) * Texture.Width + CenterX - Radius] = Color;
+				Texture.Pixels[(CenterY - Radius) * Texture.Width + CenterX - y] = Color;
+				Texture.Pixels[(CenterY - Radius) * Texture.Width + CenterX + y] = Color;
+				Texture.Pixels[(CenterY - y) * Texture.Width + CenterX + Radius] = Color;
 
 				Error <= 0 ? (++y, Error += (y << 1) + 1) : (--Radius, Error -= (Radius << 1) + 1);
 			}
@@ -299,29 +299,29 @@ namespace lwmf
 		{
 			while (Radius >= y)
 			{
-				SetPixelSafe(CenterX + Radius, CenterY + y, Color);
-				SetPixelSafe(CenterX + y, CenterY + Radius, Color);
-				SetPixelSafe(CenterX - y, CenterY + Radius, Color);
-				SetPixelSafe(CenterX - Radius, CenterY + y, Color);
-				SetPixelSafe(CenterX - Radius, CenterY - y, Color);
-				SetPixelSafe(CenterX - y, CenterY - Radius, Color);
-				SetPixelSafe(CenterX + y, CenterY - Radius, Color);
-				SetPixelSafe(CenterX + Radius, CenterY - y, Color);
+				SetPixelSafe(Texture, CenterX + Radius, CenterY + y, Color);
+				SetPixelSafe(Texture, CenterX + y, CenterY + Radius, Color);
+				SetPixelSafe(Texture, CenterX - y, CenterY + Radius, Color);
+				SetPixelSafe(Texture, CenterX - Radius, CenterY + y, Color);
+				SetPixelSafe(Texture, CenterX - Radius, CenterY - y, Color);
+				SetPixelSafe(Texture, CenterX - y, CenterY - Radius, Color);
+				SetPixelSafe(Texture, CenterX + y, CenterY - Radius, Color);
+				SetPixelSafe(Texture, CenterX + Radius, CenterY - y, Color);
 
 				Error <= 0 ? (++y, Error += (y << 1) + 1) : (--Radius, Error -= (Radius << 1) + 1);
 			}
 		}
 	}
 
-	inline void FilledCircle(const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, const std::int_fast32_t Radius, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
+	inline void FilledCircle(TextureStruct& Texture, const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, const std::int_fast32_t Radius, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
-		Circle(CenterX, CenterY, Radius, BorderColor);
+		Circle(Texture, CenterX, CenterY, Radius, BorderColor);
 
 		const std::int_fast32_t InnerRadius{ Radius - 1 };
 		const std::int_fast32_t InnerRadiusPOW{ InnerRadius * InnerRadius };
 
 		// if complete circle is within screen boundaries, there is no reason to use SetPixelSafe...
-		if (CenterX - Radius >= 0 && CenterX + Radius <= ViewportWidth && CenterY - Radius >= 0 && CenterY + Radius < ViewportHeight)
+		if (CenterX - Radius >= 0 && CenterX + Radius <= Texture.Width && CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)
 		{
 			for (std::int_fast32_t y{ -InnerRadius }; y <= InnerRadius; ++y)
 			{
@@ -331,7 +331,7 @@ namespace lwmf
 				{
 					if (x * x + YPOW <= InnerRadiusPOW)
 					{
-						PixelBuffer[(CenterY + y) * ViewportWidth + CenterX + x] = FillColor;
+						Texture.Pixels[(CenterY + y) * Texture.Width + CenterX + x] = FillColor;
 					}
 				}
 			}
@@ -347,7 +347,7 @@ namespace lwmf
 				{
 					if (x * x + YPOW <= InnerRadiusPOW)
 					{
-						SetPixelSafe(CenterX + x, CenterY + y, FillColor);
+						SetPixelSafe(Texture, CenterX + x, CenterY + y, FillColor);
 					}
 				}
 			}
@@ -403,26 +403,26 @@ namespace lwmf
 		return (Counter & 1) == 0 ? false : true;
 	}
 
-	inline void Polygon(const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor)
+	inline void Polygon(TextureStruct& Texture, const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor)
 	{
 		std::int_fast32_t Index{};
 
 		for (Index; Index < Points.size() - 1; ++Index)
 		{
-			Line(Points[Index].X, Points[Index].Y, Points[Index + 1].X, Points[Index + 1].Y, BorderColor);
+			Line(Texture, Points[Index].X, Points[Index].Y, Points[Index + 1].X, Points[Index + 1].Y, BorderColor);
 		}
 
-		Line(Points[Index].X, Points[Index].Y, Points[0].X, Points[0].Y, BorderColor);
+		Line(Texture, Points[Index].X, Points[Index].Y, Points[0].X, Points[0].Y, BorderColor);
 	}
 
-	inline void FilledPolygon(const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
+	inline void FilledPolygon(TextureStruct& Texture, const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
-		Polygon(Points, BorderColor);
+		Polygon(Texture, Points, BorderColor);
 		IntPointStruct CentroidPoint{ GetPolygonCentroid(Points) };
 
 		if (PointInsidePolygon(Points, CentroidPoint))
 		{
-			BoundaryFill(CentroidPoint, BorderColor, FillColor);
+			BoundaryFill(Texture, CentroidPoint, BorderColor, FillColor);
 		}
 	}
 

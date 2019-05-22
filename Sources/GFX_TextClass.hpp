@@ -119,7 +119,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 
 				// Blit single glyphs to individual textures
 				lwmf::TextureStruct TempGlyphTexture;
-				TempGlyphTexture.Texture.resize(Glyphs[Char].Width * Glyphs[Char].Height);
+				TempGlyphTexture.Pixels.resize(Glyphs[Char].Width * Glyphs[Char].Height);
 				TempGlyphTexture.Width = Glyphs[Char].Width;
 				TempGlyphTexture.Height = Glyphs[Char].Height;
 
@@ -127,7 +127,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				{
 					for (std::int_fast32_t TargetX{}, x{ Glyphs[Char].PosX }; x < Glyphs[Char].PosX + Glyphs[Char].Width; ++x, ++ TargetX)
 					{
-						TempGlyphTexture.Texture[TargetY * TempGlyphTexture.Width + TargetX] = FontColor[y * Width + x];
+						TempGlyphTexture.Pixels[TargetY * TempGlyphTexture.Width + TargetX] = FontColor[y * Width + x];
 					}
 				}
 
@@ -155,5 +155,5 @@ inline void GFX_TextClass::RenderTextCentered(const std::string& Text, const std
 		TextLengthInPixels += Glyphs[Char].Advance;
 	}
 
-	RenderText(Text, lwmf::ViewportWidthMid - (TextLengthInPixels >> 1), y);
+	RenderText(Text, ScreenTexture.WidthMid - (TextLengthInPixels >> 1), y);
 }

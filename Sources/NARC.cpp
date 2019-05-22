@@ -1,10 +1,10 @@
 /*
 ******************************************
-* NARC_SDL                               *
+* NARC                                   *
 *                                        *
 * "Not Another RayCaster"                *
 *                                        *
-* NARC_SDL.cpp                           *
+* NARC.cpp                               *
 *                                        *
 * (c) 2017, 2018, 2019 Stefan Kubsch     *
 *                                        *
@@ -29,21 +29,10 @@
 // ****************************
 
 // lightweight media framework
-//
-// Not fully implemented
-//
-// Currently used:
-// - lwmf_math
-// - lwmf_multithreading
-// - lwmf_openglloader
-// - lwmf_fpscounter
-// - lwmf_primitives
-// - lwmf_pixelbuffer
-// - lwmf_text
-// - lwmf_color
-// - lwmf_rawinput
-
 #include "lwmf/lwmf.hpp"
+
+// "ScreenTexture" is the main render target in our game!
+lwmf::TextureStruct ScreenTexture;
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_SIMD.hpp"
@@ -320,7 +309,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		// Sort entities back to front to draw them in right order
 		SortEntities(Game_EntityHandling::SortOrder::BackToFront);
 
-		lwmf::ClearPixelBuffer(0);
+		lwmf::ClearTexture(ScreenTexture, 0);
 
 		lwmf::FPSCounter();
 
@@ -335,7 +324,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		if (HUDEnabled)
 		{
 			HUDHealthBar.Display();
-			lwmf::DisplayFPSCounter(570, 10, 0xFFFFFFFF);
+			lwmf::DisplayFPSCounter(ScreenTexture, 570, 10, 0xFFFFFFFF);
 		}
 
 		if (Player.IsDead && !GamePausedFlag)
@@ -352,7 +341,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			HUDMinimap.Display();
 		}
 
-		GFX_Window::PixelBufferToScreen.RenderPixelBufferTexture();
+		GFX_Window::ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
 		Game_WeaponHandling::DrawWeapon();
 
 		if (HUDEnabled)
@@ -709,7 +698,7 @@ void ControlPlayerMovement()
 			VerticalLookCamera -= VerticalLookStep * (HID_Mouse::MousePos.Y * InputSensitivity);
 		}
 
-		VerticalLook = static_cast<std::int_fast32_t>(lwmf::ViewportHeight * VerticalLookCamera);
+		VerticalLook = static_cast<std::int_fast32_t>(ScreenTexture.Height * VerticalLookCamera);
 
 		if ((VerticalLook & 1) != 0)
 		{

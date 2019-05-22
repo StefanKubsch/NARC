@@ -76,7 +76,7 @@ namespace Game_SkyboxHandling
 
 			SkyboxShader.RenderTexture(&SkyboxTexture, Left, Top, SkyboxWidth, SkyboxHeight);
 
-			if (Left < SkyboxWidth - lwmf::ViewportWidth)
+			if (Left < SkyboxWidth - ScreenTexture.Width)
 			{
 				SkyboxShader.RenderTexture(&SkyboxTexture, Left - SkyboxWidth, Top, SkyboxWidth, SkyboxHeight);
 			}

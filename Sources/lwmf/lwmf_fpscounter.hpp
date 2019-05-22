@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <string>
+#include <sysinfoapi.h>
 
 #include "lwmf_text.hpp"
 
@@ -20,7 +21,7 @@ namespace lwmf
 
 
 	void FPSCounter();
-	void DisplayFPSCounter(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Color);
+	void DisplayFPSCounter(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Color);
 
 	//
 	// Variables and constants
@@ -46,9 +47,9 @@ namespace lwmf
 		++FPSFrames;
 	}
 
-	inline void DisplayFPSCounter(const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
+	inline void DisplayFPSCounter(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
 	{
-		RenderText("fps:" + std::to_string(FPS), PosX, PosY, Color);
+		RenderText(Texture, "fps:" + std::to_string(FPS), PosX, PosY, Color);
 	}
 
 

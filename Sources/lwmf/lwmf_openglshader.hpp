@@ -17,8 +17,9 @@ namespace lwmf
 {
 
 
-	void InitShader();
+	void InitShader(TextureStruct& Texture);
 	void ClearBuffer();
+	void RenderTexture(const TextureStruct& Texture);
 
 	//
 	// Variables and constants
@@ -30,7 +31,7 @@ namespace lwmf
 	// Functions
 	//
 
-	inline void InitShader()
+	inline void InitShader(TextureStruct& Texture)
 	{
 		constexpr GLfloat Vertices[]
 		{
@@ -122,7 +123,7 @@ namespace lwmf
 
 		if (FullscreenFlag == 1)
 		{
-			glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, ViewportWidth, ViewportHeight);
+			glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, Texture.Width, Texture.Height);
 		}
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -137,5 +138,25 @@ namespace lwmf
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
+	inline void RenderTexture(const TextureStruct& Texture)
+	{
+		switch (FullscreenFlag)
+		{
+		case 1:
+		{
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
+			break;
+		}
+		case 0:
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
+			break;
+		}
+		default: {};
+		}
 
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+	}
+
+	
 } // namespace lwmf

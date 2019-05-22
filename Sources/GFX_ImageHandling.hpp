@@ -43,11 +43,11 @@ namespace GFX_ImageHandling
 
 			unsigned char* ImageData{ stbi_load(ImageFileName.c_str(), &TempTexture.Width, &TempTexture.Height, &OriginalFormat, STBI_rgb_alpha) };
 
-			TempTexture.Texture.resize(TempTexture.Width * TempTexture.Height);
+			TempTexture.Pixels.resize(TempTexture.Width * TempTexture.Height);
 
 			for (std::int_fast32_t Offset{}; Offset < (TempTexture.Width * TempTexture.Height); ++Offset)
 			{
-				TempTexture.Texture[Offset] = *reinterpret_cast<std::int_fast32_t*>(ImageData + Offset * 4);
+				TempTexture.Pixels[Offset] = *reinterpret_cast<std::int_fast32_t*>(ImageData + Offset * 4);
 			}
 
 			stbi_image_free(ImageData);
@@ -68,11 +68,11 @@ namespace GFX_ImageHandling
 
 			if (Tools_ErrorHandling::CheckTextureSize(TempTexture.Width, TempTexture.Height, Size, ShowMessage, StopOnError))
 			{
-				TempTexture.Texture.resize(Size * Size);
+				TempTexture.Pixels.resize(Size * Size);
 
 				for (std::int_fast32_t Offset{}; Offset < (Size * Size); ++Offset)
 				{
-					TempTexture.Texture[Offset] = *reinterpret_cast<std::int_fast32_t*>(ImageData + Offset * 4);
+					TempTexture.Pixels[Offset] = *reinterpret_cast<std::int_fast32_t*>(ImageData + Offset * 4);
 				}
 			}
 

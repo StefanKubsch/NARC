@@ -50,7 +50,7 @@ inline void Game_WeaponDisplayClass::Init()
 		const lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };
 
 		CrosshairShader.LoadShader("Default");
-		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairTexture, lwmf::ViewportWidthMid - (TempTextureCrosshair.Width >> 1), lwmf::ViewportHeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
+		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairTexture, ScreenTexture.WidthMid - (TempTextureCrosshair.Width >> 1), ScreenTexture.HeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
 
 		// Weapon HUD settings
 		const lwmf::TextureStruct TempTextureWeaponHUD{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "WeaponHUDFileName")) };

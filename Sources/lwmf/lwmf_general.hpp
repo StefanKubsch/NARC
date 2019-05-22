@@ -22,13 +22,6 @@ namespace lwmf
 	// Variables and constants
 	//
 
-	struct TextureStruct final
-	{
-		std::vector<std::int_fast32_t> Texture;
-		std::int_fast32_t Width{};
-		std::int_fast32_t Height{};
-	};
-
 	struct IntPointStruct final
 	{
 		std::int_fast32_t X{};
@@ -50,14 +43,6 @@ namespace lwmf
 	};
 
 	inline std::int_fast32_t FullscreenFlag{};
-
-	inline std::int_fast32_t ViewportWidth{};
-	inline std::int_fast32_t ViewportHeight{};
-	inline std::int_fast32_t ViewportWidthMid{};
-	inline std::int_fast32_t ViewportHeightMid{};
-
-	inline HDC WindowHandle;
-	inline HWND MainWindow;
 
 
 } // namespace lwmf

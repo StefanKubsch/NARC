@@ -58,9 +58,9 @@ namespace Game_Transitions
 		Tools_Console::DisplayText(BRIGHT_WHITE, fmt::format("\n{}\n\n", NextLevelText));
 
 		lwmf::ClearBuffer();
-		lwmf::ClearPixelBuffer(0);
-		GeneralText.RenderTextCentered(NextLevelText, lwmf::ViewportHeight - GeneralText.FontHeight - 50);
-		GFX_Window::PixelBufferToScreen.RenderPixelBufferTexture();
+		lwmf::ClearTexture(ScreenTexture, 0);
+		GeneralText.RenderTextCentered(NextLevelText, ScreenTexture.Height - GeneralText.FontHeight - 50);
+		GFX_Window::ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
 		SwapBuffers(lwmf::WindowHandle);
 	}
 
@@ -80,7 +80,7 @@ namespace Game_Transitions
 		// My version is screensize & framerate-independent since I calculate the neccessary bits and use a gameloop...
 		//
 
-		const std::int_fast32_t Bits{ static_cast<std::int_fast32_t>(std::ceilf(std::log2f(static_cast<float>(lwmf::ViewportWidth * lwmf::ViewportHeight)) * 0.5F)) << 1 };
+		const std::int_fast32_t Bits{ static_cast<std::int_fast32_t>(std::ceilf(std::log2f(static_cast<float>(ScreenTexture.Width * ScreenTexture.Height)) * 0.5F)) << 1 };
 		const std::int_fast32_t LastFrame{ static_cast<std::int_fast32_t>(std::pow(2, Bits)) };
 		const std::int_fast32_t HalfBits{ Bits >> 1 };
 		const std::int_fast32_t HalfMask{ static_cast<std::int_fast32_t>(std::pow(2, HalfBits)) - 1 };
@@ -111,11 +111,11 @@ namespace Game_Transitions
 					}
 
 					const std::int_fast32_t FnResult{ Right << HalfBits | (Left & (LastFrame - 1)) };
-					const lwmf::IntPointStruct Pixel{FnResult % lwmf::ViewportWidth, static_cast<std::int_fast32_t>(FnResult / lwmf::ViewportWidth) };
+					const lwmf::IntPointStruct Pixel{FnResult % ScreenTexture.Width, static_cast<std::int_fast32_t>(FnResult / ScreenTexture.Width) };
 
-					if (Pixel.X < lwmf::ViewportWidth && Pixel.Y < lwmf::ViewportHeight)
+					if (Pixel.X < ScreenTexture.Width && Pixel.Y < ScreenTexture.Height)
 					{
-						lwmf::SetPixel(Pixel.X, Pixel.Y, FadeColor);
+						lwmf::SetPixel(ScreenTexture, Pixel.X, Pixel.Y, FadeColor);
 					}
 				}
 
@@ -123,7 +123,7 @@ namespace Game_Transitions
 			}
 
 			lwmf::ClearBuffer();
-			GFX_Window::PixelBufferToScreen.RenderPixelBufferTexture();
+			GFX_Window::ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
 			SwapBuffers(lwmf::WindowHandle);
 		}
 	}
@@ -132,15 +132,15 @@ namespace Game_Transitions
 	{
 		FizzleFade(0xFF0000FF, 50);
 
-		GameOverText.RenderTextCentered("You are dead. Game over...", lwmf::ViewportHeightMid - (GameOverText.FontHeight >> 1));
-		GameOverText1.RenderTextCentered("Press any key to continue", lwmf::ViewportHeight - GameOverText1.FontHeight - 50);
+		GameOverText.RenderTextCentered("You are dead. Game over...", ScreenTexture.HeightMid - (GameOverText.FontHeight >> 1));
+		GameOverText1.RenderTextCentered("Press any key to continue", ScreenTexture.Height - GameOverText1.FontHeight - 50);
 
 		SwapBuffers(lwmf::WindowHandle);
 
 		if (HID_Keyboard::WaitForKeypress())
 		{
 			GamePausedFlag = true;
-			lwmf::ClearPixelBuffer(0);
+			lwmf::ClearTexture(ScreenTexture, 0);
 		}
 	}
 
