@@ -30,7 +30,6 @@ namespace lwmf
 
 	};
 
-	void SetTextureMetrics(TextureStruct& Texture, std::int_fast32_t Width, std::int_fast32_t Height);
 	void CropTexture(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Width, std::int_fast32_t Height);
 	void ResizeTexture(TextureStruct& Texture, std::int_fast32_t TargetWidth, std::int_fast32_t TargetHeight, std::int_fast32_t FilterMode);
 	void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, std::int_fast32_t PosX, std::int_fast32_t PosY);
@@ -48,12 +47,6 @@ namespace lwmf
 	//
 	// Functions
 	//
-
-	inline void SetTextureMetrics(TextureStruct& Texture, const std::int_fast32_t Width, const std::int_fast32_t Height)
-	{
-		Texture.Height = Height;
-		Texture.Width = Width;
-	}
 
 	inline void CropTexture(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Width, const std::int_fast32_t Height)
 	{
@@ -82,7 +75,8 @@ namespace lwmf
 		}
 
 		Texture.Pixels = std::move(TempBuffer);
-		SetTextureMetrics(Texture, Width, Height);
+		Texture.Width = Width;
+		Texture.Height = Height;
 	}
 
 	inline void ResizeTexture(TextureStruct& Texture, const std::int_fast32_t TargetWidth, const std::int_fast32_t TargetHeight, const std::int_fast32_t FilterMode)
@@ -138,7 +132,8 @@ namespace lwmf
 		}
 
 		Texture.Pixels = std::move(TempBuffer);
-		SetTextureMetrics(Texture, TargetWidth, TargetHeight);
+		Texture.Width = TargetWidth;
+		Texture.Height = TargetHeight;
 	}
 
 	inline void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY)

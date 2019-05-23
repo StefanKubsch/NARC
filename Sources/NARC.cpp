@@ -95,6 +95,8 @@ inline bool HUDEnabled{ true };
 
 std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
+	WindowInstance = hInstance;
+
 	InitAndLoadGameConfig();
 	InitAndLoadLevel();
 
@@ -404,10 +406,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if ((*reinterpret_cast<short*>(& RawDev.data.mouse.usButtonData)) / WHEEL_DELTA < 0)
 						{
 							Game_WeaponHandling::InitiateWeaponChangeDown();
+							break;
 						}
-						else if ((*reinterpret_cast<short*>(&RawDev.data.mouse.usButtonData)) / WHEEL_DELTA > 0)
+
+						if ((*reinterpret_cast<short*>(&RawDev.data.mouse.usButtonData)) / WHEEL_DELTA > 0)
 						{
 							Game_WeaponHandling::InitiateWeaponChangeUp();
+							break;
 						}
 					}
 					break;
@@ -425,8 +430,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (RawDev.data.keyboard.VKey == VK_DOWN)
 						{
 							MainMenu.ItemDown();
+							break;
 						}
-						else if (RawDev.data.keyboard.VKey == VK_UP)
+
+						if (RawDev.data.keyboard.VKey == VK_UP)
 						{
 							MainMenu.ItemUp();
 							break;
@@ -465,8 +472,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::DecreaseMouseSensitivityKey)
 						{
 							HID_Mouse::ChangeMouseSensitivity('-');
+							break;
 						}
-						else if (RawDev.data.keyboard.VKey == HID_Keyboard::IncreaseMouseSensitivityKey)
+
+						if (RawDev.data.keyboard.VKey == HID_Keyboard::IncreaseMouseSensitivityKey)
 						{
 							HID_Mouse::ChangeMouseSensitivity('+');
 							break;
@@ -491,8 +500,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerForwardKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
+							break;
 						}
-						else if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerBackwardKey)
+
+						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerBackwardKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
 							break;
@@ -501,8 +512,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerStrafeLeftKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
+							break;
 						}
-						else if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerStrafeRightKey)
+
+						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerStrafeRightKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
 							break;
@@ -514,8 +527,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerForwardKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
+							break;
 						}
-						else if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerBackwardKey)
+
+						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerBackwardKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
 						}
@@ -523,10 +538,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerStrafeLeftKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
+							break;
 						}
-						else if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerStrafeRightKey)
+
+						if (RawDev.data.keyboard.VKey == HID_Keyboard::MovePlayerStrafeRightKey)
 						{
 							HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
+							break;
 						}
 					}
 					break;

@@ -15,6 +15,7 @@
 #include <sysinfoapi.h>
 
 #include "lwmf_text.hpp"
+#include "lwmf_texture.hpp"
 
 namespace lwmf
 {

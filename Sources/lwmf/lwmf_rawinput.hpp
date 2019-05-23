@@ -36,7 +36,6 @@ namespace lwmf
 	{
 		RAWINPUTDEVICE RawInputDevice;
 
-		// Define RAWINPUTDEVICE
 		RawInputDevice.usUsagePage = 1;
 		RawInputDevice.usUsage = Device;
 		RawInputDevice.dwFlags = RIDEV_DEVNOTIFY;
@@ -54,14 +53,12 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_REMOVE;
 		RawInputDevice.hwndTarget = nullptr;
 
-		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE));
+		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice));
 	}
 
 	inline void CatchMouse(const HWND hWnd)
 	{
 		static RECT WindowRect{};
-
-		//SetCapture(hWnd);
 
 		GetClientRect(hWnd, &WindowRect);
 

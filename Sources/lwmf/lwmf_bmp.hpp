@@ -12,11 +12,10 @@
 
 #include <Windows.h>
 #include <cstdint>
-#include <cstring>
+#include <string>
 #include <vector>
 #include <fstream>
 
-#include "lwmf_general.hpp"
 #include "lwmf_color.hpp"
 #include "lwmf_texture.hpp"
 
@@ -52,7 +51,8 @@ namespace lwmf
 		File.seekg(BMPHeader->bfOffBits);
 		File.read(InputBuffer.data(), BMPInfo->biSizeImage);
 
-		SetTextureMetrics(Texture, BMPInfo->biWidth, BMPInfo->biHeight);
+		Texture.Width = BMPInfo->biWidth;
+		Texture.Height = BMPInfo->biHeight;
 		Texture.Pixels.resize(Texture.Width * Texture.Height);
 
 		for (std::int_fast32_t Offset{}, y{ Texture.Height - 1 }; y >= 0; --y)
@@ -62,7 +62,6 @@ namespace lwmf
 			for (std::int_fast32_t x{}; x < Texture.Width; ++x)
 			{
 				const std::int_fast32_t TempPos{ 3 * (TempY + x) };
-
 				Texture.Pixels[Offset++] = RGBAtoINT(InputBuffer[TempPos + 2] & 255, InputBuffer[TempPos + 1] & 255, InputBuffer[TempPos] & 255, 255);
 			}
 		}

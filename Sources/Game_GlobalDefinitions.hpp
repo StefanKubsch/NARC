@@ -9,10 +9,12 @@
 
 #pragma once
 
+#include <Windows.h>
 #include <cstdint>
 #include <random>
 
 inline bool Debug{};
+inline HINSTANCE WindowInstance;
 
 // Setting planes/viewport for raycaster
 inline lwmf::FloatPointStruct Plane{};

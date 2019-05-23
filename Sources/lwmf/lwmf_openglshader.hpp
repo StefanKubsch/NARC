@@ -10,8 +10,9 @@
 
 #pragma once
 
-#include <cstdint>
 #include <GL/gl.h>
+
+#include "lwmf_texture.hpp"
 
 namespace lwmf
 {
@@ -140,23 +141,9 @@ namespace lwmf
 
 	inline void RenderTexture(const TextureStruct& Texture)
 	{
-		switch (FullscreenFlag)
-		{
-		case 1:
-		{
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
-			break;
-		}
-		case 0:
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
-			break;
-		}
-		default: {};
-		}
-
+		FullscreenFlag == 1 ? glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data()) : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 	}
 
-	
+
 } // namespace lwmf

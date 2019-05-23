@@ -14,6 +14,7 @@
 #include <cstdint>
 #include "fmt/format.h"
 
+#include "Game_GlobalDefinitions.hpp"
 #include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
@@ -41,30 +42,14 @@ namespace GFX_Window
 		{
 			Tools_Console::DisplayText(BRIGHT_MAGENTA, "\nCreating window...\n");
 
-			if (VSync)
-			{
-				// Create fullscreen "window"
-				lwmf::CreateOpenGLWindow(GetModuleHandle(nullptr),
-					ScreenTexture,
-					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
-					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
-					Tools_INIFile::ReadValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), true);
+			// Create fullscreen if VSync = true, otherwise a window
+			lwmf::CreateOpenGLWindow(WindowInstance,
+				ScreenTexture,
+				Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
+				Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
+				Tools_INIFile::ReadValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), VSync);
 
-				// -1 means "adaptive vsync"
-				lwmf::SetVSync(-1);
-			}
-			else
-			{
-				// create normal window
-				lwmf::CreateOpenGLWindow(GetModuleHandle(nullptr),
-					ScreenTexture,
-					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
-					Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
-					Tools_INIFile::ReadValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), false);
-
-				// 0 means no vsync
-				lwmf::SetVSync(0);
-			}
+			VSync ?	lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 
 			lwmf::InitOpenGLLoader();
 
