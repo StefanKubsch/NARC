@@ -22,6 +22,7 @@
 #include "lwmf_primitives.hpp"
 #include "lwmf_texture.hpp"
 #include "lwmf_bmp.hpp"
+#include "lwmf_png.hpp"
 #include "lwmf_text.hpp"
 #include "lwmf_perlinnoise.hpp"
 #include "lwmf_fpscounter.hpp"

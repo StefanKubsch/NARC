@@ -69,7 +69,6 @@ The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textu
   - lwmf, the lightweight media framework for graphics, multithreading, input handling etc. (my own work, have a look here: https://github.com/StefanKubsch/lwmf)
   - SDL 2.0.9 for low level handling of audio and gamepad support (https://www.libsdl.org/)
   - SDL_Mixer 2.0.4 for audio handling (https://www.libsdl.org/projects/SDL_mixer/)
-  - stb_image.h 2.22 for loading PNG etc. (https://github.com/nothings/stb)
   - stb_truetype.h 1.21 for TrueType font rendering (https://github.com/nothings/stb)
   - libcurl 7.64.1 for internet handling (https://curl.haxx.se/libcurl/, see documentation in Docfolder!)
   - {fmt} 5.3.0 for printing and formatting strings etc. (https://github.com/fmtlib/fmt)
