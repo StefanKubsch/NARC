@@ -31,7 +31,7 @@ namespace lwmf
 		{
 			static std::int_fast32_t ReadBitFromStream(std::int_fast32_t& Bit, const unsigned char* Bits)
 			{
-				std::int_fast32_t Result{ static_cast<std::int_fast32_t>((Bits[Bit >> 3] >> (Bit & 0x7)) & 1) };
+				const std::int_fast32_t Result{ static_cast<std::int_fast32_t>((Bits[Bit >> 3] >> (Bit & 0x7)) & 1) };
 				++Bit;
 
 				return Result;
@@ -53,7 +53,7 @@ namespace lwmf
 			{
 				std::int_fast32_t MakeFromLengths(const std::vector<std::int_fast32_t>& BitLength, std::int_fast32_t MaximumBitLength)
 				{
-					std::int_fast32_t NumCodes{ static_cast<std::int_fast32_t>(BitLength.size()) };
+					const std::int_fast32_t NumCodes{ static_cast<std::int_fast32_t>(BitLength.size()) };
 					std::int_fast32_t TreePos{};
 					std::int_fast32_t NodeFilled{};
 					std::vector<std::int_fast32_t> Tree1D(NumCodes);
@@ -62,7 +62,7 @@ namespace lwmf
 
 					for (std::int_fast32_t Bits{}; Bits < NumCodes; ++Bits)
 					{
-						BitLengthCount[BitLength[Bits]]++;
+						++BitLengthCount[BitLength[Bits]];
 					}
 
 					for (std::int_fast32_t Bits{ 1 }; Bits <= MaximumBitLength; ++Bits)
@@ -94,16 +94,7 @@ namespace lwmf
 
 							if (Tree2D[2 * TreePos + Bit] == 32767)
 							{
-								if (i + 1 == BitLength[n])
-								{
-									Tree2D[2 * TreePos + Bit] = n;
-									TreePos = 0;
-								}
-								else
-								{
-									Tree2D[2 * TreePos + Bit] = ++NodeFilled + NumCodes;
-									TreePos = NodeFilled;
-								}
+								i + 1 == BitLength[n] ? (Tree2D[2 * TreePos + Bit] = n, TreePos = 0) : (Tree2D[2 * TreePos + Bit] = ++NodeFilled + NumCodes, TreePos = NodeFilled);
 							}
 							else
 							{
@@ -117,7 +108,7 @@ namespace lwmf
 
 				std::int_fast32_t Decode(bool& Decoded, std::int_fast32_t& Result, std::int_fast32_t& TreePos, std::int_fast32_t Bit) const
 				{
-					std::int_fast32_t NumCodes{ static_cast<std::int_fast32_t>(Tree2D.size()) >> 1 };
+					const std::int_fast32_t NumCodes{ static_cast<std::int_fast32_t>(Tree2D.size()) >> 1 };
 
 					if (TreePos >= NumCodes)
 					{
@@ -239,9 +230,9 @@ namespace lwmf
 						return;
 					}
 
-					std::int_fast32_t HLit{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 5) + 257) };
-					std::int_fast32_t HDist{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 5) + 1) };
-					std::int_fast32_t HCLength{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 4) + 4) };
+					const std::int_fast32_t HLit{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 5) + 257) };
+					const std::int_fast32_t HDist{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 5) + 1) };
+					const std::int_fast32_t HCLength{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 4) + 4) };
 					std::vector<std::int_fast32_t> CodeLengthCode(19);
 
 					for (std::int_fast32_t i{}; i < 19; ++i)
@@ -261,7 +252,7 @@ namespace lwmf
 
 					while (i < HLit + HDist)
 					{
-						std::int_fast32_t Code{ HuffmanDecodeSymbol(In, BP, CodeLengthCodeTree, InLength) };
+						const std::int_fast32_t Code{ HuffmanDecodeSymbol(In, BP, CodeLengthCodeTree, InLength) };
 
 						if (Error)
 						{
@@ -270,14 +261,7 @@ namespace lwmf
 
 						if (Code <= 15)
 						{
-							if (i < HLit)
-							{
-								BitLength[i++] = Code;
-							}
-							else
-							{
-								BitLengthD[i++ - HLit] = Code;
-							}
+							i < HLit ? BitLength[i++] = Code : BitLengthD[i++ - HLit] = Code;
 						}
 						else if (Code == 16)
 						{
@@ -288,16 +272,7 @@ namespace lwmf
 							}
 
 							RepeatLength = 3 + ReadBitsFromStream(BP, In, 2);
-							std::int_fast32_t Value{};
-
-							if ((i - 1) < HLit)
-							{
-								Value = BitLength[i - 1];
-							}
-							else
-							{
-								Value = BitLengthD[i - HLit - 1];
-							}
+							const std::int_fast32_t Value{ (i - 1) < HLit ? BitLength[i - 1] : BitLengthD[i - HLit - 1] };
 
 							for (std::int_fast32_t n{}; n < RepeatLength; ++n)
 							{
@@ -307,14 +282,7 @@ namespace lwmf
 									return;
 								}
 
-								if (i < HLit)
-								{
-									BitLength[i++] = Value;
-								}
-								else
-								{
-									BitLengthD[i++ - HLit] = Value;
-								}
+								i < HLit ? BitLength[i++] = Value : BitLengthD[i++ - HLit] = Value;
 							}
 						}
 						else if (Code == 17)
@@ -335,14 +303,7 @@ namespace lwmf
 									return;
 								}
 
-								if (i < HLit)
-								{
-									BitLength[i++] = 0;
-								}
-								else
-								{
-									BitLengthD[i++ - HLit] = 0;
-								}
+								i < HLit ? BitLength[i++] = 0 :	BitLengthD[i++ - HLit] = 0;
 							}
 						}
 						else if (Code == 18)
@@ -362,14 +323,8 @@ namespace lwmf
 									Error = 15;
 									return;
 								}
-								if (i < HLit)
-								{
-									BitLength[i++] = 0;
-								}
-								else
-								{
-									BitLengthD[i++ - HLit] = 0;
-								}
+
+								i < HLit ? BitLength[i++] = 0 : BitLengthD[i++ - HLit] = 0;
 							}
 						}
 						else
@@ -418,7 +373,7 @@ namespace lwmf
 
 					for (;;)
 					{
-						std::int_fast32_t Code{ HuffmanDecodeSymbol(In, BP, CodeTree, InLength) };
+						const std::int_fast32_t Code{ HuffmanDecodeSymbol(In, BP, CodeTree, InLength) };
 
 						if (Error)
 						{
@@ -441,7 +396,6 @@ namespace lwmf
 						else if (Code >= 257 && Code <= 285)
 						{
 							std::int_fast32_t Length{ LENBASE[Code - 257] };
-							std::int_fast32_t NumberOfExtraBits{ LENEXTRA[Code - 257] };
 
 							if ((BP >> 3) >= InLength)
 							{
@@ -449,8 +403,8 @@ namespace lwmf
 								return;
 							}
 
-							Length += ReadBitsFromStream(BP, In, NumberOfExtraBits);
-							std::int_fast32_t CodeD{ HuffmanDecodeSymbol(In, BP, CodeTreeD, InLength) };
+							Length += ReadBitsFromStream(BP, In, LENEXTRA[Code - 257]);
+							const std::int_fast32_t CodeD{ HuffmanDecodeSymbol(In, BP, CodeTreeD, InLength) };
 
 							if (Error)
 							{
@@ -464,7 +418,6 @@ namespace lwmf
 							}
 
 							std::int_fast32_t Distance{ DISTBASE[CodeD] };
-							std::int_fast32_t NumberOfExtraBitsD{ DISTEXTRA[CodeD] };
 
 							if ((BP >> 3) >= InLength)
 							{
@@ -472,9 +425,8 @@ namespace lwmf
 								return;
 							}
 
-							Distance += ReadBitsFromStream(BP, In, NumberOfExtraBitsD);
-							std::int_fast32_t Start{ Pos };
-							std::int_fast32_t Back{ Start - Distance };
+							Distance += ReadBitsFromStream(BP, In, DISTEXTRA[CodeD]);
+							std::int_fast32_t Back{ Pos - Distance };
 
 							if (Pos + Length >= Out.size())
 							{
@@ -485,9 +437,9 @@ namespace lwmf
 							{
 								Out[Pos++] = Out[Back++];
 
-								if (Back >= Start)
+								if (Back >= Pos)
 								{
-									Back = Start - Distance;
+									Back = Pos - Distance;
 								}
 							}
 						}
@@ -509,8 +461,8 @@ namespace lwmf
 						return;
 					}
 
-					std::int_fast32_t Len{ In[p] + 256 * In[p + 1] };
-					std::int_fast32_t NLen{ In[p + 2] + 256 * In[p + 3] };
+					const std::int_fast32_t Len{ In[p] + 256 * In[p + 1] };
+					const std::int_fast32_t NLen{ In[p + 2] + 256 * In[p + 3] };
 
 					p += 4;
 
@@ -554,9 +506,9 @@ namespace lwmf
 					return 24;
 				}
 
-				std::int_fast32_t Cm{ static_cast<std::int_fast32_t>(In[0] & 15) };
-				std::int_fast32_t CInfo{ static_cast<std::int_fast32_t>((In[0] >> 4) & 15) };
-				std::int_fast32_t FDict{ static_cast<std::int_fast32_t>((In[1] >> 5) & 1) };
+				const std::int_fast32_t Cm{ static_cast<std::int_fast32_t>(In[0] & 15) };
+				const std::int_fast32_t CInfo{ static_cast<std::int_fast32_t>((In[0] >> 4) & 15) };
+				const std::int_fast32_t FDict{ static_cast<std::int_fast32_t>((In[1] >> 5) & 1) };
 
 				if (Cm != 8 || CInfo > 7)
 				{
@@ -592,7 +544,7 @@ namespace lwmf
 				std::vector<unsigned char> Palette;
 			} info;
 
-			std::int_fast32_t Error;
+			std::int_fast32_t Error{};
 
 			void Decode(std::vector<unsigned char>& Out, const unsigned char* In, std::int_fast32_t Size, bool ConvertToRGBA)
 			{
@@ -614,7 +566,7 @@ namespace lwmf
 				std::int_fast32_t Pos{ 33 };
 				std::vector<unsigned char> ImageData;
 				bool ImageEnd{};
-				bool KnownType = true;
+				bool KnownType{ true };
 				info.KeyDefined = false;
 
 				while (!ImageEnd)
@@ -625,14 +577,8 @@ namespace lwmf
 						return;
 					}
 
-					std::int_fast32_t ChunkLength{ Read32bitInt(&In[Pos]) };
+					const std::int_fast32_t ChunkLength{ Read32bitInt(&In[Pos]) };
 					Pos += 4;
-
-					if (ChunkLength > 2147483647)
-					{
-						Error = 63;
-						return;
-					}
 
 					if (Pos + ChunkLength >= Size)
 					{
@@ -734,7 +680,7 @@ namespace lwmf
 					Pos += 4;
 				}
 
-				std::int_fast32_t BitsPerPixel{ GetBpp(info) };
+				const std::int_fast32_t BitsPerPixel{ GetBpp(info) };
 				std::vector<unsigned char> ScanLines(((info.Width * (info.Height * BitsPerPixel + 7)) >> 3) + info.Height);
 				Zlib zlib;
 
@@ -745,8 +691,8 @@ namespace lwmf
 					return;
 				}
 
-				std::int_fast32_t ByteWidth{ (BitsPerPixel + 7) >> 3 };
-				std::int_fast32_t OutLength{ (info.Height * info.Width * BitsPerPixel + 7) >> 3 };
+				const std::int_fast32_t ByteWidth{ (BitsPerPixel + 7) >> 3 };
+				const std::int_fast32_t OutLength{ (info.Height * info.Width * BitsPerPixel + 7) >> 3 };
 
 				Out.resize(OutLength);
 
@@ -755,16 +701,15 @@ namespace lwmf
 				if (info.InterlaceMethod == 0)
 				{
 					std::int_fast32_t LineStart{};
-					std::int_fast32_t LineLength{ (info.Width * BitsPerPixel + 7) >> 3 };
+					const std::int_fast32_t LineLength{ (info.Width * BitsPerPixel + 7) >> 3 };
 
 					if (BitsPerPixel >= 8)
 					{
 						for (std::int_fast32_t y{}; y < info.Height; ++y)
 						{
-							std::int_fast32_t FilterType{ ScanLines[LineStart] };
 							const unsigned char* PreviousLine{ y == 0 ? 0 : &NewOut[(y - 1) * info.Width * ByteWidth] };
 
-							UnFilterScanline(&NewOut[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, FilterType, LineLength);
+							UnFilterScanline(&NewOut[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
 
 							if (Error)
 							{
@@ -780,10 +725,9 @@ namespace lwmf
 
 						for (std::int_fast32_t y{}, OBP{}; y < info.Height; ++y)
 						{
-							std::int_fast32_t FilterType{ ScanLines[LineStart] };
 							const unsigned char* PreviousLine{ y == 0 ? 0 : &NewOut[(y - 1) * info.Width * ByteWidth] };
 
-							UnFilterScanline(&TempLine[0], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, FilterType, LineLength);
+							UnFilterScanline(&TempLine[0], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
 
 							if (Error)
 							{
@@ -801,10 +745,10 @@ namespace lwmf
 				}
 				else
 				{
-					std::int_fast32_t PassWidth[7] { (info.Width + 7) >> 3, (info.Width + 3) >> 3, (info.Width + 3) >> 2, (info.Width + 1) >> 2, (info.Width + 1) >> 1, (info.Width + 0) >> 1, (info.Width + 0) / 1 };
-					std::int_fast32_t PassHeight[7] { (info.Height + 7) >> 3, (info.Height + 7) >> 3, (info.Height + 3) >> 3, (info.Height + 3) >> 2, (info.Height + 1) >> 2, (info.Height + 1) >> 1, (info.Height + 0) >> 1 };
-					std::int_fast32_t PassStart[7] {};
-					std::int_fast32_t Pattern[28] { 0,4,0,2,0,1,0,0,0,4,0,2,0,1,8,8,4,4,2,2,1,8,8,8,4,4,2,2 };
+					const std::int_fast32_t PassWidth[7] { (info.Width + 7) >> 3, (info.Width + 3) >> 3, (info.Width + 3) >> 2, (info.Width + 1) >> 2, (info.Width + 1) >> 1, (info.Width + 0) >> 1, (info.Width + 0) / 1 };
+					const std::int_fast32_t PassHeight[7] { (info.Height + 7) >> 3, (info.Height + 7) >> 3, (info.Height + 3) >> 3, (info.Height + 3) >> 2, (info.Height + 1) >> 2, (info.Height + 1) >> 1, (info.Height + 0) >> 1 };
+					const std::int_fast32_t Pattern[28] { 0,4,0,2,0,1,0,0,0,4,0,2,0,1,8,8,4,4,2,2,1,8,8,8,4,4,2,2 };
+					std::int_fast32_t PassStart[7]{};
 
 					for (std::int_fast32_t i{}; i < 6; ++i)
 					{
@@ -994,15 +938,14 @@ namespace lwmf
 					return;
 				}
 
-				std::int_fast32_t ByteWidth{ (Bpp + 7) >> 3 };
-				std::int_fast32_t LineLength{ 1 + ((Bpp * PassWidth + 7) >> 3) };
+				const std::int_fast32_t ByteWidth{ (Bpp + 7) >> 3 };
+				const std::int_fast32_t LineLength{ 1 + ((Bpp * PassWidth + 7) >> 3) };
 
 				for (std::int_fast32_t y{}; y < PassHeight; ++y)
 				{
-					unsigned char FilterType{ In[y * LineLength] };
 					unsigned char* PreviousLine{ y == 0 ? 0 : LineO };
 
-					UnFilterScanline(LineN, &In[y * LineLength + 1], PreviousLine, ByteWidth, FilterType, (Width * Bpp + 7) / 8);
+					UnFilterScanline(LineN, &In[y * LineLength + 1], PreviousLine, ByteWidth, In[y * LineLength], (Width * Bpp + 7) / 8);
 
 					if (Error)
 					{
@@ -1033,16 +976,14 @@ namespace lwmf
 						}
 					}
 
-					unsigned char* Temp{ LineN };
-					LineN = LineO;
-					LineO = Temp;
+					std::swap(LineO, LineN);
 				}
 			}
 
 			static std::int_fast32_t ReadBitFromReversedStream(std::int_fast32_t& BitP, const unsigned char* Bits)
 			{
-				std::int_fast32_t Result{ static_cast<std::int_fast32_t>((Bits[BitP >> 3] >> (7 - (BitP & 0x7))) & 1) };
-				BitP++;
+				const std::int_fast32_t Result{ static_cast<std::int_fast32_t>((Bits[BitP >> 3] >> (7 - (BitP & 0x7))) & 1) };
+				++BitP;
 
 				return Result;
 			}
@@ -1062,7 +1003,7 @@ namespace lwmf
 			void SetBitOfReversedStream(std::int_fast32_t& BitP, unsigned char* Bits, std::int_fast32_t Bit)
 			{
 				Bits[BitP >> 3] |= (Bit << (7 - (BitP & 0x7)));
-				BitP++;
+				++BitP;
 			}
 
 			std::int_fast32_t Read32bitInt(const unsigned char* Buffer)
@@ -1070,7 +1011,7 @@ namespace lwmf
 				return (Buffer[0] << 24) | (Buffer[1] << 16) | (Buffer[2] << 8) | Buffer[3];
 			}
 
-			std::int_fast32_t CheckColorValidity(std::int_fast32_t ColorType, std::int_fast32_t Depth)
+			std::int_fast32_t CheckColorValidity(const std::int_fast32_t ColorType, const std::int_fast32_t Depth)
 			{
 				if ((ColorType == 2 || ColorType == 4 || ColorType == 6))
 				{
@@ -1140,7 +1081,9 @@ namespace lwmf
 				{
 					for (std::int_fast32_t i{}; i < NumberOfPixels; ++i)
 					{
-						NewOut[(i << 2) + 0] = NewOut[(i << 2) + 1] = NewOut[(i << 2) + 2] = In[i];
+						NewOut[(i << 2) + 0] = In[i];
+						NewOut[(i << 2) + 1] = In[i];
+						NewOut[(i << 2) + 2] = In[i];
 						NewOut[(i << 2) + 3] = (InfoIn.KeyDefined && In[i] == InfoIn.KeyR) ? 0 : 255;
 					}
 				}
@@ -1231,7 +1174,7 @@ namespace lwmf
 				{
 					for (std::int_fast32_t i{}; i < NumberOfPixels; ++i)
 					{
-						std::int_fast32_t Value{ (ReadBitsFromReversedStream(BP, In, InfoIn.BitDepth) * 255) / ((1 << InfoIn.BitDepth) - 1) };
+						const std::int_fast32_t Value{ (ReadBitsFromReversedStream(BP, In, InfoIn.BitDepth) * 255) / ((1 << InfoIn.BitDepth) - 1) };
 
 						NewOut[(i << 2) + 0] = NewOut[(i << 2) + 1] = NewOut[(i << 2) + 2] = static_cast<unsigned char>(Value);
 						NewOut[(i << 2) + 3] = (InfoIn.KeyDefined && Value && ((1 << InfoIn.BitDepth) - 1) == InfoIn.KeyR && ((1 << InfoIn.BitDepth) - 1)) ? 0 : 255;
@@ -1241,7 +1184,7 @@ namespace lwmf
 				{
 					for (std::int_fast32_t i{}; i < NumberOfPixels; ++i)
 					{
-						std::int_fast32_t Value{ ReadBitsFromReversedStream(BP, In, InfoIn.BitDepth) };
+						const std::int_fast32_t Value{ ReadBitsFromReversedStream(BP, In, InfoIn.BitDepth) };
 
 						if ((Value << 2) >= InfoIn.Palette.size())
 						{
