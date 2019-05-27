@@ -37,7 +37,7 @@ namespace GFX_ImageHandling
 			std::vector<unsigned char> ImageData;
 
 			lwmf::LoadPNG(Buffer, ImageFileName);
-			lwmf::DecodePNG(ImageData, TempTexture.Width, TempTexture.Height, &Buffer[0], static_cast<std::int_fast32_t>(Buffer.size()));
+			lwmf::DecodePNG(ImageData, TempTexture.Width, TempTexture.Height, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()));
 			TempTexture.Pixels.resize(TempTexture.Width * TempTexture.Height);
 
 			for (std::int_fast32_t Offset{}; Offset < (TempTexture.Width * TempTexture.Height); ++Offset)
@@ -59,7 +59,7 @@ namespace GFX_ImageHandling
 			std::vector<unsigned char> ImageData;
 
 			lwmf::LoadPNG(Buffer, ImageFileName);
-			lwmf::DecodePNG(ImageData, TempTexture.Width, TempTexture.Height, &Buffer[0], static_cast<std::int_fast32_t>(Buffer.size()));
+			lwmf::DecodePNG(ImageData, TempTexture.Width, TempTexture.Height, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()));
 
 			if (Tools_ErrorHandling::CheckTextureSize(TempTexture.Width, TempTexture.Height, Size, ShowMessage, StopOnError))
 			{
