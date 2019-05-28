@@ -31,12 +31,7 @@ namespace lwmf
 
 	inline void LoadBMP(TextureStruct& Texture, const std::string& Filename)
 	{
-		std::ifstream File(Filename, std::ios::in | std::ios::binary);
-
-		if (!File)
-		{
-			exit(-1);
-		}
+		std::ifstream File(Filename, std::ios::binary);
 
 		std::vector<unsigned char> FileHeaderBuffer(sizeof(BITMAPFILEHEADER));
 		std::vector<unsigned char> InfoHeaderBuffer(sizeof(BITMAPINFOHEADER));
@@ -53,7 +48,7 @@ namespace lwmf
 
 		Texture.Width = BMPInfo->biWidth;
 		Texture.Height = BMPInfo->biHeight;
-		Texture.Pixels.resize(Texture.Width * Texture.Height);
+		Texture.Pixels.resize(static_cast<size_t>(Texture.Width) * static_cast<size_t>(Texture.Height));
 
 		for (std::int_fast32_t Offset{}, y{ Texture.Height - 1 }; y >= 0; --y)
 		{

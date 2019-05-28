@@ -101,9 +101,9 @@ namespace Game_EntityHandling
 		EntityDistance.clear();
 		EntityDistance.shrink_to_fit();
 		ZBuffer.clear();
-		ZBuffer.resize(ScreenTexture.Width);
+		ZBuffer.resize(static_cast<size_t>(ScreenTexture.Width));
 
-		EntityMap = std::vector<std::vector<EntityTypes>>(Game_LevelHandling::LevelMapWidth, std::vector<EntityTypes>(Game_LevelHandling::LevelMapHeight, EntityTypes::Clear));
+		EntityMap = std::vector<std::vector<EntityTypes>>(static_cast<size_t>(Game_LevelHandling::LevelMapWidth), std::vector<EntityTypes>(static_cast<size_t>(Game_LevelHandling::LevelMapHeight), EntityTypes::Clear));
 
 		std::int_fast32_t Index{};
 

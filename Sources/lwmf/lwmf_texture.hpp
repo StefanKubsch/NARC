@@ -140,13 +140,13 @@ namespace lwmf
 	{
 		if (PosX == 0 && PosY == 0 && TargetTexture.Width == SourceTexture.Width && TargetTexture.Height == SourceTexture.Height)
 		{
-			std::memcpy(TargetTexture.Pixels.data(), SourceTexture.Pixels.data(), (SourceTexture.Width << 2) * static_cast<size_t>(SourceTexture.Height));
+			std::memcpy(TargetTexture.Pixels.data(), SourceTexture.Pixels.data(), (static_cast<size_t>(SourceTexture.Width) << 2) * static_cast<size_t>(SourceTexture.Height));
 		}
 		else
 		{
 			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
 			{
-				std::memcpy(TargetTexture.Pixels.data() + PosY * SourceTexture.Width + PosX, SourceTexture.Pixels.data() + y * SourceTexture.Width, (SourceTexture.Width << 2));
+				std::memcpy(TargetTexture.Pixels.data() + static_cast<size_t>(PosY) * static_cast<size_t>(SourceTexture.Width) + static_cast<size_t>(PosX), SourceTexture.Pixels.data() + static_cast<size_t>(y) * static_cast<size_t>(SourceTexture.Width), (static_cast<size_t>(SourceTexture.Width) << 2));
 			}
 		}
 	}

@@ -407,7 +407,7 @@ namespace lwmf
 	{
 		std::int_fast32_t Index{};
 
-		for (Index; Index < Points.size() - 1; ++Index)
+		for (Index; Index < static_cast<std::int_fast32_t>(Points.size()) - 1; ++Index)
 		{
 			Line(Texture, Points[Index].X, Points[Index].Y, Points[Index + 1].X, Points[Index + 1].Y, BorderColor);
 		}

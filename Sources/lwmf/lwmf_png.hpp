@@ -81,7 +81,7 @@ namespace lwmf
 					}
 
 					Tree2D.clear();
-					Tree2D.resize(NumCodes << 1, 32767);
+					Tree2D.resize((static_cast<size_t>(NumCodes) << 1), 32767);
 
 					for (std::int_fast32_t n{}; n < NumCodes; ++n)
 					{
@@ -140,7 +140,7 @@ namespace lwmf
 
 					while (Final == 0 && Error == 0)
 					{
-						if (BP >> 3 >= In.size())
+						if (BP >> 3 >= static_cast<std::int_fast32_t>(In.size()))
 						{
 							Error = 52;
 							return;
@@ -155,7 +155,7 @@ namespace lwmf
 							Error = 20;
 							return;
 						}
-						
+
 						if (BTYPE == 0)
 						{
 							InflateNoCompression(Out, &In[InPos], BP, Pos, static_cast<std::int_fast32_t>(In.size()));
@@ -168,7 +168,7 @@ namespace lwmf
 
 					if (Error == 0)
 					{
-						Out.resize(Pos);
+						Out.resize(static_cast<size_t>(Pos));
 					}
 				}
 
@@ -387,12 +387,12 @@ namespace lwmf
 						{
 							return;
 						}
-						
+
 						if (Code <= 255)
 						{
-							if (Pos >= Out.size())
+							if (Pos >= static_cast<std::int_fast32_t>(Out.size()))
 							{
-								Out.resize((Pos + 1) << 1);
+								Out.resize((static_cast<size_t>(Pos) + 1) << 1);
 							}
 
 							Out[Pos++] = static_cast<unsigned char>(Code);
@@ -432,9 +432,9 @@ namespace lwmf
 							Distance += ReadBitsFromStream(BP, In, DistanceExtra[CodeD]);
 							std::int_fast32_t Back{ Pos - Distance };
 
-							if (Pos + Length >= Out.size())
+							if (Pos + Length >= static_cast<std::int_fast32_t>(Out.size()))
 							{
-								Out.resize((Pos + Length) << 1);
+								Out.resize((static_cast<size_t>(Pos) + static_cast<size_t>(Length)) << 1);
 							}
 
 							for (std::int_fast32_t i{}; i < Length; ++i)
@@ -476,9 +476,9 @@ namespace lwmf
 						return;
 					}
 
-					if (Pos + Len >= Out.size())
+					if (Pos + Len >= static_cast<std::int_fast32_t>(Out.size()))
 					{
-						Out.resize(Pos + Len);
+						Out.resize(static_cast<size_t>(Pos) + static_cast<size_t>(Len));
 					}
 
 					if (p + Len > InLength)
@@ -603,7 +603,7 @@ namespace lwmf
 					else if (In[Pos + 0] == 'P' && In[Pos + 1] == 'L' && In[Pos + 2] == 'T' && In[Pos + 3] == 'E')
 					{
 						Pos += 4;
-						info.Palette.resize((ChunkLength / 3) << 2);
+						info.Palette.resize(static_cast<size_t>((ChunkLength / 3)) << 2);
 
 						if (info.Palette.size() > 1024)
 						{
@@ -627,7 +627,7 @@ namespace lwmf
 
 						if (info.ColorType == 3)
 						{
-							if ((ChunkLength << 2) > info.Palette.size())
+							if ((ChunkLength << 2) > static_cast<std::int_fast32_t>(info.Palette.size()))
 							{
 								Error = 39;
 								return;
@@ -705,7 +705,7 @@ namespace lwmf
 				const std::int_fast32_t ByteWidth{ (BitsPerPixel + 7) >> 3 };
 				const std::int_fast32_t OutLength{ (info.Height * info.Width * BitsPerPixel + 7) >> 3 };
 
-				Out.resize(OutLength);
+				Out.resize(static_cast<size_t>(OutLength));
 
 				unsigned char* NewOut{ OutLength != 0 ? Out.data() : nullptr };
 
@@ -720,7 +720,7 @@ namespace lwmf
 						{
 							const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * info.Width * ByteWidth] };
 
-							UnFilterScanline(&NewOut[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
+							UnFilterScanline(&NewOut[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength); //-V522
 
 							if (Error != 0)
 							{
@@ -736,7 +736,7 @@ namespace lwmf
 
 						for (std::int_fast32_t y{}, OBP{}; y < info.Height; ++y)
 						{
-							const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * info.Width * ByteWidth] };
+							const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * info.Width * ByteWidth] }; //-V522
 
 							UnFilterScanline(TempLine.data(), &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
 
@@ -1034,7 +1034,7 @@ namespace lwmf
 
 					return 0;
 				}
-				
+
 				if (ColorType == 0)
 				{
 					if (!(Depth == 1 || Depth == 2 || Depth == 4 || Depth == 8 || Depth == 16))
@@ -1044,7 +1044,7 @@ namespace lwmf
 
 					return 0;
 				}
-				
+
 				if (ColorType == 3)
 				{
 					if (!(Depth == 1 || Depth == 2 || Depth == 4 || Depth == 8))
@@ -1064,7 +1064,7 @@ namespace lwmf
 				{
 					return (3 * BPPInfo.BitDepth);
 				}
-				
+
 				if (BPPInfo.ColorType >= 4)
 				{
 					return (BPPInfo.ColorType - 2) * BPPInfo.BitDepth;
@@ -1078,7 +1078,7 @@ namespace lwmf
 				const std::int_fast32_t NumberOfPixels{ Width * Height };
 				std::int_fast32_t BP{};
 
-				Out.resize(NumberOfPixels << 2);
+				Out.resize(static_cast<size_t>(NumberOfPixels) << 2);
 
 				unsigned char* NewOut{ Out.empty() ? nullptr : Out.data() };
 
@@ -1086,7 +1086,7 @@ namespace lwmf
 				{
 					for (std::int_fast32_t i{}; i < NumberOfPixels; ++i)
 					{
-						NewOut[(i << 2) + 0] = In[i];
+						NewOut[(i << 2) + 0] = In[i]; //-V522
 						NewOut[(i << 2) + 1] = In[i];
 						NewOut[(i << 2) + 2] = In[i];
 						NewOut[(i << 2) + 3] = (InfoIn.KeyDefined && In[i] == InfoIn.KeyR) ? 0 : 255;
@@ -1108,7 +1108,7 @@ namespace lwmf
 				{
 					for (std::int_fast32_t i{}; i < NumberOfPixels; ++i)
 					{
-						if ((In[i] << 2) >= InfoIn.Palette.size())
+						if ((In[i] << 2) >= static_cast<std::int_fast32_t>(InfoIn.Palette.size()))
 						{
 							return 46;
 						}
@@ -1199,7 +1199,7 @@ namespace lwmf
 					{
 						const std::int_fast32_t Value{ ReadBitsFromReversedStream(BP, In, InfoIn.BitDepth) };
 
-						if ((Value << 2) >= InfoIn.Palette.size())
+						if ((Value << 2) >= static_cast<std::int_fast32_t>(InfoIn.Palette.size()))
 						{
 							return 47;
 						}
@@ -1233,7 +1233,7 @@ namespace lwmf
 
 	inline void LoadPNG(TextureStruct& Texture, const std::string& FileName)
 	{
-		std::ifstream InputFile(FileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+		std::ifstream InputFile(FileName.c_str(), std::ios::binary);
 		std::streamsize Size{};
 
 		if (InputFile.seekg(0, std::ios::end).good())
@@ -1261,7 +1261,7 @@ namespace lwmf
 		std::vector<unsigned char> ImageData;
 
 		DecodePNG(ImageData, Texture.Width, Texture.Height, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()));
-		Texture.Pixels.resize(Texture.Width * Texture.Height);
+		Texture.Pixels.resize(static_cast<size_t>(Texture.Width) * static_cast<size_t>(Texture.Height));
 
 		for (std::int_fast32_t Offset{}; Offset < (Texture.Width * Texture.Height); ++Offset)
 		{
