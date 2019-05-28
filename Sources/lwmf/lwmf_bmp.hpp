@@ -31,7 +31,7 @@ namespace lwmf
 
 	inline void LoadBMP(TextureStruct& Texture, const std::string& Filename)
 	{
-		std::ifstream File(Filename, std::ios::binary);
+		std::ifstream File(Filename, std::ios::in | std::ios::binary);
 
 		if (!File)
 		{

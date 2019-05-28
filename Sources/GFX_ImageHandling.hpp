@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 
-#include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
 
 namespace GFX_ImageHandling
@@ -33,17 +32,7 @@ namespace GFX_ImageHandling
 
 		if (Tools_ErrorHandling::CheckFileExistence(ImageFileName, ShowMessage, StopOnError))
 		{
-			std::vector<unsigned char> Buffer;
-			std::vector<unsigned char> ImageData;
-
-			lwmf::LoadPNG(Buffer, ImageFileName);
-			lwmf::DecodePNG(ImageData, TempTexture.Width, TempTexture.Height, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()));
-			TempTexture.Pixels.resize(TempTexture.Width * TempTexture.Height);
-
-			for (std::int_fast32_t Offset{}; Offset < (TempTexture.Width * TempTexture.Height); ++Offset)
-			{
-				TempTexture.Pixels[Offset] = lwmf::RGBAtoINT(ImageData[Offset << 2], ImageData[(Offset << 2) + 1], ImageData[(Offset << 2) + 2], ImageData[(Offset << 2) + 3]);
-			}
+			lwmf::LoadPNG(TempTexture, ImageFileName);
 		}
 
 		return TempTexture;
@@ -55,20 +44,11 @@ namespace GFX_ImageHandling
 
 		if (Tools_ErrorHandling::CheckFileExistence(ImageFileName, ShowMessage, StopOnError))
 		{
-			std::vector<unsigned char> Buffer;
-			std::vector<unsigned char> ImageData;
-
-			lwmf::LoadPNG(Buffer, ImageFileName);
-			lwmf::DecodePNG(ImageData, TempTexture.Width, TempTexture.Height, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()));
+			lwmf::LoadPNG(TempTexture, ImageFileName);
 
 			if (Tools_ErrorHandling::CheckTextureSize(TempTexture.Width, TempTexture.Height, Size, ShowMessage, StopOnError))
 			{
-				TempTexture.Pixels.resize(TempTexture.Width * TempTexture.Height);
-
-				for (std::int_fast32_t Offset{}; Offset < (TempTexture.Width * TempTexture.Height); ++Offset)
-				{
-					TempTexture.Pixels[Offset] = lwmf::RGBAtoINT(ImageData[Offset << 2], ImageData[(Offset << 2) + 1], ImageData[(Offset << 2) + 2], ImageData[(Offset << 2) + 3]);
-				}
+				// Dummy, just check Size
 			}
 		}
 
