@@ -123,7 +123,7 @@ namespace lwmf
 	// Lines
 	//
 
-	inline void Line(TextureStruct& Texture, const std::int_fast32_t x1, const std::int_fast32_t y1, const std::int_fast32_t x2, const std::int_fast32_t y2, const std::int_fast32_t Color)
+	inline void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, const std::int_fast32_t x2, const std::int_fast32_t y2, const std::int_fast32_t Color)
 	{
 		// Case 1: Straight horizontal line within screen boundaries
 		if ((y1 == y2) && (x2 > x1) && (x1 >= 0 && x2 <= Texture.Width && y1 >= 0 && y1 < Texture.Height))
@@ -133,58 +133,63 @@ namespace lwmf
 		// Case 2: Line is within screen boundaries, so no further checking if pixel can be set
 		else if (x1 >= 0 && x1 <= Texture.Width && y1 >= 0 && y1 < Texture.Height && x2 >= 0 && x2 <= Texture.Width && y2 >= 0 && y2 < Texture.Height)
 		{
-			const IntPointStruct d{ x2 - x1, y2 - y1 };
-			const IntPointStruct d1{ std::abs(d.X), std::abs(d.Y) };
+			bool LongerY{};
+			std::int_fast32_t ShortLength{ y2 - y1 };
+			std::int_fast32_t LongLength{ x2 - x1 };
 
-			if (std::int_fast32_t x{}, y{}; d1.Y <= d1.X)
+			if (std::abs(ShortLength) > std::abs(LongLength))
 			{
-				std::int_fast32_t px{ (d1.Y << 1) - d1.X };
-				std::int_fast32_t xe{};
-
-				d.X >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
-				Texture.Pixels[y * Texture.Width + x] = Color;
-
-				for (std::int_fast32_t i{}; x < xe; ++i)
-				{
-					++x;
-
-					if (px < 0)
-					{
-						px += d1.Y << 1;
-					}
-					else
-					{
-						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++y : --y;
-						px += (d1.Y - d1.X) << 1;
-					}
-
-					Texture.Pixels[y * Texture.Width + x] = Color;
-				}
+				std::swap(ShortLength, LongLength);
+				LongerY = true;
 			}
-			else
+
+			const std::int_fast32_t Value{ LongLength == 0 ? 0 : (ShortLength << 16) / LongLength };
+
+			if (LongerY)
 			{
-				std::int_fast32_t py{ (d1.X << 1) - d1.Y };
-				std::int_fast32_t ye{};
-
-				d.Y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
-				Texture.Pixels[y * Texture.Width + x] = Color;
-
-				for (std::int_fast32_t i{}; y < ye; ++i)
+				if (LongLength > 0)
 				{
-					++y;
+					LongLength += y1;
 
-					if (py <= 0)
+					for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
 					{
-						py += d1.X << 1;
-					}
-					else
-					{
-						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++x : --x;
-						py += (d1.X - d1.Y) << 1;
+						Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
+						j += Value;
 					}
 
-					Texture.Pixels[y * Texture.Width + x] = Color;
+					return;
 				}
+
+				LongLength += y1;
+
+				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
+				{
+					Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
+					j -= Value;
+				}
+
+				return;
+			}
+
+			if (LongLength > 0)
+			{
+				LongLength += x1;
+
+				for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
+				{
+					Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
+					j += Value;
+				}
+
+				return;
+			}
+
+			LongLength += x1;
+
+			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
+			{
+				Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
+				j -= Value;
 			}
 		}
 		// Case 3: Check each pixel if it´s within screen boundaries (slowest)
