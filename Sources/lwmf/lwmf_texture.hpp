@@ -138,15 +138,17 @@ namespace lwmf
 
 	inline void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY)
 	{
+		const size_t Stride{ static_cast<size_t>(SourceTexture.Width) << 2 };
+
 		if (PosX == 0 && PosY == 0 && TargetTexture.Width == SourceTexture.Width && TargetTexture.Height == SourceTexture.Height)
 		{
-			std::memcpy(TargetTexture.Pixels.data(), SourceTexture.Pixels.data(), (static_cast<size_t>(SourceTexture.Width) << 2) * static_cast<size_t>(SourceTexture.Height));
+			std::memcpy(TargetTexture.Pixels.data(), SourceTexture.Pixels.data(), Stride * static_cast<size_t>(SourceTexture.Height));
 		}
 		else
 		{
 			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
 			{
-				std::memcpy(TargetTexture.Pixels.data() + static_cast<size_t>(PosY) * static_cast<size_t>(SourceTexture.Width) + static_cast<size_t>(PosX), SourceTexture.Pixels.data() + static_cast<size_t>(y) * static_cast<size_t>(SourceTexture.Width), (static_cast<size_t>(SourceTexture.Width) << 2));
+				std::memcpy(TargetTexture.Pixels.data() + static_cast<size_t>(PosY) * static_cast<size_t>(SourceTexture.Width) + static_cast<size_t>(PosX), SourceTexture.Pixels.data() + static_cast<size_t>(y) * static_cast<size_t>(SourceTexture.Width), Stride);
 			}
 		}
 	}
@@ -155,7 +157,9 @@ namespace lwmf
 	{
 		if (PosX == 0 && PosY == 0 && TargetTexture.Width == SourceTexture.Width && TargetTexture.Height == SourceTexture.Height)
 		{
-			for (std::int_fast32_t i{}; i < SourceTexture.Width * SourceTexture.Height; ++i)
+			const std::int_fast32_t Size{ SourceTexture.Width * SourceTexture.Height };
+
+			for (std::int_fast32_t i{}; i < Size; ++i)
 			{
 				if (const std::int_fast32_t Color{ SourceTexture.Pixels[i] }; Color != TransparentColor)
 				{
@@ -168,10 +172,11 @@ namespace lwmf
 			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
 			{
 				const std::int_fast32_t BufferPos{ PosY * TargetTexture.Width };
+				const std::int_fast32_t TempY{ y * SourceTexture.Width };
 
 				for (std::int_fast32_t x{}; x < SourceTexture.Width; ++x)
 				{
-					if (const std::int_fast32_t Color{ SourceTexture.Pixels[y * SourceTexture.Width + x] }; Color != TransparentColor)
+					if (const std::int_fast32_t Color{ SourceTexture.Pixels[TempY + x] }; Color != TransparentColor)
 					{
 						TargetTexture.Pixels[BufferPos + PosX + x] = Color;
 					}

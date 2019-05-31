@@ -102,14 +102,7 @@ namespace lwmf
 							return 55;
 						}
 
-						if (Tree2D[2 * TreePos + Bit] == 32767)
-						{
-							i + 1 == BitLength[n] ? (Tree2D[2 * TreePos + Bit] = n, TreePos = 0) : (Tree2D[2 * TreePos + Bit] = ++NodeFilled + NumCodes, TreePos = NodeFilled);
-						}
-						else
-						{
-							TreePos = Tree2D[2 * TreePos + Bit] - NumCodes;
-						}
+						Tree2D[2 * TreePos + Bit] == 32767 ? (i + 1 == BitLength[n] ? (Tree2D[2 * TreePos + Bit] = n, TreePos = 0) : (Tree2D[2 * TreePos + Bit] = ++NodeFilled + NumCodes, TreePos = NodeFilled)) : TreePos = Tree2D[2 * TreePos + Bit] - NumCodes;
 					}
 				}
 
@@ -164,14 +157,7 @@ namespace lwmf
 						return;
 					}
 
-					if (BTYPE == 0)
-					{
-						InflateNoCompression(Out, &In[InPos], BP, Pos, static_cast<std::int_fast32_t>(In.size()));
-					}
-					else
-					{
-						InflateHuffmanBlock(Out, &In[InPos], BP, Pos, static_cast<std::int_fast32_t>(In.size()), BTYPE);
-					}
+					BTYPE == 0 ? InflateNoCompression(Out, &In[InPos], BP, Pos, static_cast<std::int_fast32_t>(In.size())) : InflateHuffmanBlock(Out, &In[InPos], BP, Pos, static_cast<std::int_fast32_t>(In.size()), BTYPE);
 				}
 
 				if (Error == 0)

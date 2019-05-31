@@ -209,17 +209,7 @@ namespace lwmf
 				for (std::int_fast32_t i{}; x < xe; ++i)
 				{
 					++x;
-
-					if (px < 0)
-					{
-						px += d1.Y << 1;
-					}
-					else
-					{
-						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++y : --y;
-						px += (d1.Y - d1.X) << 1;
-					}
-
+					px < 0 ? px += d1.Y << 1 : ((d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++y : --y, px += (d1.Y - d1.X) << 1);
 					SetPixelSafe(Texture, x, y, Color);
 				}
 			}
@@ -234,17 +224,7 @@ namespace lwmf
 				for (std::int_fast32_t i{}; y < ye; ++i)
 				{
 					++y;
-
-					if (py <= 0)
-					{
-						py += d1.X << 1;
-					}
-					else
-					{
-						(d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++x : --x;
-						py += (d1.X - d1.Y) << 1;
-					}
-
+					py <= 0 ? py += d1.X << 1 : ((d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++x : --x, py += (d1.X - d1.Y) << 1);
 					SetPixelSafe(Texture, x, y, Color);
 				}
 			}
@@ -323,20 +303,21 @@ namespace lwmf
 		Circle(Texture, CenterX, CenterY, Radius, BorderColor);
 
 		const std::int_fast32_t InnerRadius{ Radius - 1 };
-		const std::int_fast32_t InnerRadiusPOW{ InnerRadius * InnerRadius };
+		const std::int_fast32_t PowInnerRadius{ InnerRadius * InnerRadius };
 
 		// if complete circle is within screen boundaries, there is no reason to use SetPixelSafe...
 		if (CenterX - Radius >= 0 && CenterX + Radius <= Texture.Width && CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)
 		{
 			for (std::int_fast32_t y{ -InnerRadius }; y <= InnerRadius; ++y)
 			{
-				const std::int_fast32_t YPOW{ y * y };
+				const std::int_fast32_t PowY{ y * y };
+				const std::int_fast32_t TempY{ (CenterY + y) * Texture.Width };
 
 				for (std::int_fast32_t x{ -InnerRadius }; x <= InnerRadius; ++x)
 				{
-					if (x * x + YPOW <= InnerRadiusPOW)
+					if (x * x + PowY <= PowInnerRadius)
 					{
-						Texture.Pixels[(CenterY + y) * Texture.Width + CenterX + x] = FillColor;
+						Texture.Pixels[TempY + CenterX + x] = FillColor;
 					}
 				}
 			}
@@ -346,11 +327,11 @@ namespace lwmf
 		{
 			for (std::int_fast32_t y{ -InnerRadius }; y <= InnerRadius; ++y)
 			{
-				const std::int_fast32_t YPOW{ y * y };
+				const std::int_fast32_t PowY{ y * y };
 
 				for (std::int_fast32_t x{ -InnerRadius }; x <= InnerRadius; ++x)
 				{
-					if (x * x + YPOW <= InnerRadiusPOW)
+					if (x * x + PowY <= PowInnerRadius)
 					{
 						SetPixelSafe(Texture, CenterX + x, CenterY + y, FillColor);
 					}
