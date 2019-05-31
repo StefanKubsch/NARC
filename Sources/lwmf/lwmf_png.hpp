@@ -769,7 +769,7 @@ namespace lwmf
 
 				for (std::int_fast32_t i{}; i < 7; ++i)
 				{
-					Adam7Pass(&NewOut[0], ScanLineN.data(), ScanLineO.data(), &ScanLines[PassStart[i]], PNGInfo.Width, Pattern[i], Pattern[i + 7], Pattern[i + 14], Pattern[i + 21], PassWidth[i], PassHeight[i], BitsPerPixel); //-V522
+					Adam7(&NewOut[0], ScanLineN.data(), ScanLineO.data(), &ScanLines[PassStart[i]], PNGInfo.Width, Pattern[i], Pattern[i + 7], Pattern[i + 14], Pattern[i + 21], PassWidth[i], PassHeight[i], BitsPerPixel); //-V522
 				}
 			}
 
@@ -941,7 +941,7 @@ namespace lwmf
 			}
 		}
 
-		inline void Adam7Pass(unsigned char* Out, unsigned char* LineN, unsigned char* LineO, const unsigned char* In, const std::int_fast32_t Width, const std::int_fast32_t PassLeft, const std::int_fast32_t PassTop, const std::int_fast32_t SpaceX, const std::int_fast32_t SpaceY, const std::int_fast32_t PassWidth, const std::int_fast32_t PassHeight, const std::int_fast32_t Bpp)
+		inline void Adam7(unsigned char* Out, unsigned char* LineN, unsigned char* LineO, const unsigned char* In, const std::int_fast32_t Width, const std::int_fast32_t PassLeft, const std::int_fast32_t PassTop, const std::int_fast32_t SpaceX, const std::int_fast32_t SpaceY, const std::int_fast32_t PassWidth, const std::int_fast32_t PassHeight, const std::int_fast32_t Bpp)
 		{
 			if (PassWidth == 0)
 			{
@@ -1080,7 +1080,7 @@ namespace lwmf
 				{
 					const std::int_fast32_t Offset{ i << 2 };
 
-					NewOut[Offset] = In[i]; //-V522
+					NewOut[Offset] = In[i];
 					NewOut[Offset + 1] = In[i];
 					NewOut[Offset + 2] = In[i];
 					NewOut[Offset + 3] = (InfoIn.KeyDefined && In[i] == InfoIn.KeyR) ? 0 : 255;
