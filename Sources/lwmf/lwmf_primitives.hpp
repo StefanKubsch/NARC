@@ -194,7 +194,7 @@ namespace lwmf
 		}
 		// Case 3: Check each pixel if it´s within screen boundaries (slowest)
 		else
-		{ //-V523
+		{
 			const IntPointStruct d{ x2 - x1, y2 - y1 };
 			const IntPointStruct d1{ std::abs(d.X), std::abs(d.Y) };
 

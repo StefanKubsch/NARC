@@ -1244,11 +1244,10 @@ namespace lwmf
 
 		PNG Decoder;
 		Decoder.Decode(ImageData, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()), true);
-		Texture.Width = Decoder.PNGInfo.Width;
-		Texture.Height = Decoder.PNGInfo.Height;
-		Texture.Pixels.resize(static_cast<size_t>(Texture.Width) * static_cast<size_t>(Texture.Height));
+		SetTextureMetrics(Texture,Decoder.PNGInfo.Width, Decoder.PNGInfo.Height);
+		Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
 
-		for (std::int_fast32_t Offset{}; Offset < (Texture.Width * Texture.Height); ++Offset)
+		for (std::int_fast32_t Offset{}; Offset < Texture.Size; ++Offset)
 		{
 			Texture.Pixels[Offset] = RGBAtoINT(ImageData[Offset << 2], ImageData[(Offset << 2) + 1], ImageData[(Offset << 2) + 2], ImageData[(Offset << 2) + 3]);
 		}
