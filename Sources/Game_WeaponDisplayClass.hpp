@@ -20,7 +20,6 @@
 #include "Tools_INIFile.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "GFX_TextClass.hpp"
-#include "GFX_OpenGLShaderClass.hpp"
 #include "Game_DataStructures.hpp"
 
 class Game_WeaponDisplayClass final
@@ -34,11 +33,11 @@ private:
 	GFX_TextClass CarriedAmmoText{};
 	GFX_TextClass WeaponText{};
 
-	GFX_OpenGLShaderClass WeaponHUDShader{};
+	lwmf::ShaderClass WeaponHUDShader{};
 	GLuint WeaponHUDTexture{};
 	lwmf::IntRectStruct WeaponHUDRect{};
 
-	GFX_OpenGLShaderClass CrosshairShader{};
+	lwmf::ShaderClass CrosshairShader{};
 	GLuint CrosshairTexture{};
 };
 
@@ -47,20 +46,20 @@ inline void Game_WeaponDisplayClass::Init()
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDWeaponDisplayConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
 	{
 		// Crosshair settings
-		const lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };
+		lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };
 
-		CrosshairShader.LoadShader("Default");
+		CrosshairShader.LoadShader("Default", ScreenTexture);
 		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairTexture, ScreenTexture.WidthMid - (TempTextureCrosshair.Width >> 1), ScreenTexture.HeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
 
 		// Weapon HUD settings
-		const lwmf::TextureStruct TempTextureWeaponHUD{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "WeaponHUDFileName")) };
+		lwmf::TextureStruct TempTextureWeaponHUD{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "WeaponHUDFileName")) };
 
 		WeaponHUDRect.X = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "HUD", "WeaponHUDPosX");
 		WeaponHUDRect.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "HUD", "WeaponHUDPosY");
 		WeaponHUDRect.Width = TempTextureWeaponHUD.Width;
 		WeaponHUDRect.Height = TempTextureWeaponHUD.Height;
 
-		WeaponHUDShader.LoadShader("Default");
+		WeaponHUDShader.LoadShader("Default", ScreenTexture);
 		WeaponHUDShader.LoadStaticTextureInGPU(TempTextureWeaponHUD, &WeaponHUDTexture, WeaponHUDRect.X, WeaponHUDRect.Y, WeaponHUDRect.Width, WeaponHUDRect.Height);
 	}
 

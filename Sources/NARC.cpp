@@ -32,7 +32,8 @@
 #include "lwmf/lwmf.hpp"
 
 // "ScreenTexture" is the main render target in our game!
-lwmf::TextureStruct ScreenTexture;
+inline lwmf::TextureStruct ScreenTexture;
+inline lwmf::ShaderClass ScreenTextureShader;
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_SIMD.hpp"
@@ -43,7 +44,6 @@ lwmf::TextureStruct ScreenTexture;
 #include "Tools_InitSDL.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "GFX_Shading.hpp"
-#include "GFX_OpenGLShaderClass.hpp"
 #include "GFX_Window.hpp"
 #include "GFX_TextClass.hpp"
 #include "GFX_LightingClass.hpp"
@@ -106,8 +106,6 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	// fixed timestep method
 	// loop until ESC is pressed
 
-	SDL_Event Event;
-
 	LengthOfFrame = 1000 / FrameLock;
 	std::uint_fast64_t Lag{};
 	std::chrono::time_point<std::chrono::steady_clock> EndTime{ std::chrono::steady_clock::now() };
@@ -134,6 +132,8 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			TranslateMessage(&Message);
 			DispatchMessage(&Message);
 		}
+
+		static SDL_Event Event{};
 
 		while (SDL_PollEvent(&Event) == 1)
 		{
@@ -343,7 +343,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			HUDMinimap.Display();
 		}
 
-		GFX_Window::ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
+		ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
 		Game_WeaponHandling::DrawWeapon();
 
 		if (HUDEnabled)

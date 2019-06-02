@@ -180,7 +180,6 @@
     <ClInclude Include="Sources\GFX_Window.hpp" />
     <ClInclude Include="Sources\Game_PreGame.hpp" />
     <ClInclude Include="Sources\Tools_InitSDL.hpp" />
-    <ClInclude Include="Sources\GFX_OpenGLShaderClass.hpp" />
     <ClInclude Include="Sources\Game_SkyboxHandling.hpp" />
     <ClInclude Include="Sources\Game_WeaponHandling.hpp" />
     <ClInclude Include="Sources\Tools_SIMD.hpp" />

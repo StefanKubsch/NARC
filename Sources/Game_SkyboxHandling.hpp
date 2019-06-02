@@ -19,7 +19,6 @@
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
 #include "GFX_ImageHandling.hpp"
-#include "GFX_OpenGLShaderClass.hpp"
 
 namespace Game_SkyboxHandling
 {
@@ -34,7 +33,7 @@ namespace Game_SkyboxHandling
 	// Variables and constants
 	//
 
-	inline GFX_OpenGLShaderClass SkyboxShader{};
+	inline lwmf::ShaderClass SkyboxShader{};
 	inline GLuint SkyboxTexture{};
 	inline std::int_fast32_t SkyboxWidth{};
 	inline std::int_fast32_t SkyboxHeight{};
@@ -46,7 +45,7 @@ namespace Game_SkyboxHandling
 
 	inline void Init()
 	{
-		SkyboxShader.LoadShader("Default");
+		SkyboxShader.LoadShader("Default", ScreenTexture);
 	}
 
 	inline void LoadSkyboxImage()

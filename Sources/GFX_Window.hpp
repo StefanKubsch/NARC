@@ -9,28 +9,18 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
-#include "GFX_OpenGLShaderClass.hpp"
 
 namespace GFX_Window
 {
 
 
 	void Init();
-
-	//
-	// Variables and constants
-	//
-
-	inline GFX_OpenGLShaderClass ScreenTextureShader;
 
 	//
 	// Functions
@@ -51,10 +41,15 @@ namespace GFX_Window
 
 			VSync ?	lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 
+			// Fullscreenflag is always true, since window cannot be resized - so we can create faster OpenGL textures
+			lwmf::FullscreenFlag = 1;
 			lwmf::InitOpenGLLoader();
 
-			ScreenTextureShader.LoadShader("Default");
+			ScreenTextureShader.LoadShader("Default", ScreenTexture);
 			ScreenTextureShader.PrepareLWMFTexture(ScreenTexture, 0, 0);
+
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_MOUSE);
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_KEYBOARD);

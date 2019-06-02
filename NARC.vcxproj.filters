@@ -108,9 +108,6 @@
     <ClInclude Include="Sources\Tools_SIMD.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\GFX_OpenGLShaderClass.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Tools_Console.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>

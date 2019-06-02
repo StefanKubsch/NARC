@@ -19,7 +19,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_INIFile.hpp"
-#include "GFX_OpenGLShaderClass.hpp"
 
 class GFX_TextClass final
 {
@@ -43,7 +42,7 @@ private:
 		GLuint Texture{};
 	};
 
-	GFX_OpenGLShaderClass GlyphShader{};
+	lwmf::ShaderClass GlyphShader{};
 	std::vector<GlyphStruct> Glyphs;
 };
 
@@ -53,7 +52,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 	{
 		if (const std::string FontName{ Tools_INIFile::ReadValue<std::string>(INIFileName, Section, "FontName") }; Tools_ErrorHandling::CheckFileExistence(FontName, ShowMessage, StopOnError))
 		{
-			GlyphShader.LoadShader("Default");
+			GlyphShader.LoadShader("Default", ScreenTexture);
 
 			const float FontSize{ Tools_INIFile::ReadValue<float>(INIFileName, Section, "FontSize") };
 			const unsigned char FontColorRed{ static_cast<unsigned char>(Tools_INIFile::ReadValue<std::int_fast32_t>(INIFileName, Section, "ColorRED")) };

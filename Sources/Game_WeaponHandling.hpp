@@ -136,8 +136,8 @@ namespace Game_WeaponHandling
 				Weapons[Index].HUDAmmoInfo = fmt::format("{0}/{0}", Weapons[Index].Capacity);
 				Weapons[Index].HUDCarriedAmmoInfo = fmt::format("Carried:{}", Weapons[Index].CarriedAmmo);
 
-				Weapons[Index].WeaponShader.LoadShader("Default");
-				Weapons[Index].MuzzleFlashShader.LoadShader("Default");
+				Weapons[Index].WeaponShader.LoadShader("Default", ScreenTexture);
+				Weapons[Index].MuzzleFlashShader.LoadShader("Default", ScreenTexture);
 
 				++Index;
 			}

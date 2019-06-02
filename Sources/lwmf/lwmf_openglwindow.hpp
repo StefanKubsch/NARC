@@ -122,5 +122,11 @@ namespace lwmf
 		ResizeViewportAndRenderTarget(RenderTarget, WinRect.right, WinRect.bottom);
 	}
 
+	inline void ClearBuffer()
+	{
+		glColor4f(0.0F, 0.0F, 0.0F, 0.0F);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
 
 } // namespace lwmf

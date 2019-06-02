@@ -18,7 +18,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Game_PlayerClass.hpp"
-#include "GFX_OpenGLShaderClass.hpp"
 
 //
 // Structure for entities
@@ -71,8 +70,8 @@ struct EntityStruct final
 struct WeaponStruct final
 {
 	std::vector<Mix_Chunk*> Sounds;
-	GFX_OpenGLShaderClass WeaponShader{};
-	GFX_OpenGLShaderClass MuzzleFlashShader{};
+	lwmf::ShaderClass WeaponShader{};
+	lwmf::ShaderClass MuzzleFlashShader{};
 	lwmf::IntRectStruct WeaponRect{};
 	lwmf::IntRectStruct MuzzleFlashRect{};
 	std::string HUDAmmoInfo;
