@@ -72,7 +72,7 @@ namespace Game_LevelHandling
 
 	inline void InitConfig()
 	{
-		if (const std::string INIFile{ fmt::format("./DATA/Level_{}/LevelData/Config.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+		if (const std::string INIFile{ fmt::format("./DATA/Level_{}/LevelData/Config.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			LightingFlag = Tools_INIFile::ReadValue<bool>(INIFile, "GENERAL", "Lighting");
 		}
@@ -80,7 +80,7 @@ namespace Game_LevelHandling
 
 	inline void ReadMapDataFile(const std::string& FileName, std::vector<std::vector<std::vector<std::int_fast32_t>>>& LevelMapVector, const LevelMapLayers LevelMapLayer)
 	{
-		if (Tools_ErrorHandling::CheckFileExistence(FileName, ShowMessage, StopOnError))
+		if (Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
 			std::ifstream LevelMapDataFile(FileName);
 			std::vector<std::int_fast32_t> TempVectorCeiling;
@@ -135,7 +135,7 @@ namespace Game_LevelHandling
 
 		if (LightingFlag)
 		{
-			if (const std::string FileName{ fmt::format("./DATA/Level_{}/LevelData/StaticLightsData.conf", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(FileName, ShowMessage, StopOnError))
+			if (const std::string FileName{ fmt::format("./DATA/Level_{}/LevelData/StaticLightsData.conf", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 			{
 				std::ifstream StaticLightsDataFile(FileName);
 
@@ -158,7 +158,7 @@ namespace Game_LevelHandling
 		LevelTextures.clear();
 		LevelTextures.shrink_to_fit();
 
-		if (const std::string FileName{ fmt::format("./DATA/Level_{}/LevelData/TexturesData.conf", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(FileName, ShowMessage, StopOnError))
+		if (const std::string FileName{ fmt::format("./DATA/Level_{}/LevelData/TexturesData.conf", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
 			std::ifstream LevelTexturesDataFile(FileName);
 			std::string Line;
@@ -172,13 +172,13 @@ namespace Game_LevelHandling
 
 	inline void InitBackgroundMusic()
 	{
-		if (const std::string INIFile{ fmt::format("./DATA/Level_{}/LevelData/Config.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+		if (const std::string INIFile{ fmt::format("./DATA/Level_{}/LevelData/Config.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			BackgroundMusicEnabled = Tools_INIFile::ReadValue<bool>(INIFile, "AUDIO", "BackgroundMusicEnabled");
 
 			if (BackgroundMusicEnabled)
 			{
-				if (const std::string AudioFileName{ Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, ShowMessage, StopOnError))
+				if (const std::string AudioFileName{ Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
 				{
 					BackgroundMusic = Mix_LoadMUS(AudioFileName.c_str());
 				}

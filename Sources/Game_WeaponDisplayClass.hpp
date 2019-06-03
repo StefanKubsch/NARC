@@ -43,7 +43,7 @@ private:
 
 inline void Game_WeaponDisplayClass::Init()
 {
-	if (const std::string INIFile{ "./DATA/GameConfig/HUDWeaponDisplayConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+	if (const std::string INIFile{ "./DATA/GameConfig/HUDWeaponDisplayConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Crosshair settings
 		lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };

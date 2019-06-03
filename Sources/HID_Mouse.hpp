@@ -40,7 +40,7 @@ namespace HID_Mouse
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+		if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			MouseSensitivity = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivity");
 			MouseSensitivityLowerLimit = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivityLowerLimit");

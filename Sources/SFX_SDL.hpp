@@ -15,7 +15,6 @@
 #include <SDL_mixer.h>
 #include "fmt/format.h"
 
-#include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
 
@@ -33,29 +32,28 @@ namespace SFX_SDL
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/AudioConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile,ShowMessage, StopOnError))
+		if (const std::string INIFile{ "./DATA/GameConfig/AudioConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			const std::int_fast32_t Samplerate{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "Samplerate") };
 			const std::int_fast32_t StereoChannels{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "StereoChannels") };
 			const std::int_fast32_t ChunkSize{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "ChunkSize") };
 			const std::int_fast32_t MaxChannels{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "MaxChannels") };
 
-			Tools_Console::DisplayText(BRIGHT_MAGENTA, "\nInitialising SDL Mixer system...");
+			lwmf::AddLogEntry("\nInitialising SDL Mixer system...");
 
 			if (constexpr std::int_fast32_t Flags{ MIX_INIT_OGG }; (Mix_Init(Flags) & Flags) != Flags)
 			{
-				Tools_ErrorHandling::DisplayError(fmt::format("SDL audio support init failed: {}", SDL_GetError()));
+				lwmf::LogErrorAndThrowException(fmt::format("SDL audio support init failed: {}", SDL_GetError()));
 			}
 
 			if (Mix_OpenAudio(Samplerate, MIX_DEFAULT_FORMAT, StereoChannels, ChunkSize) != 0)
 			{
-				Tools_ErrorHandling::DisplayError(fmt::format("SDL mixer init failed: {}", SDL_GetError()));
+				lwmf::LogErrorAndThrowException(fmt::format("SDL mixer init failed: {}", SDL_GetError()));
 			}
 			else
 			{
 				Mix_AllocateChannels(MaxChannels);
 				Mix_Volume(-1, MIX_MAX_VOLUME);
-				Tools_ErrorHandling::DisplayOK();
 			}
 		}
 	}
@@ -64,7 +62,7 @@ namespace SFX_SDL
 	{
 		Mix_Chunk* TempAudio{};
 
-		if (Tools_ErrorHandling::CheckFileExistence(FileName, ShowMessage, StopOnError))
+		if (Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
 			TempAudio = Mix_LoadWAV(FileName.c_str());
 		}

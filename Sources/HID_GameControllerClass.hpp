@@ -16,7 +16,6 @@
 #include <SDL.h>
 #include "fmt/format.h"
 
-#include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
 #include "Tools_Curl.hpp"
@@ -35,7 +34,7 @@ public:
 
 inline void HID_GameControllerClass::Init()
 {
-	if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+	if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		JoystickDeadZone = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GAMECONTROLLER", "JoystickDeadZone");
 		Sensitivity = Tools_INIFile::ReadValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");
@@ -45,38 +44,37 @@ inline void HID_GameControllerClass::Init()
 
 		Tools_Curl::FetchFileFromURL(GameControllerDBURL, GameControllerDBFile);
 
-		Tools_Console::DisplayText(BRIGHT_MAGENTA, "Searching and initializing gamecontroller...\n");
+		lwmf::AddLogEntry("Searching and initializing gamecontroller...\n");
 
 		if (SDL_NumJoysticks() > 0 &&  SDL_IsGameController(0) == SDL_TRUE)
 		{
-			Tools_Console::DisplayText(BRIGHT_GREEN, "Found a valid gamecontroller: ");
+			lwmf::AddLogEntry("Found a valid gamecontroller: ");
 
 			if (SDL_GameController* Controller{ SDL_GameControllerOpen(0) }; Controller != nullptr)
 			{
-				Tools_Console::DisplayText(BRIGHT_GREEN, fmt::format("{}\n", SDL_GameControllerName(Controller)));
+				lwmf::AddLogEntry(fmt::format("{}\n", SDL_GameControllerName(Controller)));
 
-				if (Tools_ErrorHandling::CheckFileExistence(GameControllerDBFile, ShowMessage, StopOnError))
+				if (Tools_ErrorHandling::CheckFileExistence(GameControllerDBFile, StopOnError))
 				{
-					Tools_Console::DisplayText(BRIGHT_MAGENTA, "Loading mapping from GameControllerDB file...");
+					lwmf::AddLogEntry("Loading mapping from GameControllerDB file...");
 
 					if (SDL_GameControllerAddMappingsFromFile(GameControllerDBFile.c_str()); SDL_GameControllerMapping(Controller) == nullptr)
 					{
-						Tools_ErrorHandling::DisplayError(fmt::format("No mapping for {} found.", SDL_GameControllerName(Controller)));
+						lwmf::LogErrorAndThrowException(fmt::format("No mapping for {} found.", SDL_GameControllerName(Controller)));
 					}
 
 					SDL_GameControllerEventState(SDL_ENABLE);
-					Tools_ErrorHandling::DisplayOK();
 					fmt::print("\n");
 				}
 			}
 			else
 			{
-				Tools_ErrorHandling::DisplayError(fmt::format("Gamecontroller init failed: {}", SDL_GetError()));
+				lwmf::LogErrorAndThrowException(fmt::format("Gamecontroller init failed: {}", SDL_GetError()));
 			}
 		}
 		else
 		{
-			Tools_Console::DisplayText(BRIGHT_MAGENTA, "No gamecontroller found...\n");
+			lwmf::AddLogEntry("No gamecontroller found...\n");
 		}
 	}
 }

@@ -1222,25 +1222,33 @@ namespace lwmf
 		}
 	};
 
-	inline void LoadPNG(TextureStruct& Texture, const std::string& FileName)
+	inline void LoadPNG(TextureStruct& Texture, const std::string& Filename)
 	{
-		std::ifstream InputFile(FileName.c_str(), std::ios::binary);
-		std::streamsize Size{};
+		AddLogEntry("PNG: Load file " + Filename + "...");
 
-		if (InputFile.seekg(0, std::ios::end).good())
+		std::ifstream File(Filename.c_str(), std::ios::binary);
+
+		if (File.fail())
 		{
-			Size = InputFile.tellg();
+			LogErrorAndThrowException("Error loading " + Filename + "!");
 		}
 
-		if (InputFile.seekg(0, std::ios::beg).good())
+		std::streamsize Size{};
+
+		if (File.seekg(0, std::ios::end).good())
 		{
-			Size -= InputFile.tellg();
+			Size = File.tellg();
+		}
+
+		if (File.seekg(0, std::ios::beg).good())
+		{
+			Size -= File.tellg();
 		}
 
 		std::vector<unsigned char> Buffer(static_cast<size_t>(Size));
 		std::vector<unsigned char> ImageData;
 
-		InputFile.read(reinterpret_cast<char*>(Buffer.data()), Size);
+		File.read(reinterpret_cast<char*>(Buffer.data()), Size);
 
 		PNG Decoder;
 		Decoder.Decode(ImageData, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()), true);

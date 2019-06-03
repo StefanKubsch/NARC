@@ -42,7 +42,7 @@ namespace Game_Raycaster
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/RaycasterConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, HideMessage, StopOnError))
+		if (const std::string INIFile{ "./DATA/GameConfig/RaycasterConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			PlaneStartValue.X = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue");
 			PlaneStartValue.Y = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue");

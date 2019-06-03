@@ -54,7 +54,7 @@ The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textu
   - realtime minimap showing entity positions
   - basic implementation of HUD (weapon, healthbar and ammo info) / Crosshair
   - fps (frames per second) counter
-  - debug console / error handling, file checks
+  - error handling, file checks
   - handling of INI files (reading/writing values, cross-platform)
   - basic implementation of main menu, options
   - autoupdates via web/HTTPS for e.g. "gamecontrollerdb.txt" (using libcurl)
@@ -66,7 +66,7 @@ The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textu
 
 **Used libraries/APIs:**
 
-  - lwmf, the lightweight media framework for graphics, multithreading, input handling etc. (my own work, have a look here: https://github.com/StefanKubsch/lwmf)
+  - lwmf, the lightweight media framework for graphics, multithreading, input handling, logging etc. (my own work, have a look here: https://github.com/StefanKubsch/lwmf)
   - SDL 2.0.9 for low level handling of audio and gamepad support (https://www.libsdl.org/)
   - SDL_Mixer 2.0.4 for audio handling (https://www.libsdl.org/projects/SDL_mixer/)
   - stb_truetype.h 1.21 for TrueType font rendering (https://github.com/nothings/stb)

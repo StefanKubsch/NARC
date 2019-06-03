@@ -19,9 +19,6 @@
 #include <iostream>
 #include "fmt/format.h"
 
-#include "Tools_Console.hpp"
-#include "Tools_ErrorHandling.hpp"
-
 namespace Tools_INIFile
 {
 
@@ -36,9 +33,7 @@ namespace Tools_INIFile
 
 	template<typename T>T ReadValue(const std::string& INIFileName, const std::string& Section, const std::string& Key)
 	{
-		Tools_Console::DisplayText(BRIGHT_MAGENTA, "Reading value from INI file ");
-		Tools_Console::DisplayText(BRIGHT_GREEN, fmt::format("[{0}] / {1}", Section, Key));
-		Tools_Console::DisplayText(BRIGHT_MAGENTA, "...");
+		lwmf::AddLogEntry(fmt::format("Reading value from INI file [{0}] / {1} ...", Section, Key));
 
 		static const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
 		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
@@ -63,8 +58,7 @@ namespace Tools_INIFile
 				}
 				else if (std::regex_search(Line, Match, ValueTest) && (CurrentSection == Section && Match[1] == Key))
 				{
-					Tools_Console::DisplayText(BRIGHT_MAGENTA, "Value : ");
-					Tools_Console::DisplayText(BRIGHT_GREEN, std::string(Match[2]) + "\n");
+					lwmf::AddLogEntry("Value : " + std::string(Match[2]));
 
 					// Convert Value to proper type
 					std::istringstream Stream(Match[2]);
@@ -77,7 +71,7 @@ namespace Tools_INIFile
 
 		if (!ValueFound)
 		{
-			Tools_ErrorHandling::DisplayError(fmt::format("Value [{0}] / {1} not found!", Section, Key));
+			lwmf::LogErrorAndThrowException(fmt::format("Value [{0}] / {1} not found!", Section, Key));
 		}
 
 		return OutputVar;
@@ -89,8 +83,7 @@ namespace Tools_INIFile
 		{
 			if (Debug)
 			{
-				Tools_Console::DisplayText(BRIGHT_MAGENTA, "Writing value to INI file ");
-				Tools_Console::DisplayText(BRIGHT_GREEN, fmt::format("[{0}] / {1} : {2}\n", Section, Key, Value));
+				lwmf::AddLogEntry(fmt::format("Writing value to INI file [{0}] / {1} : {2}", Section, Key, Value));
 			}
 
 			// Read INI file into vector of strings

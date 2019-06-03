@@ -55,7 +55,7 @@ private:
 
 inline void Game_MenuClass::Init()
 {
-	if (const std::string INIFile{ "./DATA/GameConfig/MenuConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+	if (const std::string INIFile{ "./DATA/GameConfig/MenuConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos.X = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosX");
 		Pos.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosY");
@@ -63,7 +63,7 @@ inline void Game_MenuClass::Init()
 		TextHighlight.InitFont("./DATA/GameConfig/MenuConfig.ini", "MENUFONTHIGHLIGHT");
 	}
 
-	if (const std::string MenuDefinitionFileName{ "./DATA/GameConfig/MenuDefinition.txt" }; Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, ShowMessage, StopOnError))
+	if (const std::string MenuDefinitionFileName{ "./DATA/GameConfig/MenuDefinition.txt" }; Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, StopOnError))
 	{
 		std::ifstream MenuDefinitionFile(MenuDefinitionFileName);
 		std::string Line;
@@ -134,6 +134,7 @@ inline void Game_MenuClass::ExecuteChoice()
 	if (MenuItems[HighLightedItem].Entry == "Exit Game")
 	{
 		QuitGameFlag = true;
+		PostQuitMessage(0);
 	}
 	else if (MenuItems[HighLightedItem].Entry == "Toogle Mouse / GameController")
 	{

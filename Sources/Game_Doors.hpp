@@ -48,7 +48,7 @@ namespace Game_Doors
 		Doors.clear();
 		Doors.shrink_to_fit();
 
-		if (const std::string INIFile{fmt::format("./DATA/Level_{}/LevelData/DoorConfig.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+		if (const std::string INIFile{fmt::format("./DATA/Level_{}/LevelData/DoorConfig.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			for (std::int_fast32_t Index{}, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX)
 			{

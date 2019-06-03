@@ -29,11 +29,7 @@ namespace GFX_ImageHandling
 	inline lwmf::TextureStruct ImportImage(const std::string& ImageFileName)
 	{
 		lwmf::TextureStruct TempTexture;
-
-		if (Tools_ErrorHandling::CheckFileExistence(ImageFileName, ShowMessage, StopOnError))
-		{
-			lwmf::LoadPNG(TempTexture, ImageFileName);
-		}
+		lwmf::LoadPNG(TempTexture, ImageFileName);
 
 		return TempTexture;
 	}
@@ -41,15 +37,11 @@ namespace GFX_ImageHandling
 	inline lwmf::TextureStruct ImportTexture(const std::string& ImageFileName, const std::int_fast32_t Size)
 	{
 		lwmf::TextureStruct TempTexture;
+		lwmf::LoadPNG(TempTexture, ImageFileName);
 
-		if (Tools_ErrorHandling::CheckFileExistence(ImageFileName, ShowMessage, StopOnError))
+		if (Tools_ErrorHandling::CheckTextureSize(TempTexture.Width, TempTexture.Height, Size, StopOnError))
 		{
-			lwmf::LoadPNG(TempTexture, ImageFileName);
-
-			if (Tools_ErrorHandling::CheckTextureSize(TempTexture.Width, TempTexture.Height, Size, ShowMessage, StopOnError))
-			{
-				// Dummy, just check Size
-			}
+			// Dummy, just check Size
 		}
 
 		return TempTexture;

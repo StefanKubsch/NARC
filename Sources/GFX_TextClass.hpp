@@ -48,9 +48,9 @@ private:
 
 inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::string& Section)
 {
-	if (Tools_ErrorHandling::CheckFileExistence(INIFileName, ShowMessage, StopOnError))
+	if (Tools_ErrorHandling::CheckFileExistence(INIFileName, StopOnError))
 	{
-		if (const std::string FontName{ Tools_INIFile::ReadValue<std::string>(INIFileName, Section, "FontName") }; Tools_ErrorHandling::CheckFileExistence(FontName, ShowMessage, StopOnError))
+		if (const std::string FontName{ Tools_INIFile::ReadValue<std::string>(INIFileName, Section, "FontName") }; Tools_ErrorHandling::CheckFileExistence(FontName, StopOnError))
 		{
 			GlyphShader.LoadShader("Default", ScreenTexture);
 

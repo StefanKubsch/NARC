@@ -12,7 +12,6 @@
 #include <cstdint>
 
 #include "Game_GlobalDefinitions.hpp"
-#include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
 
@@ -28,10 +27,8 @@ namespace GFX_Window
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/WindowConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+		if (const std::string INIFile{ "./DATA/GameConfig/WindowConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			Tools_Console::DisplayText(BRIGHT_MAGENTA, "\nCreating window...\n");
-
 			// Create fullscreen if VSync = true, otherwise a window
 			lwmf::CreateOpenGLWindow(WindowInstance,
 				ScreenTexture,

@@ -25,6 +25,7 @@ namespace lwmf
 	void ResizeViewportAndRenderTarget(TextureStruct& Texture, std::int_fast32_t Width, std::int_fast32_t Height);
 	void CreateOpenGLWindow(HINSTANCE hInstance, TextureStruct& RenderTarget, std::int_fast32_t Width, std::int_fast32_t Height, LPCSTR WindowName, bool Fullscreen);
 	void ResizeOpenGLWindow(TextureStruct& RenderTarget);
+	void ClearBuffer();
 
 	//
 	// Variables and constants
@@ -51,6 +52,7 @@ namespace lwmf
 	{
 		// Create window
 
+		AddLogEntry("WINDOW: Create window...");
 		WNDCLASS WindowClass{};
 		WindowClass.lpfnWndProc = WndProc;
 		WindowClass.hInstance = hInstance;
@@ -84,7 +86,14 @@ namespace lwmf
 		AdjustWindowRectEx(&WinRect, dwStyle, FALSE, dwExStyle);
 		MainWindow = CreateWindowEx(dwExStyle, WindowClass.lpszClassName, WindowName, dwStyle, 0, 0, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top, nullptr, nullptr, hInstance, nullptr);
 
+		if (MainWindow == nullptr)
+		{
+			LogErrorAndThrowException("Error creating window (CreateWindowEx)!");
+		}
+
 		// Create OpenGL context
+
+		AddLogEntry("WINDOW: Create OpenGL context...");
 
 		const PIXELFORMATDESCRIPTOR PFD =
 		{
@@ -107,8 +116,20 @@ namespace lwmf
 		};
 
 		WindowHandle = GetDC(MainWindow);
+
+		if (WindowHandle == nullptr)
+		{
+			LogErrorAndThrowException("Error creating WindowHandle (GetDC)!");
+		}
+
 		SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD);
-		wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle));
+		BOOL Result{ wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) };
+
+		if (Result == 0)
+		{
+			LogErrorAndThrowException("Error creating OpenGL context (wglMakeCurrent)!");
+		}
+
 		ShowWindow(MainWindow, SW_SHOW);
 		SetForegroundWindow(MainWindow);
 		SetFocus(MainWindow);

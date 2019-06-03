@@ -34,6 +34,7 @@ namespace lwmf
 
 	inline void RegisterRawInputDevice(const HWND hWnd, const USHORT Device)
 	{
+		AddLogEntry("RAWINPUT: Register device " + std::to_string(Device) + "...");
 		RAWINPUTDEVICE RawInputDevice;
 
 		RawInputDevice.usUsagePage = 1;
@@ -41,11 +42,17 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_DEVNOTIFY;
 		RawInputDevice.hwndTarget = hWnd;
 
-		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice));
+		const BOOL Result{ RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) };
+
+		if (Result == 0)
+		{
+			LogErrorAndThrowException("Error registering raw input device " + std::to_string(Device) + "!");
+		}
 	}
 
 	inline void UnregisterRawInputDevice(const USHORT Device)
 	{
+		AddLogEntry("RAWINPUT: Unregister device " + std::to_string(Device) + "...");
 		RAWINPUTDEVICE RawInputDevice;
 
 		RawInputDevice.usUsagePage = 1;
@@ -53,7 +60,12 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_REMOVE;
 		RawInputDevice.hwndTarget = nullptr;
 
-		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice));
+		const BOOL Result{ RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) };
+
+		if (Result == 0)
+		{
+			LogErrorAndThrowException("Error unregistering raw input device " + std::to_string(Device) + "!");
+		}
 	}
 
 	inline void CatchMouse(const HWND hWnd)

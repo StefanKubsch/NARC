@@ -18,7 +18,6 @@
 #include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
-#include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
 #include "GFX_ImageHandling.hpp"
@@ -103,7 +102,7 @@ namespace Game_WeaponHandling
 
 		while (true)
 		{
-			if (const std::string IniFile{ fmt::format("./DATA/Weapons/Weapon_{}_Data.ini", Index) }; Tools_ErrorHandling::CheckFileExistence(IniFile, ShowMessage, ContinueOnError))
+			if (const std::string IniFile{ fmt::format("./DATA/Weapons/Weapon_{}_Data.ini", Index) }; Tools_ErrorHandling::CheckFileExistence(IniFile, ContinueOnError))
 			{
 				Weapons.emplace_back();
 
@@ -143,14 +142,14 @@ namespace Game_WeaponHandling
 			}
 			else
 			{
-				Tools_Console::DisplayText(BRIGHT_WHITE, "No more weapon data found.\n");
+				lwmf::AddLogEntry("No more weapon data found.\n");
 				break;
 			}
 		}
 
 		if (Weapons.empty())
 		{
-			Tools_ErrorHandling::DisplayError("No weapon data found!");
+			lwmf::LogErrorAndThrowException("No weapon data found!");
 		}
 	}
 
@@ -159,7 +158,7 @@ namespace Game_WeaponHandling
 		for (auto&& Weapon : Weapons)
 		{
 			// Weapon textures
-			if (const std::string WeaponTextureDataConfFile{ fmt::format("./DATA/Weapons/Weapon_{}_TexturesData.conf", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, ShowMessage, StopOnError))
+			if (const std::string WeaponTextureDataConfFile{ fmt::format("./DATA/Weapons/Weapon_{}_TexturesData.conf", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
 			{
 				std::ifstream WeaponTexturesData(WeaponTextureDataConfFile);
 				std::string Line;
@@ -176,7 +175,7 @@ namespace Game_WeaponHandling
 			}
 
 			// Muzzle flash
-			if (const std::string MuzzleFlashTextureDataConfFile{ fmt::format("./DATA/Weapons/Weapon_{}_MuzzleFlashTexturesData.conf", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, ShowMessage, StopOnError))
+			if (const std::string MuzzleFlashTextureDataConfFile{ fmt::format("./DATA/Weapons/Weapon_{}_MuzzleFlashTexturesData.conf", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
 			{
 				std::ifstream MuzzleFlashTextureData(MuzzleFlashTextureDataConfFile);
 				std::string Line;
@@ -201,7 +200,7 @@ namespace Game_WeaponHandling
 			Weapon.Sounds.clear();
 			Weapon.Sounds.shrink_to_fit();
 
-			if (const std::string INIFile{ fmt::format("./DATA/Weapons/Weapon_{}_Data.ini", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+			if (const std::string INIFile{ fmt::format("./DATA/Weapons/Weapon_{}_Data.ini", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				// Get SingleShot Audio (Index = 0)
 				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "SingleShotAudio")));

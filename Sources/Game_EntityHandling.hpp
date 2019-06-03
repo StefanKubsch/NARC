@@ -109,7 +109,7 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			if (const std::string INIFile{ fmt::format("./DATA/Level_{0}/EntityData/{1}.ini", SelectedLevel, Index) }; Tools_ErrorHandling::CheckFileExistence(INIFile, HideMessage, ContinueOnError))
+			if (const std::string INIFile{ fmt::format("./DATA/Level_{0}/EntityData/{1}.ini", SelectedLevel, Index) }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				EntityOrder.emplace_back();
 				EntityDistance.emplace_back();

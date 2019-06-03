@@ -42,7 +42,7 @@ private:
 
 inline void Game_HealthBarClass::Init()
 {
-	if (const std::string INIFile{ "./DATA/GameConfig/HUDHealthBarConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ShowMessage, StopOnError))
+	if (const std::string INIFile{ "./DATA/GameConfig/HUDHealthBarConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos.X = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX");
 		Pos.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY");

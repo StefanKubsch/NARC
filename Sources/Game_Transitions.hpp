@@ -17,8 +17,6 @@
 #include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
-#include "Tools_Console.hpp"
-#include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
 #include "GFX_Window.hpp"
 #include "GFX_TextClass.hpp"
@@ -55,7 +53,7 @@ namespace Game_Transitions
 	inline void LevelTransition()
 	{
 		const std::string NextLevelText{ fmt::format("...loading level number {}...", SelectedLevel) };
-		Tools_Console::DisplayText(BRIGHT_WHITE, fmt::format("\n{}\n\n", NextLevelText));
+		lwmf::AddLogEntry(fmt::format("\n{}\n\n", NextLevelText));
 
 		lwmf::ClearBuffer();
 		lwmf::ClearTexture(ScreenTexture, 0);

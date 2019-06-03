@@ -27,11 +27,13 @@ namespace Tools_Cleanup
 		lwmf::UnregisterRawInputDevice(lwmf::HID_MOUSE);
 		lwmf::UnregisterRawInputDevice(lwmf::HID_KEYBOARD);
 
+		lwmf::AddLogEntry("Quit SDL_Mixer");
 		while (Mix_Init(0) != 0)
 		{
 			Mix_Quit();
 		}
 
+		lwmf::AddLogEntry("Quit SDL subsystems");
 		SDL_Quit();
 	}
 

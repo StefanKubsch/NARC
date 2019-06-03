@@ -95,10 +95,19 @@ inline bool HUDEnabled{ true };
 
 std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
+	lwmf::StartLogging("NARC.log");
+
 	WindowInstance = hInstance;
 
-	InitAndLoadGameConfig();
-	InitAndLoadLevel();
+	try
+	{
+		InitAndLoadGameConfig();
+		InitAndLoadLevel();
+	}
+	catch (const std::runtime_error&)
+	{
+		return EXIT_FAILURE;
+	}
 
 	lwmf::Multithreading ThreadPool;
 
@@ -125,7 +134,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		{
 			if (Message.message == WM_QUIT)
 			{
-				QuitGameFlag = true;
+				lwmf::AddLogEntry("MESSAGE: WM_QUIT received...");
 				break;
 			}
 
@@ -360,6 +369,10 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	}
 
 	Tools_Cleanup::DestroySubsystems();
+
+	lwmf::AddLogEntry("Exit program...");
+	lwmf::EndLogging();
+
 	return EXIT_SUCCESS;
 }
 
@@ -486,7 +499,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							if (NumberOfLevels > 0)
 							{
 								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = 0;
-								InitAndLoadLevel();
+								try
+								{
+									InitAndLoadLevel();
+								}
+								catch (const std::runtime_error&)
+								{
+									return EXIT_FAILURE;
+								}
+
 								break;
 							}
 						}
@@ -566,7 +587,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void InitAndLoadGameConfig()
 {
-	Game_Config::SetDebugMode();
 	Tools_Console::RedirectOutput();
 	Game_Config::GatherNumberOfLevels();
 	Game_PreGame::ShowIntroHeader();

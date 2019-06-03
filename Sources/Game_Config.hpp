@@ -13,10 +13,7 @@
 
 #include <cstdint>
 #include <string>
-#include "fmt/color.h"
-#include "fmt/core.h"
 #include "fmt/format.h"
-#include "fmt/format-inl.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -26,7 +23,6 @@ namespace Game_Config
 {
 
 
-	void SetDebugMode();
 	void Init();
 	void GatherNumberOfLevels();
 
@@ -34,14 +30,9 @@ namespace Game_Config
 	// Functions
 	//
 
-	inline void SetDebugMode()
-	{
-		Debug = Tools_ErrorHandling::CheckFileExistence("./DATA/GameConfig/Debug.txt", HideMessage, ContinueOnError) ? true : false;
-	}
-
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/GameConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, HideMessage, StopOnError))
+		if (const std::string INIFile{ "./DATA/GameConfig/GameConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			TextureSize = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "TEXTURES", "TextureSize");
 			EntitySize = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
@@ -95,7 +86,7 @@ namespace Game_Config
 
 		while (true)
 		{
-			if (Tools_ErrorHandling::CheckFolderExistence(fmt::format("./DATA/Level_{}",NumberOfLevels), HideMessage, ContinueOnError))
+			if (Tools_ErrorHandling::CheckFolderExistence(fmt::format("./DATA/Level_{}",NumberOfLevels), ContinueOnError))
 			{
 				++NumberOfLevels;
 			}
@@ -108,7 +99,7 @@ namespace Game_Config
 		// Reduce NumberOfLevels by 1 since we start counting our levels by 0 (Zero) !
 		if (--NumberOfLevels == -1)
 		{
-			Tools_ErrorHandling::DisplayError("No Leveldata found.");
+			lwmf::LogErrorAndThrowException("No Leveldata found.");
 		}
 	}
 

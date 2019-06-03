@@ -13,7 +13,6 @@
 #include <cstdint>
 #include <random>
 
-inline bool Debug{};
 inline HINSTANCE WindowInstance;
 
 // Setting planes/viewport for raycaster

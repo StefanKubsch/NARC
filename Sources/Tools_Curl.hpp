@@ -17,9 +17,6 @@
 #include <curl.h>
 #include "fmt/format.h"
 
-#include "Tools_Console.hpp"
-#include "Tools_ErrorHandling.hpp"
-
 namespace Tools_Curl
 {
 
@@ -35,8 +32,11 @@ namespace Tools_Curl
 
 	inline void Init()
 	{
-		Tools_Console::DisplayText(BRIGHT_MAGENTA, "\nInit curl...");
-		curl_global_init(CURL_GLOBAL_DEFAULT) != 0 ? Tools_ErrorHandling::DisplayError("curl init failed!") : Tools_ErrorHandling::DisplayOK();
+		lwmf::AddLogEntry("\nInit curl...");
+		if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
+		{
+			lwmf::LogErrorAndThrowException("curl init failed!");
+		}
 	}
 
 	inline size_t WriteData(void* Ptr, const size_t Size, const size_t Mem, FILE* Stream)
@@ -46,7 +46,7 @@ namespace Tools_Curl
 
 	inline bool CheckInternetConnection()
 	{
-		Tools_Console::DisplayText(BRIGHT_MAGENTA, "\nChecking internet connection...");
+		lwmf::AddLogEntry("\nChecking internet connection...");
 
 		bool Result{};
 
@@ -54,7 +54,12 @@ namespace Tools_Curl
 		{
 			curl_easy_setopt(CurlInstance, CURLOPT_URL, "www.google.com");
 			curl_easy_setopt(CurlInstance, CURLOPT_NOBODY, 1);
-			curl_easy_perform(CurlInstance) != CURLE_OK ? Tools_Console::DisplayText(BRIGHT_RED, "No internet connection found.") : (Result = true, Tools_ErrorHandling::DisplayOK());
+
+			if (curl_easy_perform(CurlInstance) != CURLE_OK)
+			{
+				lwmf::AddLogEntry("No internet connection found.");
+			}
+
 			curl_easy_cleanup(CurlInstance);
 		}
 
@@ -65,7 +70,7 @@ namespace Tools_Curl
 	{
 		if (CURL* CurlInstance{ curl_easy_init() }; CurlInstance != nullptr && CheckInternetConnection())
 		{
-			Tools_Console::DisplayText(BRIGHT_MAGENTA, fmt::format("Downloading file from URL via curl...\nSource: {}...", URL));
+			lwmf::AddLogEntry(fmt::format("Downloading file from URL via curl...\nSource: {}...", URL));
 
 			FILE* File{ fopen(Filename.c_str(), "w") };
 			curl_easy_setopt(CurlInstance, CURLOPT_URL, URL.c_str());
@@ -78,8 +83,6 @@ namespace Tools_Curl
 			{
 				fclose(File);
 			}
-
-			Tools_ErrorHandling::DisplayOK();
 		}
 	}
 
