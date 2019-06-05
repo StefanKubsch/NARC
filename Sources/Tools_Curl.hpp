@@ -32,7 +32,7 @@ namespace Tools_Curl
 
 	inline void Init()
 	{
-		lwmf::AddLogEntry("\nInit curl...");
+		lwmf::AddLogEntry("Init curl...");
 
 		if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 		{
@@ -47,7 +47,7 @@ namespace Tools_Curl
 
 	inline bool CheckInternetConnection()
 	{
-		lwmf::AddLogEntry("\nChecking internet connection...");
+		lwmf::AddLogEntry("Checking internet connection...");
 
 		bool Result{};
 
@@ -56,7 +56,11 @@ namespace Tools_Curl
 			curl_easy_setopt(CurlInstance, CURLOPT_URL, "www.google.com");
 			curl_easy_setopt(CurlInstance, CURLOPT_NOBODY, 1);
 
-			if (curl_easy_perform(CurlInstance) != CURLE_OK)
+			if (curl_easy_perform(CurlInstance) == CURLE_OK)
+			{
+				Result = true;
+			}
+			else
 			{
 				lwmf::AddLogEntry("No internet connection found.");
 			}
@@ -73,16 +77,25 @@ namespace Tools_Curl
 		{
 			lwmf::AddLogEntry(fmt::format("Downloading file from URL via curl...\nSource: {}...", URL));
 
-			FILE* File{ fopen(Filename.c_str(), "w") };
-			curl_easy_setopt(CurlInstance, CURLOPT_URL, URL.c_str());
-			curl_easy_setopt(CurlInstance, CURLOPT_WRITEFUNCTION, WriteData);
-			curl_easy_setopt(CurlInstance, CURLOPT_WRITEDATA, File);
+			FILE* FileStream;
+
+			if (fopen_s(&FileStream, Filename.c_str(), "w+") != 0)
+			{
+				lwmf::LogErrorAndThrowException("File could not be created!");
+			}
+
+			curl_easy_setopt(CurlInstance, CURLOPT_URL, URL.c_str()); //-V111
+			curl_easy_setopt(CurlInstance, CURLOPT_WRITEFUNCTION, WriteData); //-V111
+			curl_easy_setopt(CurlInstance, CURLOPT_WRITEDATA, FileStream); //-V111
 			curl_easy_perform(CurlInstance);
 			curl_easy_cleanup(CurlInstance);
 
-			if (File != nullptr)
+			if (FileStream)
 			{
-				fclose(File);
+				if (fclose(FileStream) != 0)
+				{
+					lwmf::LogErrorAndThrowException("File could not be closed!");
+				}
 			}
 		}
 	}

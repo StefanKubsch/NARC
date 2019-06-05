@@ -58,7 +58,7 @@ namespace Tools_INIFile
 				}
 				else if (std::regex_search(Line, Match, ValueTest) && (CurrentSection == Section && Match[1] == Key))
 				{
-					lwmf::AddLogEntry("Value : " + std::string(Match[2]));
+					lwmf::AddLogEntry("   Value : " + std::string(Match[2]));
 
 					// Convert Value to proper type
 					std::istringstream Stream(Match[2]);

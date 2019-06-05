@@ -14,8 +14,6 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#define _CRT_SECURE_NO_WARNINGS
-
 // Disable "unreferenced formal parameter" warning in WinMain
 #pragma warning(disable: 4100)
 
@@ -591,7 +589,6 @@ void InitAndLoadGameConfig()
 	Game_Config::GatherNumberOfLevels();
 	Game_PreGame::ShowIntroHeader();
 	Game_PreGame::SetOptions();
-	Tools_Console::CloseConsole();
 	Tools_SIMD::CheckForSSESupport();
 	Game_Config::Init();
 	Game_Raycaster::Init();
@@ -611,6 +608,7 @@ void InitAndLoadGameConfig()
 	GameController.Init();
 	Game_Transitions::Init();
 	MainMenu.Init();
+	Tools_Console::CloseConsole();
 }
 
 void InitAndLoadLevel()

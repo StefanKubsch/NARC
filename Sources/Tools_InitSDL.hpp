@@ -26,7 +26,7 @@ namespace Tools_InitSDL
 
 	inline void InitSDL()
 	{
-		lwmf::AddLogEntry("\nInitializing SDL subsystems...");
+		lwmf::AddLogEntry("Initializing SDL subsystems...");
 
 		if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0)
 		{

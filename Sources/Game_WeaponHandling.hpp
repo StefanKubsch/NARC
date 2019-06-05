@@ -142,7 +142,7 @@ namespace Game_WeaponHandling
 			}
 			else
 			{
-				lwmf::AddLogEntry("No more weapon data found.\n");
+				lwmf::AddLogEntry("No more weapon data found.");
 				break;
 			}
 		}

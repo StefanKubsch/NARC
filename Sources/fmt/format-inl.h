@@ -98,7 +98,7 @@ typedef void (*FormatFunc)(internal::buffer<char>&, int, string_view);
 // Buffer should be at least of size 1.
 int safe_strerror(int error_code, char*& buffer,
                   std::size_t buffer_size) FMT_NOEXCEPT {
-  FMT_ASSERT(buffer != FMT_NULL && buffer_size != 0, "invalid buffer");
+  FMT_ASSERT(buffer != nullptr && buffer_size != 0, "invalid buffer");
 
   class dispatcher {
    private:
@@ -200,15 +200,6 @@ void report_error(FormatFunc func, int error_code,
 }
 }  // namespace
 
-FMT_FUNC size_t internal::count_code_points(basic_string_view<char8_t> s) {
-  const char8_t* data = s.data();
-  size_t num_code_points = 0;
-  for (size_t i = 0, size = s.size(); i != size; ++i) {
-    if ((data[i] & 0xc0) != 0x80) ++num_code_points;
-  }
-  return num_code_points;
-}
-
 #if !defined(FMT_STATIC_THOUSANDS_SEPARATOR)
 namespace internal {
 
@@ -223,7 +214,7 @@ template <typename Locale> Locale locale_ref::get() const {
 }
 
 template <typename Char> FMT_FUNC Char thousands_sep_impl(locale_ref loc) {
-  return std::use_facet<std::numpunct<Char> >(loc.get<std::locale>())
+  return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
       .thousands_sep();
 }
 }  // namespace internal
@@ -650,9 +641,9 @@ template <int GRISU_VERSION> struct grisu_shortest_handler {
   // Decrement the generated number approaching value from above.
   void round(uint64_t d, uint64_t divisor, uint64_t& remainder,
              uint64_t error) {
-    while (remainder < d && error - remainder >= divisor &&
-            (remainder + divisor < d ||
-            d - remainder >= remainder + divisor - d)) {
+    while (
+        remainder < d && error - remainder >= divisor &&
+        (remainder + divisor < d || d - remainder >= remainder + divisor - d)) {
       --buf[size - 1];
       remainder += divisor;
     }
@@ -683,7 +674,8 @@ template <int GRISU_VERSION> struct grisu_shortest_handler {
   }
 };
 
-template <typename Double, FMT_ENABLE_IF_T(sizeof(Double) == sizeof(uint64_t))>
+template <typename Double,
+          enable_if_t<(sizeof(Double) == sizeof(uint64_t)), int>>
 FMT_API bool grisu_format(Double value, buffer<char>& buf, int precision,
                           unsigned options, int& exp) {
   FMT_ASSERT(value >= 0, "value is negative");
@@ -782,7 +774,7 @@ void sprintf_format(Double value, internal::buffer<char>& buf,
   *format_ptr = '\0';
 
   // Format using snprintf.
-  char* start = FMT_NULL;
+  char* start = nullptr;
   for (;;) {
     std::size_t buffer_size = buf.capacity();
     start = &buf[0];
@@ -839,7 +831,7 @@ FMT_FUNC internal::utf8_to_utf16::utf8_to_utf16(string_view s) {
   }
 
   int length = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(),
-                                   s_size, FMT_NULL, 0);
+                                   s_size, nullptr, 0);
   if (length == 0) FMT_THROW(windows_error(GetLastError(), ERROR_MSG));
   buffer_.resize(length + 1);
   length = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s_size,
@@ -865,12 +857,12 @@ FMT_FUNC int internal::utf16_to_utf8::convert(wstring_view s) {
     return 0;
   }
 
-  int length = WideCharToMultiByte(CP_UTF8, 0, s.data(), s_size, FMT_NULL, 0,
-                                   FMT_NULL, FMT_NULL);
+  int length = WideCharToMultiByte(CP_UTF8, 0, s.data(), s_size, nullptr, 0,
+                                   nullptr, nullptr);
   if (length == 0) return GetLastError();
   buffer_.resize(length + 1);
   length = WideCharToMultiByte(CP_UTF8, 0, s.data(), s_size, &buffer_[0],
-                               length, FMT_NULL, FMT_NULL);
+                               length, nullptr, nullptr);
   if (length == 0) return GetLastError();
   buffer_[length] = 0;
   return 0;
@@ -894,9 +886,9 @@ FMT_FUNC void internal::format_windows_error(internal::buffer<char>& out,
     for (;;) {
       wchar_t* system_message = &buf[0];
       int result = FormatMessageW(
-          FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, FMT_NULL,
+          FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
           error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), system_message,
-          static_cast<uint32_t>(buf.size()), FMT_NULL);
+          static_cast<uint32_t>(buf.size()), nullptr);
       if (result != 0) {
         utf16_to_utf8 utf8_message;
         if (utf8_message.convert(system_message) == ERROR_SUCCESS) {
@@ -962,7 +954,7 @@ FMT_FUNC void report_windows_error(int error_code,
 FMT_FUNC void vprint(std::FILE* f, string_view format_str, format_args args) {
   memory_buffer buffer;
   internal::vformat_to(buffer, format_str,
-                       basic_format_args<buffer_context<char>::type>(args));
+                       basic_format_args<buffer_context<char>>(args));
   fwrite_fully(buffer.data(), 1, buffer.size(), f);
 }
 

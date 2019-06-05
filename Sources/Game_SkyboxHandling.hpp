@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <string>
+#include <cmath>
 #include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"

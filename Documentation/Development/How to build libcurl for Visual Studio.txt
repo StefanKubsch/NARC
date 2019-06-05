@@ -8,11 +8,11 @@ git clone https://github.com/curl/curl.git
 
 cd curl
 
-git checkout tags/curl-7_64_1
+git checkout tags/curl-7_65_1
 
 buildconf.bat
 
-“c:\Program Files (x86)\Microsoft Visual Studio\2017\Community\vc\Auxiliary\Build\vcvarsall.bat” x64
+“c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\vc\Auxiliary\Build\vcvarsall.bat” x64
 
 cd winbuild
 

@@ -44,7 +44,7 @@ inline void HID_GameControllerClass::Init()
 
 		Tools_Curl::FetchFileFromURL(GameControllerDBURL, GameControllerDBFile);
 
-		lwmf::AddLogEntry("Searching and initializing gamecontroller...\n");
+		lwmf::AddLogEntry("Searching and initializing gamecontroller...");
 
 		if (SDL_NumJoysticks() > 0 &&  SDL_IsGameController(0) == SDL_TRUE)
 		{
@@ -52,7 +52,7 @@ inline void HID_GameControllerClass::Init()
 
 			if (SDL_GameController* Controller{ SDL_GameControllerOpen(0) }; Controller != nullptr)
 			{
-				lwmf::AddLogEntry(fmt::format("{}\n", SDL_GameControllerName(Controller)));
+				lwmf::AddLogEntry(fmt::format("{}", SDL_GameControllerName(Controller)));
 
 				if (Tools_ErrorHandling::CheckFileExistence(GameControllerDBFile, StopOnError))
 				{
@@ -74,7 +74,7 @@ inline void HID_GameControllerClass::Init()
 		}
 		else
 		{
-			lwmf::AddLogEntry("No gamecontroller found...\n");
+			lwmf::AddLogEntry("No gamecontroller found...");
 		}
 	}
 }
