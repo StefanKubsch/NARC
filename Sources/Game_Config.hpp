@@ -86,7 +86,7 @@ namespace Game_Config
 
 		while (true)
 		{
-			if (Tools_ErrorHandling::CheckFolderExistence(fmt::format("./DATA/Level_{}",NumberOfLevels), ContinueOnError))
+			if (Tools_ErrorHandling::CheckFolderExistence(fmt::format("./DATA/Level_{}", NumberOfLevels), ContinueOnError))
 			{
 				++NumberOfLevels;
 			}

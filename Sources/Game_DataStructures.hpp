@@ -16,7 +16,6 @@
 #include <map>
 #include <SDL_mixer.h>
 
-#include "Game_GlobalDefinitions.hpp"
 #include "Game_PlayerClass.hpp"
 
 //

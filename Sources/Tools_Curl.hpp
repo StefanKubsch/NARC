@@ -33,6 +33,7 @@ namespace Tools_Curl
 	inline void Init()
 	{
 		lwmf::AddLogEntry("\nInit curl...");
+
 		if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 		{
 			lwmf::LogErrorAndThrowException("curl init failed!");

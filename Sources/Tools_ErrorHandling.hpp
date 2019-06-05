@@ -17,8 +17,6 @@
 #include <sys/stat.h>
 #include "fmt/format.h"
 
-#include "Game_GlobalDefinitions.hpp"
-
 static constexpr bool ContinueOnError{ true };
 static constexpr bool StopOnError{};
 
@@ -64,7 +62,6 @@ namespace Tools_ErrorHandling
 		struct stat Info{};
 		stat(FolderName.c_str(), &Info);
 
-		// Folder exists
 		if ((Info.st_mode & S_IFDIR) == 0)
 		{
 			if (ActionFlag == StopOnError)
@@ -82,9 +79,9 @@ namespace Tools_ErrorHandling
 
 	inline bool CheckTextureSize(const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Size, const bool ActionFlag)
 	{
-		bool Result{ true };
-
 		lwmf::AddLogEntry("Checking texture for correct size...");
+
+		bool Result{ true };
 
 		if (Width != Size || Height != Size)
 		{

@@ -587,10 +587,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void InitAndLoadGameConfig()
 {
-	Tools_Console::RedirectOutput();
+	Tools_Console::CreateConsole();
 	Game_Config::GatherNumberOfLevels();
 	Game_PreGame::ShowIntroHeader();
 	Game_PreGame::SetOptions();
+	Tools_Console::CloseConsole();
 	Tools_SIMD::CheckForSSESupport();
 	Game_Config::Init();
 	Game_Raycaster::Init();

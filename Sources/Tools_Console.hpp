@@ -9,8 +9,6 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-#define FMT_STRING_ALIAS 1
 #define WIN32_LEAN_AND_MEAN
 
 #include <Windows.h>
@@ -20,16 +18,13 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
-#include "fmt/color.h"
-#include "fmt/format.h"
-
-#include "Game_GlobalDefinitions.hpp"
 
 namespace Tools_Console
 {
 
 
-	void RedirectOutput();
+	void CreateConsole();
+	void CloseConsole();
 	void ClearInputBuffer();
 	char QuestionForYesNo(const std::string& Text);
 	std::int_fast32_t QuestionForValue(const std::string& Text, std::int_fast32_t BeginRange, std::int_fast32_t EndRange);
@@ -38,14 +33,10 @@ namespace Tools_Console
 	// Functions
 	//
 
-	inline void RedirectOutput()
+	inline void CreateConsole()
 	{
 		AllocConsole();
 		SetConsoleTitle("NARC Console");
-
-		DWORD ConsoleMode{};
-		GetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), &ConsoleMode);
-		SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ConsoleMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
 		freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 		freopen_s(reinterpret_cast<FILE**>(stdin), "CONIN$", "r", stdin);
@@ -54,6 +45,14 @@ namespace Tools_Console
 		// Don´t sync C and C++ standard streams since we only use C++ streams
 		std::ios::sync_with_stdio(false);
 		std::cin.tie(nullptr);
+	}
+
+	inline void CloseConsole()
+	{
+		fclose(stdout);
+		fclose(stdin);
+		fclose(stderr);
+		FreeConsole();
 	}
 
 	inline void ClearInputBuffer()
@@ -69,7 +68,7 @@ namespace Tools_Console
 
 		while (Response != 'y' && Response != 'n')
 		{
-			fmt::print(Text);
+			std::cout << Text;
 			ClearInputBuffer();
 
 			if (std::string Input; std::getline(std::cin, Input))
@@ -89,7 +88,7 @@ namespace Tools_Console
 
 		while (true)
 		{
-			fmt::print(Text);
+			std::cout << Text;
 			ClearInputBuffer();
 
 			if (std::string Input; std::getline(std::cin, Input))

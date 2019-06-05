@@ -19,7 +19,6 @@ Due to (partial) use of SIMD Intrinsics a CPU with SSE 4.2 support is needed (vi
 The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textures are 64x64 in size, everything is pixelated, but you can also use crytal-clear hires textures...
 
 **If you want to check it out without building it by yourself, just download "Release.zip", unzip and run the exe. Everything you need is included!**
-**Windows 10 is currently needed due to the use of the "virtual terminal", which supports the escape sequences used by {fmt}.**
 
 **Current features :**
 

@@ -11,8 +11,6 @@
 
 #include <cstdint>
 
-#include "Game_GlobalDefinitions.hpp"
-
 class GFX_LightingClass final
 {
 public:

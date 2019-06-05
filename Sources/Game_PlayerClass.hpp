@@ -9,6 +9,8 @@
 
 #pragma once
 
+#define FMT_HEADER_ONLY
+
 #include <cstdint>
 #include <string>
 #include <vector>
