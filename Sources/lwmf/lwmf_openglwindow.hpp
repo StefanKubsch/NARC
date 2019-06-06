@@ -57,7 +57,11 @@ namespace lwmf
 		WindowClass.lpfnWndProc = WndProc;
 		WindowClass.hInstance = hInstance;
 		WindowClass.lpszClassName = "lwmf";
-		RegisterClass(&WindowClass);
+
+		if (RegisterClass(&WindowClass) == 0)
+		{
+			LogErrorAndThrowException("Error registering windowclass (RegisterClass)!");
+		}
 
 		DWORD dwExStyle{ WS_EX_APPWINDOW | WS_EX_WINDOWEDGE };
 		DWORD dwStyle{ WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN };
@@ -122,10 +126,12 @@ namespace lwmf
 			LogErrorAndThrowException("Error creating WindowHandle (GetDC)!");
 		}
 
-		SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD);
-		BOOL Result{ wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) };
+		if (SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD) == 0)
+		{
+			LogErrorAndThrowException("Error setting pixel format (SetPixelFormat)!");
+		}
 
-		if (Result == 0)
+		if (wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) == 0)
 		{
 			LogErrorAndThrowException("Error creating OpenGL context (wglMakeCurrent)!");
 		}

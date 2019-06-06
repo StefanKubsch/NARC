@@ -75,7 +75,7 @@ namespace lwmf
 
 	inline void InitOpenGLLoader()
 	{
-		AddLogEntry("OPENGL: Load extensions...");
+		AddLogEntry("OPENGL: Load wgl extensions...");
 		const HMODULE OGL32{ LoadLibraryA("opengl32.dll") };
 
 		if (OGL32 == nullptr)
@@ -83,9 +83,8 @@ namespace lwmf
 			LogErrorAndThrowException("Error loading opengl32.dll!");
 		}
 
-		const HINSTANCE OpenGLDLL{ OGL32 };
 		typedef PROC WINAPI wglGetProcAddressproc(LPCSTR lpszProc);
-		wglGetProcAddressproc* wglGetProcAddress{ reinterpret_cast<wglGetProcAddressproc*>(GetProcAddress(OpenGLDLL, "wglGetProcAddress")) };
+		wglGetProcAddressproc* wglGetProcAddress{ reinterpret_cast<wglGetProcAddressproc*>(GetProcAddress(OGL32, "wglGetProcAddress")) };
 
 		#define OG(Return, Name, ...) Name = (Name##proc *)wglGetProcAddress(#Name);
 			OGL
