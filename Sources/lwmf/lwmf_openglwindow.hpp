@@ -52,7 +52,7 @@ namespace lwmf
 	{
 		// Create window
 
-		AddLogEntry("WINDOW: Create window...");
+		lwmf_SystemLog.AddEntry("WINDOW: Create window...");
 		WNDCLASS WindowClass{};
 		WindowClass.lpfnWndProc = WndProc;
 		WindowClass.hInstance = hInstance;
@@ -60,7 +60,7 @@ namespace lwmf
 
 		if (RegisterClass(&WindowClass) == 0)
 		{
-			LogErrorAndThrowException("Error registering windowclass (RegisterClass)!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error registering windowclass (RegisterClass)!");
 		}
 
 		DWORD dwExStyle{ WS_EX_APPWINDOW | WS_EX_WINDOWEDGE };
@@ -92,12 +92,12 @@ namespace lwmf
 
 		if (MainWindow == nullptr)
 		{
-			LogErrorAndThrowException("Error creating window (CreateWindowEx)!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error creating window (CreateWindowEx)!");
 		}
 
 		// Create OpenGL context
 
-		AddLogEntry("WINDOW: Create OpenGL context...");
+		lwmf_SystemLog.AddEntry("WINDOW: Create OpenGL context...");
 
 		const PIXELFORMATDESCRIPTOR PFD =
 		{
@@ -123,17 +123,17 @@ namespace lwmf
 
 		if (WindowHandle == nullptr)
 		{
-			LogErrorAndThrowException("Error creating WindowHandle (GetDC)!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error creating WindowHandle (GetDC)!");
 		}
 
 		if (SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD) == 0)
 		{
-			LogErrorAndThrowException("Error setting pixel format (SetPixelFormat)!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error setting pixel format (SetPixelFormat)!");
 		}
 
 		if (wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) == 0)
 		{
-			LogErrorAndThrowException("Error creating OpenGL context (wglMakeCurrent)!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error creating OpenGL context (wglMakeCurrent)!");
 		}
 
 		ShowWindow(MainWindow, SW_SHOW);

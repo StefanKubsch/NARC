@@ -29,6 +29,9 @@
 // lightweight media framework
 #include "lwmf/lwmf.hpp"
 
+// Establish logging for NARC itself - logging for lwmf is hardcoded!
+lwmf::Logging NARCLog("NARC.log");
+
 // "ScreenTexture" is the main render target in our game!
 inline lwmf::TextureStruct ScreenTexture;
 inline lwmf::ShaderClass ScreenTextureShader;
@@ -93,8 +96,6 @@ inline bool HUDEnabled{ true };
 
 std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
-	lwmf::StartLogging("NARC.log");
-
 	WindowInstance = hInstance;
 
 	try
@@ -132,7 +133,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		{
 			if (Message.message == WM_QUIT)
 			{
-				lwmf::AddLogEntry("MESSAGE: WM_QUIT received...");
+				NARCLog.AddEntry("MESSAGE: WM_QUIT received...");
 				break;
 			}
 
@@ -368,8 +369,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 	Tools_Cleanup::DestroySubsystems();
 
-	lwmf::AddLogEntry("Exit program...");
-	lwmf::EndLogging();
+	NARCLog.AddEntry("Exit program...");
 
 	return EXIT_SUCCESS;
 }

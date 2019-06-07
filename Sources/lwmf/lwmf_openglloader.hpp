@@ -75,12 +75,12 @@ namespace lwmf
 
 	inline void InitOpenGLLoader()
 	{
-		AddLogEntry("OPENGL: Load wgl extensions...");
+		lwmf_SystemLog.AddEntry("OPENGL: Load wgl extensions...");
 		const HMODULE OGL32{ LoadLibraryA("opengl32.dll") };
 
 		if (OGL32 == nullptr)
 		{
-			LogErrorAndThrowException("Error loading opengl32.dll!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error loading opengl32.dll!");
 		}
 
 		typedef PROC WINAPI wglGetProcAddressproc(LPCSTR lpszProc);
@@ -93,7 +93,7 @@ namespace lwmf
 
 	inline void SetVSync(const std::int_fast32_t Sync)
 	{
-		AddLogEntry("OPENGL: Set vsync (" + std::to_string(Sync) + ")...");
+		lwmf_SystemLog.AddEntry("OPENGL: Set vsync (" + std::to_string(Sync) + ")...");
 		typedef PROC(WINAPI * PFNWGLSWAPINTERVALFARPROC)(std::int_fast32_t);
 		PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT{ reinterpret_cast<PFNWGLSWAPINTERVALFARPROC>(wglGetProcAddress("wglSwapIntervalEXT")) };
 		wglSwapIntervalEXT(Sync);

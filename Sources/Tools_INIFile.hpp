@@ -33,7 +33,7 @@ namespace Tools_INIFile
 
 	template<typename T>T ReadValue(const std::string& INIFileName, const std::string& Section, const std::string& Key)
 	{
-		lwmf::AddLogEntry(fmt::format("Reading value from INI file [{0}] / {1} ...", Section, Key));
+		NARCLog.AddEntry(fmt::format("Reading value from INI file [{0}] / {1} ...", Section, Key));
 
 		static const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
 		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
@@ -58,7 +58,7 @@ namespace Tools_INIFile
 				}
 				else if (std::regex_search(Line, Match, ValueTest) && (CurrentSection == Section && Match[1] == Key))
 				{
-					lwmf::AddLogEntry("   Value : " + std::string(Match[2]));
+					NARCLog.AddEntry("   Value : " + std::string(Match[2]));
 
 					// Convert Value to proper type
 					std::istringstream Stream(Match[2]);
@@ -71,7 +71,7 @@ namespace Tools_INIFile
 
 		if (!ValueFound)
 		{
-			lwmf::LogErrorAndThrowException(fmt::format("Value [{0}] / {1} not found!", Section, Key));
+			NARCLog.LogErrorAndThrowException(fmt::format("Value [{0}] / {1} not found!", Section, Key));
 		}
 
 		return OutputVar;
@@ -83,7 +83,7 @@ namespace Tools_INIFile
 		{
 			if (Debug)
 			{
-				lwmf::AddLogEntry(fmt::format("Writing value to INI file [{0}] / {1} : {2}", Section, Key, Value));
+				NARCLog.AddEntry(fmt::format("Writing value to INI file [{0}] / {1} : {2}", Section, Key, Value));
 			}
 
 			// Read INI file into vector of strings

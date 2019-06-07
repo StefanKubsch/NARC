@@ -44,23 +44,23 @@ inline void HID_GameControllerClass::Init()
 
 		Tools_Curl::FetchFileFromURL(GameControllerDBURL, GameControllerDBFile);
 
-		lwmf::AddLogEntry("Searching and initializing gamecontroller...");
+		NARCLog.AddEntry("Searching and initializing gamecontroller...");
 
 		if (SDL_NumJoysticks() > 0 &&  SDL_IsGameController(0) == SDL_TRUE)
 		{
-			lwmf::AddLogEntry("Found a valid gamecontroller: ");
+			NARCLog.AddEntry("Found a valid gamecontroller: ");
 
 			if (SDL_GameController* Controller{ SDL_GameControllerOpen(0) }; Controller != nullptr)
 			{
-				lwmf::AddLogEntry(fmt::format("{}", SDL_GameControllerName(Controller)));
+				NARCLog.AddEntry(fmt::format("{}", SDL_GameControllerName(Controller)));
 
 				if (Tools_ErrorHandling::CheckFileExistence(GameControllerDBFile, StopOnError))
 				{
-					lwmf::AddLogEntry("Loading mapping from GameControllerDB file...");
+					NARCLog.AddEntry("Loading mapping from GameControllerDB file...");
 
 					if (SDL_GameControllerAddMappingsFromFile(GameControllerDBFile.c_str()); SDL_GameControllerMapping(Controller) == nullptr)
 					{
-						lwmf::LogErrorAndThrowException(fmt::format("No mapping for {} found.", SDL_GameControllerName(Controller)));
+						NARCLog.LogErrorAndThrowException(fmt::format("No mapping for {} found.", SDL_GameControllerName(Controller)));
 					}
 
 					SDL_GameControllerEventState(SDL_ENABLE);
@@ -69,12 +69,12 @@ inline void HID_GameControllerClass::Init()
 			}
 			else
 			{
-				lwmf::LogErrorAndThrowException(fmt::format("Gamecontroller init failed: {}", SDL_GetError()));
+				NARCLog.LogErrorAndThrowException(fmt::format("Gamecontroller init failed: {}", SDL_GetError()));
 			}
 		}
 		else
 		{
-			lwmf::AddLogEntry("No gamecontroller found...");
+			NARCLog.AddEntry("No gamecontroller found...");
 		}
 	}
 }

@@ -34,7 +34,7 @@ namespace lwmf
 
 	inline void RegisterRawInputDevice(const HWND hWnd, const USHORT Device)
 	{
-		AddLogEntry("RAWINPUT: Register device " + std::to_string(Device) + "...");
+		lwmf_SystemLog.AddEntry("RAWINPUT: Register device " + std::to_string(Device) + "...");
 		RAWINPUTDEVICE RawInputDevice;
 
 		RawInputDevice.usUsagePage = 1;
@@ -44,13 +44,13 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) == 0)
 		{
-			LogErrorAndThrowException("Error registering raw input device " + std::to_string(Device) + "!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error registering raw input device " + std::to_string(Device) + "!");
 		}
 	}
 
 	inline void UnregisterRawInputDevice(const USHORT Device)
 	{
-		AddLogEntry("RAWINPUT: Unregister device " + std::to_string(Device) + "...");
+		lwmf_SystemLog.AddEntry("RAWINPUT: Unregister device " + std::to_string(Device) + "...");
 		RAWINPUTDEVICE RawInputDevice;
 
 		RawInputDevice.usUsagePage = 1;
@@ -60,7 +60,7 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) == 0)
 		{
-			LogErrorAndThrowException("Error unregistering raw input device " + std::to_string(Device) + "!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error unregistering raw input device " + std::to_string(Device) + "!");
 		}
 	}
 

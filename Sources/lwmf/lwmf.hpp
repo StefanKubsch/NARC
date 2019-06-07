@@ -13,6 +13,10 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "lwmf_logging.hpp"
+
+// Establish lwmf System logfile
+lwmf::Logging lwmf_SystemLog("lwmf_systemlog.log");
+
 #include "lwmf_math.hpp"
 #include "lwmf_general.hpp"
 #include "lwmf_color.hpp"

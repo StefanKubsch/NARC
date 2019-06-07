@@ -39,16 +39,16 @@ namespace SFX_SDL
 			const std::int_fast32_t ChunkSize{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "ChunkSize") };
 			const std::int_fast32_t MaxChannels{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "MaxChannels") };
 
-			lwmf::AddLogEntry("Initialising SDL Mixer system...");
+			NARCLog.AddEntry("Initialising SDL Mixer system...");
 
 			if (constexpr std::int_fast32_t Flags{ MIX_INIT_OGG }; (Mix_Init(Flags) & Flags) != Flags)
 			{
-				lwmf::LogErrorAndThrowException(fmt::format("SDL audio support init failed: {}", SDL_GetError()));
+				NARCLog.LogErrorAndThrowException(fmt::format("SDL audio support init failed: {}", SDL_GetError()));
 			}
 
 			if (Mix_OpenAudio(Samplerate, MIX_DEFAULT_FORMAT, StereoChannels, ChunkSize) != 0)
 			{
-				lwmf::LogErrorAndThrowException(fmt::format("SDL mixer init failed: {}", SDL_GetError()));
+				NARCLog.LogErrorAndThrowException(fmt::format("SDL mixer init failed: {}", SDL_GetError()));
 			}
 			else
 			{

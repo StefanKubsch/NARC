@@ -1224,13 +1224,13 @@ namespace lwmf
 
 	inline void LoadPNG(TextureStruct& Texture, const std::string& Filename)
 	{
-		AddLogEntry("PNG: Load file " + Filename + "...");
+		lwmf_SystemLog.AddEntry("PNG: Load file " + Filename + "...");
 
 		std::ifstream File(Filename.c_str(), std::ios::binary);
 
 		if (File.fail())
 		{
-			LogErrorAndThrowException("Error loading " + Filename + "!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error loading " + Filename + "!");
 		}
 
 		std::streamsize Size{};

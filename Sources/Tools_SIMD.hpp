@@ -24,14 +24,14 @@ namespace Tools_SIMD
 
 	inline void CheckForSSESupport()
 	{
-		lwmf::AddLogEntry("Checking for SSE 4.2 Extensions...");
+		NARCLog.AddEntry("Checking for SSE 4.2 Extensions...");
 
 		std::int_fast32_t CPUInfo[4];
 		__cpuid(CPUInfo, 1);
 
 		if ((CPUInfo[2] & (1 << 20)) == 0)
 		{
-			lwmf::LogErrorAndThrowException("SSE 4.2 is not supported on this computer!");
+			NARCLog.LogErrorAndThrowException("SSE 4.2 is not supported on this computer!");
 		}
 	}
 

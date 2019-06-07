@@ -31,13 +31,13 @@ namespace lwmf
 
 	inline void LoadBMP(TextureStruct& Texture, const std::string& Filename)
 	{
-		AddLogEntry("BMP: Load file " + Filename + "...");
+		lwmf_SystemLog.AddEntry("BMP: Load file " + Filename + "...");
 
 		std::ifstream File(Filename, std::ios::binary);
 
 		if (File.fail())
 		{
-			LogErrorAndThrowException("Error loading " + Filename + "!");
+			lwmf_SystemLog.LogErrorAndThrowException("Error loading " + Filename + "!");
 		}
 
 		std::vector<unsigned char> FileHeaderBuffer(sizeof(BITMAPFILEHEADER));

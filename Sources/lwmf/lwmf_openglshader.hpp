@@ -81,7 +81,7 @@ namespace lwmf
 
 		GLuint ElementBufferObject{};
 
-		AddLogEntry("SHADER (" + ShaderName + "): Create vertex buffer object...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Create vertex buffer object...");
 		glGenBuffers(1, &VertexBufferObject);
 		glCheckError();
 		glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
@@ -91,13 +91,13 @@ namespace lwmf
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertices), Vertices);
 		glCheckError();
 
-		AddLogEntry("SHADER (" + ShaderName + "): Create vertex array object...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Create vertex array object...");
 		glGenVertexArrays(1, &VertexArrayObject);
 		glCheckError();
 		glBindVertexArray(VertexArrayObject);
 		glCheckError();
 
-		AddLogEntry("SHADER (" + ShaderName + "): Create element buffer object...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Create element buffer object...");
 		glGenBuffers(1, &ElementBufferObject);
 		glCheckError();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
@@ -105,7 +105,7 @@ namespace lwmf
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Elements), Elements, GL_STATIC_DRAW);
 		glCheckError();
 
-		AddLogEntry("SHADER (" + ShaderName + "): Create and compile the vertex shader...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Create and compile the vertex shader...");
 		const GLchar* VertexShaderSource{ LoadShaderSource("./Shader/Vertex/" + ShaderName + ".vert") };
 		const GLint VertexShader{ glCreateShader(GL_VERTEX_SHADER) };
 		glCheckError();
@@ -115,7 +115,7 @@ namespace lwmf
 		glCheckError();
 		CheckCompileError(VertexShader, Components::Shader);
 
-		AddLogEntry("SHADER (" + ShaderName + "): Create and compile the fragment shader...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Create and compile the fragment shader...");
 		const GLchar* FragmentShaderSource{ LoadShaderSource("./Shader/Fragment/" + ShaderName + ".frag") };
 		const GLint FragmentShader{ glCreateShader(GL_FRAGMENT_SHADER) };
 		glCheckError();
@@ -125,7 +125,7 @@ namespace lwmf
 		glCheckError();
 		CheckCompileError(FragmentShader, Components::Shader);
 
-		AddLogEntry("SHADER (" + ShaderName + "): Link the vertex and fragment shader into a shader program...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Link the vertex and fragment shader into a shader program...");
 		const GLint ShaderProgram{ glCreateProgram() };
 		glCheckError();
 		glAttachShader(ShaderProgram, VertexShader);
@@ -139,11 +139,11 @@ namespace lwmf
 
 		CheckCompileError(ShaderProgram, Components::Program);
 
-		AddLogEntry("SHADER (" + ShaderName + "): Use shader program...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Use shader program...");
 		glUseProgram(ShaderProgram);
 		glCheckError();
 
-		AddLogEntry("SHADER (" + ShaderName + "): Specify the layout of the vertex data...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Specify the layout of the vertex data...");
 		const GLint PositionAttrib{ glGetAttribLocation(ShaderProgram, "position") };
 		glCheckError();
 		glEnableVertexAttribArray(PositionAttrib);
@@ -158,7 +158,7 @@ namespace lwmf
 		glVertexAttribPointer(TextureAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(2 * sizeof(GLfloat))); //-V566
 		glCheckError();
 
-		AddLogEntry("SHADER (" + ShaderName + "): Create projection matrix...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Create projection matrix...");
 		GLfloat ProjectionMatrix[16]{};
 		Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(Texture.Width), static_cast<GLfloat>(Texture.Height), 0.0F);
 		glCheckError();
@@ -167,7 +167,7 @@ namespace lwmf
 		glUniformMatrix4fv(Projection, 1, GL_FALSE, ProjectionMatrix);
 		glCheckError();
 
-		AddLogEntry("SHADER (" + ShaderName + "): Since the shader program is now loaded into GPU, we can delete the shader program...");
+		lwmf_SystemLog.AddEntry("SHADER (" + ShaderName + "): Since the shader program is now loaded into GPU, we can delete the shader program...");
 		glDetachShader(ShaderProgram, FragmentShader);
 		glCheckError();
 		glDetachShader(ShaderProgram, VertexShader);
@@ -351,7 +351,7 @@ namespace lwmf
 				default: {}
 			}
 
-			LogErrorAndThrowException("OpenGL error " + Error + " in line " + std::to_string(Line) + "!");
+			lwmf_SystemLog.LogErrorAndThrowException("OpenGL error " + Error + " in line " + std::to_string(Line) + "!");
 		}
 	}
 
@@ -369,7 +369,7 @@ namespace lwmf
 				if (ErrorResult == GL_FALSE)
 				{
 					glGetShaderInfoLog(Task, 512, nullptr, ErrorLog);
-					LogErrorAndThrowException(std::string(ErrorLog));
+					lwmf_SystemLog.LogErrorAndThrowException(std::string(ErrorLog));
 				}
 
 				break;
@@ -381,7 +381,7 @@ namespace lwmf
 				if (ErrorResult == GL_FALSE)
 				{
 					glGetProgramInfoLog(Task, 512, nullptr, ErrorLog);
-					LogErrorAndThrowException(std::string(ErrorLog));
+					lwmf_SystemLog.LogErrorAndThrowException(std::string(ErrorLog));
 				}
 
 				break;
