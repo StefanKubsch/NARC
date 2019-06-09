@@ -26,8 +26,10 @@ namespace Tools_Cleanup
 	{
 		lwmf::UnregisterRawInputDevice(lwmf::HID_MOUSE);
 		lwmf::UnregisterRawInputDevice(lwmf::HID_KEYBOARD);
+		lwmf::DeleteOpenGLContext();
 
 		NARCLog.AddEntry("Quit SDL_Mixer");
+
 		while (Mix_Init(0) != 0)
 		{
 			Mix_Quit();

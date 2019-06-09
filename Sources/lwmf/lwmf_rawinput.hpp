@@ -34,7 +34,7 @@ namespace lwmf
 
 	inline void RegisterRawInputDevice(const HWND hWnd, const USHORT Device)
 	{
-		lwmf_SystemLog.AddEntry("RAWINPUT: Register device " + std::to_string(Device) + "...");
+		LWMFSystemLog.AddEntry("lwmf_rawinput: Register device " + std::to_string(Device) + "...");
 		RAWINPUTDEVICE RawInputDevice;
 
 		RawInputDevice.usUsagePage = 1;
@@ -44,13 +44,13 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) == 0)
 		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error registering raw input device " + std::to_string(Device) + "!");
+			LWMFSystemLog.LogErrorAndThrowException("Error registering raw input device " + std::to_string(Device) + "!");
 		}
 	}
 
 	inline void UnregisterRawInputDevice(const USHORT Device)
 	{
-		lwmf_SystemLog.AddEntry("RAWINPUT: Unregister device " + std::to_string(Device) + "...");
+		LWMFSystemLog.AddEntry("lwmf_rawinput: Unregister device " + std::to_string(Device) + "...");
 		RAWINPUTDEVICE RawInputDevice;
 
 		RawInputDevice.usUsagePage = 1;
@@ -60,27 +60,15 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) == 0)
 		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error unregistering raw input device " + std::to_string(Device) + "!");
+			LWMFSystemLog.LogErrorAndThrowException("Error unregistering raw input device " + std::to_string(Device) + "!");
 		}
 	}
 
 	inline void CatchMouse(const HWND hWnd)
 	{
 		static RECT WindowRect{};
-
 		GetClientRect(hWnd, &WindowRect);
-
-		POINT UpperLeft{ WindowRect.left, WindowRect.top };
-		POINT LowerRight{ WindowRect.right, WindowRect.bottom };
-
-		MapWindowPoints(hWnd, nullptr, &UpperLeft, 1);
-		MapWindowPoints(hWnd, nullptr, &LowerRight, 1);
-
-		WindowRect.left = UpperLeft.x;
-		WindowRect.top = UpperLeft.y;
-		WindowRect.right = LowerRight.x;
-		WindowRect.bottom = LowerRight.y;
-
+		MapWindowPoints(hWnd, nullptr, reinterpret_cast<LPPOINT>(&WindowRect), 2);
 		ClipCursor(&WindowRect);
 	}
 

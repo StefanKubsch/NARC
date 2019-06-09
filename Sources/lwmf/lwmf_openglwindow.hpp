@@ -26,6 +26,7 @@ namespace lwmf
 	void CreateOpenGLWindow(HINSTANCE hInstance, TextureStruct& RenderTarget, std::int_fast32_t Width, std::int_fast32_t Height, LPCSTR WindowName, bool Fullscreen);
 	void ResizeOpenGLWindow(TextureStruct& RenderTarget);
 	void ClearBuffer();
+	void DeleteOpenGLContext();
 
 	//
 	// Variables and constants
@@ -52,7 +53,7 @@ namespace lwmf
 	{
 		// Create window
 
-		lwmf_SystemLog.AddEntry("WINDOW: Create window...");
+		LWMFSystemLog.AddEntry("lwmf_openglwindow: Create window...");
 		WNDCLASS WindowClass{};
 		WindowClass.lpfnWndProc = WndProc;
 		WindowClass.hInstance = hInstance;
@@ -60,86 +61,94 @@ namespace lwmf
 
 		if (RegisterClass(&WindowClass) == 0)
 		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error registering windowclass (RegisterClass)!");
+			LWMFSystemLog.LogErrorAndThrowException("Error registering windowclass (RegisterClass)!");
 		}
-
-		DWORD dwExStyle{ WS_EX_APPWINDOW | WS_EX_WINDOWEDGE };
-		DWORD dwStyle{ WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN };
-
-		if (Fullscreen)
+		else
 		{
-			DEVMODE ScreenSettings;
-			std::memset(&ScreenSettings, 0, sizeof(ScreenSettings));
-			ScreenSettings.dmSize = sizeof(ScreenSettings);
-			ScreenSettings.dmPelsWidth = Width;
-			ScreenSettings.dmPelsHeight = Height;
-			ScreenSettings.dmBitsPerPel = 32;
-			ScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+			DWORD dwExStyle{ WS_EX_APPWINDOW | WS_EX_WINDOWEDGE };
+			DWORD dwStyle{ WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN };
 
-			if (ChangeDisplaySettings(&ScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL)
+			if (Fullscreen)
 			{
-				dwExStyle = WS_EX_APPWINDOW;
-				dwStyle = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-				ShowCursor(FALSE);
+				DEVMODE ScreenSettings;
+				std::memset(&ScreenSettings, 0, sizeof(ScreenSettings));
+				ScreenSettings.dmSize = sizeof(ScreenSettings);
+				ScreenSettings.dmPelsWidth = Width;
+				ScreenSettings.dmPelsHeight = Height;
+				ScreenSettings.dmBitsPerPel = 32;
+				ScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
-				FullscreenFlag = 1;
+				if (ChangeDisplaySettings(&ScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL)
+				{
+					dwExStyle = WS_EX_APPWINDOW;
+					dwStyle = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+					ShowCursor(FALSE);
+
+					FullscreenFlag = 1;
+				}
+			}
+
+			RECT WinRect{ 0, 0, Width, Height };
+			AdjustWindowRectEx(&WinRect, dwStyle, FALSE, dwExStyle);
+			MainWindow = CreateWindowEx(dwExStyle, WindowClass.lpszClassName, WindowName, dwStyle, 0, 0, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top, nullptr, nullptr, hInstance, nullptr);
+
+			if (MainWindow == nullptr)
+			{
+				LWMFSystemLog.LogErrorAndThrowException("Error creating window (CreateWindowEx)!");
+			}
+
+			// Create OpenGL context
+
+			LWMFSystemLog.AddEntry("lwmf_openglwindow: Create OpenGL context...");
+
+			const PIXELFORMATDESCRIPTOR PFD =
+			{
+				sizeof(PIXELFORMATDESCRIPTOR),
+				1,
+				PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+				PFD_TYPE_RGBA,
+				32,
+				0, 0, 0, 0, 0, 0,
+				0,
+				0,
+				0,
+				0, 0, 0, 0,
+				24,
+				8,
+				0,
+				PFD_MAIN_PLANE,
+				0,
+				0, 0, 0
+			};
+
+			WindowHandle = GetDC(MainWindow);
+
+			if (WindowHandle == nullptr)
+			{
+				LWMFSystemLog.LogErrorAndThrowException("Error creating WindowHandle (GetDC)!");
+			}
+			else
+			{
+				if (SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD) == 0)
+				{
+					LWMFSystemLog.LogErrorAndThrowException("Error setting pixel format (SetPixelFormat)!");
+				}
+				else
+				{
+					if (wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) == 0)
+					{
+						LWMFSystemLog.LogErrorAndThrowException("Error creating OpenGL context (wglMakeCurrent)!");
+					}
+					else
+					{
+						ShowWindow(MainWindow, SW_SHOW);
+						SetForegroundWindow(MainWindow);
+						SetFocus(MainWindow);
+						ResizeViewportAndRenderTarget(RenderTarget, Width, Height);
+					}
+				}
 			}
 		}
-
-		RECT WinRect{ 0, 0, Width, Height };
-		AdjustWindowRectEx(&WinRect, dwStyle, FALSE, dwExStyle);
-		MainWindow = CreateWindowEx(dwExStyle, WindowClass.lpszClassName, WindowName, dwStyle, 0, 0, WinRect.right - WinRect.left, WinRect.bottom - WinRect.top, nullptr, nullptr, hInstance, nullptr);
-
-		if (MainWindow == nullptr)
-		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error creating window (CreateWindowEx)!");
-		}
-
-		// Create OpenGL context
-
-		lwmf_SystemLog.AddEntry("WINDOW: Create OpenGL context...");
-
-		const PIXELFORMATDESCRIPTOR PFD =
-		{
-			sizeof(PIXELFORMATDESCRIPTOR),
-			1,
-			PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-			PFD_TYPE_RGBA,
-			32,
-			0, 0, 0, 0, 0, 0,
-			0,
-			0,
-			0,
-			0, 0, 0, 0,
-			24,
-			8,
-			0,
-			PFD_MAIN_PLANE,
-			0,
-			0, 0, 0
-		};
-
-		WindowHandle = GetDC(MainWindow);
-
-		if (WindowHandle == nullptr)
-		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error creating WindowHandle (GetDC)!");
-		}
-
-		if (SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD) == 0)
-		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error setting pixel format (SetPixelFormat)!");
-		}
-
-		if (wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) == 0)
-		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error creating OpenGL context (wglMakeCurrent)!");
-		}
-
-		ShowWindow(MainWindow, SW_SHOW);
-		SetForegroundWindow(MainWindow);
-		SetFocus(MainWindow);
-		ResizeViewportAndRenderTarget(RenderTarget, Width, Height);
 	}
 
 	inline void ResizeOpenGLWindow(TextureStruct& RenderTarget)
@@ -153,6 +162,27 @@ namespace lwmf
 	{
 		glColor4f(0.0F, 0.0F, 0.0F, 0.0F);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	inline void DeleteOpenGLContext()
+	{
+		LWMFSystemLog.AddEntry("lwmf_openglwindow: Delete OpenGL context...");
+
+		const HGLRC OpenGLContext{ wglGetCurrentContext() };
+
+		if (OpenGLContext != nullptr)
+		{
+			wglMakeCurrent(nullptr, nullptr);
+
+			if (ReleaseDC(MainWindow, WindowHandle) == 1)
+			{
+				wglDeleteContext(OpenGLContext);
+			}
+			else
+			{
+				LWMFSystemLog.LogErrorAndThrowException("Error deleting OpenGL context (ReleaseDC)!");
+			}
+		}
 	}
 
 

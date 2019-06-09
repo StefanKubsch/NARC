@@ -27,7 +27,6 @@ namespace lwmf
 	public:
 		Logging(const std::string& Logfilename);
 		~Logging();
-
 		void AddEntry(const std::string& Text);
 		void LogErrorAndThrowException(const std::string& ErrorMessage);
 
@@ -47,27 +46,34 @@ namespace lwmf
 		}
 
 		Logfile << "lwmf logging / (c) Stefan Kubsch\n";
-		Logfile << "logging started at: " << GetTimeStamp() << "\n";
+		Logfile << "logging started at: " << GetTimeStamp();
 		Logfile << "--------------------------------------------------------------------------------------------------------------" << std::endl;
 	}
 
 	Logging::~Logging()
 	{
-		Logfile << "--------------------------------------------------------------------------------------------------------------\n";
-		Logfile << "logging ended at: " << GetTimeStamp() << std::endl;
-
-		Logfile.close();
+		if (Logfile.is_open())
+		{
+			Logfile << "--------------------------------------------------------------------------------------------------------------\n";
+			Logfile << "logging ended at: " << GetTimeStamp() << std::endl;
+		}
 	}
 
 	inline void Logging::AddEntry(const std::string& Text)
 	{
-		Logfile << "** " << Text << std::endl;
+		if (Logfile.is_open())
+		{
+			Logfile << "** " << Text << std::endl;
+		}
 	}
 
 	inline void Logging::LogErrorAndThrowException(const std::string& ErrorMessage)
 	{
-		Logfile << GetTimeStamp() << " - " << ErrorMessage << std::endl;
-		Logfile.close();
+		if (Logfile.is_open())
+		{
+			Logfile << GetTimeStamp() << " - " << ErrorMessage << std::endl;
+			Logfile.close();
+		}
 
 		throw std::runtime_error(ErrorMessage);
 	}

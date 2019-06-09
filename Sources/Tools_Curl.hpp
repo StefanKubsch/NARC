@@ -90,7 +90,7 @@ namespace Tools_Curl
 			curl_easy_perform(CurlInstance);
 			curl_easy_cleanup(CurlInstance);
 
-			if (FileStream)
+			if (FileStream != nullptr)
 			{
 				if (fclose(FileStream) != 0)
 				{

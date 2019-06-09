@@ -1224,40 +1224,42 @@ namespace lwmf
 
 	inline void LoadPNG(TextureStruct& Texture, const std::string& Filename)
 	{
-		lwmf_SystemLog.AddEntry("PNG: Load file " + Filename + "...");
+		LWMFSystemLog.AddEntry("lwmf_png: Load file " + Filename + "...");
 
 		std::ifstream File(Filename.c_str(), std::ios::binary);
 
 		if (File.fail())
 		{
-			lwmf_SystemLog.LogErrorAndThrowException("Error loading " + Filename + "!");
+			LWMFSystemLog.LogErrorAndThrowException("Error loading " + Filename + "!");
 		}
-
-		std::streamsize Size{};
-
-		if (File.seekg(0, std::ios::end).good())
+		else
 		{
-			Size = File.tellg();
-		}
+			std::streamsize Size{};
 
-		if (File.seekg(0, std::ios::beg).good())
-		{
-			Size -= File.tellg();
-		}
+			if (File.seekg(0, std::ios::end).good())
+			{
+				Size = File.tellg();
+			}
 
-		std::vector<unsigned char> Buffer(static_cast<size_t>(Size));
-		std::vector<unsigned char> ImageData;
+			if (File.seekg(0, std::ios::beg).good())
+			{
+				Size -= File.tellg();
+			}
 
-		File.read(reinterpret_cast<char*>(Buffer.data()), Size);
+			std::vector<unsigned char> Buffer(static_cast<size_t>(Size));
+			std::vector<unsigned char> ImageData;
 
-		PNG Decoder;
-		Decoder.Decode(ImageData, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()), true);
-		SetTextureMetrics(Texture,Decoder.PNGInfo.Width, Decoder.PNGInfo.Height);
-		Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
+			File.read(reinterpret_cast<char*>(Buffer.data()), Size);
 
-		for (std::int_fast32_t Offset{}; Offset < Texture.Size; ++Offset)
-		{
-			Texture.Pixels[Offset] = RGBAtoINT(ImageData[Offset << 2], ImageData[(Offset << 2) + 1], ImageData[(Offset << 2) + 2], ImageData[(Offset << 2) + 3]);
+			PNG Decoder;
+			Decoder.Decode(ImageData, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()), true);
+			SetTextureMetrics(Texture, Decoder.PNGInfo.Width, Decoder.PNGInfo.Height);
+			Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
+
+			for (std::int_fast32_t Offset{}; Offset < Texture.Size; ++Offset)
+			{
+				Texture.Pixels[Offset] = RGBAtoINT(ImageData[Offset << 2], ImageData[(Offset << 2) + 1], ImageData[(Offset << 2) + 2], ImageData[(Offset << 2) + 3]);
+			}
 		}
 	}
 
