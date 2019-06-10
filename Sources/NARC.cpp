@@ -92,8 +92,6 @@ Game_MinimapClass HUDMinimap;
 Game_WeaponDisplayClass HUDWeaponDisplay;
 HID_GameControllerClass GameController;
 
-inline bool HUDEnabled{ true };
-
 std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
 	WindowInstance = hInstance;
@@ -137,160 +135,151 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 				break;
 			}
 
-			TranslateMessage(&Message);
 			DispatchMessage(&Message);
 		}
 
-		static SDL_Event Event{};
-
-		while (SDL_PollEvent(&Event) == 1)
+		if (GameControllerFlag)
 		{
-			switch (Event.type)
+			static SDL_Event Event{};
+
+			while (SDL_PollEvent(&Event) == 1)
 			{
-				case SDL_CONTROLLERAXISMOTION:
+				switch (Event.type)
 				{
-					if (Event.caxis.which == 0)
+					case SDL_CONTROLLERAXISMOTION:
 					{
-						switch (Event.caxis.axis)
+						if (Event.caxis.which == 0)
 						{
-							case SDL_CONTROLLER_AXIS_LEFTX:
+							switch (Event.caxis.axis)
 							{
-								if (Event.caxis.value < -GameController.JoystickDeadZone)
+								case SDL_CONTROLLER_AXIS_LEFTX:
 								{
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
+									if (Event.caxis.value < -GameController.JoystickDeadZone)
+									{
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
+									}
+									else if (Event.caxis.value > GameController.JoystickDeadZone)
+									{
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
+									}
+									else
+									{
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
+									}
+									break;
 								}
-								else if (Event.caxis.value > GameController.JoystickDeadZone)
+								case SDL_CONTROLLER_AXIS_LEFTY:
 								{
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
+									if (Event.caxis.value < -GameController.JoystickDeadZone)
+									{
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
+									}
+									else if (Event.caxis.value > GameController.JoystickDeadZone)
+									{
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
+									}
+									else
+									{
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
+										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
+									}
+									break;
 								}
-								else
+								case SDL_CONTROLLER_AXIS_RIGHTX:
 								{
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
+									GameController.RightStickValue = Event.caxis.value;
+
+									if (Event.caxis.value < -GameController.JoystickDeadZone)
+									{
+										GameController.RightStickPos.X = -1;
+									}
+									else if (Event.caxis.value > GameController.JoystickDeadZone)
+									{
+										GameController.RightStickPos.X = 1;
+									}
+									else
+									{
+										GameController.RightStickPos.X = 0;
+									}
+									break;
 								}
-								break;
+								case SDL_CONTROLLER_AXIS_RIGHTY:
+								{
+									if (Event.caxis.value < -GameController.JoystickDeadZone)
+									{
+										GameController.RightStickPos.Y = -1;
+									}
+									else if (Event.caxis.value > GameController.JoystickDeadZone)
+									{
+										GameController.RightStickPos.Y = 1;
+									}
+									else
+									{
+										GameController.RightStickPos.Y = 0;
+									}
+									break;
+								}
+								default: {}
 							}
-
-							case SDL_CONTROLLER_AXIS_LEFTY:
-							{
-								if (Event.caxis.value < -GameController.JoystickDeadZone)
-								{
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
-								}
-								else if (Event.caxis.value > GameController.JoystickDeadZone)
-								{
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
-								}
-								else
-								{
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
-									HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
-								}
-								break;
-							}
-
-							case SDL_CONTROLLER_AXIS_RIGHTX:
-							{
-								GameController.RightStickValue = Event.caxis.value;
-
-								if (Event.caxis.value < -GameController.JoystickDeadZone)
-								{
-									GameController.RightStickPos.X = -1;
-								}
-								else if (Event.caxis.value > GameController.JoystickDeadZone)
-								{
-									GameController.RightStickPos.X = 1;
-								}
-								else
-								{
-									GameController.RightStickPos.X = 0;
-								}
-								break;
-							}
-
-							case SDL_CONTROLLER_AXIS_RIGHTY:
-							{
-								if (Event.caxis.value < -GameController.JoystickDeadZone)
-								{
-									GameController.RightStickPos.Y = -1;
-								}
-								else if (Event.caxis.value > GameController.JoystickDeadZone)
-								{
-									GameController.RightStickPos.Y = 1;
-								}
-								else
-								{
-									GameController.RightStickPos.Y = 0;
-								}
-								break;
-							}
-
-							default:{}
 						}
+						break;
 					}
-					break;
-				}
 
-				case SDL_CONTROLLERBUTTONDOWN:
-				{
-					switch (Event.cbutton.button)
+					case SDL_CONTROLLERBUTTONDOWN:
 					{
-						case SDL_CONTROLLER_BUTTON_X:
+						switch (Event.cbutton.button)
 						{
-							Game_Doors::TriggerDoor();
-							break;
+							case SDL_CONTROLLER_BUTTON_X:
+							{
+								Game_Doors::TriggerDoor();
+								break;
+							}
+							case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+							{
+								Game_WeaponHandling::InitiateRapidFire();
+								break;
+							}
+							case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+							{
+								Game_WeaponHandling::InitiateSingleShot();
+								break;
+							}
+							case SDL_CONTROLLER_BUTTON_DPAD_UP:
+							{
+								Game_WeaponHandling::InitiateWeaponChangeUp();
+								break;
+							}
+							case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+							{
+								Game_WeaponHandling::InitiateWeaponChangeDown();
+								break;
+							}
+							case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+							{
+								Game_WeaponHandling::InitiateReload();
+								break;
+							}
+							default: {}
 						}
-
-						case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-						{
-							Game_WeaponHandling::InitiateRapidFire();
-							break;
-						}
-
-						case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-						{
-							Game_WeaponHandling::InitiateSingleShot();
-							break;
-						}
-
-						case SDL_CONTROLLER_BUTTON_DPAD_UP:
-						{
-							Game_WeaponHandling::InitiateWeaponChangeUp();
-							break;
-						}
-
-						case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-						{
-							Game_WeaponHandling::InitiateWeaponChangeDown();
-							break;
-						}
-
-						case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-						{
-							Game_WeaponHandling::InitiateReload();
-							break;
-						}
-
-						default:{}
+						break;
 					}
-					break;
-				}
 
-				case SDL_CONTROLLERBUTTONUP:
-				{
-					switch (Event.cbutton.button)
+					case SDL_CONTROLLERBUTTONUP:
 					{
-						case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+						switch (Event.cbutton.button)
 						{
-							Game_WeaponHandling::ReleaseRapidFire();
-							break;
+							case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+							{
+								Game_WeaponHandling::ReleaseRapidFire();
+								break;
+							}
+							default: {}
 						}
-						default:{}
+						break;
 					}
-					break;
+					default: {}
 				}
-
-				default:{}
 			}
 		}
 
@@ -364,7 +353,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			MainMenu.Show();
 		}
 
-		SwapBuffers(lwmf::WindowHandle);
+		lwmf::SwapBuffer();
 	}
 
 	Tools_Cleanup::DestroySubsystems();

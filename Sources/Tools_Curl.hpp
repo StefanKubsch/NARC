@@ -10,12 +10,10 @@
 #pragma once
 
 #define CURL_STATICLIB
-#define FMT_HEADER_ONLY
 
 #include <string>
 #include <cstdio>
 #include <curl.h>
-#include "fmt/format.h"
 
 namespace Tools_Curl
 {
@@ -75,7 +73,7 @@ namespace Tools_Curl
 	{
 		if (CURL* CurlInstance{ curl_easy_init() }; CurlInstance != nullptr && CheckInternetConnection())
 		{
-			NARCLog.AddEntry(fmt::format("Downloading file from URL via curl...\nSource: {}...", URL));
+			NARCLog.AddEntry("Downloading file from URL via curl...\nSource: " + URL + "...");
 
 			FILE* FileStream;
 

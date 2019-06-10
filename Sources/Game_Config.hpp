@@ -9,11 +9,8 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -74,7 +71,16 @@ namespace Game_Config
 					TextureSizeShiftFactor = 11;
 					break;
 				}
-
+				case 4096:
+				{
+					TextureSizeShiftFactor = 12;
+					break;
+				}
+				case 8192:
+				{
+					TextureSizeShiftFactor = 13;
+					break;
+				}
 				default:{}
 			}
 		}
@@ -86,7 +92,7 @@ namespace Game_Config
 
 		while (true)
 		{
-			if (Tools_ErrorHandling::CheckFolderExistence(fmt::format("./DATA/Level_{}", NumberOfLevels), ContinueOnError))
+			if (Tools_ErrorHandling::CheckFolderExistence("./DATA/Level_" + std::to_string(NumberOfLevels), ContinueOnError))
 			{
 				++NumberOfLevels;
 			}

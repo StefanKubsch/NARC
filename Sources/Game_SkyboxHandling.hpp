@@ -9,12 +9,9 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <cmath>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -51,7 +48,7 @@ namespace Game_SkyboxHandling
 
 	inline void LoadSkyboxImage()
 	{
-		if (const std::string INIFile{ fmt::format("./DATA/Level_{}/LevelData/SkyboxConfig.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/SkyboxConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			SkyBoxEnabled = Tools_INIFile::ReadValue<bool>(INIFile, "SKYBOX", "SkyBoxEnabled");
 

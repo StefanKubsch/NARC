@@ -11,7 +11,6 @@
 
 #include <string>
 
-#include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
 
@@ -46,6 +45,9 @@ namespace HID_Mouse
 			MouseSensitivityLowerLimit = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivityLowerLimit");
 			MouseSensitivityUpperLimit = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivityUpperLimit");
 			MouseSensitivityStep = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivityStep");
+
+			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_MOUSE);
+			ShowCursor(FALSE);
 		}
 	}
 

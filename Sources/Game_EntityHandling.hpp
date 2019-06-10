@@ -9,15 +9,12 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <random>
 #include <algorithm>
 #include <SDL_mixer.h>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -109,7 +106,7 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			if (const std::string INIFile{ fmt::format("./DATA/Level_{0}/EntityData/{1}.ini", SelectedLevel, Index) }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
+			if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(Index) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				EntityOrder.emplace_back();
 				EntityDistance.emplace_back();

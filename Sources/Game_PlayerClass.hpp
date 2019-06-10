@@ -9,13 +9,10 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <SDL_mixer.h>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -55,7 +52,7 @@ private:
 
 inline void Game_PlayerClass::InitConfig()
 {
-	if (const std::string INIFile{ fmt::format("./DATA/Level_{}/PlayerData/Config.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		MoveSpeed = Tools_INIFile::ReadValue<float>(INIFile, "GENERAL", "MoveSpeed");
 		Hitpoints = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "Hitpoints");
@@ -73,7 +70,7 @@ inline void Game_PlayerClass::InitAudio()
 	Sounds.clear();
 	Sounds.shrink_to_fit();
 
-	if (const std::string INIFile{ fmt::format("./DATA/Level_{}/PlayerData/Config.ini", SelectedLevel) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Get Footsteps audio
 		Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "FootStepsAudio")));

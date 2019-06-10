@@ -9,12 +9,9 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <SDL.h>
-#include "fmt/format.h"
 
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
@@ -39,20 +36,20 @@ inline void HID_GameControllerClass::Init()
 		JoystickDeadZone = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GAMECONTROLLER", "JoystickDeadZone");
 		Sensitivity = Tools_INIFile::ReadValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");
 		RotationXLimit = Tools_INIFile::ReadValue<float>(INIFile, "GAMECONTROLLER", "RotationXLimit");
-		const std::string GameControllerDBURL = Tools_INIFile::ReadValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBURL");
-		const std::string GameControllerDBFile = Tools_INIFile::ReadValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBFile");
+		const std::string GameControllerDBURL{ Tools_INIFile::ReadValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBURL") };
+		const std::string GameControllerDBFile{ Tools_INIFile::ReadValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBFile") };
 
 		Tools_Curl::FetchFileFromURL(GameControllerDBURL, GameControllerDBFile);
 
 		NARCLog.AddEntry("Searching and initializing gamecontroller...");
 
-		if (SDL_NumJoysticks() > 0 &&  SDL_IsGameController(0) == SDL_TRUE)
+		if (SDL_NumJoysticks() > 0 && SDL_IsGameController(0) == SDL_TRUE)
 		{
 			NARCLog.AddEntry("Found a valid gamecontroller: ");
 
 			if (SDL_GameController* Controller{ SDL_GameControllerOpen(0) }; Controller != nullptr)
 			{
-				NARCLog.AddEntry(fmt::format("{}", SDL_GameControllerName(Controller)));
+				NARCLog.AddEntry(std::string(SDL_GameControllerName(Controller)));
 
 				if (Tools_ErrorHandling::CheckFileExistence(GameControllerDBFile, StopOnError))
 				{
@@ -60,16 +57,15 @@ inline void HID_GameControllerClass::Init()
 
 					if (SDL_GameControllerAddMappingsFromFile(GameControllerDBFile.c_str()); SDL_GameControllerMapping(Controller) == nullptr)
 					{
-						NARCLog.LogErrorAndThrowException(fmt::format("No mapping for {} found.", SDL_GameControllerName(Controller)));
+						NARCLog.LogErrorAndThrowException("No mapping found for: " + std::string(SDL_GameControllerName(Controller)));
 					}
 
 					SDL_GameControllerEventState(SDL_ENABLE);
-					fmt::print("\n");
 				}
 			}
 			else
 			{
-				NARCLog.LogErrorAndThrowException(fmt::format("Gamecontroller init failed: {}", SDL_GetError()));
+				NARCLog.LogErrorAndThrowException("Gamecontroller init failed: " + std::string(SDL_GetError()));
 			}
 		}
 		else

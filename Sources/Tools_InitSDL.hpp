@@ -9,10 +9,7 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <SDL.h>
-#include "fmt/format.h"
 
 namespace Tools_InitSDL
 {
@@ -30,7 +27,7 @@ namespace Tools_InitSDL
 
 		if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0)
 		{
-			NARCLog.LogErrorAndThrowException(fmt::format("SDL init failed: {}", SDL_GetError()));
+			NARCLog.LogErrorAndThrowException("SDL init failed: " + std::string(SDL_GetError()));
 		}
 	}
 

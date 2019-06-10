@@ -9,13 +9,10 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <SDL_mixer.h>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -49,7 +46,7 @@ namespace Game_AssetHandling
 		{
 			bool SkipAssetFlag{};
 
-			if (const std::string EntityDataFile{ fmt::format("./DATA/Level_{0}/EntityData/{1}.ini", SelectedLevel, AssetFileIndex) }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
+			if (const std::string EntityDataFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(AssetFileIndex) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
 			{
 				const std::string AssetTypeName{ Tools_INIFile::ReadValue<std::string>(EntityDataFile, "ENTITY", "EntityTypeName") };
 
@@ -63,7 +60,7 @@ namespace Game_AssetHandling
 					}
 				}
 
-				if (const std::string INIFile{ fmt::format("./DATA/Assets/{}/AssetData.ini", AssetTypeName) }; !SkipAssetFlag && Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+				if (const std::string INIFile{ "./DATA/Assets/" + AssetTypeName + "/AssetData.ini" }; !SkipAssetFlag && Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 				{
 					EntityAssets.emplace_back();
 					EntityAssets[AssetIndex].Number = AssetIndex;
@@ -113,7 +110,7 @@ namespace Game_AssetHandling
 
 		while (true)
 		{
-			if (const std::string Path{ fmt::format("./GFX/Entities/{0}/{1}/{2}", EntitySize, AssetTypeName, DirectionIndex) }; Tools_ErrorHandling::CheckFolderExistence(Path, ContinueOnError))
+			if (const std::string Path{ "./GFX/Entities/" + std::to_string(EntitySize) + "/" + AssetTypeName + "/" + std::to_string(DirectionIndex) }; Tools_ErrorHandling::CheckFolderExistence(Path, ContinueOnError))
 			{
 				EntityAssets[AssetIndex].WalkingTextures.emplace_back();
 
@@ -121,7 +118,7 @@ namespace Game_AssetHandling
 
 				while (true)
 				{
-					if (const std::string Texture{ fmt::format("{0}/{1}.png", Path, TextureIndex) }; Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
+					if (const std::string Texture{ Path + "/" + std::to_string(TextureIndex) + ".png" }; Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
 					{
 						EntityAssets[AssetIndex].WalkingTextures[DirectionIndex].emplace_back(GFX_ImageHandling::ImportTexture(Texture, EntitySize));
 						++TextureIndex;
@@ -147,7 +144,7 @@ namespace Game_AssetHandling
 
 		while (true)
 		{
-			if (const std::string Texture{ fmt::format("./GFX/Entities/{0}/{1}/{2}/{3}.png", EntitySize, AssetTypeName, AnimType, TextureIndex) }; Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
+			if (const std::string Texture{ "./GFX/Entities/" + std::to_string(EntitySize) + "/" + AssetTypeName + "/" + AnimType + "/" + std::to_string(TextureIndex) +".png" }; Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
 			{
 				AnimVector.emplace_back(GFX_ImageHandling::ImportTexture(Texture, EntitySize));
 				++TextureIndex;

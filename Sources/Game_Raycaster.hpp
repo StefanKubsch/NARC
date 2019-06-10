@@ -78,7 +78,6 @@ namespace Game_Raycaster
 				Start = ScreenTexture.WidthMid;
 				break;
 			}
-
 			default: {}
 		}
 

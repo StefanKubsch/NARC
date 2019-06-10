@@ -26,6 +26,7 @@ namespace lwmf
 	void CreateOpenGLWindow(HINSTANCE hInstance, TextureStruct& RenderTarget, std::int_fast32_t Width, std::int_fast32_t Height, LPCSTR WindowName, bool Fullscreen);
 	void ResizeOpenGLWindow(TextureStruct& RenderTarget);
 	void ClearBuffer();
+	void SwapBuffer();
 	void DeleteOpenGLContext();
 
 	//
@@ -162,6 +163,11 @@ namespace lwmf
 	{
 		glColor4f(0.0F, 0.0F, 0.0F, 0.0F);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	inline void SwapBuffer()
+	{
+		SwapBuffers(WindowHandle);
 	}
 
 	inline void DeleteOpenGLContext()

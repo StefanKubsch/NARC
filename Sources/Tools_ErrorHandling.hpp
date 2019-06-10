@@ -9,13 +9,10 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <fstream>
 #include <sys/stat.h>
-#include "fmt/format.h"
 
 static constexpr bool ContinueOnError{ true };
 static constexpr bool StopOnError{};
@@ -34,7 +31,7 @@ namespace Tools_ErrorHandling
 
 	inline bool CheckFileExistence(const std::string& FileName, const bool ActionFlag)
 	{
-		NARCLog.AddEntry(fmt::format("Checking for file existence {}...", FileName));
+		NARCLog.AddEntry("Checking for file existence " + FileName + "...");
 
 		bool Result{ true };
 
@@ -55,7 +52,7 @@ namespace Tools_ErrorHandling
 
 	inline bool CheckFolderExistence(const std::string& FolderName, const bool ActionFlag)
 	{
-		NARCLog.AddEntry(fmt::format("Checking for folder existence {}...", FolderName));
+		NARCLog.AddEntry("Checking for folder existence " + FolderName + "...");
 
 		bool Result{ true };
 
@@ -87,7 +84,7 @@ namespace Tools_ErrorHandling
 		{
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.LogErrorAndThrowException(fmt::format("ERROR! TextureSize is {0}*{1} pixel!", Width, Height));
+				NARCLog.LogErrorAndThrowException("ERROR! TextureSize is " + std::to_string(Width) + "*" + std::to_string(Height) + " pixel!");
 			}
 			else
 			{

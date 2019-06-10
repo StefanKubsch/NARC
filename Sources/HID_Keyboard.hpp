@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <string>
 #include <map>
-#include <SDL.h>
 
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
@@ -22,7 +21,7 @@ namespace HID_Keyboard
 
 
 	void Init();
-	bool WaitForKeypress();
+	bool WaitForKeypress(char Key);
 	bool GetKeyState(char Key);
 	void SetKeyState(char Key, bool State);
 
@@ -63,20 +62,18 @@ namespace HID_Keyboard
 			DecreaseMouseSensitivityKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "DecreaseMouseSensitivityKey");
 			SelectNextLevelKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SelectNextLevelKey");
 			SwitchLightingKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SwitchLightingKey");
+
+			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_KEYBOARD);
 		}
 	}
 
-	inline bool WaitForKeypress()
+	inline bool WaitForKeypress(const char Key)
 	{
-		SDL_Event Event;
 		bool Result{};
-
-		// Clear events that may be in line...
-		SDL_PollEvent(&Event);
 
 		while (!Result)
 		{
-			if (SDL_WaitEvent(&Event) == 1 && (Event.type == SDL_KEYDOWN || Event.type == SDL_MOUSEBUTTONDOWN || Event.type == SDL_CONTROLLERBUTTONDOWN))
+			if (GetAsyncKeyState(Key) != 0)
 			{
 				Result = true;
 			}

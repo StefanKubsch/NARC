@@ -9,11 +9,8 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <string>
 #include <SDL_mixer.h>
-#include "fmt/format.h"
 
 #include "Tools_ErrorHandling.hpp"
 #include "Tools_INIFile.hpp"
@@ -43,12 +40,12 @@ namespace SFX_SDL
 
 			if (constexpr std::int_fast32_t Flags{ MIX_INIT_OGG }; (Mix_Init(Flags) & Flags) != Flags)
 			{
-				NARCLog.LogErrorAndThrowException(fmt::format("SDL audio support init failed: {}", SDL_GetError()));
+				NARCLog.LogErrorAndThrowException("SDL audio support init failed: " + std::string(SDL_GetError()));
 			}
 
 			if (Mix_OpenAudio(Samplerate, MIX_DEFAULT_FORMAT, StereoChannels, ChunkSize) != 0)
 			{
-				NARCLog.LogErrorAndThrowException(fmt::format("SDL mixer init failed: {}", SDL_GetError()));
+				NARCLog.LogErrorAndThrowException("SDL mixer init failed: " + std::string(SDL_GetError()));
 			}
 			else
 			{

@@ -52,6 +52,7 @@ inline std::uint_fast32_t FrameLock{};
 inline bool GamePausedFlag{};
 inline bool GameControllerFlag{};
 inline bool QuitGameFlag{};
+inline bool HUDEnabled{ true };
 
 // Random Number Generator
 // C++ 11 Mersenne-Twister-Engine

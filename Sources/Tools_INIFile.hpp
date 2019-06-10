@@ -9,15 +9,12 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <regex>
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "fmt/format.h"
 
 namespace Tools_INIFile
 {
@@ -33,7 +30,7 @@ namespace Tools_INIFile
 
 	template<typename T>T ReadValue(const std::string& INIFileName, const std::string& Section, const std::string& Key)
 	{
-		NARCLog.AddEntry(fmt::format("Reading value from INI file [{0}] / {1} ...", Section, Key));
+		NARCLog.AddEntry("Reading value from INI file [" + Section + "] / " + Key + "...");
 
 		static const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
 		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
@@ -71,7 +68,7 @@ namespace Tools_INIFile
 
 		if (!ValueFound)
 		{
-			NARCLog.LogErrorAndThrowException(fmt::format("Value [{0}] / {1} not found!", Section, Key));
+			NARCLog.LogErrorAndThrowException("Value [" + Section + "] / " + Key + " not found!");
 		}
 
 		return OutputVar;
@@ -81,10 +78,7 @@ namespace Tools_INIFile
 	{
 		if (Tools_ErrorHandling::CheckFileExistence(INIFileName, HideMessage, StopOnError))
 		{
-			if (Debug)
-			{
-				NARCLog.AddEntry(fmt::format("Writing value to INI file [{0}] / {1} : {2}", Section, Key, Value));
-			}
+			NARCLog.AddEntry("Writing value to INI file [" + Section + "] / " + Key);
 
 			// Read INI file into vector of strings
 
@@ -119,10 +113,10 @@ namespace Tools_INIFile
 				}
 				else if (std::regex_search(Line, Match, ValueTest) && (CurrentSection == Section && Match[1] == Key))
 				{
-					Line = fmt::format("{0}={1}", Key, Value);
+					Line << Key << "=" << Value << "\n";
 				}
 
-				OutputINIFile << fmt::format("{}\n", Line);
+				OutputINIFile << Line;
 			}
 
 			OutputINIFile.close();

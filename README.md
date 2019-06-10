@@ -70,7 +70,6 @@ The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textu
   - SDL_Mixer 2.0.4 for audio handling (https://www.libsdl.org/projects/SDL_mixer/)
   - stb_truetype.h 1.21 for TrueType font rendering (https://github.com/nothings/stb)
   - libcurl 7.65.1 for internet handling (https://curl.haxx.se/libcurl/, see documentation in Docfolder!)
-  - {fmt} 5.3.0 for printing and formatting strings etc. (https://github.com/fmtlib/fmt)
   
 **Controls (configurable):**
   

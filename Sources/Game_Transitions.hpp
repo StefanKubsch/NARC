@@ -9,12 +9,9 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <chrono>
 #include <string>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_INIFile.hpp"
@@ -52,14 +49,14 @@ namespace Game_Transitions
 
 	inline void LevelTransition()
 	{
-		const std::string NextLevelText{ fmt::format("...loading level number {}...", SelectedLevel) };
-		NARCLog.AddEntry(fmt::format("\n{}\n\n", NextLevelText));
+		const std::string NextLevelText{ "...loading level number " + std::to_string(SelectedLevel) + "..." };
+		NARCLog.AddEntry("\n" + NextLevelText + "\n\n");
 
 		lwmf::ClearBuffer();
 		lwmf::ClearTexture(ScreenTexture, 0);
 		GeneralText.RenderTextCentered(NextLevelText, ScreenTexture.Height - GeneralText.FontHeight - 50);
 		ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
-		SwapBuffers(lwmf::WindowHandle);
+		lwmf::SwapBuffer();
 	}
 
 	inline void FizzleFade(const std::int_fast32_t FadeColor, const std::int_fast32_t Speed)
@@ -122,7 +119,7 @@ namespace Game_Transitions
 
 			lwmf::ClearBuffer();
 			ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
-			SwapBuffers(lwmf::WindowHandle);
+			lwmf::SwapBuffer();
 		}
 	}
 
@@ -131,11 +128,11 @@ namespace Game_Transitions
 		FizzleFade(0xFF0000FF, 50);
 
 		GameOverText.RenderTextCentered("You are dead. Game over...", ScreenTexture.HeightMid - (GameOverText.FontHeight >> 1));
-		GameOverText1.RenderTextCentered("Press any key to continue", ScreenTexture.Height - GameOverText1.FontHeight - 50);
+		GameOverText1.RenderTextCentered("Press [SPACE] to continue", ScreenTexture.Height - GameOverText1.FontHeight - 50);
 
-		SwapBuffers(lwmf::WindowHandle);
+		lwmf::SwapBuffer();
 
-		if (HID_Keyboard::WaitForKeypress())
+		if (HID_Keyboard::WaitForKeypress(VK_SPACE))
 		{
 			GamePausedFlag = true;
 			lwmf::ClearTexture(ScreenTexture, 0);

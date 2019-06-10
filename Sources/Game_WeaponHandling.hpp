@@ -9,13 +9,10 @@
 
 #pragma once
 
-#define FMT_HEADER_ONLY
-
 #include <cstdint>
 #include <string>
 #include <fstream>
 #include <SDL_mixer.h>
-#include "fmt/format.h"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -102,7 +99,7 @@ namespace Game_WeaponHandling
 
 		while (true)
 		{
-			if (const std::string IniFile{ fmt::format("./DATA/Weapons/Weapon_{}_Data.ini", Index) }; Tools_ErrorHandling::CheckFileExistence(IniFile, ContinueOnError))
+			if (const std::string IniFile{ "./DATA/Weapons/Weapon_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(IniFile, ContinueOnError))
 			{
 				Weapons.emplace_back();
 
@@ -132,8 +129,8 @@ namespace Game_WeaponHandling
 
 				// Initial built of ammo info HUD strings
 
-				Weapons[Index].HUDAmmoInfo = fmt::format("{0}/{0}", Weapons[Index].Capacity);
-				Weapons[Index].HUDCarriedAmmoInfo = fmt::format("Carried:{}", Weapons[Index].CarriedAmmo);
+				Weapons[Index].HUDAmmoInfo = std::to_string(Weapons[Index].Capacity) + "/" + std::to_string(Weapons[Index].Capacity);
+				Weapons[Index].HUDCarriedAmmoInfo = "Carried:" + std::to_string(Weapons[Index].CarriedAmmo);
 
 				Weapons[Index].WeaponShader.LoadShader("Default", ScreenTexture);
 				Weapons[Index].MuzzleFlashShader.LoadShader("Default", ScreenTexture);
@@ -158,7 +155,7 @@ namespace Game_WeaponHandling
 		for (auto&& Weapon : Weapons)
 		{
 			// Weapon textures
-			if (const std::string WeaponTextureDataConfFile{ fmt::format("./DATA/Weapons/Weapon_{}_TexturesData.conf", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
+			if (const std::string WeaponTextureDataConfFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
 			{
 				std::ifstream WeaponTexturesData(WeaponTextureDataConfFile);
 				std::string Line;
@@ -175,7 +172,7 @@ namespace Game_WeaponHandling
 			}
 
 			// Muzzle flash
-			if (const std::string MuzzleFlashTextureDataConfFile{ fmt::format("./DATA/Weapons/Weapon_{}_MuzzleFlashTexturesData.conf", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
+			if (const std::string MuzzleFlashTextureDataConfFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_MuzzleFlashTexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
 			{
 				std::ifstream MuzzleFlashTextureData(MuzzleFlashTextureDataConfFile);
 				std::string Line;
@@ -200,7 +197,7 @@ namespace Game_WeaponHandling
 			Weapon.Sounds.clear();
 			Weapon.Sounds.shrink_to_fit();
 
-			if (const std::string INIFile{ fmt::format("./DATA/Weapons/Weapon_{}_Data.ini", Weapon.Number) }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+			if (const std::string INIFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				// Get SingleShot Audio (Index = 0)
 				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "SingleShotAudio")));
@@ -312,7 +309,7 @@ namespace Game_WeaponHandling
 						if (const auto WP{ Entity.ContainedItem.find(Weapon.Name) }; Weapon.Name == WP->first)
 						{
 							Weapon.CarriedAmmo += WP->second;
-							Weapon.HUDCarriedAmmoInfo = fmt::format("Carried:{}", Weapon.CarriedAmmo);
+							Weapon.HUDCarriedAmmoInfo = "Carried:" + std::to_string(Weapon.CarriedAmmo);
 						}
 					}
 				}
@@ -399,8 +396,8 @@ namespace Game_WeaponHandling
 		}
 
 		// Build ammo info HUD string
-		Weapons[Player.SelectedWeapon].LoadedRounds < 10 ? Weapons[Player.SelectedWeapon].HUDAmmoInfo = fmt::format("0{0}/{1}", Weapons[Player.SelectedWeapon].LoadedRounds, Weapons[Player.SelectedWeapon].Capacity) :
-			Weapons[Player.SelectedWeapon].HUDAmmoInfo = fmt::format("{0}/{1}", Weapons[Player.SelectedWeapon].LoadedRounds, Weapons[Player.SelectedWeapon].Capacity);
+		Weapons[Player.SelectedWeapon].LoadedRounds < 10 ? Weapons[Player.SelectedWeapon].HUDAmmoInfo = "0" + std::to_string(Weapons[Player.SelectedWeapon].LoadedRounds) + "/" + std::to_string(Weapons[Player.SelectedWeapon].Capacity) :
+			Weapons[Player.SelectedWeapon].HUDAmmoInfo = std::to_string(Weapons[Player.SelectedWeapon].LoadedRounds) + "/" + std::to_string(Weapons[Player.SelectedWeapon].Capacity);
 
 		if (CurrentFiringState == FiringState::SingleShot)
 		{
@@ -433,8 +430,8 @@ namespace Game_WeaponHandling
 					Weapons[Player.SelectedWeapon].CarriedAmmo = 0;
 				}
 
-				Weapons[Player.SelectedWeapon].HUDAmmoInfo = fmt::format("{0}/{1}", Weapons[Player.SelectedWeapon].LoadedRounds, Weapons[Player.SelectedWeapon].Capacity);
-				Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo = fmt::format("Carried: {}", Weapons[Player.SelectedWeapon].CarriedAmmo);
+				Weapons[Player.SelectedWeapon].HUDAmmoInfo = std::to_string(Weapons[Player.SelectedWeapon].LoadedRounds) + "/" + std::to_string(Weapons[Player.SelectedWeapon].Capacity);
+				Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo = "Carried:" + std::to_string(Weapons[Player.SelectedWeapon].CarriedAmmo);
 
 				// Reloading is finished
 				CurrentWeaponState = WeaponState::Ready;
