@@ -13,7 +13,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 
 namespace GFX_Window
 {
@@ -32,9 +31,9 @@ namespace GFX_Window
 			// Create fullscreen if VSync = true, otherwise a window
 			lwmf::CreateOpenGLWindow(WindowInstance,
 				ScreenTexture,
-				Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
-				Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
-				Tools_INIFile::ReadValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), VSync);
+				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
+				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
+				lwmf::ReadINIValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), VSync);
 
 			VSync ?	lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 

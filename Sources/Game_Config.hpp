@@ -14,7 +14,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 
 namespace Game_Config
 {
@@ -31,9 +30,9 @@ namespace Game_Config
 	{
 		if (const std::string INIFile{ "./DATA/GameConfig/GameConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			TextureSize = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "TEXTURES", "TextureSize");
-			EntitySize = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
-			FrameLock = Tools_INIFile::ReadValue<std::uint_fast32_t>(INIFile, "GENERAL", "FrameLock");
+			TextureSize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "TextureSize");
+			EntitySize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
+			FrameLock = lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GENERAL", "FrameLock");
 
 			// Factor for bitwise texture operations
 			TextureSizeBitwiseAnd = TextureSize - 1;

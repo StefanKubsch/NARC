@@ -21,9 +21,6 @@
     <ClInclude Include="Sources\HID_Mouse.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Tools_INIFile.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Tools_ErrorHandling.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -93,9 +90,6 @@
     <ClInclude Include="Sources\Game_PathFinding.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\GFX_Shading.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\GFX_ImageHandling.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -103,9 +97,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Sources\GFX_TextClass.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Tools_SIMD.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Tools_Console.hpp">

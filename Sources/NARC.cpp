@@ -37,14 +37,11 @@ inline lwmf::TextureStruct ScreenTexture;
 inline lwmf::ShaderClass ScreenTextureShader;
 
 #include "Game_GlobalDefinitions.hpp"
-#include "Tools_SIMD.hpp"
 #include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "Tools_Curl.hpp"
 #include "Tools_InitSDL.hpp"
 #include "GFX_ImageHandling.hpp"
-#include "GFX_Shading.hpp"
 #include "GFX_Window.hpp"
 #include "GFX_TextClass.hpp"
 #include "GFX_LightingClass.hpp"
@@ -575,7 +572,7 @@ void InitAndLoadGameConfig()
 	Game_Config::GatherNumberOfLevels();
 	Game_PreGame::ShowIntroHeader();
 	Game_PreGame::SetOptions();
-	Tools_SIMD::CheckForSSESupport();
+	lwmf::CheckForSSESupport();
 	Game_Config::Init();
 	Game_Raycaster::Init();
 	Tools_Curl::Init();

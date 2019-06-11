@@ -13,7 +13,6 @@
 #include <string>
 
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "Game_DataStructures.hpp"
 #include "Game_LevelHandling.hpp"
 #include "Game_EntityHandling.hpp"
@@ -43,14 +42,14 @@ inline void Game_MinimapClass::Init()
 {
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDMinimapConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		Pos.X = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX");
-		Pos.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY");
-		PlayerColor = Tools_INIFile::GetRGBColor(INIFile, "PLAYER");
-		EnemyColor = Tools_INIFile::GetRGBColor(INIFile, "ENEMY");
-		NeutralColor = Tools_INIFile::GetRGBColor(INIFile, "NEUTRAL");
-		AmmoBoxColor = Tools_INIFile::GetRGBColor(INIFile, "AMMO");
-		WallColor = Tools_INIFile::GetRGBColor(INIFile, "WALLS");
-		DoorColor = Tools_INIFile::GetRGBColor(INIFile, "DOORS");
+		Pos.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX");
+		Pos.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY");
+		PlayerColor = lwmf::ReadINIValueRGBA(INIFile, "PLAYER");
+		EnemyColor = lwmf::ReadINIValueRGBA(INIFile, "ENEMY");
+		NeutralColor = lwmf::ReadINIValueRGBA(INIFile, "NEUTRAL");
+		AmmoBoxColor = lwmf::ReadINIValueRGBA(INIFile, "AMMO");
+		WallColor = lwmf::ReadINIValueRGBA(INIFile, "WALLS");
+		DoorColor = lwmf::ReadINIValueRGBA(INIFile, "DOORS");
 	}
 }
 

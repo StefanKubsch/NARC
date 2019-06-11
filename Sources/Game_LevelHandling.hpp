@@ -18,7 +18,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "GFX_LightingClass.hpp"
 
@@ -71,7 +70,7 @@ namespace Game_LevelHandling
 	{
 		if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			LightingFlag = Tools_INIFile::ReadValue<bool>(INIFile, "GENERAL", "Lighting");
+			LightingFlag = lwmf::ReadINIValue<bool>(INIFile, "GENERAL", "Lighting");
 		}
 	}
 
@@ -171,11 +170,11 @@ namespace Game_LevelHandling
 	{
 		if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			BackgroundMusicEnabled = Tools_INIFile::ReadValue<bool>(INIFile, "AUDIO", "BackgroundMusicEnabled");
+			BackgroundMusicEnabled = lwmf::ReadINIValue<bool>(INIFile, "AUDIO", "BackgroundMusicEnabled");
 
 			if (BackgroundMusicEnabled)
 			{
-				if (const std::string AudioFileName{ Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
+				if (const std::string AudioFileName{ lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
 				{
 					BackgroundMusic = Mix_LoadMUS(AudioFileName.c_str());
 				}

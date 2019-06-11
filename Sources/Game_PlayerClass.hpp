@@ -16,7 +16,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "SFX_SDL.hpp"
 
 class Game_PlayerClass final
@@ -54,14 +53,14 @@ inline void Game_PlayerClass::InitConfig()
 {
 	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		MoveSpeed = Tools_INIFile::ReadValue<float>(INIFile, "GENERAL", "MoveSpeed");
-		Hitpoints = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "Hitpoints");
-		CollisionDetectionFactor = MoveSpeed + Tools_INIFile::ReadValue<float>(INIFile, "GENERAL", "CollisionDetectionWallDist");
-		Pos.X = Tools_INIFile::ReadValue<float>(INIFile, "POSITION", "PosX");
-		Pos.Y = Tools_INIFile::ReadValue<float>(INIFile, "POSITION", "PosY");
-		Dir.X = Tools_INIFile::ReadValue<float>(INIFile, "POSITION", "DirX");
-		Dir.Y = Tools_INIFile::ReadValue<float>(INIFile, "POSITION", "DirY");
-		SelectedWeapon = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "WEAPON", "SelectedWeapon");
+		MoveSpeed = lwmf::ReadINIValue<float>(INIFile, "GENERAL", "MoveSpeed");
+		Hitpoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "Hitpoints");
+		CollisionDetectionFactor = MoveSpeed + lwmf::ReadINIValue<float>(INIFile, "GENERAL", "CollisionDetectionWallDist");
+		Pos.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosX");
+		Pos.Y = lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosY");
+		Dir.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "DirX");
+		Dir.Y = lwmf::ReadINIValue<float>(INIFile, "POSITION", "DirY");
+		SelectedWeapon = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WEAPON", "SelectedWeapon");
 	}
 }
 
@@ -73,14 +72,14 @@ inline void Game_PlayerClass::InitAudio()
 	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Get Footsteps audio
-		Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "FootStepsAudio")));
+		Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio")));
 		FootStepsAudioChannel = 0;
 
 		// Get Hurt audio
-		Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "HurtAudio")));
+		Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio")));
 
 		// Get DeathScream audio
-		Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio")));
+		Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio")));
 	}
 }
 

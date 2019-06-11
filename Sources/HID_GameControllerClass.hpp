@@ -14,7 +14,6 @@
 #include <SDL.h>
 
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "Tools_Curl.hpp"
 
 class HID_GameControllerClass final
@@ -33,11 +32,11 @@ inline void HID_GameControllerClass::Init()
 {
 	if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		JoystickDeadZone = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GAMECONTROLLER", "JoystickDeadZone");
-		Sensitivity = Tools_INIFile::ReadValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");
-		RotationXLimit = Tools_INIFile::ReadValue<float>(INIFile, "GAMECONTROLLER", "RotationXLimit");
-		const std::string GameControllerDBURL{ Tools_INIFile::ReadValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBURL") };
-		const std::string GameControllerDBFile{ Tools_INIFile::ReadValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBFile") };
+		JoystickDeadZone = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GAMECONTROLLER", "JoystickDeadZone");
+		Sensitivity = lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");
+		RotationXLimit = lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "RotationXLimit");
+		const std::string GameControllerDBURL{ lwmf::ReadINIValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBURL") };
+		const std::string GameControllerDBFile{ lwmf::ReadINIValue <std::string>(INIFile, "GAMECONTROLLER", "GameControllerDBFile") };
 
 		Tools_Curl::FetchFileFromURL(GameControllerDBURL, GameControllerDBFile);
 

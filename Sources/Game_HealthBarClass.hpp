@@ -14,7 +14,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "Game_PlayerClass.hpp"
 #include "Game_DataStructures.hpp"
 
@@ -44,16 +43,16 @@ inline void Game_HealthBarClass::Init()
 {
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDHealthBarConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		Pos.X = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX");
-		Pos.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY");
-		HealthBarWidth = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "HealthBarWidth");
-		const std::int_fast32_t HealthBarLength{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "HealthBarLength") };
+		Pos.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX");
+		Pos.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY");
+		HealthBarWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "HealthBarWidth");
+		const std::int_fast32_t HealthBarLength{ lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "HealthBarLength") };
 		HealthBarFactor = HealthBarLength / 100;
 
-		Green = Tools_INIFile::GetRGBColor(INIFile, "GREEN");
-		Red = Tools_INIFile::GetRGBColor(INIFile, "RED");
-		Orange = Tools_INIFile::GetRGBColor(INIFile, "ORANGE");
-		Black = Tools_INIFile::GetRGBColor(INIFile, "BLACK");
+		Green = lwmf::ReadINIValueRGBA(INIFile, "GREEN");
+		Red = lwmf::ReadINIValueRGBA(INIFile, "RED");
+		Orange = lwmf::ReadINIValueRGBA(INIFile, "ORANGE");
+		Black = lwmf::ReadINIValueRGBA(INIFile, "BLACK");
 
 		RectRed = { Pos.X, Pos.Y, HealthBarLength, HealthBarWidth };
 		RectOrange = { Pos.X - 3, Pos.Y - 3, HealthBarLength + 6, HealthBarWidth + 6 };

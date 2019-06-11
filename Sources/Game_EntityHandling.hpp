@@ -18,7 +18,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "GFX_Shading.hpp"
 #include "Game_DataStructures.hpp"
 #include "Game_LevelHandling.hpp"
 #include "Game_PathFinding.hpp"
@@ -112,9 +111,9 @@ namespace Game_EntityHandling
 				EntityDistance.emplace_back();
 				Entities.emplace_back();
 				Entities[Index].Number = Index;
-				Entities[Index].TypeName = Tools_INIFile::ReadValue<std::string>(INIFile, "ENTITY", "EntityTypeName");
+				Entities[Index].TypeName = lwmf::ReadINIValue<std::string>(INIFile, "ENTITY", "EntityTypeName");
 
-				if (const std::string EntityTypeString{ Tools_INIFile::ReadValue<std::string>(INIFile, "ENTITY", "EntityType") }; EntityTypeString == "Neutral")
+				if (const std::string EntityTypeString{ lwmf::ReadINIValue<std::string>(INIFile, "ENTITY", "EntityType") }; EntityTypeString == "Neutral")
 				{
 					Entities[Index].Type = static_cast<std::int_fast32_t>(EntityTypes::Neutral);
 				}
@@ -131,23 +130,23 @@ namespace Game_EntityHandling
 					Entities[Index].Type = static_cast<std::int_fast32_t>(EntityTypes::Turret);
 				}
 
-				Entities[Index].WalkAnimStepWidth = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "ENTITY", "WalkAnimStepWidth");
-				Entities[Index].AttackAnimStepWidth = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "ENTITY", "AttackAnimStepWidth");
-				Entities[Index].MoveV = Tools_INIFile::ReadValue<float>(INIFile, "ENTITY", "EntityMoveV");
-				Entities[Index].MoveSpeed = Tools_INIFile::ReadValue<float>(INIFile, "MOVEMENT", "MoveSpeed");
-				Entities[Index].MovementBehaviour = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "MOVEMENT", "MovementBehaviour");
-				Entities[Index].AttackMode = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "MOVEMENT", "AttackMode");
-				Entities[Index].Pos.X = Tools_INIFile::ReadValue<float>(INIFile, "POSITION", "StartPosX");
-				Entities[Index].Pos.Y = Tools_INIFile::ReadValue<float>(INIFile, "POSITION", "StartPosY");
-				Entities[Index].Dir.X = Tools_INIFile::ReadValue<float>(INIFile, "DIRECTION", "DirX");
-				Entities[Index].Dir.Y = Tools_INIFile::ReadValue<float>(INIFile, "DIRECTION", "DirY");
-				Entities[Index].Direction = Tools_INIFile::ReadValue<char>(INIFile, "DIRECTION", "Direction");
-				Entities[Index].RotationFactor = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "DIRECTION", "RotationFactor");
-				Entities[Index].Hitpoints = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "STATUS", "Hitpoints");
-				Entities[Index].HitAnimDuration = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "STATUS", "HitAnimDuration");
-				Entities[Index].DamagePoints = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "DAMAGE", "DamagePoints");
-				Entities[Index].DamageHitrate = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "DAMAGE", "DamageHitrate");
-				Entities[Index].ContainedItem[Tools_INIFile::ReadValue<std::string>(INIFile, "CONTAINS", "ContainedItem")] = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "CONTAINS", "ContainedItemValue");
+				Entities[Index].WalkAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "WalkAnimStepWidth");
+				Entities[Index].AttackAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "AttackAnimStepWidth");
+				Entities[Index].MoveV = lwmf::ReadINIValue<float>(INIFile, "ENTITY", "EntityMoveV");
+				Entities[Index].MoveSpeed = lwmf::ReadINIValue<float>(INIFile, "MOVEMENT", "MoveSpeed");
+				Entities[Index].MovementBehaviour = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MOVEMENT", "MovementBehaviour");
+				Entities[Index].AttackMode = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MOVEMENT", "AttackMode");
+				Entities[Index].Pos.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosX");
+				Entities[Index].Pos.Y = lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosY");
+				Entities[Index].Dir.X = lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirX");
+				Entities[Index].Dir.Y = lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirY");
+				Entities[Index].Direction = lwmf::ReadINIValue<char>(INIFile, "DIRECTION", "Direction");
+				Entities[Index].RotationFactor = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DIRECTION", "RotationFactor");
+				Entities[Index].Hitpoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "STATUS", "Hitpoints");
+				Entities[Index].HitAnimDuration = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "STATUS", "HitAnimDuration");
+				Entities[Index].DamagePoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DAMAGE", "DamagePoints");
+				Entities[Index].DamageHitrate = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DAMAGE", "DamageHitrate");
+				Entities[Index].ContainedItem[lwmf::ReadINIValue<std::string>(INIFile, "CONTAINS", "ContainedItem")] = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "CONTAINS", "ContainedItemValue");
 
 				// Assign proper asset data (= texture set) to entity
 				for (const auto& Asset : EntityAssets)
@@ -209,7 +208,7 @@ namespace Game_EntityHandling
 							if ((Color & lwmf::AMask) != 0)
 							{
 								Entities[EntityOrder[Index]].IsHit ? lwmf::SetPixel(ScreenTexture, x, y, Color | 0xFFFFFF00) :
-									(Game_LevelHandling::LightingFlag ? lwmf::SetPixel(ScreenTexture, x, y, GFX_Shading::ShadeColor(Color, TransY, FogOfWarDistance)) : lwmf::SetPixel(ScreenTexture, x, y, Color));
+									(Game_LevelHandling::LightingFlag ? lwmf::SetPixel(ScreenTexture, x, y, lwmf::ShadeColor(Color, TransY, FogOfWarDistance)) : lwmf::SetPixel(ScreenTexture, x, y, Color));
 							}
 						}
 					}

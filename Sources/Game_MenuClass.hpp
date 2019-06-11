@@ -17,7 +17,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "GFX_TextClass.hpp"
 
 class Game_MenuClass final
@@ -57,8 +56,8 @@ inline void Game_MenuClass::Init()
 {
 	if (const std::string INIFile{ "./DATA/GameConfig/MenuConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		Pos.X = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosX");
-		Pos.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosY");
+		Pos.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosX");
+		Pos.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosY");
 		Text.InitFont("./DATA/GameConfig/MenuConfig.ini", "MENUFONT");
 		TextHighlight.InitFont("./DATA/GameConfig/MenuConfig.ini", "MENUFONTHIGHLIGHT");
 	}

@@ -15,7 +15,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "GFX_ImageHandling.hpp"
 
 namespace Game_SkyboxHandling
@@ -50,11 +49,11 @@ namespace Game_SkyboxHandling
 	{
 		if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/SkyboxConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			SkyBoxEnabled = Tools_INIFile::ReadValue<bool>(INIFile, "SKYBOX", "SkyBoxEnabled");
+			SkyBoxEnabled = lwmf::ReadINIValue<bool>(INIFile, "SKYBOX", "SkyBoxEnabled");
 
 			if (SkyBoxEnabled)
 			{
-				const lwmf::TextureStruct TempTexture { GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "SKYBOX", "SkyBoxImageName"))	};
+				const lwmf::TextureStruct TempTexture { GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "SKYBOX", "SkyBoxImageName"))	};
 
 				SkyboxWidth = TempTexture.Width;
 				SkyboxHeight = TempTexture.Height;

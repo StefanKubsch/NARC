@@ -13,7 +13,6 @@
 #include <SDL_mixer.h>
 
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 
 namespace SFX_SDL
 {
@@ -31,10 +30,10 @@ namespace SFX_SDL
 	{
 		if (const std::string INIFile{ "./DATA/GameConfig/AudioConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			const std::int_fast32_t Samplerate{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "Samplerate") };
-			const std::int_fast32_t StereoChannels{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "StereoChannels") };
-			const std::int_fast32_t ChunkSize{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "ChunkSize") };
-			const std::int_fast32_t MaxChannels{ Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "MaxChannels") };
+			const std::int_fast32_t Samplerate{ lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "Samplerate") };
+			const std::int_fast32_t StereoChannels{ lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "StereoChannels") };
+			const std::int_fast32_t ChunkSize{ lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "ChunkSize") };
+			const std::int_fast32_t MaxChannels{ lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "MaxChannels") };
 
 			NARCLog.AddEntry("Initialising SDL Mixer system...");
 

@@ -12,7 +12,6 @@
 #include <string>
 
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 
 namespace HID_Mouse
 {
@@ -41,10 +40,10 @@ namespace HID_Mouse
 	{
 		if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			MouseSensitivity = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivity");
-			MouseSensitivityLowerLimit = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivityLowerLimit");
-			MouseSensitivityUpperLimit = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivityUpperLimit");
-			MouseSensitivityStep = Tools_INIFile::ReadValue<float>(INIFile, "MOUSE", "MouseSensitivityStep");
+			MouseSensitivity = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivity");
+			MouseSensitivityLowerLimit = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityLowerLimit");
+			MouseSensitivityUpperLimit = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityUpperLimit");
+			MouseSensitivityStep = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityStep");
 
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_MOUSE);
 			ShowCursor(FALSE);

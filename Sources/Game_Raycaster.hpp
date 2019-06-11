@@ -14,8 +14,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
-#include "GFX_Shading.hpp"
 #include "Game_DataStructures.hpp"
 #include "Game_LevelHandling.hpp"
 #include "Game_EntityHandling.hpp"
@@ -44,12 +42,12 @@ namespace Game_Raycaster
 	{
 		if (const std::string INIFile{ "./DATA/GameConfig/RaycasterConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			PlaneStartValue.X = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue");
-			PlaneStartValue.Y = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue");
-			VerticalLookUpLimit = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "VerticalLookUpLimit");
-			VerticalLookDownLimit = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "VerticalLookDownLimit");
-			VerticalLookStep = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "VerticalLookStep");
-			FogOfWarDistance = Tools_INIFile::ReadValue<float>(INIFile, "RAYCASTER", "FogOfWarDistance");
+			PlaneStartValue.X = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue");
+			PlaneStartValue.Y = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue");
+			VerticalLookUpLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookUpLimit");
+			VerticalLookDownLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookDownLimit");
+			VerticalLookStep = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookStep");
+			FogOfWarDistance = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "FogOfWarDistance");
 		}
 	}
 
@@ -144,7 +142,7 @@ namespace Game_Raycaster
 
 					if (Game_LevelHandling::LightingFlag)
 					{
-						std::int_fast32_t ShadedTexel{ GFX_Shading::ShadeColor(WallTexel, WallDist, FogOfWarDistance) };
+						std::int_fast32_t ShadedTexel{ lwmf::ShadeColor(WallTexel, WallDist, FogOfWarDistance) };
 
 						for (auto&& Light : Game_LevelHandling::StaticLights)
 						{
@@ -152,7 +150,7 @@ namespace Game_Raycaster
 							{
 								if (const float Intensity{ Light.GetIntensity(MapPos.X + WallX, MapPos.Y + WallY) }; Intensity > 0.0F)
 								{
-									ShadedTexel = GFX_Shading::BlendColor(ShadedTexel, WallTexel, Intensity);
+									ShadedTexel = lwmf::BlendColor(ShadedTexel, WallTexel, Intensity);
 								}
 							}
 						}
@@ -219,7 +217,7 @@ namespace Game_Raycaster
 
 								if (Game_LevelHandling::LightingFlag)
 								{
-									std::int_fast32_t ShadedTexel{ GFX_Shading::ShadeColor(FloorTexel, CurrentDist, FloorCeilingShading) };
+									std::int_fast32_t ShadedTexel{ lwmf::ShadeColor(FloorTexel, CurrentDist, FloorCeilingShading) };
 
 									for (auto&& Light : Game_LevelHandling::StaticLights)
 									{
@@ -227,7 +225,7 @@ namespace Game_Raycaster
 										{
 											if (const float Intensity{ Light.GetIntensity(Floor.X, Floor.Y) }; Intensity > 0.0F)
 											{
-												ShadedTexel = GFX_Shading::BlendColor(ShadedTexel, FloorTexel, Intensity);
+												ShadedTexel = lwmf::BlendColor(ShadedTexel, FloorTexel, Intensity);
 											}
 										}
 									}
@@ -256,7 +254,7 @@ namespace Game_Raycaster
 
 								if (Game_LevelHandling::LightingFlag)
 								{
-									std::int_fast32_t ShadedTexel{ GFX_Shading::ShadeColor(CeilingTexel, CurrentDist, FloorCeilingShading) };
+									std::int_fast32_t ShadedTexel{ lwmf::ShadeColor(CeilingTexel, CurrentDist, FloorCeilingShading) };
 
 									for (auto&& Light : Game_LevelHandling::StaticLights)
 									{
@@ -264,7 +262,7 @@ namespace Game_Raycaster
 										{
 											if (const float Intensity{ Light.GetIntensity(Floor.X, Floor.Y) }; Intensity > 0.0F)
 											{
-												ShadedTexel = GFX_Shading::BlendColor(ShadedTexel, CeilingTexel, Intensity);
+												ShadedTexel = lwmf::BlendColor(ShadedTexel, CeilingTexel, Intensity);
 											}
 										}
 									}

@@ -17,6 +17,7 @@
 // Establish lwmf system logfile
 lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 
+#include "lwmf_simd.hpp"
 #include "lwmf_math.hpp"
 #include "lwmf_general.hpp"
 #include "lwmf_color.hpp"
@@ -32,3 +33,4 @@ lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 #include "lwmf_perlinnoise.hpp"
 #include "lwmf_fpscounter.hpp"
 #include "lwmf_multithreading.hpp"
+#include "lwmf_inifile.hpp"

@@ -16,7 +16,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "SFX_SDL.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "Game_DataStructures.hpp"
@@ -48,7 +47,7 @@ namespace Game_AssetHandling
 
 			if (const std::string EntityDataFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(AssetFileIndex) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
 			{
-				const std::string AssetTypeName{ Tools_INIFile::ReadValue<std::string>(EntityDataFile, "ENTITY", "EntityTypeName") };
+				const std::string AssetTypeName{ lwmf::ReadINIValue<std::string>(EntityDataFile, "ENTITY", "EntityTypeName") };
 
 				// If asset type was already loaded, skip this...
 				for (const auto& Asset : EntityAssets)
@@ -78,18 +77,18 @@ namespace Game_AssetHandling
 					// Get SFX
 					//
 
-					if (const std::string AssetType{ Tools_INIFile::ReadValue<std::string>(INIFile, "GENERAL", "AssetType") }; AssetType == "AmmoBox")
+					if (const std::string AssetType{ lwmf::ReadINIValue<std::string>(INIFile, "GENERAL", "AssetType") }; AssetType == "AmmoBox")
 					{
 						// Get Pickup audio
-						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "AmmoPickup")));
+						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup")));
 					}
 					else if (AssetType == "Enemy" || AssetType == "Turret")
 					{
 						// Get KillSound audio
-						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "KillSound")));
+						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound")));
 
 						// Get AttackSound audio
-						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "AttackSound")));
+						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound")));
 					}
 
 					++AssetIndex;

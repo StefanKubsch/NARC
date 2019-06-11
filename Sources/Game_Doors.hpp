@@ -15,7 +15,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "SFX_SDL.hpp"
 #include "Game_DataStructures.hpp"
 #include "Game_LevelHandling.hpp"
@@ -60,11 +59,11 @@ namespace Game_Doors
 						Doors[Index].Pos.Y = MapPosY;
 						Doors[Index].OriginalTexture = Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY];
 						Doors[Index].OpenCloseWidth = TextureSize;
-						Doors[Index].OpenCloseSpeed = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "OpenCloseSpeed");
-						Doors[Index].StayOpenTime = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "GENERAL", "StayOpenTime") * static_cast<std::int_fast32_t>(FrameLock);
+						Doors[Index].OpenCloseSpeed = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "OpenCloseSpeed");
+						Doors[Index].StayOpenTime = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "StayOpenTime") * static_cast<std::int_fast32_t>(FrameLock);
 						Doors[Index].AnimTexture = Game_LevelHandling::LevelTextures[Doors[Index].OriginalTexture];
 
-						Doors[Index].Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "OpenCloseSound")));
+						Doors[Index].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound")));
 
 						++Index;
 					}

@@ -14,7 +14,6 @@
 #include <string>
 
 #include "Game_GlobalDefinitions.hpp"
-#include "Tools_INIFile.hpp"
 #include "GFX_Window.hpp"
 #include "GFX_TextClass.hpp"
 #include "HID_Keyboard.hpp"

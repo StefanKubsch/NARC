@@ -14,7 +14,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "GFX_TextClass.hpp"
 #include "Game_DataStructures.hpp"
@@ -43,16 +42,16 @@ inline void Game_WeaponDisplayClass::Init()
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDWeaponDisplayConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Crosshair settings
-		lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };
+		lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };
 
 		CrosshairShader.LoadShader("Default", ScreenTexture);
 		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairTexture, ScreenTexture.WidthMid - (TempTextureCrosshair.Width >> 1), ScreenTexture.HeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
 
 		// Weapon HUD settings
-		lwmf::TextureStruct TempTextureWeaponHUD{ GFX_ImageHandling::ImportImage(Tools_INIFile::ReadValue<std::string>(INIFile, "HUD", "WeaponHUDFileName")) };
+		lwmf::TextureStruct TempTextureWeaponHUD{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "HUD", "WeaponHUDFileName")) };
 
-		WeaponHUDRect.X = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "HUD", "WeaponHUDPosX");
-		WeaponHUDRect.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(INIFile, "HUD", "WeaponHUDPosY");
+		WeaponHUDRect.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "HUD", "WeaponHUDPosX");
+		WeaponHUDRect.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "HUD", "WeaponHUDPosY");
 		WeaponHUDRect.Width = TempTextureWeaponHUD.Width;
 		WeaponHUDRect.Height = TempTextureWeaponHUD.Height;
 

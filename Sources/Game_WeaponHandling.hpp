@@ -16,7 +16,6 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "Game_DataStructures.hpp"
 #include "Game_LevelHandling.hpp"
@@ -104,25 +103,25 @@ namespace Game_WeaponHandling
 				Weapons.emplace_back();
 
 				Weapons[Index].Number = Index;
-				Weapons[Index].Name = Tools_INIFile::ReadValue<std::string>(IniFile, "DATA", "Name");
-				Weapons[Index].Weight = Tools_INIFile::ReadValue<float>(IniFile, "DATA", "Weight");
-				Weapons[Index].Capacity = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "DATA", "Capacity");
-				Weapons[Index].PaceFactor = Tools_INIFile::ReadValue<float>(IniFile, "DATA", "PaceFactor");
-				Weapons[Index].Damage = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "DATA", "Damage");
+				Weapons[Index].Name = lwmf::ReadINIValue<std::string>(IniFile, "DATA", "Name");
+				Weapons[Index].Weight = lwmf::ReadINIValue<float>(IniFile, "DATA", "Weight");
+				Weapons[Index].Capacity = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "Capacity");
+				Weapons[Index].PaceFactor = lwmf::ReadINIValue<float>(IniFile, "DATA", "PaceFactor");
+				Weapons[Index].Damage = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "Damage");
 
-				if (const std::string WeaponTypeString{ Tools_INIFile::ReadValue<std::string>(IniFile, "DATA", "WeaponType") }; WeaponTypeString == "DirectHit")
+				if (const std::string WeaponTypeString{ lwmf::ReadINIValue<std::string>(IniFile, "DATA", "WeaponType") }; WeaponTypeString == "DirectHit")
 				{
 					Weapons[Index].Type = static_cast<std::int_fast32_t>(WeaponType::DirectHit);
 				}
 
-				Weapons[Index].CarriedAmmo = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "DATA", "CarriedAmmo");
-				Weapons[Index].Cadence = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "DATA", "Cadence");
-				Weapons[Index].WeaponRect.X = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "PosX");
-				Weapons[Index].WeaponRect.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "PosY");
-				Weapons[Index].FadeInOutSpeed = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "POSITION", "FadeInOutSpeed");
-				Weapons[Index].MuzzleFlashDuration = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashDuration");
-				Weapons[Index].MuzzleFlashRect.X = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosX");
-				Weapons[Index].MuzzleFlashRect.Y = Tools_INIFile::ReadValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosY");
+				Weapons[Index].CarriedAmmo = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "CarriedAmmo");
+				Weapons[Index].Cadence = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "Cadence");
+				Weapons[Index].WeaponRect.X = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "POSITION", "PosX");
+				Weapons[Index].WeaponRect.Y = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "POSITION", "PosY");
+				Weapons[Index].FadeInOutSpeed = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "POSITION", "FadeInOutSpeed");
+				Weapons[Index].MuzzleFlashDuration = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashDuration");
+				Weapons[Index].MuzzleFlashRect.X = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosX");
+				Weapons[Index].MuzzleFlashRect.Y = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosY");
 
 				// pre-load weapon
 				Weapons[Index].LoadedRounds = Weapons[Index].Capacity;
@@ -200,13 +199,13 @@ namespace Game_WeaponHandling
 			if (const std::string INIFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				// Get SingleShot Audio (Index = 0)
-				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "SingleShotAudio")));
+				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio")));
 
 				// Get Dry Fire Audio (Index = 1)
-				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "DryFireAudio")));
+				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio")));
 
 				// Get Reload Audio (Index = 2)
-				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(Tools_INIFile::ReadValue<std::string>(INIFile, "AUDIO", "ReloadAudio")));
+				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio")));
 
 				// Get length of audio file in ms and store to weapon data
 				Weapon.ReloadDuration = static_cast<std::int_fast32_t>(Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)]->alen / 1000) >> 2;

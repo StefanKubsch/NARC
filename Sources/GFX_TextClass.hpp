@@ -18,7 +18,6 @@
 #include "stb/stb_truetype.h"
 
 #include "Game_GlobalDefinitions.hpp"
-#include "Tools_INIFile.hpp"
 
 class GFX_TextClass final
 {
@@ -50,15 +49,15 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 {
 	if (Tools_ErrorHandling::CheckFileExistence(INIFileName, StopOnError))
 	{
-		if (const std::string FontName{ Tools_INIFile::ReadValue<std::string>(INIFileName, Section, "FontName") }; Tools_ErrorHandling::CheckFileExistence(FontName, StopOnError))
+		if (const std::string FontName{ lwmf::ReadINIValue<std::string>(INIFileName, Section, "FontName") }; Tools_ErrorHandling::CheckFileExistence(FontName, StopOnError))
 		{
 			GlyphShader.LoadShader("Default", ScreenTexture);
 
-			const float FontSize{ Tools_INIFile::ReadValue<float>(INIFileName, Section, "FontSize") };
-			const unsigned char FontColorRed{ static_cast<unsigned char>(Tools_INIFile::ReadValue<std::int_fast32_t>(INIFileName, Section, "ColorRED")) };
-			const unsigned char FontColorGreen{ static_cast<unsigned char>(Tools_INIFile::ReadValue<std::int_fast32_t>(INIFileName, Section, "ColorGREEN")) };
-			const unsigned char FontColorBlue{ static_cast<unsigned char>(Tools_INIFile::ReadValue<std::int_fast32_t>(INIFileName, Section, "ColorBLUE")) };
-			Offset = { Tools_INIFile::ReadValue<std::int_fast32_t>(INIFileName, Section, "OffsetX"), Tools_INIFile::ReadValue<std::int_fast32_t>(INIFileName, Section, "OffsetY") };
+			const float FontSize{ lwmf::ReadINIValue<float>(INIFileName, Section, "FontSize") };
+			const unsigned char FontColorRed{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorRED")) };
+			const unsigned char FontColorGreen{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorGREEN")) };
+			const unsigned char FontColorBlue{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorBLUE")) };
+			Offset = { lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetY") };
 
 			// Get raw (binary) font data
 			std::vector<char> FontBuffer;

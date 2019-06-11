@@ -14,7 +14,6 @@
 #include <map>
 
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_INIFile.hpp"
 
 namespace HID_Keyboard
 {
@@ -51,17 +50,17 @@ namespace HID_Keyboard
 	{
 		if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			MovePlayerForwardKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "MoveForwardKey");
-			MovePlayerBackwardKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "MoveBackwardKey");
-			MovePlayerStrafeLeftKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "StrafeLeftKey");
-			MovePlayerStrafeRightKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "StrafeRightKey");
-			ReloadWeaponKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "ReloadWeaponKey");
-			HUDKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "HUDKey");
-			MiniMapKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "MiniMapKey");
-			IncreaseMouseSensitivityKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "IncreaseMouseSensitivityKey");
-			DecreaseMouseSensitivityKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "DecreaseMouseSensitivityKey");
-			SelectNextLevelKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SelectNextLevelKey");
-			SwitchLightingKey = Tools_INIFile::ReadValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SwitchLightingKey");
+			MovePlayerForwardKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "MoveForwardKey");
+			MovePlayerBackwardKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "MoveBackwardKey");
+			MovePlayerStrafeLeftKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "StrafeLeftKey");
+			MovePlayerStrafeRightKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "StrafeRightKey");
+			ReloadWeaponKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "ReloadWeaponKey");
+			HUDKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "HUDKey");
+			MiniMapKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "MiniMapKey");
+			IncreaseMouseSensitivityKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "IncreaseMouseSensitivityKey");
+			DecreaseMouseSensitivityKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "DecreaseMouseSensitivityKey");
+			SelectNextLevelKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SelectNextLevelKey");
+			SwitchLightingKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SwitchLightingKey");
 
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_KEYBOARD);
 		}

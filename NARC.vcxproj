@@ -153,7 +153,6 @@
     <ClInclude Include="Sources\Game_PathFinding.hpp" />
     <ClInclude Include="Sources\Game_Raycaster.hpp" />
     <ClInclude Include="Sources\GFX_ImageHandling.hpp" />
-    <ClInclude Include="Sources\GFX_Shading.hpp" />
     <ClInclude Include="Sources\SFX_SDL.hpp" />
     <ClInclude Include="Sources\Game_Doors.hpp" />
     <ClInclude Include="Sources\Game_HealthBarClass.hpp" />
@@ -172,7 +171,6 @@
     <ClInclude Include="Sources\Tools_ErrorHandling.hpp" />
     <ClInclude Include="Sources\HID_GameControllerClass.hpp" />
     <ClInclude Include="Sources\Game_GlobalDefinitions.hpp" />
-    <ClInclude Include="Sources\Tools_INIFile.hpp" />
     <ClInclude Include="Sources\Game_Config.hpp" />
     <ClInclude Include="Sources\HID_Keyboard.hpp" />
     <ClInclude Include="Sources\Game_LevelHandling.hpp" />
@@ -182,7 +180,6 @@
     <ClInclude Include="Sources\Tools_InitSDL.hpp" />
     <ClInclude Include="Sources\Game_SkyboxHandling.hpp" />
     <ClInclude Include="Sources\Game_WeaponHandling.hpp" />
-    <ClInclude Include="Sources\Tools_SIMD.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NARC.cpp" />
