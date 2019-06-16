@@ -51,7 +51,7 @@ namespace lwmf
 
 	inline ColorStruct INTtoRGBA(const std::int_fast32_t Color)
 	{
-		return { static_cast<std::int_fast32_t>(Color & RMask), static_cast<std::int_fast32_t>(Color & GMask), static_cast<std::int_fast32_t>(Color & BMask), static_cast<std::int_fast32_t>(Color & AMask) };
+		return { (Color & static_cast<std::int_fast32_t>(RMask)), (Color & static_cast<std::int_fast32_t>(GMask)) >> 8, (Color & static_cast<std::int_fast32_t>(BMask)) >> 16, (Color & static_cast<std::int_fast32_t>(AMask)) >> 24 };
 	}
 
 	inline std::int_fast32_t ShadeColor(const std::int_fast32_t Color, const float ShadeFactor, const float Limit)
