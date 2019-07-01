@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "lwmf_texture.hpp"

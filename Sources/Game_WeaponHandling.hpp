@@ -138,14 +138,14 @@ namespace Game_WeaponHandling
 			}
 			else
 			{
-				NARCLog.AddEntry("No more weapon data found.");
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "No more weapon data found.");
 				break;
 			}
 		}
 
 		if (Weapons.empty())
 		{
-			NARCLog.LogErrorAndThrowException("No weapon data found!");
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "No weapon data found!");
 		}
 	}
 

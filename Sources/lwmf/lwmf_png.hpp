@@ -11,10 +11,12 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 #include <iostream>
 #include <fstream>
 
+#include "lwm_logging.hpp"
 #include "lwmf_texture.hpp"
 
 namespace lwmf
@@ -1224,13 +1226,13 @@ namespace lwmf
 
 	inline void LoadPNG(TextureStruct& Texture, const std::string& Filename)
 	{
-		LWMFSystemLog.AddEntry("lwmf_png: Load file " + Filename + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
 		std::ifstream File(Filename.c_str(), std::ios::binary);
 
 		if (File.fail())
 		{
-			LWMFSystemLog.LogErrorAndThrowException("Error loading " + Filename + "!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + "!");
 		}
 		else
 		{

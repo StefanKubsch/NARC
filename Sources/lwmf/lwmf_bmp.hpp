@@ -16,6 +16,7 @@
 #include <vector>
 #include <fstream>
 
+#include "lwm_logging.hpp"
 #include "lwmf_color.hpp"
 #include "lwmf_texture.hpp"
 
@@ -31,13 +32,13 @@ namespace lwmf
 
 	inline void LoadBMP(TextureStruct& Texture, const std::string& Filename)
 	{
-		LWMFSystemLog.AddEntry("lwmf_bmp: Load file " + Filename + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
 		std::ifstream File(Filename, std::ios::binary);
 
 		if (File.fail())
 		{
-			LWMFSystemLog.LogErrorAndThrowException("Error loading " + Filename + "!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + "!");
 		}
 		else
 		{

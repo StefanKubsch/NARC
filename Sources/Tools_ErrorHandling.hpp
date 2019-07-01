@@ -31,7 +31,7 @@ namespace Tools_ErrorHandling
 
 	inline bool CheckFileExistence(const std::string& FileName, const bool ActionFlag)
 	{
-		NARCLog.AddEntry("Checking for file existence " + FileName + "...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Checking for file existence " + FileName + "...");
 
 		bool Result{ true };
 
@@ -39,7 +39,7 @@ namespace Tools_ErrorHandling
 		{
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.LogErrorAndThrowException("ERROR! File not found!");
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "File not found!");
 			}
 			else
 			{
@@ -52,7 +52,7 @@ namespace Tools_ErrorHandling
 
 	inline bool CheckFolderExistence(const std::string& FolderName, const bool ActionFlag)
 	{
-		NARCLog.AddEntry("Checking for folder existence " + FolderName + "...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Checking for folder existence " + FolderName + "...");
 
 		bool Result{ true };
 
@@ -63,7 +63,7 @@ namespace Tools_ErrorHandling
 		{
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.LogErrorAndThrowException("ERROR! Folder not found!");
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "Folder not found!");
 			}
 			else
 			{
@@ -76,7 +76,7 @@ namespace Tools_ErrorHandling
 
 	inline bool CheckTextureSize(const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Size, const bool ActionFlag)
 	{
-		NARCLog.AddEntry("Checking texture for correct size...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Checking texture for correct size...");
 
 		bool Result{ true };
 
@@ -84,7 +84,7 @@ namespace Tools_ErrorHandling
 		{
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.LogErrorAndThrowException("ERROR! TextureSize is " + std::to_string(Width) + "*" + std::to_string(Height) + " pixel!");
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "TextureSize is " + std::to_string(Width) + " * " + std::to_string(Height) + " pixel!");
 			}
 			else
 			{

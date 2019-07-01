@@ -104,7 +104,7 @@ namespace Game_Config
 		// Reduce NumberOfLevels by 1 since we start counting our levels by 0 (Zero) !
 		if (--NumberOfLevels == -1)
 		{
-			NARCLog.LogErrorAndThrowException("No Leveldata found.");
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "No Leveldata found.");
 		}
 	}
 

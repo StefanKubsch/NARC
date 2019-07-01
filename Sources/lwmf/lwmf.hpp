@@ -15,7 +15,7 @@
 #include "lwmf_logging.hpp"
 
 // Establish lwmf system logfile
-lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
+inline lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 
 #include "lwmf_simd.hpp"
 #include "lwmf_math.hpp"

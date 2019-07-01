@@ -23,11 +23,11 @@ namespace Tools_InitSDL
 
 	inline void InitSDL()
 	{
-		NARCLog.AddEntry("Initializing SDL subsystems...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Initializing SDL subsystems...");
 
 		if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0)
 		{
-			NARCLog.LogErrorAndThrowException("SDL init failed: " + std::string(SDL_GetError()));
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "SDL init failed: " + std::string(SDL_GetError()));
 		}
 	}
 

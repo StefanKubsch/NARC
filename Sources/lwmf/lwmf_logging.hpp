@@ -10,6 +10,10 @@
 
 #pragma once
 
+// This macro will return the current filename without any path information
+#define __FILENAME__ (std::strrchr(__FILE__, '\\') ? std::strrchr(__FILE__, '\\') + 1 : __FILE__)
+
+#include <cstring>
 #include <string>
 #include <exception>
 #include <stdexcept>
@@ -21,14 +25,21 @@
 namespace lwmf
 {
 
+	enum class LogLevel : std::int_fast32_t
+	{
+		Info,
+		Debug,
+		Warn,
+		Error,
+		Critical
+	};
 
 	class Logging final
 	{
 	public:
 		Logging(const std::string& Logfilename);
 		~Logging();
-		void AddEntry(const std::string& Text);
-		void LogErrorAndThrowException(const std::string& ErrorMessage);
+		void AddEntry(LogLevel Level, const char* Filename, const std::string& Message);
 
 	private:
 		std::string GetTimeStamp();
@@ -42,7 +53,7 @@ namespace lwmf
 
 		if (Logfile.fail())
 		{
-			throw std::runtime_error("Error creating logfile!");
+			std::_Exit(EXIT_FAILURE);
 		}
 
 		Logfile << "lwmf logging / (c) Stefan Kubsch\n";
@@ -59,23 +70,57 @@ namespace lwmf
 		}
 	}
 
-	inline void Logging::AddEntry(const std::string& Text)
+	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::string& Message)
 	{
+		std::string LogLevelString;
+		bool IsError{};
+
+		switch (Level)
+		{
+			case LogLevel::Info:
+			{
+				LogLevelString = "** INFO ** ";
+				break;
+			}
+			case LogLevel::Debug:
+			{
+				LogLevelString = "** DEBUG ** ";
+				break;
+			}
+			case LogLevel::Warn:
+			{
+				LogLevelString = "** WARNING ** ";
+				break;
+			}
+			case LogLevel::Error:
+			{
+				LogLevelString = "** ERROR ** ";
+				IsError = true;
+				break;
+			}
+			case LogLevel::Critical:
+			{
+				LogLevelString = "** CRITICAL ERROR ** ";
+				IsError = true;
+				break;
+			}
+			default: {}
+		}
+
 		if (Logfile.is_open())
 		{
-			Logfile << "** " << Text << std::endl;
-		}
-	}
+			if (!IsError)
+			{
+				Logfile << LogLevelString << std::string(Filename) << ": "<< Message << std::endl;
+			}
+			else
+			{
+				Logfile << "\n" << GetTimeStamp() << LogLevelString << std::string(Filename) << ": " << Message << std::endl;
+				Logfile.close();
 
-	inline void Logging::LogErrorAndThrowException(const std::string& ErrorMessage)
-	{
-		if (Logfile.is_open())
-		{
-			Logfile << GetTimeStamp() << " - " << ErrorMessage << std::endl;
-			Logfile.close();
+				throw std::runtime_error(Message);
+			}
 		}
-
-		throw std::runtime_error(ErrorMessage);
 	}
 
 	inline std::string Logging::GetTimeStamp()

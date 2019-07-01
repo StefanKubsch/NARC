@@ -49,7 +49,7 @@ namespace Game_Transitions
 	inline void LevelTransition()
 	{
 		const std::string NextLevelText{ "...loading level number " + std::to_string(SelectedLevel) + "..." };
-		NARCLog.AddEntry("\n" + NextLevelText + "\n\n");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "\n\n" + NextLevelText + "\n\n");
 
 		lwmf::ClearBuffer();
 		lwmf::ClearTexture(ScreenTexture, 0);

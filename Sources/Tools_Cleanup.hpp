@@ -28,14 +28,14 @@ namespace Tools_Cleanup
 		lwmf::UnregisterRawInputDevice(lwmf::HID_KEYBOARD);
 		lwmf::DeleteOpenGLContext();
 
-		NARCLog.AddEntry("Quit SDL_Mixer");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Quit SDL_Mixer");
 
 		while (Mix_Init(0) != 0)
 		{
 			Mix_Quit();
 		}
 
-		NARCLog.AddEntry("Quit SDL subsystems");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Quit SDL subsystems");
 		SDL_Quit();
 	}
 

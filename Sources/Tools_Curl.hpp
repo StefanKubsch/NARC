@@ -30,11 +30,11 @@ namespace Tools_Curl
 
 	inline void Init()
 	{
-		NARCLog.AddEntry("Init curl...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init curl...");
 
 		if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 		{
-			NARCLog.LogErrorAndThrowException("curl init failed!");
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "curl init failed!");
 		}
 	}
 
@@ -45,7 +45,7 @@ namespace Tools_Curl
 
 	inline bool CheckInternetConnection()
 	{
-		NARCLog.AddEntry("Checking internet connection...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Checking internet connection...");
 
 		bool Result{};
 
@@ -60,7 +60,7 @@ namespace Tools_Curl
 			}
 			else
 			{
-				NARCLog.AddEntry("No internet connection found.");
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "No internet connection found.");
 			}
 
 			curl_easy_cleanup(CurlInstance);
@@ -73,13 +73,13 @@ namespace Tools_Curl
 	{
 		if (CURL* CurlInstance{ curl_easy_init() }; CurlInstance != nullptr && CheckInternetConnection())
 		{
-			NARCLog.AddEntry("Downloading file from URL via curl...\nSource: " + URL + "...");
+			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Downloading file from URL via curl...Source: " + URL + "...");
 
 			FILE* FileStream;
 
 			if (fopen_s(&FileStream, Filename.c_str(), "w+") != 0)
 			{
-				NARCLog.LogErrorAndThrowException("File could not be created!");
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "File could not be created!");
 			}
 
 			curl_easy_setopt(CurlInstance, CURLOPT_URL, URL.c_str()); //-V111
@@ -92,7 +92,7 @@ namespace Tools_Curl
 			{
 				if (fclose(FileStream) != 0)
 				{
-					NARCLog.LogErrorAndThrowException("File could not be closed!");
+					NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "File could not be closed!");
 				}
 			}
 		}

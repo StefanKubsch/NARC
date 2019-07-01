@@ -128,7 +128,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		{
 			if (Message.message == WM_QUIT)
 			{
-				NARCLog.AddEntry("MESSAGE: WM_QUIT received...");
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "MESSAGE: WM_QUIT received...");
 				break;
 			}
 
@@ -354,7 +354,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	}
 
 	Tools_Cleanup::DestroySubsystems();
-	NARCLog.AddEntry("Exit program...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Exit program...");
 	return EXIT_SUCCESS;
 }
 
