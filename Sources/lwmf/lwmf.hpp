@@ -12,9 +12,17 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+// *************************************************
+// ** YOU CAN MAKE SOME SETTINGS HERE !!!         **
+// *************************************************
+
+// Set LoggingEnabled to "false" if you don´t want to write any logsfiles!
+constexpr bool LoggingEnabled{ true };
+
 #include "lwmf_logging.hpp"
 
 // Establish lwmf system logfile
+// Will not be created if "LoggingEnabled" = false !
 inline lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 
 #include "lwmf_simd.hpp"

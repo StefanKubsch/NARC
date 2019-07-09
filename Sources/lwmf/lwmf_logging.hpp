@@ -17,8 +17,8 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
-#include <iostream>
 #include <fstream>
+#include <sstream>
 #include <ctime>
 #include <chrono>
 
@@ -49,76 +49,84 @@ namespace lwmf
 
 	Logging::Logging(const std::string& Logfilename)
 	{
-		Logfile.open(Logfilename);
-
-		if (Logfile.fail())
+		if (LoggingEnabled)
 		{
-			std::_Exit(EXIT_FAILURE);
-		}
+			std::ios_base::sync_with_stdio(false);
 
-		Logfile << "lwmf logging / (c) Stefan Kubsch\n";
-		Logfile << "logging started at: " << GetTimeStamp();
-		Logfile << "--------------------------------------------------------------------------------------------------------------" << std::endl;
+			Logfile.open(Logfilename, std::ios::out | std::ios::trunc);
+
+			if (Logfile.fail())
+			{
+				std::_Exit(EXIT_FAILURE);
+			}
+
+			Logfile << "lwmf logging\nlogging started at: " << GetTimeStamp() << std::string(150,'-') << "\n";
+		}
 	}
 
 	Logging::~Logging()
 	{
-		if (Logfile.is_open())
+		if (LoggingEnabled)
 		{
-			Logfile << "--------------------------------------------------------------------------------------------------------------\n";
-			Logfile << "logging ended at: " << GetTimeStamp() << std::endl;
+			if (Logfile.is_open())
+			{
+				Logfile << std::string(150, '-') << "\nlogging ended at: " << GetTimeStamp() << "\n";
+			}
 		}
 	}
 
 	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::string& Message)
 	{
-		std::string LogLevelString;
-		bool IsError{};
-
-		switch (Level)
+		if (LoggingEnabled)
 		{
-			case LogLevel::Info:
-			{
-				LogLevelString = "** INFO ** ";
-				break;
-			}
-			case LogLevel::Debug:
-			{
-				LogLevelString = "** DEBUG ** ";
-				break;
-			}
-			case LogLevel::Warn:
-			{
-				LogLevelString = "** WARNING ** ";
-				break;
-			}
-			case LogLevel::Error:
-			{
-				LogLevelString = "** ERROR ** ";
-				IsError = true;
-				break;
-			}
-			case LogLevel::Critical:
-			{
-				LogLevelString = "** CRITICAL ERROR ** ";
-				IsError = true;
-				break;
-			}
-			default: {}
-		}
+			std::string LogLevelString;
+			bool IsError{};
 
-		if (Logfile.is_open())
-		{
-			if (!IsError)
+			switch (Level)
 			{
-				Logfile << LogLevelString << std::string(Filename) << ": "<< Message << std::endl;
+				case LogLevel::Info:
+				{
+					LogLevelString = "** INFO ** ";
+					break;
+				}
+				case LogLevel::Debug:
+				{
+					LogLevelString = "** DEBUG ** ";
+					break;
+				}
+				case LogLevel::Warn:
+				{
+					LogLevelString = "** WARNING ** ";
+					break;
+				}
+				case LogLevel::Error:
+				{
+					LogLevelString = "** ERROR ** ";
+					IsError = true;
+					break;
+				}
+				case LogLevel::Critical:
+				{
+					LogLevelString = "** CRITICAL ERROR ** ";
+					IsError = true;
+					break;
+				}
+				default: {}
 			}
-			else
-			{
-				Logfile << "\n" << GetTimeStamp() << LogLevelString << std::string(Filename) << ": " << Message << std::endl;
-				Logfile.close();
 
-				throw std::runtime_error(Message);
+			if (Logfile.is_open())
+			{
+				if (!IsError)
+				{
+					Logfile << LogLevelString << std::string(Filename) << ": " << Message << "\n";
+				}
+				else
+				{
+					Logfile << "\n" << GetTimeStamp() << LogLevelString << std::string(Filename) << ": " << Message << "\n";
+					Logfile.close();
+
+					throw std::runtime_error(Message);
+				}
 			}
 		}
 	}

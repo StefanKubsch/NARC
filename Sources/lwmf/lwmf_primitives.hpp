@@ -24,7 +24,7 @@ namespace lwmf
 	void SetPixel(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
 	void SetPixelSafe(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
 	std::int_fast32_t GetPixel(const TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y);
-	void BoundaryFill(TextureStruct& Texture, IntPointStruct& CenterPoints, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
+	void BoundaryFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
 	void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
 	void Rectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
 	void FilledRectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
@@ -65,19 +65,20 @@ namespace lwmf
 	// Flood Fill
 	//
 
-	inline void BoundaryFill(TextureStruct& Texture, IntPointStruct& CenterPoints, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
+	inline void BoundaryFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
+		IntPointStruct Points{ CenterPoint };
 		std::vector<IntPointStruct> Stack;
-		Stack.push_back(CenterPoints);
+		Stack.push_back(Points);
 
 		while (!Stack.empty())
 		{
-			CenterPoints = Stack.back();
+			Points = Stack.back();
 			Stack.pop_back();
 
-			std::int_fast32_t x1{ CenterPoints.X };
+			std::int_fast32_t x1{ Points.X };
 
-			while (x1 >= 0 && Texture.Pixels[CenterPoints.Y * Texture.Width + x1] != BorderColor)
+			while (x1 >= 0 && Texture.Pixels[Points.Y * Texture.Width + x1] != BorderColor)
 			{
 				--x1;
 			}
@@ -87,28 +88,28 @@ namespace lwmf
 			bool Above{};
 			bool Below{};
 
-			const std::int_fast32_t TempY{ CenterPoints.Y * Texture.Width };
+			const std::int_fast32_t TempY{ Points.Y * Texture.Width };
 
 			while (x1 < Texture.Width && Texture.Pixels[TempY + x1] != BorderColor)
 			{
 				Texture.Pixels[TempY + x1] = FillColor;
 
-				if (!Above && CenterPoints.Y > 0 && Texture.Pixels[(CenterPoints.Y - 1) * Texture.Width + x1] != BorderColor)
+				if (!Above && Points.Y > 0 && Texture.Pixels[(Points.Y - 1) * Texture.Width + x1] != BorderColor)
 				{
-					Stack.push_back({ x1, CenterPoints.Y - 1 });
+					Stack.push_back({ x1, Points.Y - 1 });
 					Above = true;
 				}
-				else if (Above && CenterPoints.Y > 0 && Texture.Pixels[(CenterPoints.Y - 1) * Texture.Width + x1] != BorderColor)
+				else if (Above && Points.Y > 0 && Texture.Pixels[(Points.Y - 1) * Texture.Width + x1] != BorderColor)
 				{
 					Above = false;
 				}
 
-				if (!Below && CenterPoints.Y < Texture.Height - 1 && Texture.Pixels[(CenterPoints.Y + 1) * Texture.Width + x1] != BorderColor)
+				if (!Below && Points.Y < Texture.Height - 1 && Texture.Pixels[(Points.Y + 1) * Texture.Width + x1] != BorderColor)
 				{
-					Stack.push_back({ x1, CenterPoints.Y + 1 });
+					Stack.push_back({ x1, Points.Y + 1 });
 					Below = true;
 				}
-				else if (Below && CenterPoints.Y < Texture.Height - 1 && Texture.Pixels[(CenterPoints.Y + 1) * Texture.Width + x1] != BorderColor)
+				else if (Below && Points.Y < Texture.Height - 1 && Texture.Pixels[(Points.Y + 1) * Texture.Width + x1] != BorderColor)
 				{
 					Below = false;
 				}
@@ -130,7 +131,7 @@ namespace lwmf
 			std::fill(Texture.Pixels.begin() + y1 * Texture.Width + x1, Texture.Pixels.begin() + y1 * Texture.Width + x2, Color);
 		}
 		// Case 2: Line is within screen boundaries, so no further checking if pixel can be set
-		else if (static_cast<std::uint_fast32_t>(x1) <= static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y1) < static_cast<std::uint_fast32_t>(Texture.Height) 
+		else if (static_cast<std::uint_fast32_t>(x1) <= static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y1) < static_cast<std::uint_fast32_t>(Texture.Height)
 			&& static_cast<std::uint_fast32_t>(x2) <= static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y2) < static_cast<std::uint_fast32_t>(Texture.Height))
 		{
 			bool LongerY{};
@@ -404,9 +405,8 @@ namespace lwmf
 	inline void FilledPolygon(TextureStruct& Texture, const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
 		Polygon(Texture, Points, BorderColor);
-		IntPointStruct CentroidPoint{ GetPolygonCentroid(Points) };
 
-		if (PointInsidePolygon(Points, CentroidPoint))
+		if (const IntPointStruct CentroidPoint{ GetPolygonCentroid(Points) }; PointInsidePolygon(Points, CentroidPoint))
 		{
 			BoundaryFill(Texture, CentroidPoint, BorderColor, FillColor);
 		}

@@ -301,7 +301,7 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "(Shadername " + ShaderName + ") - Loading shaderfile " + FileName);
 
-		std::ifstream ShaderFile(FileName);
+		std::ifstream ShaderFile(FileName, std::ios::in);
 		std::string Result;
 
 		if (ShaderFile.fail())

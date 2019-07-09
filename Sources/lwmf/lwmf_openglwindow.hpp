@@ -187,7 +187,7 @@ namespace lwmf
 			}
 			else
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error deleting OpenGL context (ReleaseDC)!");
+				LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error deleting OpenGL context (ReleaseDC)!");
 			}
 		}
 	}

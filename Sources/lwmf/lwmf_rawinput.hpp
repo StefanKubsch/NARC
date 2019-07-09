@@ -62,7 +62,7 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error unregistering raw input device " + std::to_string(Device) + "!");
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error unregistering raw input device " + std::to_string(Device) + "!");
 		}
 	}
 

@@ -1228,7 +1228,7 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
-		std::ifstream File(Filename.c_str(), std::ios::binary);
+		std::ifstream File(Filename.c_str(), std::ios::in | std::ios::binary);
 
 		if (File.fail())
 		{
