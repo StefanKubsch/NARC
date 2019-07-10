@@ -54,7 +54,6 @@ The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textu
   - basic implementation of HUD (weapon, healthbar and ammo info) / Crosshair
   - fps (frames per second) counter
   - error handling, file checks
-  - handling of INI files (reading/writing values, cross-platform)
   - basic implementation of main menu, options
   - autoupdates via web/HTTPS for e.g. "gamecontrollerdb.txt" (using libcurl)
   - really fast & lightweight text rendering via stb_truetype.h and pre-generated glyph textures (OpenGL)
