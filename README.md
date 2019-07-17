@@ -20,6 +20,8 @@ The demoproject resembles a "between Wolfenstein 3D and Doom" retro style: Textu
 
 **If you want to check it out without building it by yourself, just download "Release.zip", unzip and run the exe. Everything you need is included!**
 
+The whole engine is public domain - you can do what you want with the code. It would be nice to state that it´s my initial work when you use the code in your projects, but hey...
+
 **Current features :**
 
   - hardware accelerated by native OpenGL 4.5 Core (Shader, not immediate/direct mode!)
