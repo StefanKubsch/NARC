@@ -1,8 +1,3 @@
-// stb_truetype.hpp - in work - public domain
-// C++ conversion of the original stb_truetype.h
-// authored 2019 by Stefan Kubsch
-//
-//
 // stb_truetype.h - v1.21 - public domain
 // authored from 2009-2016 by Sean Barrett / RAD Game Tools
 //
@@ -266,6 +261,8 @@
 ////   of C library functions used by stb_truetype, e.g. if you don't
 ////   link with the C runtime library.
 
+#pragma once
+
 #include <cassert>
 #include <cstring>
 #include <cstdlib>
@@ -278,7 +275,6 @@
 	// #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h
 	#ifndef STBTT_malloc
 		#define STBTT_malloc(x,u)  (static_cast<void>(u),malloc(x))
-		#define STBTT_free(x,u)    (static_cast<void>(u),free(x))
 	#endif
 #endif
 
@@ -290,16 +286,12 @@
 ////
 
 #ifndef __STB_INCLUDE_STB_TRUETYPE_H__
-#define __STB_INCLUDE_STB_TRUETYPE_H__
+	#define __STB_INCLUDE_STB_TRUETYPE_H__
 
 #ifdef STBTT_STATIC
-#define STBTT_DEF static
+	#define STBTT_DEF static
 #else
-#define STBTT_DEF extern
-#endif
-
-#ifdef __cplusplus
-extern "C" {
+	#define STBTT_DEF extern
 #endif
 
 // private structure
@@ -901,10 +893,6 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
    STBTT_MAC_LANG_HEBREW       =10,   STBTT_MAC_LANG_CHINESE_SIMPLIFIED =33,
    STBTT_MAC_LANG_ITALIAN      =3 ,   STBTT_MAC_LANG_CHINESE_TRAD =19
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // __STB_INCLUDE_STB_TRUETYPE_H__
 
@@ -1920,15 +1908,15 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             // Append vertices.
             tmp = static_cast<stbtt_vertex*>(STBTT_malloc((num_vertices+comp_num_verts)*sizeof(stbtt_vertex), info->userdata));
             if (!tmp) {
-               if (vertices) STBTT_free(vertices, info->userdata);
-               if (comp_verts) STBTT_free(comp_verts, info->userdata);
+			   if (vertices) static_cast<void>(info->userdata), free(vertices);
+			   if (comp_verts) static_cast<void>(info->userdata), free(comp_verts);
                return 0;
             }
             if (num_vertices > 0) std::memcpy(tmp, vertices, num_vertices*sizeof(stbtt_vertex));
 			std::memcpy(tmp+num_vertices, comp_verts, comp_num_verts*sizeof(stbtt_vertex));
-            if (vertices) STBTT_free(vertices, info->userdata);
+            if (vertices) static_cast<void>(info->userdata), free(vertices);
             vertices = tmp;
-            STBTT_free(comp_verts, info->userdata);
+			static_cast<void>(info->userdata), free(comp_verts);
             num_vertices += comp_num_verts;
          }
          // More components ?
@@ -2828,7 +2816,7 @@ STBTT_DEF float stbtt_ScaleForMappingEmToPixels(const stbtt_fontinfo *info, floa
 
 STBTT_DEF void stbtt_FreeShape(const stbtt_fontinfo *info, stbtt_vertex *v)
 {
-	STBTT_free(v, info->userdata);
+	static_cast<void>(info->userdata), free(v);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2963,7 +2951,8 @@ static void stbtt__hheap_cleanup(stbtt__hheap *hh, void *userdata)
 	while (c)
 	{
 		stbtt__hheap_chunk* n{ c->next };
-		STBTT_free(c, userdata);
+		static_cast<void>(userdata), free(c);
+
 		c = n;
 	}
 }
@@ -2979,7 +2968,7 @@ typedef struct stbtt__edge
 
 typedef struct stbtt__active_edge
 {
-	struct stbtt__active_edge* next;
+	struct stbtt__active_edge* next{};
 	#if STBTT_RASTERIZER_VERSION==1
 		int x{};
 		int dx{};
@@ -3494,7 +3483,8 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
    stbtt__hheap_cleanup(&hh, userdata);
 
    if (scanline != scanline_data)
-      STBTT_free(scanline, userdata);
+		static_cast<void>(userdata), free(scanline);
+
 }
 #else
 #error "Unrecognized value of STBTT_RASTERIZER_VERSION"
@@ -3648,7 +3638,8 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts, const int
    // now, traverse the scanlines and find the intersections on each scanline, use xor winding rule
    stbtt__rasterize_sorted_edges(result, e, n, vsubsample, off_x, off_y, userdata);
 
-   STBTT_free(e, userdata);
+   static_cast<void>(userdata), free(e);
+
 }
 
 static void stbtt__add_point(stbtt__point *points, int n, float x, float y)
@@ -3792,8 +3783,9 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
 
    return points;
 error:
-   STBTT_free(points, userdata);
-   STBTT_free(*contour_lengths, userdata);
+   static_cast<void>(userdata), free(points);
+   static_cast<void>(userdata), free(*contour_lengths);
+
    *contour_lengths = nullptr;
    *num_contours = 0;
    return nullptr;
@@ -3807,14 +3799,16 @@ STBTT_DEF void stbtt_Rasterize(stbtt__bitmap *result, float flatness_in_pixels, 
    stbtt__point *windings = stbtt_FlattenCurves(vertices, num_verts, flatness_in_pixels / scale, &winding_lengths, &winding_count, userdata);
    if (windings) {
       stbtt__rasterize(result, windings, winding_lengths, winding_count, scale_x, scale_y, shift_x, shift_y, x_off, y_off, invert, userdata);
-      STBTT_free(winding_lengths, userdata);
-      STBTT_free(windings, userdata);
+	  static_cast<void>(userdata), free(winding_lengths);
+	  static_cast<void>(userdata), free(windings);
+
    }
 }
 
 STBTT_DEF void stbtt_FreeBitmap(unsigned char *bitmap, void *userdata)
 {
-   STBTT_free(bitmap, userdata);
+   static_cast<void>(userdata), free(bitmap);
+
 }
 
 STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info, float scale_x, float scale_y, float shift_x, float shift_y, int glyph, int *width, int *height, int *xoff, int *yoff)
@@ -3836,7 +3830,8 @@ STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info
 	{
 		if (scale_x == 0)
 		{
-			STBTT_free(vertices, info->userdata);
+			static_cast<void>(info->userdata), free(vertices);
+
 			return nullptr;
 		}
 		scale_y = scale_x;
@@ -3880,7 +3875,8 @@ STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info
 		}
 	}
 
-	STBTT_free(vertices, info->userdata);
+	static_cast<void>(info->userdata), free(vertices);
+
 	return gbm.pixels;
 }
 
@@ -3905,7 +3901,8 @@ STBTT_DEF void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo *info, unsigne
    if (gbm.w && gbm.h)
       stbtt_Rasterize(&gbm, 0.35f, vertices, num_verts, scale_x, scale_y, shift_x, shift_y, ix0,iy0, 1, info->userdata);
 
-   STBTT_free(vertices, info->userdata);
+   static_cast<void>(info->userdata), free(vertices);
+
 }
 
 STBTT_DEF void stbtt_MakeGlyphBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int glyph)
@@ -4042,45 +4039,60 @@ using stbrp_context = struct
 
 using stbrp_node = struct
 {
-   unsigned char x;
+	unsigned char x;
 };
 
 struct stbrp_rect
 {
-   stbrp_coord x,y;
-   int id,w,h,was_packed;
+	stbrp_coord x{};
+	stbrp_coord y{};
+	int id{};
+	int w{};
+	int h{};
+	int was_packed{};
 };
 
 static void stbrp_init_target(stbrp_context *con, int pw, int ph, stbrp_node *nodes, int num_nodes)
 {
-   con->width  = pw;
-   con->height = ph;
-   con->x = 0;
-   con->y = 0;
-   con->bottom_y = 0;
-   STBTT__NOTUSED(nodes);
-   STBTT__NOTUSED(num_nodes);
+	con->width = pw;
+	con->height = ph;
+	con->x = 0;
+	con->y = 0;
+	con->bottom_y = 0;
+	STBTT__NOTUSED(nodes);
+	STBTT__NOTUSED(num_nodes);
 }
 
 static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects, int num_rects)
 {
-   int i;
-   for (i=0; i < num_rects; ++i) {
-      if (con->x + rects[i].w > con->width) {
-         con->x = 0;
-         con->y = con->bottom_y;
-      }
-      if (con->y + rects[i].h > con->height)
-         break;
-      rects[i].x = con->x;
-      rects[i].y = con->y;
-      rects[i].was_packed = 1;
-      con->x += rects[i].w;
-      if (con->y + rects[i].h > con->bottom_y)
-         con->bottom_y = con->y + rects[i].h;
-   }
-   for (   ; i < num_rects; ++i)
-      rects[i].was_packed = 0;
+	for (int i{}; i < num_rects; ++i) 
+	{
+		if (con->x + rects[i].w > con->width) 
+		{
+			con->x = 0;
+			con->y = con->bottom_y;
+		}
+
+		if (con->y + rects[i].h > con->height)
+		{
+			break;
+		}
+
+		rects[i].x = con->x;
+		rects[i].y = con->y;
+		rects[i].was_packed = 1;
+		con->x += rects[i].w;
+
+		if (con->y + rects[i].h > con->bottom_y)
+		{
+			con->bottom_y = con->y + rects[i].h;
+		}
+	}
+
+	for (int i{}; i < num_rects; ++i)
+	{
+		rects[i].was_packed = 0;
+	}
 }
 #endif
 
@@ -4093,119 +4105,154 @@ static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects, int num_rect
 
 STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels, int pw, int ph, int stride_in_bytes, int padding, void *alloc_context)
 {
-   stbrp_context *context = static_cast<stbrp_context*>(STBTT_malloc(sizeof(*context), alloc_context));
-   int            num_nodes = pw - padding;
-   stbrp_node    *nodes   = static_cast<stbrp_node*>(STBTT_malloc(sizeof(*nodes  ) * num_nodes,alloc_context));
+	stbrp_context* context{ static_cast<stbrp_context*>(STBTT_malloc(sizeof(*context), alloc_context)) };
+	const int num_nodes{ pw - padding };
+	stbrp_node* nodes{ static_cast<stbrp_node*>(STBTT_malloc(sizeof(*nodes) * num_nodes,alloc_context)) };
 
-   if (context == nullptr || nodes == nullptr) {
-      if (context != nullptr) STBTT_free(context, alloc_context);
-      if (nodes   != nullptr) STBTT_free(nodes  , alloc_context);
-      return 0;
-   }
+	if (context == nullptr || nodes == nullptr) 
+	{
+		if (context != nullptr)
+		{
+			static_cast<void>(alloc_context), free(context);
+		}
 
-   spc->user_allocator_context = alloc_context;
-   spc->width = pw;
-   spc->height = ph;
-   spc->pixels = pixels;
-   spc->pack_info = context;
-   spc->nodes = nodes;
-   spc->padding = padding;
-   spc->stride_in_bytes = stride_in_bytes != 0 ? stride_in_bytes : pw;
-   spc->h_oversample = 1;
-   spc->v_oversample = 1;
-   spc->skip_missing = 0;
+		if (nodes != nullptr)
+		{
+			static_cast<void>(alloc_context), free(nodes);
+		}
 
-   stbrp_init_target(context, pw-padding, ph-padding, nodes, num_nodes);
+		return 0;
+	}
 
-   if (pixels)
-      std::memset(pixels, 0, pw*ph); // background of 0 around pixels
+	spc->user_allocator_context = alloc_context;
+	spc->width = pw;
+	spc->height = ph;
+	spc->pixels = pixels;
+	spc->pack_info = context;
+	spc->nodes = nodes;
+	spc->padding = padding;
+	spc->stride_in_bytes = stride_in_bytes != 0 ? stride_in_bytes : pw;
+	spc->h_oversample = 1;
+	spc->v_oversample = 1;
+	spc->skip_missing = 0;
 
-   return 1;
+	stbrp_init_target(context, pw-padding, ph-padding, nodes, num_nodes);
+
+	if (pixels)
+	{
+		std::memset(pixels, 0, pw * ph); // background of 0 around pixels
+	}
+
+	return 1;
 }
 
 STBTT_DEF void stbtt_PackEnd  (stbtt_pack_context *spc)
 {
-   STBTT_free(spc->nodes    , spc->user_allocator_context);
-   STBTT_free(spc->pack_info, spc->user_allocator_context);
+	static_cast<void>(spc->user_allocator_context), free(spc->nodes);
+	static_cast<void>(spc->user_allocator_context), free(spc->pack_info);
 }
 
 STBTT_DEF void stbtt_PackSetOversampling(stbtt_pack_context *spc, unsigned int h_oversample, unsigned int v_oversample)
 {
 	assert(h_oversample <= STBTT_MAX_OVERSAMPLE);
 	assert(v_oversample <= STBTT_MAX_OVERSAMPLE);
-   if (h_oversample <= STBTT_MAX_OVERSAMPLE)
-      spc->h_oversample = h_oversample;
-   if (v_oversample <= STBTT_MAX_OVERSAMPLE)
-      spc->v_oversample = v_oversample;
+
+	if (h_oversample <= STBTT_MAX_OVERSAMPLE)
+	{
+		spc->h_oversample = h_oversample;
+	}
+
+	if (v_oversample <= STBTT_MAX_OVERSAMPLE)
+	{
+		spc->v_oversample = v_oversample;
+	}
 }
 
 STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc, int skip)
 {
-   spc->skip_missing = skip;
+	spc->skip_missing = skip;
 }
 
 #define STBTT__OVER_MASK  (STBTT_MAX_OVERSAMPLE-1)
 
 static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_in_bytes, unsigned int kernel_width)
 {
-   unsigned char buffer[STBTT_MAX_OVERSAMPLE];
-   int safe_w = w - kernel_width;
-   int j;
-   std::memset(buffer, 0, STBTT_MAX_OVERSAMPLE); // suppress bogus warning from VS2013 -analyze
-   for (j=0; j < h; ++j) {
-      int i;
-      unsigned int total;
-      std::memset(buffer, 0, kernel_width);
+	unsigned char buffer[STBTT_MAX_OVERSAMPLE];
+	const int safe_w{ w - static_cast<int>(kernel_width) };
 
-      total = 0;
+	std::memset(buffer, 0, STBTT_MAX_OVERSAMPLE); // suppress bogus warning from VS2013 -analyze
 
-      // make kernel_width a constant in common cases so compiler can optimize out the divide
-      switch (kernel_width) {
-         case 2:
-            for (i=0; i <= safe_w; ++i) {
-               total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-               buffer[(i+kernel_width) & STBTT__OVER_MASK] = pixels[i];
-               pixels[i] = static_cast<unsigned char>(total / 2);
-            }
-            break;
-         case 3:
-            for (i=0; i <= safe_w; ++i) {
-               total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-               buffer[(i+kernel_width) & STBTT__OVER_MASK] = pixels[i];
-               pixels[i] = static_cast<unsigned char>(total / 3);
-            }
-            break;
-         case 4:
-            for (i=0; i <= safe_w; ++i) {
-               total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-               buffer[(i+kernel_width) & STBTT__OVER_MASK] = pixels[i];
-               pixels[i] = static_cast<unsigned char>(total / 4);
-            }
-            break;
-         case 5:
-            for (i=0; i <= safe_w; ++i) {
-               total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-               buffer[(i+kernel_width) & STBTT__OVER_MASK] = pixels[i];
-               pixels[i] = static_cast<unsigned char>(total / 5);
-            }
-            break;
-         default:
-            for (i=0; i <= safe_w; ++i) {
-               total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-               buffer[(i+kernel_width) & STBTT__OVER_MASK] = pixels[i];
-               pixels[i] = static_cast<unsigned char>(total / kernel_width);
-            }
-            break;
-      }
+	for (int j{}; j < h; ++j) 
+	{
+		unsigned int total{};
+		std::memset(buffer, 0, kernel_width);
 
-      for (; i < w; ++i) {
-		  assert(pixels[i] == 0);
-         total -= buffer[i & STBTT__OVER_MASK];
-         pixels[i] = static_cast<unsigned char>(total / kernel_width);
-      }
+		total = 0;
 
-      pixels += stride_in_bytes;
-   }
+		// make kernel_width a constant in common cases so compiler can optimize out the divide
+		switch (kernel_width) 
+		{
+			case 2:
+			{
+				for (int i{}; i <= safe_w; ++i)
+				{
+					total += pixels[i] - buffer[i & STBTT__OVER_MASK];
+					buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
+					pixels[i] = static_cast<unsigned char>(total / 2);
+				}
+				break;
+			}
+			case 3:
+			{
+				for (int i{}; i <= safe_w; ++i)
+				{
+					total += pixels[i] - buffer[i & STBTT__OVER_MASK];
+					buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
+					pixels[i] = static_cast<unsigned char>(total / 3);
+				}
+				break;
+			}
+			case 4:
+			{
+				for (int i{}; i <= safe_w; ++i)
+				{
+					total += pixels[i] - buffer[i & STBTT__OVER_MASK];
+					buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
+					pixels[i] = static_cast<unsigned char>(total / 4);
+				}
+				break;
+			}
+			case 5:
+			{
+				for (int i{}; i <= safe_w; ++i)
+				{
+					total += pixels[i] - buffer[i & STBTT__OVER_MASK];
+					buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
+					pixels[i] = static_cast<unsigned char>(total / 5);
+				}
+				break;
+			}
+			default:
+			{
+				for (int i{}; i <= safe_w; ++i)
+				{
+					total += pixels[i] - buffer[i & STBTT__OVER_MASK];
+					buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
+					pixels[i] = static_cast<unsigned char>(total / kernel_width);
+				}
+				break;
+			}
+		}
+
+		for (int i{}; i < w; ++i) 
+		{
+			assert(pixels[i] == 0);
+			total -= buffer[i & STBTT__OVER_MASK];
+			pixels[i] = static_cast<unsigned char>(total / kernel_width);
+		}
+
+		pixels += stride_in_bytes;
+	}
 }
 
 static void stbtt__v_prefilter(unsigned char *pixels, int w, int h, int stride_in_bytes, unsigned int kernel_width)
@@ -4481,7 +4528,7 @@ STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context *spc, const unsigned char 
 	stbtt_PackFontRangesPackRects(spc, rects, n);
 	return_value = stbtt_PackFontRangesRenderIntoRects(spc, &info, ranges, num_ranges, rects);
 
-	STBTT_free(rects, spc->user_allocator_context);
+	static_cast<void>(spc->user_allocator_context), free(rects);
 	return return_value;
 }
 
@@ -5054,8 +5101,8 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
 			}
 		}
 
-		STBTT_free(precompute, info->userdata);
-		STBTT_free(verts, info->userdata);
+		static_cast<void>(info->userdata), free(precompute);
+		static_cast<void>(info->userdata), free(verts);
 	}
 
 	return data;
@@ -5068,7 +5115,7 @@ STBTT_DEF unsigned char * stbtt_GetCodepointSDF(const stbtt_fontinfo *info, floa
 
 STBTT_DEF void stbtt_FreeSDF(unsigned char *bitmap, void *userdata)
 {
-	STBTT_free(bitmap, userdata);
+	static_cast<void>(userdata), free(bitmap);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -5079,41 +5126,108 @@ STBTT_DEF void stbtt_FreeSDF(unsigned char *bitmap, void *userdata)
 // check if a utf8 string contains a prefix which is the utf16 string; if so return length of matching utf8 string
 static signed int stbtt__CompareUTF8toUTF16_bigendian_prefix(const unsigned char *s1, signed int len1, const unsigned char *s2, signed int len2)
 {
-   signed int i=0;
+	signed int i{};
 
-   // convert utf16 to utf8 and compare the results while converting
-   while (len2) {
-      unsigned short ch = s2[0]*256 + s2[1];
-      if (ch < 0x80) {
-         if (i >= len1) return -1;
-         if (s1[i++] != ch) return -1;
-      } else if (ch < 0x800) {
-         if (i+1 >= len1) return -1;
-         if (s1[i++] != 0xc0 + (ch >> 6)) return -1;
-         if (s1[i++] != 0x80 + (ch & 0x3f)) return -1;
-      } else if (ch >= 0xd800 && ch < 0xdc00) {
-         unsigned int c;
-         unsigned short ch2 = s2[2]*256 + s2[3];
-         if (i+3 >= len1) return -1;
-         c = ((ch - 0xd800) << 10) + (ch2 - 0xdc00) + 0x10000;
-         if (s1[i++] != 0xf0 + (c >> 18)) return -1;
-         if (s1[i++] != 0x80 + ((c >> 12) & 0x3f)) return -1;
-         if (s1[i++] != 0x80 + ((c >>  6) & 0x3f)) return -1;
-         if (s1[i++] != 0x80 + ((c      ) & 0x3f)) return -1;
-         s2 += 2; // plus another 2 below
-         len2 -= 2;
-      } else if (ch >= 0xdc00 && ch < 0xe000) {
-         return -1;
-      } else {
-         if (i+2 >= len1) return -1;
-         if (s1[i++] != 0xe0 + (ch >> 12)) return -1;
-         if (s1[i++] != 0x80 + ((ch >> 6) & 0x3f)) return -1;
-         if (s1[i++] != 0x80 + ((ch     ) & 0x3f)) return -1;
-      }
-      s2 += 2;
-      len2 -= 2;
-   }
-   return i;
+	// convert utf16 to utf8 and compare the results while converting
+	while (len2)
+	{
+		const unsigned short ch = s2[0] * 256 + s2[1];
+
+		if (ch < 0x80) 
+		{
+			if (i >= len1)
+			{
+				return -1;
+			}
+
+			if (s1[i++] != ch)
+			{
+				return -1;
+			}
+		} 
+		else if (ch < 0x800) 
+		{
+			if (i + 1 >= len1)
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0xc0 + (ch >> 6))
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0x80 + (ch & 0x3f))
+			{
+				return -1;
+			}
+		} 
+		else if (ch >= 0xd800 && ch < 0xdc00)
+		{
+			const unsigned short ch2 = s2[2] * 256 + s2[3];
+
+			if (i + 3 >= len1)
+			{
+				return -1;
+			}
+
+			const unsigned int c = ((ch - 0xd800) << 10) + (ch2 - 0xdc00) + 0x10000;
+
+			if (s1[i++] != 0xf0 + (c >> 18))
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0x80 + ((c >> 12) & 0x3f))
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0x80 + ((c >> 6) & 0x3f))
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0x80 + ((c) & 0x3f))
+			{
+				return -1;
+			}
+
+			s2 += 2; // plus another 2 below
+			len2 -= 2;
+		} 
+		else if (ch >= 0xdc00 && ch < 0xe000)
+		{
+			return -1;
+		} 
+		else 
+		{
+			if (i + 2 >= len1)
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0xe0 + (ch >> 12))
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0x80 + ((ch >> 6) & 0x3f))
+			{
+				return -1;
+			}
+
+			if (s1[i++] != 0x80 + ((ch) & 0x3f))
+			{
+				return -1;
+			}
+		}
+
+		s2 += 2;
+		len2 -= 2;
+	}
+
+	return i;
 }
 
 static int stbtt_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1, char *s2, int len2)
@@ -5125,8 +5239,6 @@ static int stbtt_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1, char 
 // will be BIG-ENDIAN... use stbtt_CompareUTF8toUTF16_bigendian() to compare
 STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID)
 {
-	signed int count{};
-	signed int stringOffset{};
 	unsigned char* fc{ font->data };
 	const unsigned int offset{ static_cast<unsigned int>(font->fontstart) };
 	const unsigned int nm{ stbtt__find_table(fc, offset, "name") };
@@ -5136,17 +5248,17 @@ STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *l
 		return nullptr;
 	}
 
-	count = ttUSHORT(fc+nm+2);
-	stringOffset = nm + ttUSHORT(fc+nm+4);
+	const signed int count{ ttUSHORT(fc + nm + 2) };
+	const signed int stringOffset{ static_cast<signed int>(nm + ttUSHORT(fc + nm + 4)) };
 
 	for (signed int i{}; i < count; ++i)
 	{
 		const unsigned int loc{ nm + 6 + 12 * i };
 
-		if (platformID == ttUSHORT(fc+loc+0) && encodingID == ttUSHORT(fc+loc+2) && languageID == ttUSHORT(fc+loc+4) && nameID == ttUSHORT(fc+loc+6))
+		if (platformID == ttUSHORT(fc + loc + 0) && encodingID == ttUSHORT(fc + loc + 2) && languageID == ttUSHORT(fc + loc + 4) && nameID == ttUSHORT(fc + loc + 6))
 		{
-			*length = ttUSHORT(fc+loc+8);
-			return reinterpret_cast<const char *>(fc+stringOffset+ttUSHORT(fc+loc+10));
+			*length = ttUSHORT(fc + loc + 8);
+			return reinterpret_cast<const char *>(fc + stringOffset + ttUSHORT(fc + loc + 10));
 		}
 	}
 
@@ -5268,55 +5380,55 @@ static int stbtt__matches(unsigned char *fc, unsigned int offset, unsigned char 
 
 static int stbtt_FindMatchingFont_internal(unsigned char *font_collection, char *name_utf8, signed int flags)
 {
-   signed int i;
-   for (i=0;;++i) {
-      signed int off = stbtt_GetFontOffsetForIndex(font_collection, i);
-	  if (off < 0)
-	  {
-		  return off;
-	  }
-	  if (stbtt__matches(reinterpret_cast<unsigned char*>(font_collection), off, reinterpret_cast<unsigned char*>(name_utf8), flags) != 0)
-	  {
-		  return off;
-	  }
-   }
+	for (int i{};; ++i)
+	{
+		const signed int off{ stbtt_GetFontOffsetForIndex(font_collection, i) };
+
+		if (off < 0)
+		{
+			return off;
+		}
+
+		if (stbtt__matches(reinterpret_cast<unsigned char*>(font_collection), off, reinterpret_cast<unsigned char*>(name_utf8), flags) != 0)
+		{
+			return off;
+		}
+	}
 }
 
 #if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-qual"
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
-STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,
-                                float pixel_height, unsigned char *pixels, int pw, int ph,
-                                int first_char, int num_chars, stbtt_bakedchar *chardata)
+STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset, float pixel_height, unsigned char *pixels, int pw, int ph, int first_char, int num_chars, stbtt_bakedchar *chardata)
 {
-   return stbtt_BakeFontBitmap_internal(const_cast<unsigned char *>(data), offset, pixel_height, pixels, pw, ph, first_char, num_chars, chardata);
+	return stbtt_BakeFontBitmap_internal(const_cast<unsigned char *>(data), offset, pixel_height, pixels, pw, ph, first_char, num_chars, chardata);
 }
 
 STBTT_DEF int stbtt_GetFontOffsetForIndex(const unsigned char *data, int index)
 {
-   return stbtt_GetFontOffsetForIndex_internal(const_cast<unsigned char *>(data), index);
+	return stbtt_GetFontOffsetForIndex_internal(const_cast<unsigned char *>(data), index);
 }
 
 STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data)
 {
-   return stbtt_GetNumberOfFonts_internal(const_cast<unsigned char *>(data));
+	return stbtt_GetNumberOfFonts_internal(const_cast<unsigned char *>(data));
 }
 
 STBTT_DEF int stbtt_InitFont(stbtt_fontinfo *info, const unsigned char *data, int offset)
 {
-   return stbtt_InitFont_internal(info, const_cast<unsigned char *>(data), offset);
+	return stbtt_InitFont_internal(info, const_cast<unsigned char *>(data), offset);
 }
 
 STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *fontdata, const char *name, int flags)
 {
-   return stbtt_FindMatchingFont_internal(const_cast<unsigned char *>(fontdata), const_cast<char *>(name), flags);
+	return stbtt_FindMatchingFont_internal(const_cast<unsigned char *>(fontdata), const_cast<char *>(name), flags);
 }
 
 STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const char *s2, int len2)
 {
-   return stbtt_CompareUTF8toUTF16_bigendian_internal(const_cast<char *>(s1), len1, const_cast<char *>(s2), len2);
+	return stbtt_CompareUTF8toUTF16_bigendian_internal(const_cast<char *>(s1), len1, const_cast<char *>(s2), len2);
 }
 
 #if defined(__GNUC__) || defined(__clang__)

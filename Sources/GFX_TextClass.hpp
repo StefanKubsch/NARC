@@ -15,7 +15,7 @@
 #include <fstream>
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include "stb/stb_truetype.h"
+#include "stb/stb_truetype.hpp"
 
 #include "Game_GlobalDefinitions.hpp"
 
