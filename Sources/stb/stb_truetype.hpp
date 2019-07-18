@@ -1,3 +1,8 @@
+// stb_truetype.hpp - under development - public domain
+// authored in 2019 by Stefan Kubsch
+// conversion to C++
+//
+// Original version infos:
 // stb_truetype.h - v1.21 - public domain
 // authored from 2009-2016 by Sean Barrett / RAD Game Tools
 //
@@ -268,16 +273,6 @@
 #include <cstdlib>
 #include <cstring>
 
-#ifdef STB_TRUETYPE_IMPLEMENTATION
-	typedef char stbtt__check_size32[sizeof(signed int)==4 ? 1 : -1];
-	typedef char stbtt__check_size16[sizeof(signed short)==2 ? 1 : -1];
-
-	// #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h
-	#ifndef STBTT_malloc
-		#define STBTT_malloc(x,u)  (static_cast<void>(u),malloc(x))
-	#endif
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ////
@@ -286,7 +281,7 @@
 ////
 
 #ifndef __STB_INCLUDE_STB_TRUETYPE_H__
-	#define __STB_INCLUDE_STB_TRUETYPE_H__
+#define __STB_INCLUDE_STB_TRUETYPE_H__
 
 #ifdef STBTT_STATIC
 	#define STBTT_DEF static
@@ -904,25 +899,24 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 ////
 
 #ifdef STB_TRUETYPE_IMPLEMENTATION
-
 #ifndef STBTT_MAX_OVERSAMPLE
-#define STBTT_MAX_OVERSAMPLE   8
+	#define STBTT_MAX_OVERSAMPLE   8
 #endif
 
 #if STBTT_MAX_OVERSAMPLE > 255
-#error "STBTT_MAX_OVERSAMPLE cannot be > 255"
+	#error "STBTT_MAX_OVERSAMPLE cannot be > 255"
 #endif
 
 typedef int stbtt__test_oversample_pow2[(STBTT_MAX_OVERSAMPLE & (STBTT_MAX_OVERSAMPLE-1)) == 0 ? 1 : -1];
 
 #ifndef STBTT_RASTERIZER_VERSION
-#define STBTT_RASTERIZER_VERSION 2
+	#define STBTT_RASTERIZER_VERSION 2
 #endif
 
 #ifdef _MSC_VER
-#define STBTT__NOTUSED(v)  (void)(v)
+	#define STBTT__NOTUSED(v)  (void)(v)
 #else
-#define STBTT__NOTUSED(v)  (void)sizeof(v)
+	#define STBTT__NOTUSED(v)  (void)sizeof(v)
 #endif
 
 //////////////////////////////////////////////////////////////////////////
@@ -1234,7 +1228,7 @@ static int stbtt_GetFontOffsetForIndex_internal(unsigned char *font_collection, 
 static int stbtt_GetNumberOfFonts_internal(unsigned char *font_collection)
 {
    // if it's just a font, there's only one valid font
-   if (stbtt__isfont(font_collection))
+   if (stbtt__isfont(font_collection) != 0)
       return 1;
 
    // check if it's a TTC
@@ -1284,15 +1278,15 @@ static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data, in
 	info->kern = stbtt__find_table(data, fontstart, "kern"); // not required
 	info->gpos = stbtt__find_table(data, fontstart, "GPOS"); // not required
 
-	if (!cmap || !info->head || !info->hhea || !info->hmtx)
+	if (cmap == 0|| info->head == 0 || info->hhea == 0 || info->hmtx == 0)
 	{
 		return 0;
 	}
 
-	if (info->glyf)
+	if (info->glyf != 0)
 	{
 		// required for truetype
-		if (!info->loca)
+		if (info->loca == 0)
 		{
 			return 0;
 		}
@@ -1618,7 +1612,7 @@ static int stbtt__GetGlyphInfoT2(const stbtt_fontinfo *info, int glyph_index, in
 
 STBTT_DEF int stbtt_GetGlyphBox(const stbtt_fontinfo *info, int glyph_index, int *x0, int *y0, int *x1, int *y1)
 {
-	if (info->cff.size)
+	if (info->cff.size != 0)
 	{
 		stbtt__GetGlyphInfoT2(info, glyph_index, x0, y0, x1, y1);
 	}
@@ -1665,7 +1659,7 @@ STBTT_DEF int stbtt_IsGlyphEmpty(const stbtt_fontinfo *info, int glyph_index)
 	signed short numberOfContours;
 	int g{};
 
-	if (info->cff.size)
+	if (info->cff.size != 0)
 	{
 		return stbtt__GetGlyphInfoT2(info, glyph_index, nullptr, nullptr, nullptr, nullptr) == 0;
 	}
@@ -1683,9 +1677,9 @@ STBTT_DEF int stbtt_IsGlyphEmpty(const stbtt_fontinfo *info, int glyph_index)
 
 static int stbtt__close_shape(stbtt_vertex *vertices, int num_vertices, int was_off, int start_off, signed int sx, signed int sy, signed int scx, signed int scy, signed int cx, signed int cy)
 {
-	if (start_off)
+	if (start_off != 0)
 	{
-		if (was_off)
+		if (was_off != 0)
 		{
 			stbtt_setvertex(&vertices[num_vertices++], STBTT_vcurve, (cx + scx) >> 1, (cy + scy) >> 1, cx, cy);
 		}
@@ -1694,7 +1688,7 @@ static int stbtt__close_shape(stbtt_vertex *vertices, int num_vertices, int was_
 	}
 	else
 	{
-		if (was_off)
+		if (was_off != 0)
 		{
 			stbtt_setvertex(&vertices[num_vertices++], STBTT_vcurve, sx, sy, cx, cy);
 		}
@@ -1734,8 +1728,9 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
       n = 1+ttUSHORT(endPtsOfContours + numberOfContours*2-2);
 
       m = n + 2*numberOfContours;  // a loose bound on how many vertices we might need
-      vertices = static_cast<stbtt_vertex*>(STBTT_malloc(m * sizeof(vertices[0]), info->userdata));
-      if (vertices == nullptr)
+      vertices = static_cast<stbtt_vertex*>(static_cast<void>(info->userdata), malloc(m * sizeof(vertices[0])));
+
+	  if (vertices == nullptr)
          return 0;
 
       next_move = 0;
@@ -1752,7 +1747,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
       for (i=0; i < n; ++i) {
          if (flagcount == 0) {
             flags = *points++;
-            if (flags & 8)
+            if ((flags & 8) != 0)
                flagcount = *points++;
          } else
             --flagcount;
@@ -1763,11 +1758,11 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
       x=0;
       for (i=0; i < n; ++i) {
          flags = vertices[off+i].type;
-         if (flags & 2) {
+         if ((flags & 2) != 0) {
             signed short dx = *points++;
-            x += (flags & 16) ? dx : -dx; // ???
+            x += (flags & 16) != 0 ? dx : -dx; // ???
          } else {
-            if (!(flags & 16)) {
+            if ((flags & 16) == 0) {
                x = x + static_cast<signed short>(points[0]*256 + points[1]);
                points += 2;
             }
@@ -1779,11 +1774,11 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
       y=0;
       for (i=0; i < n; ++i) {
          flags = vertices[off+i].type;
-         if (flags & 4) {
+         if ((flags & 4) != 0) {
             signed short dy = *points++;
-            y += (flags & 32) ? dy : -dy; // ???
+            y += (flags & 32) != 0 ? dy : -dy; // ???
          } else {
-            if (!(flags & 32)) {
+            if ((flags & 32) == 0) {
                y = y + static_cast<signed short>(points[0]*256 + points[1]);
                points += 2;
             }
@@ -1805,12 +1800,12 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
 
             // now start the new one
             start_off = !(flags & 1);
-            if (start_off) {
+            if (start_off != 0) {
                // if we start off with an off-curve point, then when we need to find a point on the curve
                // where we can start, and we need to save some state for when we wraparound.
                scx = x;
                scy = y;
-               if (!(vertices[off+i+1].type & 1)) {
+               if ((vertices[off+i+1].type & 1) == 0) {
                   // next point is also a curve point, so interpolate an on-point curve
                   sx = (x + static_cast<signed int>(vertices[off+i+1].x)) >> 1;
                   sy = (y + static_cast<signed int>(vertices[off+i+1].y)) >> 1;
@@ -1829,14 +1824,14 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             next_move = 1 + ttUSHORT(endPtsOfContours+j*2);
             ++j;
          } else {
-            if (!(flags & 1)) { // if it's a curve
-               if (was_off) // two off-curve control points in a row means interpolate an on-curve midpoint
+            if ((flags & 1) == 0) { // if it's a curve
+               if (was_off != 0) // two off-curve control points in a row means interpolate an on-curve midpoint
                   stbtt_setvertex(&vertices[num_vertices++], STBTT_vcurve, (cx+x)>>1, (cy+y)>>1, cx, cy);
                cx = x;
                cy = y;
                was_off = 1;
             } else {
-               if (was_off)
+               if (was_off != 0)
                   stbtt_setvertex(&vertices[num_vertices++], STBTT_vcurve, x,y, cx, cy);
                else
                   stbtt_setvertex(&vertices[num_vertices++], STBTT_vline, x,y,0,0);
@@ -1851,7 +1846,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
       unsigned char *comp = data + g + 10;
       num_vertices = 0;
       vertices = nullptr;
-      while (more) {
+      while (more != 0) {
          unsigned short flags, gidx;
          int comp_num_verts = 0, i;
          stbtt_vertex *comp_verts = nullptr, *tmp = nullptr;
@@ -1860,8 +1855,8 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
          flags = ttSHORT(comp); comp+=2;
          gidx = ttSHORT(comp); comp+=2;
 
-         if (flags & 2) { // XY values
-            if (flags & 1) { // shorts
+         if ((flags & 2) != 0) { // XY values
+            if ((flags & 1) != 0) { // shorts
                mtx[4] = ttSHORT(comp); comp+=2;
                mtx[5] = ttSHORT(comp); comp+=2;
             } else {
@@ -1873,14 +1868,14 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             // @TODO handle matching point
 			 assert(0);
          }
-         if (flags & (1<<3)) { // WE_HAVE_A_SCALE
+         if ((flags & (1<<3)) != 0) { // WE_HAVE_A_SCALE
             mtx[0] = mtx[3] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[1] = mtx[2] = 0;
-         } else if (flags & (1<<6)) { // WE_HAVE_AN_X_AND_YSCALE
+         } else if ((flags & (1<<6)) != 0) { // WE_HAVE_AN_X_AND_YSCALE
             mtx[0] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[1] = mtx[2] = 0;
             mtx[3] = ttSHORT(comp)/16384.0f; comp+=2;
-         } else if (flags & (1<<7)) { // WE_HAVE_A_TWO_BY_TWO
+         } else if ((flags & (1<<7)) != 0) { // WE_HAVE_A_TWO_BY_TWO
             mtx[0] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[1] = ttSHORT(comp)/16384.0f; comp+=2;
             mtx[2] = ttSHORT(comp)/16384.0f; comp+=2;
@@ -1906,8 +1901,9 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
                v->cy = static_cast<stbtt_vertex_type>(n * (mtx[1]*x + mtx[3]*y + mtx[5]));
             }
             // Append vertices.
-            tmp = static_cast<stbtt_vertex*>(STBTT_malloc((num_vertices+comp_num_verts)*sizeof(stbtt_vertex), info->userdata));
-            if (!tmp) {
+            tmp = static_cast<stbtt_vertex*>(static_cast<void>(info->userdata), malloc((num_vertices + comp_num_verts) * sizeof(stbtt_vertex)));
+
+			if (!tmp) {
 			   if (vertices) static_cast<void>(info->userdata), free(vertices);
 			   if (comp_verts) static_cast<void>(info->userdata), free(comp_verts);
                return 0;
@@ -1953,22 +1949,22 @@ using stbtt__csctx = struct
 
 static void stbtt__track_vertex(stbtt__csctx *c, signed int x, signed int y)
 {
-	if (x > c->max_x || !c->started)
+	if (x > c->max_x || c->started == 0)
 	{
 		c->max_x = x;
 	}
 
-	if (y > c->max_y || !c->started)
+	if (y > c->max_y || c->started == 0)
 	{
 		c->max_y = y;
 	}
 
-	if (x < c->min_x || !c->started)
+	if (x < c->min_x || c->started == 0)
 	{
 		c->min_x = x;
 	}
 
-	if (y < c->min_y || !c->started)
+	if (y < c->min_y || c->started == 0)
 	{
 		c->min_y = y;
 	}
@@ -1978,7 +1974,7 @@ static void stbtt__track_vertex(stbtt__csctx *c, signed int x, signed int y)
 
 static void stbtt__csctx_v(stbtt__csctx *c, unsigned char type, signed int x, signed int y, signed int cx, signed int cy, signed int cx1, signed int cy1)
 {
-	if (c->bounds)
+	if (c->bounds != 0)
 	{
 		stbtt__track_vertex(c, x, y);
 
@@ -2094,7 +2090,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
       // @TODO implement hinting
       case 0x13: // hintmask
       case 0x14: // cntrmask
-         if (in_header)
+         if (in_header != 0)
             maskbits += (sp / 2); // implicit "vstem"
          in_header = 0;
          stbtt__buf_skip(&b, (maskbits + 7) / 8);
@@ -2190,7 +2186,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
       case 0x1B: // hhcurveto
          if (sp < 4) return STBTT__CSERR("(vv|hh)curveto stack");
          f = 0.0;
-         if (sp & 1) { f = s[i]; i++; }
+         if ((sp & 1) != 0) { f = s[i]; i++; }
          for (; i + 3 < sp; i += 4) {
             if (b0 == 0x1B)
                stbtt__csctx_rccurve_to(c, s[i], f, s[i+1], s[i+2], s[i+3], 0.0);
@@ -2201,8 +2197,8 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          break;
 
       case 0x0A: // callsubr
-         if (!has_subrs) {
-            if (info->fdselect.size)
+         if (has_subrs == 0) {
+            if (info->fdselect.size != 0)
                subrs = stbtt__cid_get_glyph_subrs(info, glyph_index);
             has_subrs = 1;
          }
@@ -2330,7 +2326,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
          clear_stack = 0;
          break;
       }
-      if (clear_stack) sp = 0;
+      if (clear_stack != 0) sp = 0;
    }
    return STBTT__CSERR("no endchar");
 
@@ -2343,12 +2339,13 @@ static int stbtt__GetGlyphShapeT2(const stbtt_fontinfo *info, int glyph_index, s
 	stbtt__csctx count_ctx = STBTT__CSCTX_INIT(1);
 	stbtt__csctx output_ctx = STBTT__CSCTX_INIT(0);
 
-	if (stbtt__run_charstring(info, glyph_index, &count_ctx))
+	if (stbtt__run_charstring(info, glyph_index, &count_ctx) != 0)
 	{
-		*pvertices = static_cast<stbtt_vertex*>(STBTT_malloc(count_ctx.num_vertices*sizeof(stbtt_vertex), info->userdata));
+		*pvertices = static_cast<stbtt_vertex*>(static_cast<void>(info->userdata), malloc(count_ctx.num_vertices * sizeof(stbtt_vertex)));
+
 		output_ctx.pvertices = *pvertices;
 
-		if (stbtt__run_charstring(info, glyph_index, &output_ctx))
+		if (stbtt__run_charstring(info, glyph_index, &output_ctx) != 0)
 		{
 			assert(output_ctx.num_vertices == count_ctx.num_vertices);
 			return output_ctx.num_vertices;
@@ -2366,30 +2363,30 @@ static int stbtt__GetGlyphInfoT2(const stbtt_fontinfo *info, int glyph_index, in
 
 	if (x0 != nullptr)
 	{
-		*x0 = r ? c.min_x : 0;
+		*x0 = r != 0 ? c.min_x : 0;
 	}
 
 	if (y0 != nullptr)
 	{
-		*y0 = r ? c.min_y : 0;
+		*y0 = r != 0 ? c.min_y : 0;
 	}
 
 	if (x1 != nullptr)
 	{
-		*x1 = r ? c.max_x : 0;
+		*x1 = r != 0 ? c.max_x : 0;
 	}
 
 	if (y1 != nullptr)
 	{
-		*y1 = r ? c.max_y : 0;
+		*y1 = r != 0 ? c.max_y : 0;
 	}
 
-	return r ? c.num_vertices : 0;
+	return r != 0 ? c.num_vertices : 0;
 }
 
 STBTT_DEF int stbtt_GetGlyphShape(const stbtt_fontinfo *info, int glyph_index, stbtt_vertex **pvertices)
 {
-	if (!info->cff.size)
+	if (info->cff.size == 0)
 	{
 		return stbtt__GetGlyphShapeTT(info, glyph_index, pvertices);
 	}
@@ -2437,7 +2434,7 @@ static int  stbtt__GetGlyphKernInfoAdvance(const stbtt_fontinfo *info, int glyph
 	int m{};
 
 	// we only look at the first table. it must be 'horizontal' and format 0.
-	if (!info->kern)
+	if (info->kern == 0)
 	{
 		return 0;
 	}
@@ -2539,51 +2536,65 @@ static signed int  stbtt__GetCoverageIndex(unsigned char *coverageTable, int gly
 
 static signed int  stbtt__GetGlyphClass(unsigned char *classDefTable, int glyph)
 {
-    unsigned short classDefFormat = ttUSHORT(classDefTable);
-    switch(classDefFormat)
-    {
-        case 1: {
-            unsigned short startGlyphID = ttUSHORT(classDefTable + 2);
-            unsigned short glyphCount = ttUSHORT(classDefTable + 4);
-            unsigned char *classDef1ValueArray = classDefTable + 6;
+	switch(ttUSHORT(classDefTable))
+	{
+		case 1:
+		{
+			const unsigned short startGlyphID{ ttUSHORT(classDefTable + 2) };
+			const unsigned short glyphCount{ ttUSHORT(classDefTable + 4) };
+			unsigned char* classDef1ValueArray{ classDefTable + 6 };
 
-            if (glyph >= startGlyphID && glyph < startGlyphID + glyphCount)
-                return static_cast<signed int>(ttUSHORT(classDef1ValueArray + 2 * (glyph - startGlyphID)));
+			if (glyph >= startGlyphID && glyph < startGlyphID + glyphCount)
+			{
+				return static_cast<signed int>(ttUSHORT(classDef1ValueArray + 2 * (glyph - startGlyphID)));
+			}
 
-            classDefTable = classDef1ValueArray + 2 * glyphCount;
-        } break;
+			classDefTable = classDef1ValueArray + 2 * glyphCount;
+			break;
+		}
 
-        case 2: {
-            unsigned short classRangeCount = ttUSHORT(classDefTable + 2);
-            unsigned char *classRangeRecords = classDefTable + 4;
+		case 2:
+		{
+			const unsigned short classRangeCount{ ttUSHORT(classDefTable + 2) };
+			unsigned char* classRangeRecords{ classDefTable + 4 };
 
-            // Binary search.
-            signed int l=0, r=classRangeCount-1, m;
-            int strawStart, strawEnd, needle=glyph;
-            while (l <= r) {
-                unsigned char *classRangeRecord;
-                m = (l + r) >> 1;
-                classRangeRecord = classRangeRecords + 6 * m;
-                strawStart = ttUSHORT(classRangeRecord);
-                strawEnd = ttUSHORT(classRangeRecord + 2);
-                if (needle < strawStart)
-                    r = m - 1;
-                else if (needle > strawEnd)
-                    l = m + 1;
-                else
-                    return static_cast<signed int>(ttUSHORT(classRangeRecord + 4));
-            }
+			// Binary search.
+			signed int l{};
+			signed int r{ classRangeCount - 1};
+			const int needle{ glyph };
 
-            classDefTable = classRangeRecords + 6 * classRangeCount;
-        } break;
+			while (l <= r)
+			{
+				const signed int m{ (l + r) >> 1 };
+				unsigned char* classRangeRecord{ classRangeRecords + 6 * m };
 
-        default: {
-            // There are no other cases.
+				if (needle < ttUSHORT(classRangeRecord))
+				{
+					r = m - 1;
+				}
+				else if (needle > ttUSHORT(classRangeRecord + 2))
+				{
+					l = m + 1;
+				}
+				else
+				{
+					return static_cast<signed int>(ttUSHORT(classRangeRecord + 4));
+				}
+			}
+
+			classDefTable = classRangeRecords + 6 * classRangeCount;
+			break;
+		}
+
+		default:
+		{
+			// There are no other cases.
 			assert(0);
-        } break;
-    }
+			break;
+		}
+	}
 
-    return -1;
+	return -1;
 }
 
 // Define to STBTT_assert(x) if you want to break on unimplemented formats.
@@ -2591,126 +2602,157 @@ static signed int  stbtt__GetGlyphClass(unsigned char *classDefTable, int glyph)
 
 static signed int  stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, int glyph1, int glyph2)
 {
-    unsigned short lookupListOffset;
-    unsigned char *lookupList;
-    unsigned short lookupCount;
-    unsigned char *data;
-    signed int i;
+	if (info->gpos == 0)
+	{
+		return 0;
+	}
 
-    if (!info->gpos) return 0;
+	unsigned char* data{ info->data + info->gpos };
 
-    data = info->data + info->gpos;
+	if (ttUSHORT(data + 0) != 1)
+	{
+		return 0; // Major version 1
+	}
 
-    if (ttUSHORT(data+0) != 1) return 0; // Major version 1
-    if (ttUSHORT(data+2) != 0) return 0; // Minor version 0
+	if (ttUSHORT(data + 2) != 0)
+	{
+		return 0; // Minor version 0
+	}
 
-    lookupListOffset = ttUSHORT(data+8);
-    lookupList = data + lookupListOffset;
-    lookupCount = ttUSHORT(lookupList);
+	unsigned char* lookupList{ data + ttUSHORT(data + 8) };
+	const unsigned short lookupCount{ ttUSHORT(lookupList) };
 
-    for (i=0; i<lookupCount; ++i) {
-        unsigned short lookupOffset = ttUSHORT(lookupList + 2 + 2 * i);
-        unsigned char *lookupTable = lookupList + lookupOffset;
+	for (signed int i{}; i < lookupCount; ++i)
+	{
+		unsigned char* lookupTable{ lookupList + ttUSHORT(lookupList + 2 + 2 * i) };
 
-        unsigned short lookupType = ttUSHORT(lookupTable);
-        unsigned short subTableCount = ttUSHORT(lookupTable + 4);
-        unsigned char *subTableOffsets = lookupTable + 6;
-        switch(lookupType) {
-            case 2: { // Pair Adjustment Positioning Subtable
-                signed int sti;
-                for (sti=0; sti<subTableCount; sti++) {
-                    unsigned short subtableOffset = ttUSHORT(subTableOffsets + 2 * sti);
-                    unsigned char *table = lookupTable + subtableOffset;
-                    unsigned short posFormat = ttUSHORT(table);
-                    unsigned short coverageOffset = ttUSHORT(table + 2);
-                    signed int coverageIndex = stbtt__GetCoverageIndex(table + coverageOffset, glyph1);
-                    if (coverageIndex == -1) continue;
+        switch(ttUSHORT(lookupTable))
+		{
+            case 2:
+			{ // Pair Adjustment Positioning Subtable
+				const unsigned short subTableCount{ ttUSHORT(lookupTable + 4) };
+				unsigned char* subTableOffsets{ lookupTable + 6 };
 
-                    switch (posFormat) {
-                        case 1: {
-                            signed int l, r, m;
-                            int straw, needle;
-                            unsigned short valueFormat1 = ttUSHORT(table + 4);
-                            unsigned short valueFormat2 = ttUSHORT(table + 6);
-                            signed int valueRecordPairSizeInBytes = 2;
-                            unsigned short pairSetCount = ttUSHORT(table + 8);
-                            unsigned short pairPosOffset = ttUSHORT(table + 10 + 2 * coverageIndex);
-                            unsigned char *pairValueTable = table + pairPosOffset;
-                            unsigned short pairValueCount = ttUSHORT(pairValueTable);
-                            unsigned char *pairValueArray = pairValueTable + 2;
+				for (signed int sti{}; sti < subTableCount; sti++)
+				{
+					unsigned char* table{ lookupTable + ttUSHORT(subTableOffsets + 2 * sti) };
+					const signed int coverageIndex{ stbtt__GetCoverageIndex(table + ttUSHORT(table + 2), glyph1) };
+
+					if (coverageIndex == -1)
+					{
+						continue;
+					}
+
+                    switch (ttUSHORT(table))
+					{
+                        case 1:
+						{
+							const unsigned short valueFormat1{ ttUSHORT(table + 4) };
+							const unsigned short valueFormat2{ ttUSHORT(table + 6) };
+							const signed int valueRecordPairSizeInBytes{ 2 };
+							const unsigned short pairSetCount{ ttUSHORT(table + 8) };
+							const unsigned short pairPosOffset{ ttUSHORT(table + 10 + 2 * coverageIndex) };
+							unsigned char* pairValueTable{ table + pairPosOffset };
+							const unsigned short pairValueCount{ ttUSHORT(pairValueTable) };
+							unsigned char* pairValueArray{ pairValueTable + 2 };
+
                             // TODO: Support more formats.
                             STBTT_GPOS_TODO_assert(valueFormat1 == 4);
-                            if (valueFormat1 != 4) return 0;
-                            STBTT_GPOS_TODO_assert(valueFormat2 == 0);
-                            if (valueFormat2 != 0) return 0;
+
+							if (valueFormat1 != 4)
+							{
+								return 0;
+							}
+
+							STBTT_GPOS_TODO_assert(valueFormat2 == 0);
+
+							if (valueFormat2 != 0)
+							{
+								return 0;
+							}
 
 							assert(coverageIndex < pairSetCount);
                             STBTT__NOTUSED(pairSetCount);
 
-                            needle=glyph2;
-                            r=pairValueCount-1;
-                            l=0;
+							int needle{ glyph2 };
+							signed int r{ pairValueCount - 1 };
+							signed int l{};
 
                             // Binary search.
-                            while (l <= r) {
-                                unsigned short secondGlyph;
-                                unsigned char *pairValue;
-                                m = (l + r) >> 1;
-                                pairValue = pairValueArray + (2 + valueRecordPairSizeInBytes) * m;
-                                secondGlyph = ttUSHORT(pairValue);
-                                straw = secondGlyph;
-                                if (needle < straw)
-                                    r = m - 1;
-                                else if (needle > straw)
-                                    l = m + 1;
-                                else {
-                                    signed short xAdvance = ttSHORT(pairValue + 2);
-                                    return xAdvance;
+                            while (l <= r)
+							{
+								signed int m{ (l + r) >> 1 };
+								unsigned char* pairValue{ pairValueArray + (2 + valueRecordPairSizeInBytes) * m };
+								const unsigned short secondGlyph{ ttUSHORT(pairValue) };
+
+								if (needle < secondGlyph)
+								{
+									r = m - 1;
+								}
+								else if (needle > secondGlyph)
+								{
+									l = m + 1;
+								}
+                                else
+								{
+                                    return ttSHORT(pairValue + 2);
                                 }
                             }
-                        } break;
 
-                        case 2: {
-                            unsigned short valueFormat1 = ttUSHORT(table + 4);
-                            unsigned short valueFormat2 = ttUSHORT(table + 6);
+							break;
+                        }
+                        case 2:
+						{
+							const unsigned short valueFormat1{ ttUSHORT(table + 4) };
+							const unsigned short valueFormat2{ ttUSHORT(table + 6) };
+							const int glyph1class{ stbtt__GetGlyphClass(table + ttUSHORT(table + 8), glyph1) };
+							const int glyph2class{ stbtt__GetGlyphClass(table + ttUSHORT(table + 10), glyph2) };
+							const unsigned short class1Count{ ttUSHORT(table + 12) };
+							const unsigned short class2Count{ ttUSHORT(table + 14) };
 
-                            unsigned short classDef1Offset = ttUSHORT(table + 8);
-                            unsigned short classDef2Offset = ttUSHORT(table + 10);
-                            int glyph1class = stbtt__GetGlyphClass(table + classDef1Offset, glyph1);
-                            int glyph2class = stbtt__GetGlyphClass(table + classDef2Offset, glyph2);
-
-                            unsigned short class1Count = ttUSHORT(table + 12);
-                            unsigned short class2Count = ttUSHORT(table + 14);
 							assert(glyph1class < class1Count);
 							assert(glyph2class < class2Count);
 
                             // TODO: Support more formats.
                             STBTT_GPOS_TODO_assert(valueFormat1 == 4);
-                            if (valueFormat1 != 4) return 0;
+
+							if (valueFormat1 != 4)
+							{
+								return 0;
+							}
+
                             STBTT_GPOS_TODO_assert(valueFormat2 == 0);
-                            if (valueFormat2 != 0) return 0;
 
-                            if (glyph1class >= 0 && glyph1class < class1Count && glyph2class >= 0 && glyph2class < class2Count) {
-                                unsigned char *class1Records = table + 16;
-                                unsigned char *class2Records = class1Records + 2 * (glyph1class * class2Count);
-                                signed short xAdvance = ttSHORT(class2Records + 2 * glyph2class);
-                                return xAdvance;
+							if (valueFormat2 != 0)
+							{
+								return 0;
+							}
+
+                            if (glyph1class >= 0 && glyph1class < class1Count && glyph2class >= 0 && glyph2class < class2Count)
+							{
+                                return ttSHORT(table + 16 + 2 * (glyph1class * class2Count) + 2 * glyph2class);
                             }
-                        } break;
 
-                        default: {
+							break;
+                        }
+
+                        default:
+						{
                             // There are no other cases.
 							assert(0);
                             break;
-                        };
+                        }
                     }
                 }
+
                 break;
             };
 
             default:
-                // TODO: Implement other stuff.
-                break;
+			{
+				// TODO: Implement other stuff.
+				break;
+			}
         }
     }
 
@@ -2721,12 +2763,12 @@ STBTT_DEF int stbtt_GetGlyphKernAdvance(const stbtt_fontinfo *info, int g1, int 
 {
 	int xAdvance{};
 
-	if (info->gpos)
+	if (info->gpos != 0)
 	{
 		xAdvance += stbtt__GetGlyphGPOSInfoAdvance(info, g1, g2);
 	}
 
-	if (info->kern)
+	if (info->kern != 0)
 	{
 		xAdvance += stbtt__GetGlyphKernInfoAdvance(info, g1, g2);
 	}
@@ -2736,7 +2778,7 @@ STBTT_DEF int stbtt_GetGlyphKernAdvance(const stbtt_fontinfo *info, int g1, int 
 
 STBTT_DEF int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2)
 {
-	if (!info->kern && !info->gpos) // if no kerning table, don't waste time looking up both codepoint->glyphs
+	if (info->kern == 0 && info->gpos == 0) // if no kerning table, don't waste time looking up both codepoint->glyphs
 	{
 		return 0;
 	}
@@ -2769,9 +2811,9 @@ STBTT_DEF void stbtt_GetFontVMetrics(const stbtt_fontinfo *info, int *ascent, in
 
 STBTT_DEF int  stbtt_GetFontVMetricsOS2(const stbtt_fontinfo *info, int *typoAscent, int *typoDescent, int *typoLineGap)
 {
-	int tab{ static_cast<int>(stbtt__find_table(info->data, info->fontstart, "OS/2")) };
+	const int tab{ static_cast<int>(stbtt__find_table(info->data, info->fontstart, "OS/2")) };
 
-	if (!tab)
+	if (tab == 0)
 	{
 		return 0;
 	}
@@ -2804,14 +2846,12 @@ STBTT_DEF void stbtt_GetFontBoundingBox(const stbtt_fontinfo *info, int *x0, int
 
 STBTT_DEF float stbtt_ScaleForPixelHeight(const stbtt_fontinfo *info, float height)
 {
-	const int fheight{ ttSHORT(info->data + info->hhea + 4) - ttSHORT(info->data + info->hhea + 6) };
-	return static_cast<float>(height / fheight);
+	return static_cast<float>(height / (ttSHORT(info->data + info->hhea + 4) - ttSHORT(info->data + info->hhea + 6)));
 }
 
 STBTT_DEF float stbtt_ScaleForMappingEmToPixels(const stbtt_fontinfo *info, float pixels)
 {
-	const int unitsPerEm{ ttUSHORT(info->data + info->head + 18) };
-	return pixels / unitsPerEm;
+	return pixels / ttUSHORT(info->data + info->head + 18);
 }
 
 STBTT_DEF void stbtt_FreeShape(const stbtt_fontinfo *info, stbtt_vertex *v)
@@ -2831,7 +2871,7 @@ STBTT_DEF void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo *font, int g
 	int x1{};
 	int y1{}; // =0 suppresses compiler warning
 
-	if (!stbtt_GetGlyphBox(font, glyph, &x0, &y0, &x1, &y1))
+	if (stbtt_GetGlyphBox(font, glyph, &x0, &y0, &x1, &y1) == 0)
 	{
 		// e.g. space character
 		if (ix0 != nullptr)
@@ -2907,7 +2947,7 @@ typedef struct stbtt__hheap
 {
 	struct stbtt__hheap_chunk* head;
 	void* first_free;
-	int num_remaining_in_head_chunk;
+	int num_remaining_in_head_chunk{};
 } stbtt__hheap;
 
 static void *stbtt__hheap_alloc(stbtt__hheap *hh, size_t size, void *userdata)
@@ -2922,7 +2962,8 @@ static void *stbtt__hheap_alloc(stbtt__hheap *hh, size_t size, void *userdata)
 	if (hh->num_remaining_in_head_chunk == 0)
 	{
 		const int count{ (size < 32 ? 2000 : size < 128 ? 800 : 100) };
-		stbtt__hheap_chunk* c{ static_cast<stbtt__hheap_chunk*>(STBTT_malloc(sizeof(stbtt__hheap_chunk) + size * count, userdata)) };
+		stbtt__hheap_chunk* c{ static_cast<stbtt__hheap_chunk*>(static_cast<void>(userdata), malloc(sizeof(stbtt__hheap_chunk) + size * count)) };
+
 
 		if (c == nullptr)
 		{
@@ -3399,7 +3440,8 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
    STBTT__NOTUSED(vsubsample);
 
    if (result->w > 64)
-      scanline = static_cast<float*>(STBTT_malloc((result->w*2+1) * sizeof(float), userdata));
+      scanline = static_cast<float*>(static_cast<void>(userdata), malloc((result->w * 2 + 1) * sizeof(float)));
+
    else
       scanline = scanline_data;
 
@@ -3603,7 +3645,8 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts, const int
    for (i=0; i < windings; ++i)
       n += wcount[i];
 
-   e = static_cast<stbtt__edge*>(STBTT_malloc(sizeof(*e) * (n+1), userdata)); // add an extra one as a sentinel
+   e = static_cast<stbtt__edge*>(static_cast<void>(userdata), malloc(sizeof(*e) * (n + 1))); // add an extra one as a sentinel
+
    if (e == nullptr) return;
    n = 0;
 
@@ -3729,7 +3772,8 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
    *num_contours = n;
    if (n == 0) return nullptr;
 
-   *contour_lengths = static_cast<int*>(STBTT_malloc(sizeof(**contour_lengths) * n, userdata));
+   *contour_lengths = static_cast<int*>(static_cast<void>(userdata), malloc(sizeof(**contour_lengths) * n));
+
 
    if (*contour_lengths == nullptr) {
       *num_contours = 0;
@@ -3740,7 +3784,8 @@ static stbtt__point *stbtt_FlattenCurves(stbtt_vertex *vertices, int num_verts, 
    for (pass=0; pass < 2; ++pass) {
       float x=0,y=0;
       if (pass == 1) {
-         points = static_cast<stbtt__point*>(STBTT_malloc(num_points * sizeof(points[0]), userdata));
+         points = static_cast<stbtt__point*>(static_cast<void>(userdata), malloc(num_points * sizeof(points[0])));
+
          if (points == nullptr) goto error;
       }
       num_points = 0;
@@ -3866,7 +3911,8 @@ STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info
 
 	if (gbm.w && gbm.h)
 	{
-		gbm.pixels = static_cast<unsigned char*>(STBTT_malloc(gbm.w * gbm.h, info->userdata));
+		gbm.pixels = static_cast<unsigned char*>(static_cast<void>(info->userdata), malloc(gbm.w * gbm.h));
+
 
 		if (gbm.pixels)
 		{
@@ -4065,9 +4111,9 @@ static void stbrp_init_target(stbrp_context *con, int pw, int ph, stbrp_node *no
 
 static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects, int num_rects)
 {
-	for (int i{}; i < num_rects; ++i) 
+	for (int i{}; i < num_rects; ++i)
 	{
-		if (con->x + rects[i].w > con->width) 
+		if (con->x + rects[i].w > con->width)
 		{
 			con->x = 0;
 			con->y = con->bottom_y;
@@ -4105,11 +4151,13 @@ static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects, int num_rect
 
 STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels, int pw, int ph, int stride_in_bytes, int padding, void *alloc_context)
 {
-	stbrp_context* context{ static_cast<stbrp_context*>(STBTT_malloc(sizeof(*context), alloc_context)) };
+	stbrp_context* context{ static_cast<stbrp_context*>(static_cast<void>(alloc_context), malloc(sizeof(*context))) };
 	const int num_nodes{ pw - padding };
-	stbrp_node* nodes{ static_cast<stbrp_node*>(STBTT_malloc(sizeof(*nodes) * num_nodes,alloc_context)) };
+	stbrp_node* nodes{ static_cast<stbrp_node*>(static_cast<void>(alloc_context), malloc(sizeof(*nodes) * num_nodes)) };
 
-	if (context == nullptr || nodes == nullptr) 
+
+
+	if (context == nullptr || nodes == nullptr)
 	{
 		if (context != nullptr)
 		{
@@ -4182,7 +4230,7 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_i
 
 	std::memset(buffer, 0, STBTT_MAX_OVERSAMPLE); // suppress bogus warning from VS2013 -analyze
 
-	for (int j{}; j < h; ++j) 
+	for (int j{}; j < h; ++j)
 	{
 		unsigned int total{};
 		std::memset(buffer, 0, kernel_width);
@@ -4190,7 +4238,7 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_i
 		total = 0;
 
 		// make kernel_width a constant in common cases so compiler can optimize out the divide
-		switch (kernel_width) 
+		switch (kernel_width)
 		{
 			case 2:
 			{
@@ -4244,7 +4292,7 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_i
 			}
 		}
 
-		for (int i{}; i < w; ++i) 
+		for (int i{}; i < w; ++i)
 		{
 			assert(pixels[i] == 0);
 			total -= buffer[i & STBTT__OVER_MASK];
@@ -4515,7 +4563,7 @@ STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context *spc, const unsigned char 
 		n += ranges[i].num_chars;
 	}
 
-	rects = static_cast<stbrp_rect*>(STBTT_malloc(sizeof(*rects) * n, spc->user_allocator_context));
+	rects = static_cast<stbrp_rect*>(static_cast<void>(spc->user_allocator_context), malloc(sizeof(*rects) * n));
 
 	if (rects == nullptr)
 	{
@@ -4846,22 +4894,22 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
 	w = (ix1 - ix0);
 	h = (iy1 - iy0);
 
-	if (width)
+	if (width != nullptr)
 	{
 		*width = w;
 	}
 
-	if (height)
+	if (height != nullptr)
 	{
 		*height = h;
 	}
 
-	if (xoff)
+	if (xoff != nullptr)
 	{
 		*xoff = ix0;
 	}
 
-	if (yoff)
+	if (yoff != nullptr)
 	{
 		*yoff = iy0;
 	}
@@ -4873,8 +4921,8 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sc
 		float *precompute;
 		stbtt_vertex *verts;
 		const int num_verts{ stbtt_GetGlyphShape(info, glyph, &verts) };
-		data = static_cast<unsigned char *>(STBTT_malloc(w * h, info->userdata));
-		precompute = static_cast<float *>(STBTT_malloc(num_verts * sizeof(float), info->userdata));
+		data = static_cast<unsigned char*>(static_cast<void>(info->userdata), malloc(w * h));
+		precompute = static_cast<float*>(static_cast<void>(info->userdata), malloc(num_verts * sizeof(float)));
 
 		for (int i{}, j = num_verts - 1; i < num_verts; j = i++)
 		{
@@ -5133,7 +5181,7 @@ static signed int stbtt__CompareUTF8toUTF16_bigendian_prefix(const unsigned char
 	{
 		const unsigned short ch = s2[0] * 256 + s2[1];
 
-		if (ch < 0x80) 
+		if (ch < 0x80)
 		{
 			if (i >= len1)
 			{
@@ -5144,8 +5192,8 @@ static signed int stbtt__CompareUTF8toUTF16_bigendian_prefix(const unsigned char
 			{
 				return -1;
 			}
-		} 
-		else if (ch < 0x800) 
+		}
+		else if (ch < 0x800)
 		{
 			if (i + 1 >= len1)
 			{
@@ -5161,7 +5209,7 @@ static signed int stbtt__CompareUTF8toUTF16_bigendian_prefix(const unsigned char
 			{
 				return -1;
 			}
-		} 
+		}
 		else if (ch >= 0xd800 && ch < 0xdc00)
 		{
 			const unsigned short ch2 = s2[2] * 256 + s2[3];
@@ -5195,12 +5243,12 @@ static signed int stbtt__CompareUTF8toUTF16_bigendian_prefix(const unsigned char
 
 			s2 += 2; // plus another 2 below
 			len2 -= 2;
-		} 
+		}
 		else if (ch >= 0xdc00 && ch < 0xe000)
 		{
 			return -1;
-		} 
-		else 
+		}
+		else
 		{
 			if (i + 2 >= len1)
 			{
