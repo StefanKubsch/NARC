@@ -58,7 +58,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - error handling, file checks
   - basic implementation of main menu, options
   - autoupdates via web/HTTPS for e.g. "gamecontrollerdb.txt" (using libcurl)
-  - really fast & lightweight text rendering via stb_truetype.h and pre-generated glyph textures (OpenGL)
+  - really fast & lightweight text rendering via a modified stb_truetype.h and pre-generated glyph textures (OpenGL)
 
 ![NARC_PIC1](https://github.com/StefanKubsch/NARC/blob/master/Documentation/NARC.png)
 
