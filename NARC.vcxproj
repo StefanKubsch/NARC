@@ -70,14 +70,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Coding\NARC\Libs\libcurl\include\curl;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\include;C:\Coding\NARC\Libs\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\NARC\Libs\libcurl\lib;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\lib\x64;C:\Coding\NARC\Libs\SDL2-2.0.9\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Coding\NARC\Libs\libcurl\include\curl;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\include;C:\Coding\NARC\Libs\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\NARC\Libs\libcurl\lib;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\lib\x64;C:\Coding\NARC\Libs\SDL2-2.0.10\lib\x64;$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Coding\NARC\Libs\libcurl\include\curl;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\include;C:\Coding\NARC\Libs\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\NARC\Libs\libcurl\lib;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\lib\x64;C:\Coding\NARC\Libs\SDL2-2.0.9\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Coding\NARC\Libs\libcurl\include\curl;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\include;C:\Coding\NARC\Libs\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\NARC\Libs\libcurl\lib;C:\Coding\NARC\Libs\SDL2_mixer-2.0.4\lib\x64;C:\Coding\NARC\Libs\SDL2-2.0.10\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
