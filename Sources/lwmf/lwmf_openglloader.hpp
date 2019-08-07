@@ -36,10 +36,10 @@ using GLintptr = std::ptrdiff_t;
 #define OGL \
 	OG(void,	glAttachShader,				GLuint program, GLuint shader) \
 	OG(void,	glBindBuffer,				GLenum target, GLuint buffer) \
-	OG(void,	glBindFragDataLocation,		GLuint program, GLuint colorNumber,	const char * name) \
+	OG(void,	glBindFragDataLocation,		GLuint program, GLuint colorNumber,	const char* name) \
 	OG(void,	glBindVertexArray,			GLuint array) \
-	OG(void,	glBufferData,				GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage) \
-	OG(void,	glBufferSubData,			GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid * data) \
+	OG(void,	glBufferData,				GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage) \
+	OG(void,	glBufferSubData,			GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid* data) \
 	OG(void,	glCompileShader,			GLuint shader) \
 	OG(GLint,	glCreateProgram,			void) \
 	OG(GLint,	glCreateShader,				GLenum type) \
@@ -47,23 +47,23 @@ using GLintptr = std::ptrdiff_t;
 	OG(void,	glDeleteShader,				GLuint shader) \
 	OG(void,	glDetachShader,				GLuint program, GLuint shader) \
 	OG(void,	glEnableVertexAttribArray,	GLuint index) \
-	OG(void,	glGenBuffers,				GLsizei n, GLuint *buffers) \
-	OG(void,	glGenVertexArrays,			GLsizei n, GLuint *arrays) \
+	OG(void,	glGenBuffers,				GLsizei n, GLuint* buffers) \
+	OG(void,	glGenVertexArrays,			GLsizei n, GLuint* arrays) \
 	OG(GLint,	glGetAttribLocation,		GLuint program, const GLchar *name) \
-	OG(void,	glGetProgramInfoLog,		GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog) \
-	OG(void,	glGetProgramiv,				GLuint program, GLenum pname, GLint *params) \
-	OG(void,	glGetShaderInfoLog,			GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) \
-	OG(void,	glGetShaderiv,				GLuint shader, GLenum pname, GLint *params) \
-	OG(GLint,	glGetUniformLocation,		GLuint program, const GLchar *name) \
+	OG(void,	glGetProgramInfoLog,		GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog) \
+	OG(void,	glGetProgramiv,				GLuint program, GLenum pname, GLint* params) \
+	OG(void,	glGetShaderInfoLog,			GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog) \
+	OG(void,	glGetShaderiv,				GLuint shader, GLenum pname, GLint* params) \
+	OG(GLint,	glGetUniformLocation,		GLuint program, const GLchar* name) \
 	OG(void,	glLinkProgram,				GLuint program) \
-	OG(void,	glShaderSource,				GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length) \
-	OG(void,	glTexStorage2D,				GLenum target,	GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) \
+	OG(void,	glShaderSource,				GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length) \
+	OG(void,	glTexStorage2D,				GLenum target,GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) \
 	OG(void,	glUniform2f,				GLint location, GLfloat v0, GLfloat v1) \
-	OG(void,	glUniformMatrix4fv,			GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) \
+	OG(void,	glUniformMatrix4fv,			GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) \
 	OG(void,	glUseProgram,				GLuint program) \
-	OG(void,	glVertexAttribPointer,		GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer)
+	OG(void,	glVertexAttribPointer,		GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer)
 
-#define OG(Return, Name, ...) typedef Return WINAPI Name##proc(__VA_ARGS__); extern Name##proc * Name;
+#define OG(Return, Name, ...) typedef Return WINAPI Name##proc(__VA_ARGS__); extern Name##proc* Name;
 	OGL
 #undef OG
 
@@ -86,7 +86,7 @@ namespace lwmf
 		}
 		else
 		{
-			typedef PROC WINAPI wglGetProcAddressproc(LPCSTR lpszProc);
+			using wglGetProcAddressproc = PROC WINAPI(LPCSTR);
 			wglGetProcAddressproc* wglGetProcAddress{ reinterpret_cast<wglGetProcAddressproc*>(GetProcAddress(OGL32, "wglGetProcAddress")) };
 
 			#define OG(Return, Name, ...) Name = (Name##proc *)wglGetProcAddress(#Name);
@@ -100,8 +100,8 @@ namespace lwmf
 	inline void SetVSync(const std::int_fast32_t Sync)
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Set vsync (" + std::to_string(Sync) + ")...");
-		typedef PROC(WINAPI * PFNWGLSWAPINTERVALFARPROC)(std::int_fast32_t);
-		PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT{ reinterpret_cast<PFNWGLSWAPINTERVALFARPROC>(wglGetProcAddress("wglSwapIntervalEXT")) };
+		using PFNWGLSWAPINTERVALFARPROC = PROC WINAPI(std::int_fast32_t);
+		PFNWGLSWAPINTERVALFARPROC* wglSwapIntervalEXT{ reinterpret_cast<PFNWGLSWAPINTERVALFARPROC*>(wglGetProcAddress("wglSwapIntervalEXT")) };
 		wglSwapIntervalEXT(Sync);
 	}
 
