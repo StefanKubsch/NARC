@@ -740,3 +740,17 @@ NARC.log
 .vs/NARC/v16/ipch/AutoPCH/e1c250ceb544b38a/HID_GAMECONTROLLERCLASS.ipch
 lwmf_systemlog.log
 x64/Release/NARC.nativecodeanalysis.sarif
+.vs/NARC/v16/ipch/AutoPCH/fae196e338af2b49/STB_TRUETYPE.ipch
+x64/Debug/NARC.exe
+x64/Debug/NARC.ilk
+x64/Debug/NARC.obj
+x64/Debug/NARC.pdb
+x64/Debug/NARC.tlog/CL.command.1.tlog
+x64/Debug/NARC.tlog/CL.read.1.tlog
+x64/Debug/NARC.tlog/CL.write.1.tlog
+x64/Debug/NARC.tlog/link.command.1.tlog
+x64/Debug/NARC.tlog/link.read.1.tlog
+x64/Debug/NARC.tlog/link.write.1.tlog
+x64/Debug/NARC.tlog/NARC.lastbuildstate
+x64/Debug/vc142.idb
+x64/Debug/vc142.pdb
