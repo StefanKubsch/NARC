@@ -50,9 +50,11 @@ namespace lwmf
 
 	inline void SetPixelSafe(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color)
 	{
-		if (static_cast<std::uint_fast32_t>(x) <= static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y) < static_cast<std::uint_fast32_t>(Texture.Height))
+		const std::int_fast32_t PixelPos{ y * Texture.Width + x };
+
+		if (PixelPos >= 0 && PixelPos < static_cast<std::int_fast32_t>(Texture.Pixels.size()))
 		{
-			Texture.Pixels[y * Texture.Width + x] = Color;
+			Texture.Pixels[PixelPos] = Color;
 		}
 	}
 
