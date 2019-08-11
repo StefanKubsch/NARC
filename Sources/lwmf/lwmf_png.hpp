@@ -97,12 +97,12 @@ namespace lwmf
 				{
 					for (std::int_fast32_t i{}; i < BitLength[n]; ++i)
 					{
-						const std::int_fast32_t Bit{ (Tree1D[n] >> (BitLength[n] - i - 1)) & 1 };
-
 						if (TreePos > NumCodes - 2)
 						{
 							return 55;
 						}
+
+						const std::int_fast32_t Bit{ (Tree1D[n] >> (BitLength[n] - i - 1)) & 1 };
 
 						Tree2D[2 * TreePos + Bit] == 32767 ? (i + 1 == BitLength[n] ? (Tree2D[2 * TreePos + Bit] = n, TreePos = 0) : (Tree2D[2 * TreePos + Bit] = ++NodeFilled + NumCodes, TreePos = NodeFilled)) : TreePos = Tree2D[2 * TreePos + Bit] - NumCodes;
 					}
@@ -249,12 +249,12 @@ namespace lwmf
 
 				while (i < HLit + HDist)
 				{
-					const std::int_fast32_t Code{ HuffmanDecodeSymbol(In, BP, CodeLengthCodeTree, InLength) };
-
 					if (Error != 0)
 					{
 						return;
 					}
+
+					const std::int_fast32_t Code{ HuffmanDecodeSymbol(In, BP, CodeLengthCodeTree, InLength) };
 
 					if (Code <= 15)
 					{
