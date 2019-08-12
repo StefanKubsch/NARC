@@ -118,11 +118,11 @@ namespace lwmf
 			{
 				if (!IsError)
 				{
-					Logfile << LogLevelString << std::string(Filename) << ": " << Message << "\n";
+					Logfile << LogLevelString << Filename << ": " << Message << "\n";
 				}
 				else
 				{
-					Logfile << "\n" << GetTimeStamp() << LogLevelString << std::string(Filename) << ": " << Message << "\n";
+					Logfile << "\n" << GetTimeStamp() << LogLevelString << Filename << ": " << Message << "\n";
 					Logfile.close();
 
 					throw std::runtime_error(Message);

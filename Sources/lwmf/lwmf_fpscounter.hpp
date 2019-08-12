@@ -12,6 +12,8 @@
 
 #include <cstdint>
 #include <string>
+#include <charconv>
+#include <vector>
 #include <sysinfoapi.h>
 
 #include "lwmf_text.hpp"
@@ -50,7 +52,9 @@ namespace lwmf
 
 	inline void DisplayFPSCounter(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
 	{
-		RenderText(Texture, "fps:" + std::to_string(FPS), PosX, PosY, Color);
+		std::vector<char> FPSString(4);
+		std::to_chars(FPSString.data(), FPSString.data() + FPSString.size(), FPS);
+		RenderText(Texture, "fps:" + std::string(FPSString.data()), PosX, PosY, Color);
 	}
 
 
