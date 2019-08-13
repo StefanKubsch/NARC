@@ -450,9 +450,8 @@ inline static stbtt__buf stbtt__buf_range(const stbtt__buf* b, const std::int_fa
 inline static stbtt__buf stbtt__cff_get_index(stbtt__buf* b)
 {
 	const std::int_fast32_t start{ b->cursor };
-	const std::int_fast32_t count{ stbtt__buf_get((b), 2) };
 
-	if (count != 0)
+	if (const std::int_fast32_t count{ stbtt__buf_get((b), 2) }; count != 0)
 	{
 		const std::int_fast32_t offsize{ stbtt__buf_get8(b) };
 		stbtt__buf_skip(b, offsize * count);
@@ -496,9 +495,7 @@ inline static std::int_fast32_t stbtt__cff_int(stbtt__buf* b)
 
 inline static void stbtt__cff_skip_operand(stbtt__buf* b)
 {
-	const std::int_fast32_t b0{ stbtt__buf_peek8(b) };
-
-	if (b0 == 30)
+	if (const std::int_fast32_t b0{ stbtt__buf_peek8(b) }; b0 == 30)
 	{
 		stbtt__buf_skip(b, 1);
 
@@ -1485,9 +1482,8 @@ inline static stbtt__buf stbtt__cid_get_glyph_subrs(const stbtt_fontinfo* info, 
 	std::int_fast32_t fdselector{ -1 };
 
 	stbtt__buf_seek(&fdselect, 0);
-	const std::int_fast32_t fmt{ stbtt__buf_get8(&fdselect) };
 
-	if (fmt == 0)
+	if (const std::int_fast32_t fmt{ stbtt__buf_get8(&fdselect) }; fmt == 0)
 	{
 		// untested
 		stbtt__buf_skip(&fdselect, glyph_index);
@@ -1996,9 +1992,8 @@ inline std::int_fast32_t stbtt_GetGlyphShape(const stbtt_fontinfo* info, const s
 
 inline void stbtt_GetGlyphHMetrics(const stbtt_fontinfo* info, const std::int_fast32_t glyph_index, std::int_fast32_t* advanceWidth, std::int_fast32_t* leftSideBearing)
 {
-	const std::int_fast32_t numOfLongHorMetrics{ ttUSHORT(info->data + info->hhea + 34) };
-
-	if (glyph_index < numOfLongHorMetrics)
+	
+	if (const std::int_fast32_t numOfLongHorMetrics{ ttUSHORT(info->data + info->hhea + 34) }; glyph_index < numOfLongHorMetrics)
 	{
 		if (advanceWidth != nullptr)
 		{
@@ -2618,9 +2613,7 @@ inline static void stbtt__fill_active_edges_new(float* scanline, float* scanline
 			if (x_top >= 0.0F && x_bottom >= 0.0F && x_top < len && x_bottom < len)
 			{
 				// from here on, we don't have to range check x values
-				float dy{ e->fdy };
-
-				if (static_cast<std::int_fast32_t>(x_top) == static_cast<std::int_fast32_t>(x_bottom))
+				if (float dy{ e->fdy }; static_cast<std::int_fast32_t>(x_top) == static_cast<std::int_fast32_t>(x_bottom))
 				{
 					// simple case, only spans one pixel
 					const std::int_fast32_t x{ static_cast<std::int_fast32_t>(x_top) };
@@ -2770,9 +2763,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap* result, stbtt__e
 		// remove all active edges that terminate before the top of this scanline
 		while (*step != nullptr)
 		{
-			stbtt__active_edge* z{ *step };
-
-			if (z->ey <= scan_y_top)
+			if (stbtt__active_edge* z{ *step }; z->ey <= scan_y_top)
 			{
 				*step = z->next; // delete from list
 				z->direction = 0;
@@ -2789,9 +2780,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap* result, stbtt__e
 		{
 			if (e->y0 != e->y1)
 			{
-				stbtt__active_edge* z{ stbtt__new_active(&hh, e, off_x, scan_y_top, userdata) };
-
-				if (z != nullptr)
+				if (stbtt__active_edge* z{ stbtt__new_active(&hh, e, off_x, scan_y_top, userdata) }; z != nullptr)
 				{
 					if (j == 0 && off_y != 0)
 					{
@@ -3004,9 +2993,8 @@ inline static void stbtt__rasterize(stbtt__bitmap* result, stbtt__point* pts, co
 	{
 		const stbtt__point* p{ pts + m };
 		m += wcount[i];
-		std::int_fast32_t j{ wcount[i] - 1 };
 
-		for (std::int_fast32_t k{}; k < wcount[i]; j = k++)
+		for (std::int_fast32_t j{ wcount[i] - 1 }, k{}; k < wcount[i]; j = k++)
 		{
 			std::int_fast32_t a{ k };
 			std::int_fast32_t b{ j };
@@ -3261,9 +3249,7 @@ inline void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo* info, unsigned c
 
 	stbtt_GetGlyphBitmapBoxSubpixel(info, glyph, scale_x, scale_y, shift_x, shift_y, &ix0, &iy0, nullptr, nullptr);
 
-	stbtt__bitmap gbm{ out_w, out_h, out_stride, output };
-
-	if (gbm.w != 0 && gbm.h != 0)
+	if (stbtt__bitmap gbm{ out_w, out_h, out_stride, output }; gbm.w != 0 && gbm.h != 0)
 	{
 		stbtt_Rasterize(&gbm, 0.35F, vertices, num_verts, scale_x, scale_y, shift_x, shift_y, ix0, iy0, 1, info->userdata);
 	}
