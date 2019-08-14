@@ -3271,7 +3271,6 @@ inline void stbtt_MakeGlyphBitmap(const stbtt_fontinfo* info, unsigned char* out
 inline static std::int_fast32_t stbtt_BakeFontBitmap_internal(const unsigned char* data, const std::int_fast32_t offset, const float pixel_height, unsigned char* pixels, const std::int_fast32_t pw, const std::int_fast32_t ph, const std::int_fast32_t first_char, const std::int_fast32_t num_chars, stbtt_bakedchar* chardata)
 {
 	stbtt_fontinfo f{};
-	f.userdata = nullptr;
 
 	if (stbtt_InitFont(&f, data, offset) == 0)
 	{
