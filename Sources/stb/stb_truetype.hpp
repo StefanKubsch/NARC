@@ -1992,7 +1992,7 @@ inline std::int_fast32_t stbtt_GetGlyphShape(const stbtt_fontinfo* info, const s
 
 inline void stbtt_GetGlyphHMetrics(const stbtt_fontinfo* info, const std::int_fast32_t glyph_index, std::int_fast32_t* advanceWidth, std::int_fast32_t* leftSideBearing)
 {
-	
+
 	if (const std::int_fast32_t numOfLongHorMetrics{ ttUSHORT(info->data + info->hhea + 34) }; glyph_index < numOfLongHorMetrics)
 	{
 		if (advanceWidth != nullptr)
@@ -2433,7 +2433,7 @@ using stbtt__hheap = struct stbtt__hheap
 	std::int_fast32_t num_remaining_in_head_chunk{};
 };
 
-inline static void *stbtt__hheap_alloc(stbtt__hheap* hh, const size_t size, void* userdata)
+inline static void *stbtt__hheap_alloc(stbtt__hheap* hh, const size_t size)
 {
 	if (hh->first_free != nullptr)
 	{
@@ -2502,7 +2502,7 @@ using stbtt__active_edge = struct stbtt__active_edge
 
 inline static stbtt__active_edge* stbtt__new_active(stbtt__hheap* hh, stbtt__edge* e, const std::int_fast32_t off_x, const float start_point, void* userdata)
 {
-	stbtt__active_edge* z{ static_cast<stbtt__active_edge*>(stbtt__hheap_alloc(hh, sizeof(*z), userdata)) };
+	stbtt__active_edge* z{ static_cast<stbtt__active_edge*>(stbtt__hheap_alloc(hh, sizeof(*z))) };
 
 	if (z == nullptr)
 	{
@@ -2732,7 +2732,7 @@ inline static void stbtt__fill_active_edges_new(float* scanline, float* scanline
 }
 
 // directly AA rasterize edges w/o supersampling
-inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap* result, stbtt__edge* e, const std::int_fast32_t n, const std::int_fast32_t vsubsample, const std::int_fast32_t off_x, const std::int_fast32_t off_y, void* userdata)
+inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap* result, stbtt__edge* e, const std::int_fast32_t n, const std::int_fast32_t vsubsample, const std::int_fast32_t off_x, const std::int_fast32_t off_y, void* userdata) //-V751
 {
 	stbtt__hheap hh{};
 	stbtt__active_edge* active{};
