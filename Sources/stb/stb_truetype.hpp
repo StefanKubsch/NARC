@@ -1643,7 +1643,7 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo* info
 
 				for (;;)
 				{
-					if (i >= sp)
+					if (i >= sp) //-V547
 					{
 						break;
 					}
@@ -1653,7 +1653,7 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo* info
 				++i;
 
 				vlineto:
-				if (i >= sp)
+				if (i >= sp) //-V547
 				{
 					break;
 				}
@@ -2283,10 +2283,7 @@ inline static std::int_fast32_t stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fonti
                         }
                         case 2:
 						{
-							const std::int_fast32_t valueFormat1{ ttUSHORT(table + 4) };
-							const std::int_fast32_t valueFormat2{ ttUSHORT(table + 6) };
-
-							if ((valueFormat1 != 4) || (valueFormat2 != 0))
+							if ((ttUSHORT(table + 4) != 4) || (ttUSHORT(table + 6) != 0))
 							{
 								return 0;
 							}
@@ -2851,14 +2848,11 @@ inline static void stbtt__sort_edges_ins_sort(stbtt__edge* p, const std::int_fas
 	{
 		stbtt__edge t{ p[i] };
 		stbtt__edge* a{ &t };
-
 		std::int_fast32_t j{ i };
 
 		while (j > 0)
 		{
-			stbtt__edge* b{ &p[j - 1] };
-
-			if (!(a->y0 < b->y0))
+			if (stbtt__edge* b{ &p[j - 1] }; !(a->y0 < b->y0))
 			{
 				break;
 			}
