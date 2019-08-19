@@ -12,11 +12,9 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <SDL_mixer.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "SFX_SDL.hpp"
 
 class Game_PlayerClass final
 {
@@ -43,10 +41,6 @@ public:
 	float MoveSpeed{};
 	float CollisionDetectionFactor{};
 	bool IsDead{};
-
-private:
-	std::vector<Mix_Chunk*> Sounds;
-	std::int_fast32_t FootStepsAudioChannel{};
 };
 
 inline void Game_PlayerClass::InitConfig()
@@ -66,20 +60,16 @@ inline void Game_PlayerClass::InitConfig()
 
 inline void Game_PlayerClass::InitAudio()
 {
-	Sounds.clear();
-	Sounds.shrink_to_fit();
-
 	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Get Footsteps audio
-		Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio")));
-		FootStepsAudioChannel = 0;
+		lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio"), lwmf::AudioTypes::MP3, "FootSteps");
 
 		// Get Hurt audio
-		Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio")));
+		lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio"), lwmf::AudioTypes::MP3, "Hurt");
 
 		// Get DeathScream audio
-		Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio")));
+		lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio"), lwmf::AudioTypes::MP3, "DeathScream");
 	}
 }
 
@@ -101,21 +91,31 @@ inline void Game_PlayerClass::HurtPlayer(const std::int_fast32_t DamageDealt)
 
 inline void Game_PlayerClass::PlayAudio(const PlayerSounds Sound)
 {
-	if (Sound == PlayerSounds::FootSteps && Mix_Playing(FootStepsAudioChannel) == 0)
+	switch (Sound)
 	{
-		FootStepsAudioChannel = Mix_PlayChannel(-1, Sounds[static_cast<std::int_fast32_t>(Sound)], 0);
-	}
-	else if (Sound != PlayerSounds::FootSteps)
-	{
-		Mix_PlayChannel(-1, Sounds[static_cast<std::int_fast32_t>(Sound)], 0);
+		case PlayerSounds::FootSteps:
+		{
+			lwmf::PlayAudio("FootSteps", lwmf::MainWindow, lwmf::AudioPlayModes::NOTIFY);
+			break;
+		}
+		case PlayerSounds::Hurt:
+		{
+			lwmf::PlayAudio("Hurt", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
+			break;
+		}
+		case PlayerSounds::DeathScream:
+		{
+			lwmf::PlayAudio("DeathScream", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
+			break;
+		}
+		default: {}
 	}
 }
 
 inline void Game_PlayerClass::CloseAudio()
 {
-	for (auto&& Sound : Sounds)
-	{
-		Mix_FreeChunk(Sound);
-	}
+	lwmf::CloseAudio("FootSteps");
+	lwmf::CloseAudio("Hurt");
+	lwmf::CloseAudio("DeathScream");
 }
 

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <SDL.h>
-#include <SDL_mixer.h>
 
 namespace Tools_Cleanup
 {
@@ -27,13 +26,6 @@ namespace Tools_Cleanup
 		lwmf::UnregisterRawInputDevice(lwmf::HID_MOUSE);
 		lwmf::UnregisterRawInputDevice(lwmf::HID_KEYBOARD);
 		lwmf::DeleteOpenGLContext();
-
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Quit SDL_Mixer");
-
-		while (Mix_Init(0) != 0)
-		{
-			Mix_Quit();
-		}
 
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Quit SDL subsystems");
 		SDL_Quit();

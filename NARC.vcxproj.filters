@@ -75,9 +75,6 @@
     <ClInclude Include="Sources\Game_Transitions.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\SFX_SDL.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Tools_Curl.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>

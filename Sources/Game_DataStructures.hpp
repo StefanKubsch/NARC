@@ -14,7 +14,6 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <SDL_mixer.h>
 
 #include "Game_PlayerClass.hpp"
 
@@ -68,7 +67,6 @@ struct EntityStruct final
 
 struct WeaponStruct final
 {
-	std::vector<Mix_Chunk*> Sounds;
 	lwmf::ShaderClass WeaponShader{};
 	lwmf::ShaderClass MuzzleFlashShader{};
 	lwmf::IntRectStruct WeaponRect{};
@@ -104,7 +102,7 @@ struct EntityAssetStruct final
 	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures;
 	std::vector<lwmf::TextureStruct> AttackTextures;
 	std::vector<lwmf::TextureStruct> KillTextures;
-	std::vector<Mix_Chunk*> Sounds;
+	std::vector<std::string> Sounds;
 	std::string Name;
 	std::int_fast32_t Number{};
 };
@@ -116,7 +114,7 @@ struct EntityAssetStruct final
 struct DoorStruct final
 {
 	lwmf::TextureStruct AnimTexture;
-	std::vector<Mix_Chunk*> Sounds;
+	std::string OpenCloseSound;
 	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t Number{};
 	std::int_fast32_t OriginalTexture{};

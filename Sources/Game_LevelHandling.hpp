@@ -14,7 +14,6 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <SDL_mixer.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -50,8 +49,6 @@ namespace Game_LevelHandling
 	inline std::vector<lwmf::TextureStruct> LevelTextures;
 
 	inline std::vector<GFX_LightingClass> StaticLights;
-
-	inline Mix_Music* BackgroundMusic;
 
 	static constexpr std::int_fast32_t NumberOfLevelMapLayers{ 4 };
 
@@ -176,7 +173,7 @@ namespace Game_LevelHandling
 			{
 				if (const std::string AudioFileName{ lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
 				{
-					BackgroundMusic = Mix_LoadMUS(AudioFileName.c_str());
+					lwmf::LoadAudioFile(AudioFileName, lwmf::AudioTypes::MP3, "BackgroundMusic");
 				}
 			}
 		}
@@ -186,7 +183,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			Mix_PlayMusic(BackgroundMusic, -1);
+			lwmf::PlayAudio("BackgroundMusic", lwmf::MainWindow, lwmf::AudioPlayModes::REPEAT);
 		}
 	}
 
@@ -194,7 +191,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			Mix_FreeMusic(BackgroundMusic);
+			lwmf::CloseAudio("BackgroundMusic");
 		}
 	}
 

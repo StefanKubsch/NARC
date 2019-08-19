@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <string>
 #include <fstream>
-#include <SDL_mixer.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -193,22 +192,19 @@ namespace Game_WeaponHandling
 	{
 		for (auto&& Weapon : Weapons)
 		{
-			Weapon.Sounds.clear();
-			Weapon.Sounds.shrink_to_fit();
-
 			if (const std::string INIFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				// Get SingleShot Audio (Index = 0)
-				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio")));
+				lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"), lwmf::AudioTypes::MP3, "Shot");
 
 				// Get Dry Fire Audio (Index = 1)
-				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio")));
+				lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio"), lwmf::AudioTypes::MP3, "DryFire");
 
 				// Get Reload Audio (Index = 2)
-				Weapon.Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio")));
+				lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"), lwmf::AudioTypes::MP3, "Reload");
 
 				// Get length of audio file in ms and store to weapon data
-				Weapon.ReloadDuration = static_cast<std::int_fast32_t>(Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)]->alen / 1000) >> 2;
+				Weapon.ReloadDuration = lwmf::GetAudioLength("Reload") / FrameLock;
 			}
 		}
 	}
@@ -511,7 +507,29 @@ namespace Game_WeaponHandling
 
 	inline void PlayAudio(const std::int_fast32_t SelectedPlayerWeapon, const WeaponsSounds WeaponSound)
 	{
-		Mix_PlayChannel(-1, Weapons[SelectedPlayerWeapon].Sounds[static_cast<std::int_fast32_t>(WeaponSound)], 0);
+		std::string WeaponSoundString;
+
+		switch (WeaponSound)
+		{
+			case WeaponsSounds::Shot:
+			{
+				WeaponSoundString = "Shot";
+				break;
+			}
+			case WeaponsSounds::Dryfire:
+			{
+				WeaponSoundString = "Dryfire";
+				break;
+			}
+			case WeaponsSounds::Reload:
+			{
+				WeaponSoundString = "Reload";
+				break;
+			}
+			default: {}
+		}
+
+		lwmf::PlayAudio(WeaponSoundString, lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
 	}
 
 

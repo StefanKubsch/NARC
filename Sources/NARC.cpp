@@ -45,7 +45,6 @@ inline lwmf::ShaderClass ScreenTextureShader;
 #include "GFX_Window.hpp"
 #include "GFX_TextClass.hpp"
 #include "GFX_LightingClass.hpp"
-#include "SFX_SDL.hpp"
 #include "HID_Keyboard.hpp"
 #include "HID_Mouse.hpp"
 #include "HID_GameControllerClass.hpp"
@@ -560,6 +559,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			PostQuitMessage(0);
 			break;
 		}
+		case MM_MCINOTIFY:
+		{
+			switch (wParam)
+			{
+				// "rewind" player footsteps audio if played completely
+				case MCI_NOTIFY_SUCCESSFUL:
+				{
+					mciSendString("seek FootSteps to start", nullptr, 0, nullptr);
+					break;
+				}
+			}
+			break;
+		}
 		default: {}
 	}
 
@@ -578,7 +590,6 @@ void InitAndLoadGameConfig()
 	Tools_Curl::Init();
 	Tools_InitSDL::InitSDL();
 	GFX_Window::Init();
-	SFX_SDL::Init();
 	Game_WeaponHandling::InitConfig();
 	Game_WeaponHandling::InitTextures();
 	Game_WeaponHandling::InitAudio();
@@ -598,7 +609,6 @@ void InitAndLoadLevel()
 {
 	Game_Transitions::LevelTransition();
 
-	SFX_SDL::StopAudio();
 	Game_LevelHandling::CloseBackgroundMusic();
 	Game_AssetHandling::CloseAudio();
 	Player.CloseAudio();

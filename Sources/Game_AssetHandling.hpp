@@ -12,11 +12,9 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <SDL_mixer.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "SFX_SDL.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "Game_DataStructures.hpp"
 
@@ -80,15 +78,18 @@ namespace Game_AssetHandling
 					if (const std::string AssetType{ lwmf::ReadINIValue<std::string>(INIFile, "GENERAL", "AssetType") }; AssetType == "AmmoBox")
 					{
 						// Get Pickup audio
-						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup")));
+						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "AmmoPickup");
+						lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup"), lwmf::AudioTypes::MP3, EntityAssets[AssetIndex].Sounds[0]);
 					}
 					else if (AssetType == "Enemy" || AssetType == "Turret")
 					{
 						// Get KillSound audio
-						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound")));
+						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "KillSound");
+						lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound"), lwmf::AudioTypes::MP3, EntityAssets[AssetIndex].Sounds[0]);
 
 						// Get AttackSound audio
-						EntityAssets[AssetIndex].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound")));
+						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "AttackSound");
+						lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound"), lwmf::AudioTypes::MP3, EntityAssets[AssetIndex].Sounds[1]);
 					}
 
 					++AssetIndex;
@@ -161,7 +162,7 @@ namespace Game_AssetHandling
 		{
 			for (auto&& Sound : Asset.Sounds)
 			{
-				Mix_FreeChunk(Sound);
+				lwmf::CloseAudio(Sound);
 			}
 		}
 	}

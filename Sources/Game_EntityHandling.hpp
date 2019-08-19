@@ -14,7 +14,6 @@
 #include <vector>
 #include <random>
 #include <algorithm>
-#include <SDL_mixer.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -684,7 +683,7 @@ namespace Game_EntityHandling
 
 	inline void PlayAudio(const std::int_fast32_t TypeNumber, const EntitySounds EntitySound)
 	{
-		Mix_PlayChannel(-1, EntityAssets[TypeNumber].Sounds[static_cast<std::int_fast32_t>(EntitySound)], 0);
+		lwmf::PlayAudio(EntityAssets[TypeNumber].Sounds[static_cast<std::int_fast32_t>(EntitySound)], lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
 	}
 
 

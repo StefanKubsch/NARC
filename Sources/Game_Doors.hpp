@@ -11,11 +11,9 @@
 
 #include <cstdint>
 #include <string>
-#include <SDL_mixer.h>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "SFX_SDL.hpp"
 #include "Game_DataStructures.hpp"
 #include "Game_LevelHandling.hpp"
 #include "Game_EntityHandling.hpp"
@@ -24,15 +22,10 @@ namespace Game_Doors
 {
 
 
-	enum class DoorSounds : std::int_fast32_t
-	{
-		OpenClose
-	};
-
 	void Init();
 	void TriggerDoor();
 	void OpenCloseDoors();
-	void PlayAudio(const DoorStruct& Door, DoorSounds DoorSound);
+	void PlayAudio(const DoorStruct& Door);
 	void CloseAudio();
 
 	//
@@ -62,8 +55,8 @@ namespace Game_Doors
 						Doors[Index].OpenCloseSpeed = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "OpenCloseSpeed");
 						Doors[Index].StayOpenTime = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "StayOpenTime") * static_cast<std::int_fast32_t>(FrameLock);
 						Doors[Index].AnimTexture = Game_LevelHandling::LevelTextures[Doors[Index].OriginalTexture];
-
-						Doors[Index].Sounds.emplace_back(SFX_SDL::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound")));
+						Doors[Index].OpenCloseSound = "Door" + std::to_string(Index) + "OpenClose";
+						lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound"), lwmf::AudioTypes::MP3, Doors[Index].OpenCloseSound);
 
 						++Index;
 					}
@@ -80,7 +73,7 @@ namespace Game_Doors
 			{
 				Door.IsOpenTriggered = true;
 				Door.OpenCloseCounter = 0;
-				PlayAudio(Door, DoorSounds::OpenClose);
+				PlayAudio(Door);
 			}
 		}
 	}
@@ -131,7 +124,7 @@ namespace Game_Doors
 					{
 						if (!Door.OpenCloseAudioFlag)
 						{
-							PlayAudio(Door, DoorSounds::OpenClose);
+							PlayAudio(Door);
 							Door.OpenCloseAudioFlag = true;
 						}
 
@@ -156,19 +149,16 @@ namespace Game_Doors
 		}
 	}
 
-	inline void PlayAudio(const DoorStruct& Door, const DoorSounds DoorSound)
+	inline void PlayAudio(const DoorStruct& Door)
 	{
-		Mix_PlayChannel(-1, Door.Sounds[static_cast<std::int_fast32_t>(DoorSound)], 0);
+		lwmf::PlayAudio(Door.OpenCloseSound, lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
 	}
 
 	inline void CloseAudio()
 	{
 		for (const auto& Door : Doors)
 		{
-			for (auto&& Sound : Door.Sounds)
-			{
-				Mix_FreeChunk(Sound);
-			}
+			lwmf::CloseAudio(Door.OpenCloseSound);
 		}
 	}
 
