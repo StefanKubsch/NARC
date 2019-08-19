@@ -38,6 +38,7 @@ inline lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 #include "lwmf_bmp.hpp"
 #include "lwmf_png.hpp"
 #include "lwmf_text.hpp"
+#include "lwmf_audio.hpp"
 #include "lwmf_perlinnoise.hpp"
 #include "lwmf_fpscounter.hpp"
 #include "lwmf_multithreading.hpp"

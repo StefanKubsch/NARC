@@ -29,7 +29,7 @@ namespace GFX_Window
 		if (const std::string INIFile{ "./DATA/GameConfig/WindowConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			// Create fullscreen if VSync = true, otherwise a window
-			lwmf::CreateOpenGLWindow(WindowInstance,
+			lwmf::CreateOpenGLWindow(lwmf::WindowInstance,
 				ScreenTexture,
 				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
 				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <Windows.h>
 #include <cstdint>
 
 namespace lwmf
@@ -40,6 +41,7 @@ namespace lwmf
 		std::int_fast32_t Height{};
 	};
 
+	inline HINSTANCE WindowInstance;
 	inline std::int_fast32_t FullscreenFlag{};
 
 
