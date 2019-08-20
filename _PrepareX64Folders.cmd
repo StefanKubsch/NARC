@@ -22,7 +22,6 @@ xcopy .\GFX .\x64\Release\GFX\ /S
 xcopy .\SFX .\x64\Release\SFX\ /S
 xcopy .\Shader .\x64\Release\Shader\ /S
 
-xcopy .\Libs\SDL2_mixer-2.0.4\lib\x64\SDL2_mixer.dll .\x64\Debug\ /Y
 xcopy .\Libs\SDL2-2.0.10\lib\x64\SDL2.dll .\x64\Debug\ /Y
 xcopy .\Libs\libcurl\bin\libcurl.dll .\x64\Debug\ /Y
 
