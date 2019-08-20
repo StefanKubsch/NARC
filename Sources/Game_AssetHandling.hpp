@@ -79,17 +79,17 @@ namespace Game_AssetHandling
 					{
 						// Get Pickup audio
 						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "AmmoPickup");
-						lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup"), lwmf::AudioTypes::MP3, EntityAssets[AssetIndex].Sounds[0]);
+						lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup"), EntityAssets[AssetIndex].Sounds[0]);
 					}
 					else if (AssetType == "Enemy" || AssetType == "Turret")
 					{
 						// Get KillSound audio
 						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "KillSound");
-						lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound"), lwmf::AudioTypes::MP3, EntityAssets[AssetIndex].Sounds[0]);
+						lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound"), EntityAssets[AssetIndex].Sounds[0]);
 
 						// Get AttackSound audio
 						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "AttackSound");
-						lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound"), lwmf::AudioTypes::MP3, EntityAssets[AssetIndex].Sounds[1]);
+						lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound"), EntityAssets[AssetIndex].Sounds[1]);
 					}
 
 					++AssetIndex;
@@ -162,7 +162,7 @@ namespace Game_AssetHandling
 		{
 			for (auto&& Sound : Asset.Sounds)
 			{
-				lwmf::CloseAudio(Sound);
+				lwmf::CloseMP3(Sound);
 			}
 		}
 	}

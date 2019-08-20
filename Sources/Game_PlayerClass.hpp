@@ -63,13 +63,13 @@ inline void Game_PlayerClass::InitAudio()
 	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Get Footsteps audio
-		lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio"), lwmf::AudioTypes::MP3, "FootSteps");
+		lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio"), "FootSteps");
 
 		// Get Hurt audio
-		lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio"), lwmf::AudioTypes::MP3, "Hurt");
+		lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio"), "Hurt");
 
 		// Get DeathScream audio
-		lwmf::LoadAudioFile(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio"), lwmf::AudioTypes::MP3, "DeathScream");
+		lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio"), "DeathScream");
 	}
 }
 
@@ -95,17 +95,17 @@ inline void Game_PlayerClass::PlayAudio(const PlayerSounds Sound)
 	{
 		case PlayerSounds::FootSteps:
 		{
-			lwmf::PlayAudio("FootSteps", lwmf::MainWindow, lwmf::AudioPlayModes::NOTIFY);
+			lwmf::PlayMP3("FootSteps", lwmf::MainWindow, lwmf::AudioPlayModes::NOTIFY);
 			break;
 		}
 		case PlayerSounds::Hurt:
 		{
-			lwmf::PlayAudio("Hurt", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
+			lwmf::PlayMP3("Hurt", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
 			break;
 		}
 		case PlayerSounds::DeathScream:
 		{
-			lwmf::PlayAudio("DeathScream", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
+			lwmf::PlayMP3("DeathScream", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
 			break;
 		}
 		default: {}
@@ -114,8 +114,8 @@ inline void Game_PlayerClass::PlayAudio(const PlayerSounds Sound)
 
 inline void Game_PlayerClass::CloseAudio()
 {
-	lwmf::CloseAudio("FootSteps");
-	lwmf::CloseAudio("Hurt");
-	lwmf::CloseAudio("DeathScream");
+	lwmf::CloseMP3("FootSteps");
+	lwmf::CloseMP3("Hurt");
+	lwmf::CloseMP3("DeathScream");
 }
 

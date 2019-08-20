@@ -69,6 +69,7 @@ struct WeaponStruct final
 {
 	lwmf::ShaderClass WeaponShader{};
 	lwmf::ShaderClass MuzzleFlashShader{};
+	std::vector<lwmf::Wav> WeaponSounds;
 	lwmf::IntRectStruct WeaponRect{};
 	lwmf::IntRectStruct MuzzleFlashRect{};
 	std::string HUDAmmoInfo;

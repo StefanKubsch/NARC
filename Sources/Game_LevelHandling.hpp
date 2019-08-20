@@ -173,7 +173,7 @@ namespace Game_LevelHandling
 			{
 				if (const std::string AudioFileName{ lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
 				{
-					lwmf::LoadAudioFile(AudioFileName, lwmf::AudioTypes::MP3, "BackgroundMusic");
+					lwmf::LoadMP3(AudioFileName, "BackgroundMusic");
 				}
 			}
 		}
@@ -183,7 +183,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			lwmf::PlayAudio("BackgroundMusic", lwmf::MainWindow, lwmf::AudioPlayModes::REPEAT);
+			lwmf::PlayMP3("BackgroundMusic", lwmf::MainWindow, lwmf::AudioPlayModes::REPEAT);
 		}
 	}
 
@@ -191,7 +191,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			lwmf::CloseAudio("BackgroundMusic");
+			lwmf::CloseMP3("BackgroundMusic");
 		}
 	}
 
