@@ -69,7 +69,7 @@ struct WeaponStruct final
 {
 	lwmf::ShaderClass WeaponShader{};
 	lwmf::ShaderClass MuzzleFlashShader{};
-	std::vector<lwmf::Wav> WeaponSounds;
+	std::vector<lwmf::MP3> Sounds;
 	lwmf::IntRectStruct WeaponRect{};
 	lwmf::IntRectStruct MuzzleFlashRect{};
 	std::string HUDAmmoInfo;
@@ -103,7 +103,7 @@ struct EntityAssetStruct final
 	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures;
 	std::vector<lwmf::TextureStruct> AttackTextures;
 	std::vector<lwmf::TextureStruct> KillTextures;
-	std::vector<std::string> Sounds;
+	std::vector<lwmf::MP3> Sounds;
 	std::string Name;
 	std::int_fast32_t Number{};
 };
@@ -115,7 +115,7 @@ struct EntityAssetStruct final
 struct DoorStruct final
 {
 	lwmf::TextureStruct AnimTexture;
-	std::string OpenCloseSound;
+	std::vector<lwmf::MP3> Sounds;
 	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t Number{};
 	std::int_fast32_t OriginalTexture{};

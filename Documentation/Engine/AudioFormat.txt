@@ -1,4 +1,4 @@
 Supported audio formats:
 
 SFX & Music
-	MP3 or WAV
+	Currently only MP3 is supported!

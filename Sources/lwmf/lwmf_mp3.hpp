@@ -1,7 +1,7 @@
 /*
 ****************************************************
 *                                                  *
-* lwmf_mp3 - lightweight media framework           *
+* lwmf_mp3 - lightweight media framework         *
 *                                                  *
 * (C) 2019 - present by Stefan Kubsch              *
 *                                                  *
@@ -15,6 +15,7 @@
 #include <mciapi.h>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #pragma comment(lib, "Winmm.lib")
 
@@ -24,52 +25,61 @@ namespace lwmf
 {
 
 
-	enum class AudioPlayModes
+	class MP3
 	{
-		REPEAT,
-		FROMSTART,
-		NOTIFY
+	public:
+		enum class PlayModes
+		{
+			REPEAT,
+			FROMSTART,
+			NOTIFY
+		};
+
+		void Load(const std::string& Filename, const std::string& Handle);
+		void Play(PlayModes PlayMode);
+		void Close();
+
+	private:
+		std::int_fast32_t GetDuration();
+		std::string GetMCIError(MCIERROR Error);
+
+		std::string AudioHandle;
+		std::int_fast32_t Duration{};
 	};
 
-	void LoadMP3(const std::string& Filename, const std::string& MP3Handle);
-	void PlayMP3(const std::string& MP3Handle, HWND Window, AudioPlayModes PlayMode);
-	std::int_fast32_t GetMP3Length(const std::string& MP3Handle);
-	void CloseMP3(const std::string& MP3Handle);
-	std::string GetMCIError(MCIERROR Error);
-
-	//
-	// Functions
-	//
-
-	inline void LoadMP3(const std::string& Filename, const std::string& MP3Handle)
+	inline void MP3::Load(const std::string& Filename, const std::string& Handle)
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
-		const MCIERROR Error{ mciSendString(("open \"" + Filename + "\" type mpegvideo alias " + MP3Handle).c_str(), nullptr, 0, nullptr) };
+		AudioHandle = Handle;
+
+		const MCIERROR Error{ mciSendString(("open \"" + Filename + "\" type mpegvideo alias " + AudioHandle).c_str(), nullptr, 0, nullptr) };
 
 		if (Error != 0)
 		{
 			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + "!" + GetMCIError(Error));
 		}
+
+		Duration = GetDuration();
 	}
 
-	inline void PlayMP3(const std::string& MP3Handle, const HWND Window, const AudioPlayModes PlayMode)
+	inline void MP3::Play(PlayModes PlayMode)
 	{
 		std::string PlayModeString;
 
 		switch (PlayMode)
 		{
-			case AudioPlayModes::REPEAT:
+			case PlayModes::REPEAT:
 			{
 				PlayModeString = " repeat";
 				break;
 			}
-			case AudioPlayModes::FROMSTART:
+			case PlayModes::FROMSTART:
 			{
 				PlayModeString = " from 0";
 				break;
 			}
-			case AudioPlayModes::NOTIFY:
+			case PlayModes::NOTIFY:
 			{
 				PlayModeString = " notify";
 				break;
@@ -77,38 +87,38 @@ namespace lwmf
 			default: {}
 		}
 
-		const MCIERROR Error{ mciSendString(("play " + MP3Handle + PlayModeString).c_str(), nullptr, 0, Window) };
+		const MCIERROR Error{ (PlayMode == PlayModes::NOTIFY) ? mciSendString(("play " + AudioHandle + PlayModeString).c_str(), nullptr, 0, MainWindow) : mciSendString(("play " + AudioHandle + PlayModeString).c_str(), nullptr, 0, nullptr) };
 
 		if (Error != 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error playing " + MP3Handle + "!" + GetMCIError(Error));
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error playing " + AudioHandle + "!" + GetMCIError(Error));
 		}
 	}
 
-	inline std::int_fast32_t GetMP3Length(const std::string& MP3Handle)
+	inline void MP3::Close()
 	{
-		std::vector<char> Buffer(256);
-		const MCIERROR Error{ mciSendString(("status " + MP3Handle + " length").c_str(), Buffer.data(), 256, nullptr) };
+		const MCIERROR Error{ mciSendString(("close " + AudioHandle).c_str(), nullptr, 0, nullptr) };
 
 		if (Error != 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error getting length of " + MP3Handle + "!" + GetMCIError(Error));
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Problem closing " + AudioHandle + "!" + GetMCIError(Error));
+		}
+	}
+
+	inline std::int_fast32_t MP3::GetDuration()
+	{
+		std::vector<char> Buffer(256);
+		const MCIERROR Error{ mciSendString(("status " + AudioHandle + " length").c_str(), Buffer.data(), 256, nullptr) };
+
+		if (Error != 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error getting length of " + AudioHandle + "!" + GetMCIError(Error));
 		}
 
 		return std::stoi(Buffer.data());
 	}
 
-	inline void CloseMP3(const std::string& MP3Handle)
-	{
-		const MCIERROR Error{ mciSendString(("close " + MP3Handle).c_str(), nullptr, 0, nullptr) };
-
-		if (Error != 0)
-		{
-			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Problem closing " + MP3Handle + "!" + GetMCIError(Error));
-		}
-	}
-
-	inline std::string GetMCIError(const MCIERROR Error)
+	inline std::string MP3::GetMCIError(const MCIERROR Error)
 	{
 		std::vector<char> szErrorBuf(MAXERRORLENGTH);
 		return mciGetErrorString(Error, static_cast<LPSTR>(szErrorBuf.data()), MAXERRORLENGTH) ? " MCI error: " + std::string(szErrorBuf.data()) : " Unknown MCI error!";;

@@ -192,11 +192,16 @@ namespace Game_WeaponHandling
 	{
 		for (auto&& Weapon : Weapons)
 		{
+			Weapon.Sounds.clear();
+			Weapon.Sounds.shrink_to_fit();
+
 			if (const std::string INIFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
-				Weapon.WeaponSounds.emplace_back(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"));
-				Weapon.WeaponSounds.emplace_back(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio"));
-				Weapon.WeaponSounds.emplace_back(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"));
+				Weapon.Sounds.resize(3);
+
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"), "Weapon" + std::to_string(Weapon.Number) + "Shot");
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Dryfire)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio"), "Weapon" + std::to_string(Weapon.Number) + "DryFire");
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"), "Weapon" + std::to_string(Weapon.Number) + "Reload");
 			}
 		}
 	}
@@ -499,7 +504,7 @@ namespace Game_WeaponHandling
 
 	inline void PlayAudio(const std::int_fast32_t SelectedPlayerWeapon, const WeaponsSounds WeaponSound)
 	{
-		Weapons[SelectedPlayerWeapon].WeaponSounds[static_cast<std::int_fast32_t>(WeaponSound)].Play(true);
+		Weapons[SelectedPlayerWeapon].Sounds[static_cast<std::int_fast32_t>(WeaponSound)].Play(lwmf::MP3::PlayModes::FROMSTART);
 	}
 
 

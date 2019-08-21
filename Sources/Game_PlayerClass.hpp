@@ -41,6 +41,7 @@ public:
 	float MoveSpeed{};
 	float CollisionDetectionFactor{};
 	bool IsDead{};
+	std::vector<lwmf::MP3> Sounds;
 };
 
 inline void Game_PlayerClass::InitConfig()
@@ -60,16 +61,21 @@ inline void Game_PlayerClass::InitConfig()
 
 inline void Game_PlayerClass::InitAudio()
 {
+	Sounds.clear();
+	Sounds.shrink_to_fit();
+
 	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
+		Sounds.resize(3);
+
 		// Get Footsteps audio
-		lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio"), "FootSteps");
+		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::FootSteps)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio"), "FootSteps");
 
 		// Get Hurt audio
-		lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio"), "Hurt");
+		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::Hurt)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio"), "Hurt");
 
 		// Get DeathScream audio
-		lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio"), "DeathScream");
+		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::DeathScream)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio"), "DeathScream");
 	}
 }
 
@@ -91,31 +97,21 @@ inline void Game_PlayerClass::HurtPlayer(const std::int_fast32_t DamageDealt)
 
 inline void Game_PlayerClass::PlayAudio(const PlayerSounds Sound)
 {
-	switch (Sound)
+	if (Sound == PlayerSounds::FootSteps)
 	{
-		case PlayerSounds::FootSteps:
-		{
-			lwmf::PlayMP3("FootSteps", lwmf::MainWindow, lwmf::AudioPlayModes::NOTIFY);
-			break;
-		}
-		case PlayerSounds::Hurt:
-		{
-			lwmf::PlayMP3("Hurt", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
-			break;
-		}
-		case PlayerSounds::DeathScream:
-		{
-			lwmf::PlayMP3("DeathScream", lwmf::MainWindow, lwmf::AudioPlayModes::FROMSTART);
-			break;
-		}
-		default: {}
+		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::FootSteps)].Play(lwmf::MP3::PlayModes::NOTIFY);
+	}
+	else
+	{
+		Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::FROMSTART);
 	}
 }
 
 inline void Game_PlayerClass::CloseAudio()
 {
-	lwmf::CloseMP3("FootSteps");
-	lwmf::CloseMP3("Hurt");
-	lwmf::CloseMP3("DeathScream");
+	for (auto& Sound : Sounds)
+	{
+		Sound.Close();
+	}
 }
 

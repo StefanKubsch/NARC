@@ -75,21 +75,24 @@ namespace Game_AssetHandling
 					// Get SFX
 					//
 
+					EntityAssets[AssetIndex].Sounds.clear();
+					EntityAssets[AssetIndex].Sounds.shrink_to_fit();
+
 					if (const std::string AssetType{ lwmf::ReadINIValue<std::string>(INIFile, "GENERAL", "AssetType") }; AssetType == "AmmoBox")
 					{
 						// Get Pickup audio
-						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "AmmoPickup");
-						lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup"), EntityAssets[AssetIndex].Sounds[0]);
+						EntityAssets[AssetIndex].Sounds.resize(1);
+						EntityAssets[AssetIndex].Sounds[0].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup"), "Asset" + std::to_string(AssetIndex) + "AmmoPickup");
 					}
 					else if (AssetType == "Enemy" || AssetType == "Turret")
 					{
+						EntityAssets[AssetIndex].Sounds.resize(2);
+
 						// Get KillSound audio
-						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "KillSound");
-						lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound"), EntityAssets[AssetIndex].Sounds[0]);
+						EntityAssets[AssetIndex].Sounds[0].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound"), "Asset" + std::to_string(AssetIndex) + "KillSound");
 
 						// Get AttackSound audio
-						EntityAssets[AssetIndex].Sounds.emplace_back("Asset" + std::to_string(AssetIndex) + "AttackSound");
-						lwmf::LoadMP3(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound"), EntityAssets[AssetIndex].Sounds[1]);
+						EntityAssets[AssetIndex].Sounds[1].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound"), "Asset" + std::to_string(AssetIndex) + "AttackSound");
 					}
 
 					++AssetIndex;
@@ -158,11 +161,11 @@ namespace Game_AssetHandling
 
 	inline void CloseAudio()
 	{
-		for (const auto& Asset : EntityAssets)
+		for (auto& Asset : EntityAssets)
 		{
 			for (auto&& Sound : Asset.Sounds)
 			{
-				lwmf::CloseMP3(Sound);
+				Sound.Close();
 			}
 		}
 	}

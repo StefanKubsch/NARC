@@ -49,6 +49,7 @@ namespace Game_LevelHandling
 	inline std::vector<lwmf::TextureStruct> LevelTextures;
 
 	inline std::vector<GFX_LightingClass> StaticLights;
+	lwmf::MP3 BackgroundMusic;
 
 	static constexpr std::int_fast32_t NumberOfLevelMapLayers{ 4 };
 
@@ -173,7 +174,7 @@ namespace Game_LevelHandling
 			{
 				if (const std::string AudioFileName{ lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
 				{
-					lwmf::LoadMP3(AudioFileName, "BackgroundMusic");
+					BackgroundMusic.Load(AudioFileName, "BackgroundMusic");
 				}
 			}
 		}
@@ -183,7 +184,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			lwmf::PlayMP3("BackgroundMusic", lwmf::MainWindow, lwmf::AudioPlayModes::REPEAT);
+			BackgroundMusic.Play(lwmf::MP3::PlayModes::REPEAT);
 		}
 	}
 
@@ -191,7 +192,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			lwmf::CloseMP3("BackgroundMusic");
+			BackgroundMusic.Close();
 		}
 	}
 
