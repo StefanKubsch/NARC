@@ -199,9 +199,11 @@ namespace Game_WeaponHandling
 			{
 				Weapon.Sounds.resize(3);
 
-				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"), "Weapon" + std::to_string(Weapon.Number) + "Shot");
-				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Dryfire)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio"), "Weapon" + std::to_string(Weapon.Number) + "DryFire");
-				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"), "Weapon" + std::to_string(Weapon.Number) + "Reload");
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"));
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Dryfire)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio"));
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"));
+			
+				// Weapon.ReloadDuration = Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Duration / FrameLock;
 			}
 		}
 	}

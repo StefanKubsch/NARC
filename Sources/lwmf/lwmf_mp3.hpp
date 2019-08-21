@@ -35,87 +35,92 @@ namespace lwmf
 			NOTIFY
 		};
 
-		void Load(const std::string& Filename, const std::string& Handle);
+		void Load(const std::string& Filename);
 		void Play(PlayModes PlayMode);
 		void Close();
 
-	private:
-		std::int_fast32_t GetDuration();
-		std::string GetMCIError(MCIERROR Error);
-
-		std::string AudioHandle;
 		std::int_fast32_t Duration{};
+		std::uint_fast32_t DeviceID{};
+	private:
+		void GetDuration();
+		std::string GetMCIError(MCIERROR Error);
 	};
 
-	inline void MP3::Load(const std::string& Filename, const std::string& Handle)
+	inline void MP3::Load(const std::string& Filename)
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
-		AudioHandle = Handle;
+		MCI_OPEN_PARMS OpenParams;
+		OpenParams.lpstrDeviceType = "mpegvideo";
+		OpenParams.lpstrElementName = Filename.c_str();
 
-		const MCIERROR Error{ mciSendString(("open \"" + Filename + "\" type mpegvideo alias " + AudioHandle).c_str(), nullptr, 0, nullptr) };
+		mciSendCommand(0, MCI_OPEN, MCI_WAIT | MCI_OPEN_TYPE | MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE, reinterpret_cast<DWORD_PTR>(&OpenParams));
 
-		if (Error != 0)
-		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + "!" + GetMCIError(Error));
-		}
+		DeviceID = OpenParams.wDeviceID;
 
-		Duration = GetDuration();
+		MCI_SET_PARMS SetParams;
+		SetParams.dwCallback = NULL;
+		SetParams.dwTimeFormat = 0;
+
+		mciSendCommand(DeviceID, MCI_SET, MCI_SET_TIME_FORMAT, reinterpret_cast<DWORD_PTR>(&SetParams));
 	}
 
 	inline void MP3::Play(PlayModes PlayMode)
 	{
-		std::string PlayModeString;
+		MCI_PLAY_PARMS PlayParams;
+		PlayParams.dwCallback = reinterpret_cast<DWORD_PTR>(MainWindow);
+		PlayParams.dwFrom = 0;
+
+		MCIERROR Error{};
 
 		switch (PlayMode)
 		{
 			case PlayModes::REPEAT:
 			{
-				PlayModeString = " repeat";
+				Error = mciSendCommand(DeviceID, MCI_PLAY, MCI_NOTIFY, reinterpret_cast<DWORD_PTR>(&PlayParams));
 				break;
 			}
 			case PlayModes::FROMSTART:
 			{
-				PlayModeString = " from 0";
+				Error = mciSendCommand(DeviceID, MCI_PLAY, MCI_FROM, reinterpret_cast<DWORD_PTR>(&PlayParams));
 				break;
 			}
 			case PlayModes::NOTIFY:
 			{
-				PlayModeString = " notify";
+				Error = mciSendCommand(DeviceID, MCI_PLAY, MCI_NOTIFY, reinterpret_cast<DWORD_PTR>(&PlayParams));
 				break;
 			}
 			default: {}
 		}
 
-		const MCIERROR Error{ (PlayMode == PlayModes::NOTIFY) ? mciSendString(("play " + AudioHandle + PlayModeString).c_str(), nullptr, 0, MainWindow) : mciSendString(("play " + AudioHandle + PlayModeString).c_str(), nullptr, 0, nullptr) };
-
 		if (Error != 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error playing " + AudioHandle + "!" + GetMCIError(Error));
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error playing MCI device" + std::to_string(DeviceID) + "!" + GetMCIError(Error));
 		}
 	}
 
 	inline void MP3::Close()
 	{
-		const MCIERROR Error{ mciSendString(("close " + AudioHandle).c_str(), nullptr, 0, nullptr) };
+		const MCIERROR Error{ mciSendCommand(DeviceID, MCI_CLOSE, 0, NULL) };
 
 		if (Error != 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Problem closing " + AudioHandle + "!" + GetMCIError(Error));
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error closing MCI device " + std::to_string(DeviceID) + "!" + GetMCIError(Error));
 		}
 	}
 
-	inline std::int_fast32_t MP3::GetDuration()
+	inline void MP3::GetDuration()
 	{
-		std::vector<char> Buffer(256);
-		const MCIERROR Error{ mciSendString(("status " + AudioHandle + " length").c_str(), Buffer.data(), 256, nullptr) };
+		MCI_STATUS_PARMS StatusParams;
+
+		const MCIERROR Error{ mciSendCommand(DeviceID, MCI_STATUS, MCI_NOTIFY, reinterpret_cast<DWORD_PTR>(&StatusParams)) };
 
 		if (Error != 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error getting length of " + AudioHandle + "!" + GetMCIError(Error));
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error getting length of MCi device " + std::to_string(DeviceID) + "!" + GetMCIError(Error));
 		}
 
-		return std::stoi(Buffer.data());
+		Duration = StatusParams.dwTrack;
 	}
 
 	inline std::string MP3::GetMCIError(const MCIERROR Error)

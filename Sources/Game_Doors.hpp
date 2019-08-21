@@ -64,7 +64,7 @@ namespace Game_Doors
 						Doors[Index].AnimTexture = Game_LevelHandling::LevelTextures[Doors[Index].OriginalTexture];
 						
 						Doors[Index].Sounds.resize(1);
-						Doors[Index].Sounds[static_cast<std::int_fast32_t>(DoorSounds::OpenClose)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound"), "Door" + std::to_string(Index) + "OpenClose");
+						Doors[Index].Sounds[static_cast<std::int_fast32_t>(DoorSounds::OpenClose)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound"));
 
 						++Index;
 					}

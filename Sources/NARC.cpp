@@ -566,7 +566,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				// "rewind" player footsteps audio if played completely
 				case MCI_NOTIFY_SUCCESSFUL:
 				{
-					mciSendString("seek FootSteps to start", nullptr, 0, nullptr);
+					MCI_PLAY_PARMS mciPlayParms;
+					mciSendCommand(Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].DeviceID, MCI_SEEK, MCI_SEEK_TO_START, reinterpret_cast<DWORD_PTR>(&mciPlayParms));
+
 					break;
 				}
 			}

@@ -174,7 +174,7 @@ namespace Game_LevelHandling
 			{
 				if (const std::string AudioFileName{ lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
 				{
-					BackgroundMusic.Load(AudioFileName, "BackgroundMusic");
+					BackgroundMusic.Load(AudioFileName);
 				}
 			}
 		}
