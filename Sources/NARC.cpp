@@ -563,12 +563,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			switch (wParam)
 			{
-				// "rewind" player footsteps audio if played completely
 				case MCI_NOTIFY_SUCCESSFUL:
 				{
-					MCI_PLAY_PARMS mciPlayParms;
-					mciSendCommand(Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].DeviceID, MCI_SEEK, MCI_SEEK_TO_START, reinterpret_cast<DWORD_PTR>(&mciPlayParms));
+					// "rewind" player footsteps audio if played completely
+					if (lParam == Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].DeviceID)
+					{
+						Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].RewindToStart();
+					}
 
+					// "rewind" and restart background music
+					if (lParam == Game_LevelHandling::BackgroundMusic.DeviceID)
+					{
+						Game_LevelHandling::BackgroundMusic.RewindToStart();
+						Game_LevelHandling::BackgroundMusic.Play(lwmf::MP3::PlayModes::NOTIFY);
+					}
 					break;
 				}
 			}

@@ -49,7 +49,7 @@ namespace Game_LevelHandling
 	inline std::vector<lwmf::TextureStruct> LevelTextures;
 
 	inline std::vector<GFX_LightingClass> StaticLights;
-	lwmf::MP3 BackgroundMusic;
+	inline lwmf::MP3 BackgroundMusic;
 
 	static constexpr std::int_fast32_t NumberOfLevelMapLayers{ 4 };
 
@@ -184,7 +184,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			BackgroundMusic.Play(lwmf::MP3::PlayModes::REPEAT);
+			BackgroundMusic.Play(lwmf::MP3::PlayModes::NOTIFY);
 		}
 	}
 

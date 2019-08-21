@@ -22,16 +22,16 @@ namespace Game_Doors
 {
 
 
-	enum class DoorSounds
-	{
-		OpenClose
-	};
-
 	void Init();
 	void TriggerDoor();
 	void OpenCloseDoors();
-	void PlayAudio(DoorStruct& Door);
 	void CloseAudio();
+
+	//
+	// Variables and constants
+	//
+
+	inline lwmf::MP3 OpenCloseSound;
 
 	//
 	// Functions
@@ -44,6 +44,8 @@ namespace Game_Doors
 
 		if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/DoorConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
+			OpenCloseSound.Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound"));
+
 			for (std::int_fast32_t Index{}, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX)
 			{
 				for (std::int_fast32_t MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY)
@@ -51,8 +53,6 @@ namespace Game_Doors
 					if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] > 0)
 					{
 						Doors.emplace_back();
-						Doors[Index].Sounds.clear();
-						Doors[Index].Sounds.shrink_to_fit();
 
 						Doors[Index].Number = Index;
 						Doors[Index].Pos.X = MapPosX;
@@ -62,9 +62,6 @@ namespace Game_Doors
 						Doors[Index].OpenCloseSpeed = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "OpenCloseSpeed");
 						Doors[Index].StayOpenTime = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "StayOpenTime") * static_cast<std::int_fast32_t>(FrameLock);
 						Doors[Index].AnimTexture = Game_LevelHandling::LevelTextures[Doors[Index].OriginalTexture];
-						
-						Doors[Index].Sounds.resize(1);
-						Doors[Index].Sounds[static_cast<std::int_fast32_t>(DoorSounds::OpenClose)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound"));
 
 						++Index;
 					}
@@ -81,7 +78,7 @@ namespace Game_Doors
 			{
 				Door.IsOpenTriggered = true;
 				Door.OpenCloseCounter = 0;
-				PlayAudio(Door);
+				OpenCloseSound.Play(lwmf::MP3::PlayModes::FROMSTART);
 			}
 		}
 	}
@@ -132,7 +129,7 @@ namespace Game_Doors
 					{
 						if (!Door.OpenCloseAudioFlag)
 						{
-							PlayAudio(Door);
+							OpenCloseSound.Play(lwmf::MP3::PlayModes::FROMSTART);
 							Door.OpenCloseAudioFlag = true;
 						}
 
@@ -157,21 +154,9 @@ namespace Game_Doors
 		}
 	}
 
-	inline void PlayAudio(DoorStruct& Door)
-	{
-		Door.Sounds[static_cast<std::int_fast32_t>(DoorSounds::OpenClose)].Play(lwmf::MP3::PlayModes::FROMSTART);
-	}
-
 	inline void CloseAudio()
 	{
-		for (auto& Door : Doors)
-		{
-			for (auto&& Sound : Door.Sounds)
-			{
-				Sound.Close();
-
-			}
-		}
+		OpenCloseSound.Close();
 	}
 
 

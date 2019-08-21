@@ -115,7 +115,6 @@ struct EntityAssetStruct final
 struct DoorStruct final
 {
 	lwmf::TextureStruct AnimTexture;
-	std::vector<lwmf::MP3> Sounds;
 	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t Number{};
 	std::int_fast32_t OriginalTexture{};
