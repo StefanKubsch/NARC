@@ -67,8 +67,8 @@ namespace Game_EntityHandling
 	//
 
 	// Populate the Mersenne-Twister-Random Engine with proper distributions
-	inline static const std::uniform_int_distribution<std::mt19937::result_type> Distribution200(1, 200);
-	inline static const std::uniform_int_distribution<std::mt19937::result_type> Distribution666(1, 666);
+	inline static const std::uniform_int_distribution<std::int_fast32_t> Distribution200(1, 200);
+	inline static const std::uniform_int_distribution<std::int_fast32_t> Distribution666(1, 666);
 
 	static constexpr float EntityCollisionDetectionWallDist{ 0.5F };
 

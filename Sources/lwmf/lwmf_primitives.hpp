@@ -134,103 +134,69 @@ namespace lwmf
 		else if (static_cast<std::uint_fast32_t>(x1) <= static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y1) < static_cast<std::uint_fast32_t>(Texture.Height)
 			&& static_cast<std::uint_fast32_t>(x2) <= static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y2) < static_cast<std::uint_fast32_t>(Texture.Height))
 		{
-			bool LongerY{};
-			std::int_fast32_t ShortLength{ y2 - y1 };
-			std::int_fast32_t LongLength{ x2 - x1 };
-
-			if (std::abs(ShortLength) > std::abs(LongLength))
+			const std::int_fast32_t dx{ std::abs(x2 - x1) };
+			const std::int_fast32_t sx{ x1 < x2 ? 1 : -1 };
+			const std::int_fast32_t dy{ -std::abs(y2 - y1) };
+			const std::int_fast32_t sy{ y1 < y2 ? 1 : -1 };
+			std::int_fast32_t Error{ dx + dy };
+ 
+			for (;;)
 			{
-				std::swap(ShortLength, LongLength);
-				LongerY = true;
-			}
+				SetPixel(Texture, x1, y1, Color);
 
-			const std::int_fast32_t Value{ LongLength == 0 ? 0 : (ShortLength << 16) / LongLength };
-
-			if (LongerY)
-			{
-				if (LongLength > 0)
+				if (x1 == x2 && y1 == y2)
 				{
-					LongLength += y1;
-
-					for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
-					{
-						Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
-						j += Value;
-					}
-
-					return;
+					break;
 				}
 
-				LongLength += y1;
+				const std::int_fast32_t Error2{ Error << 1 };
 
-				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
+				if (Error2 >= dy)
 				{
-					Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
-					j -= Value;
+					Error += dy;
+					x1 += sx;
 				}
 
-				return;
-			}
-
-			if (LongLength > 0)
-			{
-				LongLength += x1;
-
-				for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
+				if (Error2 <= dx)
 				{
-					Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
-					j += Value;
+					Error += dx;
+					y1 += sy;
 				}
-
-				return;
-			}
-
-			LongLength += x1;
-
-			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
-			{
-				Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
-				j -= Value;
 			}
 		}
 		// Case 3: Check each pixel if it´s within screen boundaries (slowest)
 		else
 		{
-			const IntPointStruct d{ x2 - x1, y2 - y1 };
-			const IntPointStruct d1{ std::abs(d.X), std::abs(d.Y) };
+			const std::int_fast32_t dx{ std::abs(x2 - x1) };
+			const std::int_fast32_t sx{ x1 < x2 ? 1 : -1 };
+			const std::int_fast32_t dy{ -std::abs(y2 - y1) };
+			const std::int_fast32_t sy{ y1 < y2 ? 1 : -1 };
+			std::int_fast32_t Error{ dx + dy };
 
-			if (std::int_fast32_t x{}, y{}; d1.Y <= d1.X)
+			for (;;)
 			{
-				std::int_fast32_t px{ (d1.Y << 1) - d1.X };
-				std::int_fast32_t xe{};
+				SetPixelSafe(Texture, x1, y1, Color);
 
-				d.X >= 0 ? (x = x1, y = y1, xe = x2) : (x = x2, y = y2, xe = x1);
-				SetPixelSafe(Texture, x, y, Color);
-
-				for (std::int_fast32_t i{}; x < xe; ++i)
+				if (x1 == x2 && y1 == y2)
 				{
-					++x;
-					px < 0 ? px += d1.Y << 1 : ((d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++y : --y, px += (d1.Y - d1.X) << 1);
-					SetPixelSafe(Texture, x, y, Color);
+					break;
 				}
-			}
-			else
-			{
-				std::int_fast32_t py{ (d1.X << 1) - d1.Y };
-				std::int_fast32_t ye{};
 
-				d.Y >= 0 ? (x = x1, y = y1, ye = y2) : (x = x2, y = y2, ye = y1);
-				SetPixelSafe(Texture, x, y, Color);
+				const std::int_fast32_t Error2{ Error << 1 };
 
-				for (std::int_fast32_t i{}; y < ye; ++i)
+				if (Error2 >= dy)
 				{
-					++y;
-					py <= 0 ? py += d1.X << 1 : ((d.X < 0 && d.Y < 0) || (d.X > 0 && d.Y > 0) ? ++x : --x, py += (d1.X - d1.Y) << 1);
-					SetPixelSafe(Texture, x, y, Color);
+					Error += dy;
+					x1 += sx;
+				}
+
+				if (Error2 <= dx)
+				{
+					Error += dx;
+					y1 += sy;
 				}
 			}
 		}
-
 	}
 
 	//

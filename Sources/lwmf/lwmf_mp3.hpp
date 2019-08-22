@@ -25,7 +25,7 @@ namespace lwmf
 {
 
 
-	class MP3
+	class MP3 final
 	{
 	public:
 		enum class PlayModes
@@ -38,18 +38,21 @@ namespace lwmf
 		void Play(PlayModes PlayMode);
 		void RewindToStart();
 		std::int_fast32_t GetDuration();
+		std::uint_fast32_t GetDeviceID();
 		void Close();
 
-		std::uint_fast32_t DeviceID{};
 	private:
 		std::string GetMCIError(MCIERROR Error);
+
+		std::uint_fast32_t DeviceID{};
+
 	};
 
 	inline void MP3::Load(const std::string& Filename)
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
-		MCI_OPEN_PARMS OpenParams;
+		MCI_OPEN_PARMS OpenParams{};
 		OpenParams.lpstrDeviceType = "mpegvideo";
 		OpenParams.lpstrElementName = Filename.c_str();
 
@@ -61,7 +64,7 @@ namespace lwmf
 
 	inline void MP3::Play(const PlayModes PlayMode)
 	{
-		MCI_PLAY_PARMS PlayParams;
+		MCI_PLAY_PARMS PlayParams{};
 		PlayParams.dwCallback = reinterpret_cast<DWORD_PTR>(MainWindow);
 		PlayParams.dwFrom = 0;
 
@@ -95,7 +98,7 @@ namespace lwmf
 
 	inline std::int_fast32_t MP3::GetDuration()
 	{
-		MCI_STATUS_PARMS StatusParams;
+		MCI_STATUS_PARMS StatusParams{};
 		StatusParams.dwItem = MCI_STATUS_LENGTH;
 		StatusParams.dwTrack = 1;
 
@@ -107,6 +110,11 @@ namespace lwmf
 		}
 
 		return static_cast<std::int_fast32_t>(StatusParams.dwReturn);
+	}
+
+	inline std::uint_fast32_t MP3::GetDeviceID()
+	{
+		return DeviceID;
 	}
 
 	inline void MP3::Close()
