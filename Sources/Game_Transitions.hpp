@@ -53,7 +53,7 @@ namespace Game_Transitions
 
 		lwmf::ClearBuffer();
 		lwmf::ClearTexture(ScreenTexture, 0);
-		GeneralText.RenderTextCentered(NextLevelText, ScreenTexture.Height - GeneralText.FontHeight - 50);
+		GeneralText.RenderTextCentered(NextLevelText, ScreenTexture.Height - GeneralText.GetFontHeight() - 50);
 		ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
 		lwmf::SwapBuffer();
 	}
@@ -126,8 +126,8 @@ namespace Game_Transitions
 	{
 		FizzleFade(0xFF0000FF, 50);
 
-		GameOverText.RenderTextCentered("You are dead. Game over...", ScreenTexture.HeightMid - (GameOverText.FontHeight >> 1));
-		GameOverText1.RenderTextCentered("Press [SPACE] to continue", ScreenTexture.Height - GameOverText1.FontHeight - 50);
+		GameOverText.RenderTextCentered("You are dead. Game over...", ScreenTexture.HeightMid - (GameOverText.GetFontHeight() >> 1));
+		GameOverText1.RenderTextCentered("Press [SPACE] to continue", ScreenTexture.Height - GameOverText1.GetFontHeight() - 50);
 
 		lwmf::SwapBuffer();
 

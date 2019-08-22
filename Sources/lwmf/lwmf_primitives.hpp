@@ -140,9 +140,9 @@ namespace lwmf
 			const std::int_fast32_t sy{ y1 < y2 ? 1 : -1 };
 			std::int_fast32_t Error{ dx + dy };
  
-			for (;;)
+			while (true)
 			{
-				SetPixel(Texture, x1, y1, Color);
+				Texture.Pixels[y1 * Texture.Width + x1] = Color;
 
 				if (x1 == x2 && y1 == y2)
 				{
@@ -173,7 +173,7 @@ namespace lwmf
 			const std::int_fast32_t sy{ y1 < y2 ? 1 : -1 };
 			std::int_fast32_t Error{ dx + dy };
 
-			for (;;)
+			while (true)
 			{
 				SetPixelSafe(Texture, x1, y1, Color);
 

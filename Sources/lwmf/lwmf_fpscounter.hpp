@@ -52,7 +52,7 @@ namespace lwmf
 
 	inline void DisplayFPSCounter(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
 	{
-		std::vector<char> FPSString(4);
+		std::vector<char> FPSString(6);
 		std::to_chars(FPSString.data(), FPSString.data() + FPSString.size(), FPS);
 		RenderText(Texture, "fps:" + std::string(FPSString.data()), PosX, PosY, Color);
 	}

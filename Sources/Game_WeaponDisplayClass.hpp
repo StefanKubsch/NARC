@@ -69,7 +69,7 @@ inline void Game_WeaponDisplayClass::Display()
 	CrosshairShader.RenderStaticTexture(&CrosshairTexture);
 	WeaponHUDShader.RenderStaticTexture(&WeaponHUDTexture);
 
-	WeaponText.RenderText(Weapons[Player.SelectedWeapon].Name, WeaponHUDRect.X + WeaponText.Offset.X, WeaponHUDRect.Y + WeaponText.Offset.Y);
-	CarriedAmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo, WeaponHUDRect.X + CarriedAmmoText.Offset.X, WeaponHUDRect.Y + CarriedAmmoText.Offset.Y);
-	AmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDAmmoInfo, WeaponHUDRect.X + AmmoText.Offset.X, WeaponHUDRect.Y + AmmoText.Offset.Y);
+	WeaponText.RenderText(Weapons[Player.SelectedWeapon].Name, WeaponHUDRect.X + WeaponText.GetOffset().X, WeaponHUDRect.Y + WeaponText.GetOffset().Y);
+	CarriedAmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo, WeaponHUDRect.X + CarriedAmmoText.GetOffset().X, WeaponHUDRect.Y + CarriedAmmoText.GetOffset().Y);
+	AmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDAmmoInfo, WeaponHUDRect.X + AmmoText.GetOffset().X, WeaponHUDRect.Y + AmmoText.GetOffset().Y);
 }

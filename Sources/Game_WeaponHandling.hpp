@@ -11,7 +11,9 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <fstream>
+#include <charconv>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -74,6 +76,10 @@ namespace Game_WeaponHandling
 	// Variables and constants
 	//
 
+	constexpr std::int_fast32_t MaximumCarriedAmmoDigits{ 3 };
+	constexpr std::int_fast32_t MaximumAmmoCapacityDigits{ 3 };
+	constexpr std::int_fast32_t MaximumLoadedRoundsDigits{ 3 };
+
 	inline WeaponState CurrentWeaponState;
 	inline FiringState CurrentFiringState;
 
@@ -126,10 +132,15 @@ namespace Game_WeaponHandling
 				Weapons[Index].LoadedRounds = Weapons[Index].Capacity;
 
 				// Initial built of ammo info HUD strings
+				std::vector<char> CapacityString(MaximumAmmoCapacityDigits);
+				std::to_chars(CapacityString.data(), CapacityString.data() + CapacityString.size(), Weapons[Index].Capacity);
+				Weapons[Index].HUDAmmoInfo = std::string(CapacityString.data()) + "/" + std::string(CapacityString.data());
 
-				Weapons[Index].HUDAmmoInfo = std::to_string(Weapons[Index].Capacity) + "/" + std::to_string(Weapons[Index].Capacity);
-				Weapons[Index].HUDCarriedAmmoInfo = "Carried:" + std::to_string(Weapons[Index].CarriedAmmo);
+				std::vector<char> CarriedAmmoString(MaximumCarriedAmmoDigits);
+				std::to_chars(CarriedAmmoString.data(), CarriedAmmoString.data() + CarriedAmmoString.size(), Weapons[Index].CarriedAmmo);
+				Weapons[Index].HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
 
+				// Load Shader
 				Weapons[Index].WeaponShader.LoadShader("Default", ScreenTexture);
 				Weapons[Index].MuzzleFlashShader.LoadShader("Default", ScreenTexture);
 
@@ -155,7 +166,7 @@ namespace Game_WeaponHandling
 			// Weapon textures
 			if (const std::string WeaponTextureDataConfFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
 			{
-				std::ifstream WeaponTexturesData(WeaponTextureDataConfFile);
+				std::ifstream WeaponTexturesData(WeaponTextureDataConfFile, std::ios::in);
 				std::string Line;
 
 				while (std::getline(WeaponTexturesData, Line))
@@ -197,10 +208,13 @@ namespace Game_WeaponHandling
 
 			if (const std::string INIFile{ "./DATA/Weapons/Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
-				Weapon.Sounds.resize(3);
-
+				Weapon.Sounds.emplace_back();
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"));
+
+				Weapon.Sounds.emplace_back();
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Dryfire)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio"));
+
+				Weapon.Sounds.emplace_back();
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"));
 
 				Weapon.ReloadDuration = Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].GetDuration() / FrameLock;
@@ -303,7 +317,9 @@ namespace Game_WeaponHandling
 						if (const auto WP{ Entity.ContainedItem.find(Weapon.Name) }; Weapon.Name == WP->first)
 						{
 							Weapon.CarriedAmmo += WP->second;
-							Weapon.HUDCarriedAmmoInfo = "Carried:" + std::to_string(Weapon.CarriedAmmo);
+							std::vector<char> CarriedAmmoString(MaximumCarriedAmmoDigits);
+							std::to_chars(CarriedAmmoString.data(), CarriedAmmoString.data() + CarriedAmmoString.size(), Weapon.CarriedAmmo);
+							Weapon.HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
 						}
 					}
 				}
@@ -424,8 +440,16 @@ namespace Game_WeaponHandling
 					Weapons[Player.SelectedWeapon].CarriedAmmo = 0;
 				}
 
-				Weapons[Player.SelectedWeapon].HUDAmmoInfo = std::to_string(Weapons[Player.SelectedWeapon].LoadedRounds) + "/" + std::to_string(Weapons[Player.SelectedWeapon].Capacity);
-				Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo = "Carried:" + std::to_string(Weapons[Player.SelectedWeapon].CarriedAmmo);
+				// Update HUD informations
+				std::vector<char> LoadedRoundsString(MaximumLoadedRoundsDigits);
+				std::to_chars(LoadedRoundsString.data(), LoadedRoundsString.data() + LoadedRoundsString.size(), Weapons[Player.SelectedWeapon].LoadedRounds);
+				std::vector<char> CapacityString(MaximumAmmoCapacityDigits);
+				std::to_chars(CapacityString.data(), CapacityString.data() + CapacityString.size(), Weapons[Player.SelectedWeapon].Capacity);
+				Weapons[Player.SelectedWeapon].HUDAmmoInfo = std::string(LoadedRoundsString.data()) + "/" + std::string(CapacityString.data());
+
+				std::vector<char> CarriedAmmoString(MaximumCarriedAmmoDigits);
+				std::to_chars(CarriedAmmoString.data(), CarriedAmmoString.data() + CarriedAmmoString.size(), Weapons[Player.SelectedWeapon].CarriedAmmo);
+				Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
 
 				// Reloading is finished
 				CurrentWeaponState = WeaponState::Ready;

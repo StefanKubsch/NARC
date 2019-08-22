@@ -76,7 +76,7 @@ namespace Game_LevelHandling
 	{
 		if (Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
-			std::ifstream LevelMapDataFile(FileName);
+			std::ifstream LevelMapDataFile(FileName, std::ios::in);
 			std::vector<std::int_fast32_t> TempVectorCeiling;
 			std::string Line;
 
@@ -131,7 +131,7 @@ namespace Game_LevelHandling
 		{
 			if (const std::string FileName{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/StaticLightsData.conf" }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 			{
-				std::ifstream StaticLightsDataFile(FileName);
+				std::ifstream StaticLightsDataFile(FileName, std::ios::in);
 
 				std::int_fast32_t Location{};
 				float PosX{};
@@ -154,7 +154,7 @@ namespace Game_LevelHandling
 
 		if (const std::string FileName{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
-			std::ifstream LevelTexturesDataFile(FileName);
+			std::ifstream LevelTexturesDataFile(FileName, std::ios::in);
 			std::string Line;
 
 			while (std::getline(LevelTexturesDataFile, Line))

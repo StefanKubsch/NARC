@@ -64,7 +64,7 @@ inline void Game_MenuClass::Init()
 
 	if (const std::string MenuDefinitionFileName{ "./DATA/GameConfig/MenuDefinition.txt" }; Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, StopOnError))
 	{
-		std::ifstream MenuDefinitionFile(MenuDefinitionFileName);
+		std::ifstream MenuDefinitionFile(MenuDefinitionFileName, std::ios::in);
 		std::string Line;
 
 		while (std::getline(MenuDefinitionFile, Line))
@@ -110,7 +110,7 @@ inline void Game_MenuClass::Show()
 			if (MenuItems[ItemNumber].Level == 0)
 			{
 				DrawItem(ItemNumber, TempMenuPosY);
-				TempMenuPosY += Text.FontHeight;
+				TempMenuPosY += Text.GetFontHeight();
 			}
 			else
 			{
@@ -119,7 +119,7 @@ inline void Game_MenuClass::Show()
 					if (ItemNumber == ChildItemNumber)
 					{
 						DrawItem(ItemNumber, TempMenuPosY);
-						TempMenuPosY += Text.FontHeight;
+						TempMenuPosY += Text.GetFontHeight();
 						break;
 					}
 				}

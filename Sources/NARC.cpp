@@ -572,7 +572,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					}
 
 					// "rewind" and restart background music
-					if (lParam == Game_LevelHandling::BackgroundMusic.GetDeviceID())
+					if (Game_LevelHandling::BackgroundMusicEnabled && lParam == Game_LevelHandling::BackgroundMusic.GetDeviceID())
 					{
 						Game_LevelHandling::BackgroundMusic.RewindToStart();
 						Game_LevelHandling::BackgroundMusic.Play(lwmf::MP3::PlayModes::NOTIFY);
