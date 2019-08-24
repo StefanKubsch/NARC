@@ -108,7 +108,7 @@ namespace Game_Raycaster
 					if (Door.Pos.X == MapPos.X && Door.Pos.Y == MapPos.Y)
 					{
 						Door.IsOpen ? Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][Door.Pos.X][Door.Pos.Y] = 0 :
-							static_cast<std::int_fast32_t>((Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][Door.Pos.X][Door.Pos.Y] = Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][Door.Pos.X][Door.Pos.Y], DoorNumber = Door.Number, WallHit = true));
+							static_cast<std::int_fast32_t>((Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][Door.Pos.X][Door.Pos.Y] = 1, DoorNumber = Door.Number, WallHit = true));
 
 						break;
 					}

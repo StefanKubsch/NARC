@@ -22,49 +22,78 @@ namespace Game_Doors
 {
 
 
-	void Init();
+	enum class DoorSounds
+	{
+		OpenCloseSound
+	};
+
+	void InitDoorAssets();
+	void InitDoors();
 	void TriggerDoor();
 	void OpenCloseDoors();
+	void PlayAudio(const DoorStruct& Door, DoorSounds Sound);
 	void CloseAudio();
-
-	//
-	// Variables and constants
-	//
-
-	inline lwmf::MP3 OpenCloseSound;
 
 	//
 	// Functions
 	//
 
-	inline void Init()
+	inline void InitDoorAssets()
+	{
+		DoorTypes.clear();
+		DoorTypes.shrink_to_fit();
+
+		// We start our DoorTypes counting at "1", since in the map definition it has to be greater zero!
+		DoorTypes.resize(1);
+		std::int_fast32_t Index{ 1 };
+
+		while (true)
+		{
+			if (const std::string INIFile{ "./DATA/Assets_Doors/Door_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
+			{
+				DoorTypes.emplace_back();
+
+				lwmf::LoadPNG(DoorTypes[Index].OriginalTexture, lwmf::ReadINIValue<std::string>(INIFile, "TEXTURE", "DoorTexture"));
+
+				DoorTypes[Index].Sounds.emplace_back();
+				DoorTypes[Index].Sounds[static_cast<std::int_fast32_t>(DoorSounds::OpenCloseSound)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound"));
+
+				DoorTypes[Index].OpenCloseWidth = TextureSize;
+				DoorTypes[Index].OpenCloseSpeed = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "OpenCloseSpeed");
+				DoorTypes[Index].StayOpenTime = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "StayOpenTime") * static_cast<std::int_fast32_t>(FrameLock);
+
+				++Index;
+			}
+			else
+			{
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "No more doortype data found.");
+				break;
+			}
+		}
+	}
+
+	inline void InitDoors()
 	{
 		Doors.clear();
 		Doors.shrink_to_fit();
 
-		if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/DoorConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		for (std::int_fast32_t Index{}, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX)
 		{
-			OpenCloseSound.Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "OpenCloseSound"));
-
-			for (std::int_fast32_t Index{}, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX)
+			for (std::int_fast32_t MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY)
 			{
-				for (std::int_fast32_t MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY)
+				const std::int_fast32_t FoundDoorType{ Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] };
+
+				if (FoundDoorType > 0)
 				{
-					if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] > 0)
-					{
-						Doors.emplace_back();
+					Doors.emplace_back();
 
-						Doors[Index].Number = Index;
-						Doors[Index].Pos.X = MapPosX;
-						Doors[Index].Pos.Y = MapPosY;
-						Doors[Index].OriginalTexture = Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY];
-						Doors[Index].OpenCloseWidth = TextureSize;
-						Doors[Index].OpenCloseSpeed = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "OpenCloseSpeed");
-						Doors[Index].StayOpenTime = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "StayOpenTime") * static_cast<std::int_fast32_t>(FrameLock);
-						Doors[Index].AnimTexture = Game_LevelHandling::LevelTextures[Doors[Index].OriginalTexture];
+					Doors[Index].DoorType = FoundDoorType;
+					Doors[Index].AnimTexture = DoorTypes[FoundDoorType].OriginalTexture;
+					Doors[Index].Number = Index;
+					Doors[Index].Pos.X = MapPosX;
+					Doors[Index].Pos.Y = MapPosY;
 
-						++Index;
-					}
+					++Index;
 				}
 			}
 		}
@@ -78,7 +107,7 @@ namespace Game_Doors
 			{
 				Door.IsOpenTriggered = true;
 				Door.OpenCloseCounter = 0;
-				OpenCloseSound.Play(lwmf::MP3::PlayModes::FROMSTART);
+				PlayAudio(Door, DoorSounds::OpenCloseSound);
 			}
 		}
 	}
@@ -90,29 +119,29 @@ namespace Game_Doors
 			// Open door
 			if (Door.IsOpenTriggered)
 			{
-				if (Door.OpenCloseCounter < Door.OpenCloseWidth)
+				if (Door.OpenCloseCounter < DoorTypes[Door.DoorType].OpenCloseWidth)
 				{
-					Door.OpenCloseCounter += Door.OpenCloseSpeed;
+					Door.OpenCloseCounter += DoorTypes[Door.DoorType].OpenCloseSpeed;
 
 					// TODO(Stefan): Of course, you have to see what´s behind the door when opening/closing...Rendering needs to be changed for that!
 					std::fill(Door.AnimTexture.Pixels.begin(), Door.AnimTexture.Pixels.end(), lwmf::AMask);
 
-					for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < Door.OpenCloseWidth; ++x, ++SourceTextureX)
+					for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < DoorTypes[Door.DoorType].OpenCloseWidth; ++x, ++SourceTextureX)
 					{
 						for (std::int_fast32_t y{}; y < TextureSize; ++y)
 						{
-							Door.AnimTexture.Pixels[y * TextureSize + x] = Game_LevelHandling::LevelTextures[Door.OriginalTexture].Pixels[y * TextureSize + SourceTextureX];
+							Door.AnimTexture.Pixels[y * TextureSize + x] = DoorTypes[Door.DoorType].OriginalTexture.Pixels[y * TextureSize + SourceTextureX];
 						}
 					}
 				}
 
-				if (Door.OpenCloseCounter >= Door.OpenCloseWidth)
+				if (Door.OpenCloseCounter >= DoorTypes[Door.DoorType].OpenCloseWidth)
 				{
 					Door.IsOpen = true;
 					Door.IsOpenTriggered = false;
 					Door.IsCloseTriggered = true;
-					Door.StayOpenCounter = Door.StayOpenTime;
-					Door.OpenCloseCounter = Door.OpenCloseWidth;
+					Door.StayOpenCounter = DoorTypes[Door.DoorType].StayOpenTime;
+					Door.OpenCloseCounter = DoorTypes[Door.DoorType].OpenCloseWidth;
 				}
 			}
 
@@ -125,21 +154,21 @@ namespace Game_Doors
 				{
 					Door.IsOpen = false;
 
-					if (Door.OpenCloseCounter >= Door.OpenCloseSpeed)
+					if (Door.OpenCloseCounter >= DoorTypes[Door.DoorType].OpenCloseSpeed)
 					{
 						if (!Door.OpenCloseAudioFlag)
 						{
-							OpenCloseSound.Play(lwmf::MP3::PlayModes::FROMSTART);
+							PlayAudio(Door, DoorSounds::OpenCloseSound);
 							Door.OpenCloseAudioFlag = true;
 						}
 
-						Door.OpenCloseCounter -= Door.OpenCloseSpeed;
+						Door.OpenCloseCounter -= DoorTypes[Door.DoorType].OpenCloseSpeed;
 
-						for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < Door.OpenCloseWidth; ++x, ++SourceTextureX)
+						for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < DoorTypes[Door.DoorType].OpenCloseWidth; ++x, ++SourceTextureX)
 						{
 							for (std::int_fast32_t y{}; y < TextureSize; ++y)
 							{
-								Door.AnimTexture.Pixels[y * TextureSize + x] = Game_LevelHandling::LevelTextures[Door.OriginalTexture].Pixels[y * TextureSize + SourceTextureX];
+								Door.AnimTexture.Pixels[y * TextureSize + x] = DoorTypes[Door.DoorType].OriginalTexture.Pixels[y * TextureSize + SourceTextureX];
 							}
 						}
 					}
@@ -154,9 +183,20 @@ namespace Game_Doors
 		}
 	}
 
+	inline void PlayAudio(const DoorStruct& Door, const DoorSounds Sound)
+	{
+		DoorTypes[Door.DoorType].Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::FROMSTART);
+	}
+
 	inline void CloseAudio()
 	{
-		OpenCloseSound.Close();
+		for (auto&& DoorType : DoorTypes)
+		{
+			for (auto&& Sound : DoorType.Sounds)
+			{
+				Sound.Close();
+			}
+		}
 	}
 
 

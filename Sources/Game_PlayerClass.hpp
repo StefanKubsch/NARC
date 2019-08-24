@@ -98,19 +98,23 @@ inline void Game_PlayerClass::HurtPlayer(const std::int_fast32_t DamageDealt)
 
 inline void Game_PlayerClass::PlayAudio(const PlayerSounds Sound)
 {
-	if (Sound == PlayerSounds::FootSteps)
+	switch (Sound)
 	{
-		Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::NOTIFY);
-	}
-	else
-	{
-		Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::FROMSTART);
+		case PlayerSounds::FootSteps:
+		{
+			Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::NOTIFY);
+			break;
+		}
+		default:
+		{
+			Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::FROMSTART);
+		}
 	}
 }
 
 inline void Game_PlayerClass::CloseAudio()
 {
-	for (auto& Sound : Sounds)
+	for (auto&& Sound : Sounds)
 	{
 		Sound.Close();
 	}

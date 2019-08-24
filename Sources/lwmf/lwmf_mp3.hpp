@@ -52,11 +52,13 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
-		MCI_OPEN_PARMS OpenParams{};
-		OpenParams.lpstrDeviceType = "mpegvideo";
+		MCI_OPEN_PARMS OpenParams;
+		OpenParams.dwCallback = NULL;
+		OpenParams.lpstrDeviceType = std::to_string(MCI_ALL_DEVICE_ID).c_str();
 		OpenParams.lpstrElementName = Filename.c_str();
+		OpenParams.lpstrAlias = nullptr;
 
-		mciSendCommand(NULL, MCI_OPEN, MCI_WAIT | MCI_OPEN_TYPE | MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE, reinterpret_cast<DWORD_PTR>(&OpenParams));
+		mciSendCommand(NULL, MCI_OPEN, MCI_WAIT | MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE, reinterpret_cast<DWORD_PTR>(&OpenParams));
 
 		DeviceID = OpenParams.wDeviceID;
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "File loaded with MCI device ID: " + std::to_string(DeviceID));
@@ -64,9 +66,8 @@ namespace lwmf
 
 	inline void MP3::Play(const PlayModes PlayMode)
 	{
-		MCI_PLAY_PARMS PlayParams{};
+		MCI_PLAY_PARMS PlayParams;
 		PlayParams.dwCallback = reinterpret_cast<DWORD_PTR>(MainWindow);
-		PlayParams.dwFrom = 0;
 
 		MCIERROR Error{};
 
@@ -74,6 +75,7 @@ namespace lwmf
 		{
 			case PlayModes::FROMSTART:
 			{
+				PlayParams.dwFrom = 0;
 				Error = mciSendCommand(DeviceID, MCI_PLAY, MCI_FROM, reinterpret_cast<DWORD_PTR>(&PlayParams));
 				break;
 			}
@@ -93,16 +95,17 @@ namespace lwmf
 
 	inline void MP3::RewindToStart()
 	{
-		mciSendCommand(DeviceID, MCI_SEEK, MCI_SEEK_TO_START, NULL);
+		MCI_SEEK_PARMS SeekParams;
+		SeekParams.dwCallback = reinterpret_cast<DWORD_PTR>(MainWindow);
+		mciSendCommand(DeviceID, MCI_SEEK, MCI_SEEK_TO_START, reinterpret_cast<DWORD_PTR>(&SeekParams));
 	}
 
 	inline std::int_fast32_t MP3::GetDuration()
 	{
-		MCI_STATUS_PARMS StatusParams{};
+		MCI_STATUS_PARMS StatusParams;
 		StatusParams.dwItem = MCI_STATUS_LENGTH;
-		StatusParams.dwTrack = 1;
 
-		const MCIERROR Error{ mciSendCommand(DeviceID, MCI_STATUS, MCI_WAIT | MCI_TRACK | MCI_STATUS_ITEM, reinterpret_cast<DWORD_PTR>(&StatusParams)) };
+		const MCIERROR Error{ mciSendCommand(DeviceID, MCI_STATUS, MCI_WAIT | MCI_STATUS_ITEM, reinterpret_cast<DWORD_PTR>(&StatusParams)) };
 
 		if (Error != 0)
 		{
@@ -119,7 +122,14 @@ namespace lwmf
 
 	inline void MP3::Close()
 	{
-		const MCIERROR Error{ mciSendCommand(DeviceID, MCI_CLOSE, 0, NULL) };
+		MCIERROR Error{ mciSendCommand(DeviceID, MCI_STOP, MCI_WAIT, NULL) };
+
+		if (Error != 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error stopping MCI device ID: " + std::to_string(DeviceID) + "!" + GetMCIError(Error));
+		}
+
+		Error = mciSendCommand(DeviceID, MCI_CLOSE, MCI_WAIT, NULL);
 
 		if (Error != 0)
 		{

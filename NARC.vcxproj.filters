@@ -78,9 +78,6 @@
     <ClInclude Include="Sources\Tools_Curl.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Game_AssetHandling.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Game_Raycaster.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>

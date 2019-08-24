@@ -152,7 +152,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\Game_AssetHandling.hpp" />
     <ClInclude Include="Sources\Game_PathFinding.hpp" />
     <ClInclude Include="Sources\Game_Raycaster.hpp" />
     <ClInclude Include="Sources\GFX_ImageHandling.hpp" />

@@ -790,3 +790,27 @@ x64/Release/SFX/PlayerSounds/Hurt.mp3
 x64/Release/SFX/PlayerSounds/DeathScream.mp3
 x64/Release/SFX/EntitySounds/Turret/Turret_Shot.mp3
 x64/Release/SFX/EntitySounds/Turret/Turret_Explosion.mp3
+x64/Release/DATA/Assets_Weapons/Weapon_1_TexturesData.conf
+x64/Release/DATA/Assets_Weapons/Weapon_1_Data.ini
+x64/Release/DATA/Assets_Weapons/Weapon_0_MuzzleFlashTexturesData.conf
+x64/Release/DATA/Assets_Weapons/README - Description of ConfigFiles.txt
+x64/Release/DATA/Assets_Weapons/Weapon_1_MuzzleFlashTexturesData.conf
+x64/Release/DATA/Assets_Weapons/Weapon_0_TexturesData.conf
+x64/Release/DATA/Assets_Weapons/Weapon_0_Data.ini
+x64/Release/DATA/Assets_Entities/Turret/AssetData.ini
+x64/Release/DATA/Assets_Entities/Soldier/AssetData.ini
+x64/Release/DATA/Assets_Entities/Demon/AssetData.ini
+x64/Release/DATA/Assets_Entities/AmmoBox/AssetData.ini
+x64/Release/DATA/Assets_Doors/Door_1_Data.ini
+x64/Debug/DATA/Assets_Weapons/Weapon_1_TexturesData.conf
+x64/Debug/DATA/Assets_Weapons/Weapon_1_MuzzleFlashTexturesData.conf
+x64/Debug/DATA/Assets_Weapons/Weapon_1_Data.ini
+x64/Debug/DATA/Assets_Weapons/Weapon_0_TexturesData.conf
+x64/Debug/DATA/Assets_Weapons/Weapon_0_MuzzleFlashTexturesData.conf
+x64/Debug/DATA/Assets_Weapons/Weapon_0_Data.ini
+x64/Debug/DATA/Assets_Weapons/README - Description of ConfigFiles.txt
+x64/Debug/DATA/Assets_Entities/Turret/AssetData.ini
+x64/Debug/DATA/Assets_Entities/Soldier/AssetData.ini
+x64/Debug/DATA/Assets_Entities/Demon/AssetData.ini
+x64/Debug/DATA/Assets_Entities/AmmoBox/AssetData.ini
+x64/Debug/DATA/Assets_Doors/Door_1_Data.ini

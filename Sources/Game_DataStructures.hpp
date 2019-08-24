@@ -109,19 +109,25 @@ struct EntityAssetStruct final
 };
 
 //
-// Structure for doors
+// Structures for doors
 //
+
+struct DoorTypeStruct final
+{
+	lwmf::TextureStruct OriginalTexture;
+	std::vector<lwmf::MP3> Sounds;
+	std::int_fast32_t OpenCloseWidth{};
+	std::int_fast32_t OpenCloseSpeed{};
+	std::int_fast32_t StayOpenTime{};
+};
 
 struct DoorStruct final
 {
 	lwmf::TextureStruct AnimTexture;
 	lwmf::IntPointStruct Pos{};
+	std::int_fast32_t DoorType{};
 	std::int_fast32_t Number{};
-	std::int_fast32_t OriginalTexture{};
-	std::int_fast32_t OpenCloseWidth{};
-	std::int_fast32_t OpenCloseSpeed{};
 	std::int_fast32_t OpenCloseCounter{};
-	std::int_fast32_t StayOpenTime{};
 	std::int_fast32_t StayOpenCounter{};
 	bool IsOpen{};
 	bool IsOpenTriggered{};
@@ -133,6 +139,7 @@ struct DoorStruct final
 // Init all needed objects
 //
 
+inline std::vector<DoorTypeStruct> DoorTypes;
 inline std::vector<DoorStruct> Doors;
 inline std::vector<EntityStruct> Entities;
 inline std::vector<WeaponStruct> Weapons;

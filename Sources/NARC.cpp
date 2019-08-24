@@ -48,7 +48,6 @@ inline lwmf::ShaderClass ScreenTextureShader;
 #include "HID_Keyboard.hpp"
 #include "HID_Mouse.hpp"
 #include "HID_GameControllerClass.hpp"
-#include "Tools_Cleanup.hpp"
 
 // *************************************
 // * NOW DATA & GAME RELEVANT HEADERS! *
@@ -60,7 +59,6 @@ inline lwmf::ShaderClass ScreenTextureShader;
 #include "Game_Config.hpp"
 #include "Game_LevelHandling.hpp"
 #include "Game_SkyboxHandling.hpp"
-#include "Game_AssetHandling.hpp"
 #include "Game_PathFinding.hpp"
 #include "Game_EntityHandling.hpp"
 #include "Game_Doors.hpp"
@@ -71,6 +69,7 @@ inline lwmf::ShaderClass ScreenTextureShader;
 #include "Game_Transitions.hpp"
 #include "Game_MenuClass.hpp"
 #include "Game_Raycaster.hpp"
+#include "Tools_Cleanup.hpp"
 
 //
 // Declare functions
@@ -352,6 +351,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		lwmf::SwapBuffer();
 	}
 
+	Tools_Cleanup::CloseAllAudio();
 	Tools_Cleanup::DestroySubsystems();
 	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Exit program...");
 	return EXIT_SUCCESS;
@@ -608,6 +608,7 @@ void InitAndLoadGameConfig()
 	HUDHealthBar.Init();
 	HUDMinimap.Init();
 	Game_SkyboxHandling::Init();
+	Game_Doors::InitDoorAssets();
 	HID_Keyboard::Init();
 	HID_Mouse::Init();
 	GameController.Init();
@@ -621,9 +622,8 @@ void InitAndLoadLevel()
 	Game_Transitions::LevelTransition();
 
 	Game_LevelHandling::CloseBackgroundMusic();
-	Game_AssetHandling::CloseAudio();
+	Game_EntityHandling::CloseAudio();
 	Player.CloseAudio();
-	Game_Doors::CloseAudio();
 
 	Game_LevelHandling::InitConfig();
 	Game_LevelHandling::InitMapData();
@@ -633,13 +633,13 @@ void InitAndLoadLevel()
 
 	Game_PathFinding::GenerateFlattenedMap(Game_PathFinding::FlattenedMap, Game_LevelHandling::LevelMapWidth, Game_LevelHandling::LevelMapHeight);
 
-	Game_Doors::Init();
+	Game_Doors::InitDoors();
 	Game_SkyboxHandling::ClearSkyBox();
 	Game_SkyboxHandling::LoadSkyboxImage();
 	HUDMinimap.PreRender();
 	Player.InitConfig();
 	Player.InitAudio();
-	Game_AssetHandling::InitAssets();
+	Game_EntityHandling::InitEntityAssets();
 	Game_EntityHandling::InitEntities();
 
 	Game_LevelHandling::PlayBackgroundMusic();

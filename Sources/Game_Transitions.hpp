@@ -82,6 +82,8 @@ namespace Game_Transitions
 		std::uint_fast64_t Lag{};
 		std::chrono::time_point<std::chrono::steady_clock> EndTime{ std::chrono::steady_clock::now() };
 
+		lwmf::SetVSync(-1);
+
 		while (Frame < LastFrame)
 		{
 			std::chrono::time_point<std::chrono::steady_clock> StartTime{ std::chrono::steady_clock::now() };
@@ -120,6 +122,8 @@ namespace Game_Transitions
 			ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
 			lwmf::SwapBuffer();
 		}
+
+		VSync ? lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 	}
 
 	inline void DeathSequence()
