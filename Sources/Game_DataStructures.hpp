@@ -17,9 +17,24 @@
 
 #include "Game_PlayerClass.hpp"
 
+// Tried tp "pad" the elements by their size..
+
+//
+// Structure for entity asset data (textures, sounds etc.)
+//
+
+struct EntityAssetStruct final
+{
+	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures;
+	std::vector<lwmf::TextureStruct> AttackTextures;
+	std::vector<lwmf::TextureStruct> KillTextures;
+	std::vector<lwmf::MP3> Sounds;
+	std::string Name;
+	std::int_fast32_t Number{};
+};
+
 //
 // Structure for entities
-// Tried tp "pad" the elements by their size..
 //
 
 struct EntityStruct final
@@ -95,20 +110,6 @@ struct WeaponStruct final
 };
 
 //
-// Structure for entity asset data (textures, sounds etc.)
-//
-
-struct EntityAssetStruct final
-{
-	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures;
-	std::vector<lwmf::TextureStruct> AttackTextures;
-	std::vector<lwmf::TextureStruct> KillTextures;
-	std::vector<lwmf::MP3> Sounds;
-	std::string Name;
-	std::int_fast32_t Number{};
-};
-
-//
 // Structures for doors
 //
 
@@ -139,9 +140,9 @@ struct DoorStruct final
 // Init all needed objects
 //
 
-inline std::vector<DoorTypeStruct> DoorTypes;
-inline std::vector<DoorStruct> Doors;
+inline std::vector<EntityAssetStruct> EntityAssets;
 inline std::vector<EntityStruct> Entities;
 inline std::vector<WeaponStruct> Weapons;
-inline std::vector<EntityAssetStruct> EntityAssets;
+inline std::vector<DoorTypeStruct> DoorTypes;
+inline std::vector<DoorStruct> Doors;
 inline Game_PlayerClass Player;

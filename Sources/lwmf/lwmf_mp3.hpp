@@ -61,6 +61,13 @@ namespace lwmf
 		mciSendCommand(NULL, MCI_OPEN, MCI_WAIT | MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE, reinterpret_cast<DWORD_PTR>(&OpenParams));
 
 		DeviceID = OpenParams.wDeviceID;
+
+		MCI_SET_PARMS SetParams;
+		SetParams.dwCallback = NULL;
+		SetParams.dwTimeFormat = 0;
+
+		mciSendCommand(DeviceID, MCI_SET, MCI_SET_TIME_FORMAT, reinterpret_cast<DWORD_PTR>(&SetParams));
+
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "File loaded with MCI device ID: " + std::to_string(DeviceID));
 	}
 

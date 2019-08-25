@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <cmath>
 #include <chrono>
-#include <SDL.h>
 
 // ****************************
 // * TECHNICAL HEADERS FIRST! *
@@ -39,15 +38,12 @@ inline lwmf::ShaderClass ScreenTextureShader;
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
-#include "Tools_Curl.hpp"
-#include "Tools_InitSDL.hpp"
 #include "GFX_ImageHandling.hpp"
 #include "GFX_Window.hpp"
 #include "GFX_TextClass.hpp"
 #include "GFX_LightingClass.hpp"
 #include "HID_Keyboard.hpp"
 #include "HID_Mouse.hpp"
-#include "HID_GameControllerClass.hpp"
 
 // *************************************
 // * NOW DATA & GAME RELEVANT HEADERS! *
@@ -85,7 +81,9 @@ Game_MenuClass MainMenu;
 Game_HealthBarClass HUDHealthBar;
 Game_MinimapClass HUDMinimap;
 Game_WeaponDisplayClass HUDWeaponDisplay;
-HID_GameControllerClass GameController;
+
+// HID_GameControllerClass GameController;
+lwmf::Gamepad GameController;
 
 std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -102,6 +100,18 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	}
 
 	lwmf::Multithreading ThreadPool;
+
+	GameController.SetWindow(lwmf::MainWindow);
+	GameController.ClearMappings();
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::LeftStickLeft, 0.3F, HID_Keyboard::MovePlayerStrafeLeftKey);
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::LeftStickRight, 0.3F, HID_Keyboard::MovePlayerStrafeRightKey);
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::LeftStickUp, 0.3F, HID_Keyboard::MovePlayerForwardKey);
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::LeftStickDown, 0.3F, HID_Keyboard::MovePlayerBackwardKey);
+
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::RightStickLeft, 0.3F, HID_Keyboard::MouseLeft);
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::RightStickRight, 0.3F, HID_Keyboard::MouseRight);
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::RightStickUp, 0.3F, HID_Keyboard::MouseUp);
+	GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::RightStickDown, 0.3F, HID_Keyboard::MouseDown);
 
 	// Main game loop
 	// fixed timestep method
@@ -120,6 +130,8 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		EndTime = StartTime;
 		Lag += static_cast<std::uint_fast64_t>(ElapsedTime.count());
 
+		GameController.Refresh();
+
 		static MSG Message{};
 
 		while (PeekMessage(&Message, nullptr, 0, 0, PM_REMOVE))
@@ -133,6 +145,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			DispatchMessage(&Message);
 		}
 
+		/*
 		if (GameControllerFlag)
 		{
 			static SDL_Event Event{};
@@ -141,86 +154,6 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			{
 				switch (Event.type)
 				{
-					case SDL_CONTROLLERAXISMOTION:
-					{
-						if (Event.caxis.which == 0)
-						{
-							switch (Event.caxis.axis)
-							{
-								case SDL_CONTROLLER_AXIS_LEFTX:
-								{
-									if (Event.caxis.value < -GameController.JoystickDeadZone)
-									{
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
-									}
-									else if (Event.caxis.value > GameController.JoystickDeadZone)
-									{
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
-									}
-									else
-									{
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
-									}
-									break;
-								}
-								case SDL_CONTROLLER_AXIS_LEFTY:
-								{
-									if (Event.caxis.value < -GameController.JoystickDeadZone)
-									{
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
-									}
-									else if (Event.caxis.value > GameController.JoystickDeadZone)
-									{
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
-									}
-									else
-									{
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
-										HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
-									}
-									break;
-								}
-								case SDL_CONTROLLER_AXIS_RIGHTX:
-								{
-									GameController.RightStickValue = Event.caxis.value;
-
-									if (Event.caxis.value < -GameController.JoystickDeadZone)
-									{
-										GameController.RightStickPos.X = -1;
-									}
-									else if (Event.caxis.value > GameController.JoystickDeadZone)
-									{
-										GameController.RightStickPos.X = 1;
-									}
-									else
-									{
-										GameController.RightStickPos.X = 0;
-									}
-									break;
-								}
-								case SDL_CONTROLLER_AXIS_RIGHTY:
-								{
-									if (Event.caxis.value < -GameController.JoystickDeadZone)
-									{
-										GameController.RightStickPos.Y = -1;
-									}
-									else if (Event.caxis.value > GameController.JoystickDeadZone)
-									{
-										GameController.RightStickPos.Y = 1;
-									}
-									else
-									{
-										GameController.RightStickPos.Y = 0;
-									}
-									break;
-								}
-								default: {}
-							}
-						}
-						break;
-					}
-
 					case SDL_CONTROLLERBUTTONDOWN:
 					{
 						switch (Event.cbutton.button)
@@ -259,7 +192,6 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 						}
 						break;
 					}
-
 					case SDL_CONTROLLERBUTTONUP:
 					{
 						switch (Event.cbutton.button)
@@ -277,6 +209,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 				}
 			}
 		}
+		*/
 
 		while (Lag >= LengthOfFrame)
 		{
@@ -361,6 +294,97 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
+		case WM_KEYDOWN:
+		{
+			if (GameControllerFlag)
+			{
+				if (wParam == HID_Keyboard::MovePlayerForwardKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
+				}
+				else if (wParam == HID_Keyboard::MovePlayerBackwardKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
+				}
+
+				if (wParam == HID_Keyboard::MovePlayerStrafeLeftKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
+				}
+				else if (wParam == HID_Keyboard::MovePlayerStrafeRightKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
+				}
+
+				if (wParam == HID_Keyboard::MouseLeft)
+				{
+					GameController.RightStickPos.X = -1;
+				}
+				else if (wParam == HID_Keyboard::MouseRight)
+				{
+					GameController.RightStickPos.X = 1;
+				}
+
+				if (wParam == HID_Keyboard::MouseUp)
+				{
+					GameController.RightStickPos.Y = -1;
+				}
+				else if (wParam == HID_Keyboard::MouseDown)
+				{
+					GameController.RightStickPos.Y = 1;
+				}
+			}
+			break;
+		}
+		case WM_KEYUP:
+		{
+			if (GameControllerFlag)
+			{
+				if (wParam == HID_Keyboard::MovePlayerForwardKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
+					break;
+				}
+
+				if (wParam == HID_Keyboard::MovePlayerBackwardKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
+				}
+
+				if (wParam == HID_Keyboard::MovePlayerStrafeLeftKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
+					break;
+				}
+
+				if (wParam == HID_Keyboard::MovePlayerStrafeRightKey)
+				{
+					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
+					break;
+				}
+
+				if (wParam == HID_Keyboard::MouseLeft)
+				{
+					GameController.RightStickPos.X = 0;
+				}
+
+				if (wParam == HID_Keyboard::MouseRight)
+				{
+					GameController.RightStickPos.X = 0;
+				}
+
+				if (wParam == HID_Keyboard::MouseUp)
+				{
+					GameController.RightStickPos.Y = 0;
+				}
+
+				if (wParam == HID_Keyboard::MouseDown)
+				{
+					GameController.RightStickPos.Y = 0;
+				}
+			}
+			break;
+		}
 		case WM_INPUT:
 		{
 			static RAWINPUT RawDev;
@@ -598,8 +622,6 @@ void InitAndLoadGameConfig()
 	lwmf::CheckForSSESupport();
 	Game_Config::Init();
 	Game_Raycaster::Init();
-	Tools_Curl::Init();
-	Tools_InitSDL::InitSDL();
 	GFX_Window::Init();
 	Game_WeaponHandling::InitConfig();
 	Game_WeaponHandling::InitTextures();
@@ -611,7 +633,6 @@ void InitAndLoadGameConfig()
 	Game_Doors::InitDoorAssets();
 	HID_Keyboard::Init();
 	HID_Mouse::Init();
-	GameController.Init();
 	Game_Transitions::Init();
 	MainMenu.Init();
 	Tools_Console::CloseConsole();
@@ -676,46 +697,46 @@ void ControlPlayerMovement()
 	{
 		switch (GameController.RightStickPos.X)
 		{
-			case -1:
-			{
-				--HID_Mouse::MousePos.X;
-				break;
-			}
-			case 1:
-			{
-				++HID_Mouse::MousePos.X;
-				break;
-			}
-			default:
-			{
-				HID_Mouse::MousePos.X = 0;
-			}
+		case -1:
+		{
+			--HID_Mouse::MousePos.X;
+			break;
+		}
+		case 1:
+		{
+			++HID_Mouse::MousePos.X;
+			break;
+		}
+		default:
+		{
+			HID_Mouse::MousePos.X = 0;
+		}
 		}
 
 		switch (GameController.RightStickPos.Y)
 		{
-			case -1:
-			{
-				--HID_Mouse::MousePos.Y;
-				break;
-			}
-			case 1:
-			{
-				++HID_Mouse::MousePos.Y;
-				break;
-			}
-			default:
-			{
-				HID_Mouse::MousePos.Y = 0;
-			}
+		case -1:
+		{
+			--HID_Mouse::MousePos.Y;
+			break;
+		}
+		case 1:
+		{
+			++HID_Mouse::MousePos.Y;
+			break;
+		}
+		default:
+		{
+			HID_Mouse::MousePos.Y = 0;
+		}
 		}
 	}
 
-	const float InputSensitivity { GameControllerFlag ? GameController.Sensitivity : HID_Mouse::MouseSensitivity };
+	const float InputSensitivity{ GameControllerFlag ? GameController.Sensitivity : HID_Mouse::MouseSensitivity };
 
 	if (HID_Mouse::MousePos.X != HID_Mouse::OldMousePos.X)
 	{
-		const float RotationX{ GameControllerFlag ? GameController.RotationXLimit * (GameController.RightStickValue / 8000) : HID_Mouse::MousePos.X * InputSensitivity * (lwmf::PI / 180.0F) };
+		const float RotationX{ GameControllerFlag ? GameController.RotationXLimit * (GameController.rightStickX / 0.3F) : HID_Mouse::MousePos.X * InputSensitivity * (lwmf::PI / 180.0F) };
 		const float oldDirX{ Player.Dir.X };
 		const float TmpCos{ std::cosf(-RotationX) };
 		const float TmpSin{ std::sinf(-RotationX) };

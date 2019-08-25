@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <SDL.h>
-
 namespace Tools_Cleanup
 {
 
@@ -27,9 +25,6 @@ namespace Tools_Cleanup
 		lwmf::UnregisterRawInputDevice(lwmf::HID_MOUSE);
 		lwmf::UnregisterRawInputDevice(lwmf::HID_KEYBOARD);
 		lwmf::DeleteOpenGLContext();
-
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Quit SDL subsystems");
-		SDL_Quit();
 	}
 
 	inline void CloseAllAudio()

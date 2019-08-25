@@ -77,9 +77,9 @@ namespace Game_WeaponHandling
 	// Variables and constants
 	//
 
-	constexpr std::int_fast32_t MaximumCarriedAmmoDigits{ 3 };
-	constexpr std::int_fast32_t MaximumAmmoCapacityDigits{ 3 };
-	constexpr std::int_fast32_t MaximumLoadedRoundsDigits{ 3 };
+	static constexpr std::int_fast32_t MaximumCarriedAmmoDigits{ 3 };
+	static constexpr std::int_fast32_t MaximumAmmoCapacityDigits{ 3 };
+	static constexpr std::int_fast32_t MaximumLoadedRoundsDigits{ 3 };
 
 	inline WeaponState CurrentWeaponState;
 	inline FiringState CurrentFiringState;

@@ -70,14 +70,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Coding\NARC\Libs\libcurl\include\curl;C:\Coding\NARC\Libs\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\NARC\Libs\libcurl\lib;C:\Coding\NARC\Libs\SDL2-2.0.10\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Coding\NARC\Libs\libcurl\include\curl;C:\Coding\NARC\Libs\SDL2-2.0.10\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\NARC\Libs\libcurl\lib;C:\Coding\NARC\Libs\SDL2-2.0.10\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
@@ -95,7 +95,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Coding\NARC\Libs\libcurl\include\curl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -103,7 +103,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -127,7 +127,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Coding\NARC\Libs\libcurl\include\curl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -143,7 +143,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;libcurl.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -165,13 +165,11 @@
     <ClInclude Include="Sources\stb\stb_truetype.hpp" />
     <ClInclude Include="Sources\Tools_Cleanup.hpp" />
     <ClInclude Include="Sources\Tools_Console.hpp" />
-    <ClInclude Include="Sources\Tools_Curl.hpp" />
     <ClInclude Include="Sources\Game_PlayerClass.hpp" />
     <ClInclude Include="Sources\GFX_TextClass.hpp" />
     <ClInclude Include="Sources\Game_DataStructures.hpp" />
     <ClInclude Include="Sources\Game_EntityHandling.hpp" />
     <ClInclude Include="Sources\Tools_ErrorHandling.hpp" />
-    <ClInclude Include="Sources\HID_GameControllerClass.hpp" />
     <ClInclude Include="Sources\Game_GlobalDefinitions.hpp" />
     <ClInclude Include="Sources\Game_Config.hpp" />
     <ClInclude Include="Sources\HID_Keyboard.hpp" />
@@ -179,7 +177,6 @@
     <ClInclude Include="Sources\HID_Mouse.hpp" />
     <ClInclude Include="Sources\GFX_Window.hpp" />
     <ClInclude Include="Sources\Game_PreGame.hpp" />
-    <ClInclude Include="Sources\Tools_InitSDL.hpp" />
     <ClInclude Include="Sources\Game_SkyboxHandling.hpp" />
     <ClInclude Include="Sources\Game_WeaponHandling.hpp" />
   </ItemGroup>

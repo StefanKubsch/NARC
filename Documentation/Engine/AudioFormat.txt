@@ -1,4 +1,4 @@
 Supported audio formats:
 
 SFX & Music
-	Currently only MP3 is supported!
+	Currently only MP3 CBR (Constand BitRate) is supported!

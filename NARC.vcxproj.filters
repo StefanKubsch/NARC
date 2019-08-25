@@ -66,16 +66,10 @@
     <ClInclude Include="Sources\Game_WeaponDisplayClass.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\HID_GameControllerClass.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Game_Doors.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Game_Transitions.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Tools_Curl.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Game_Raycaster.hpp">
@@ -94,9 +88,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Tools_Console.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Tools_InitSDL.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Sources\GFX_Window.hpp">

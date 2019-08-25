@@ -2,7 +2,7 @@
 
 ## "Not Another RayCaster"
 
-A raycasting game engine in C++, built using my own library lwmf, OpenGL and - in small parts - SDL 2.0 (only for gamepad support).
+A raycasting game engine in C++, built using my own library lwmf and OpenGL.
 
 I am working on a 2.5D, "Wolfenstein 3D"-like game engine, written in modern C++.
 
@@ -48,7 +48,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - per-pixel softwareshading for viewsize-dependent darkening of environment
   - real time lighting (somewhat faked, needs more work)
   - movement via free mouselook (x- and y-axis) and wasd (including strafing)...
-  - ...or just use a connected gamepad like a XBOX 360 Controller. Gamepads will be detected automatically!
+  - ...or just use a connected XBOX 360 gamepad!
   - adjustable input sensitivity
   - basic audio functions (background music, steps, weapon sounds, entity sounds, door sounds)
   - basic weapon behaviour (sway, muzzleflash, shooting, reloading, ammo pickup, change weapon)
@@ -57,7 +57,6 @@ The whole engine is public domain - you can do what you want with the code. It w
   - fps (frames per second) counter
   - error handling, file checks
   - basic implementation of main menu, options
-  - autoupdates via web/HTTPS for e.g. "gamecontrollerdb.txt" (using libcurl)
   - really fast & lightweight text rendering via a modified stb_truetype.h and pre-generated glyph textures (OpenGL)
 
 ![NARC_PIC1](https://github.com/StefanKubsch/NARC/blob/master/Documentation/NARC.png)
@@ -67,9 +66,7 @@ The whole engine is public domain - you can do what you want with the code. It w
 **Used libraries/APIs:**
 
   - lwmf, the lightweight media framework for graphics, audio, multithreading, input handling, logging etc. (my own work, have a look here: https://github.com/StefanKubsch/lwmf)
-  - SDL 2.0.10 for gamepad support (https://www.libsdl.org/)
   - stb_truetype.hpp for TrueType font rendering, work in progress of converting to C++ (original lib here:https://github.com/nothings/stb)
-  - libcurl 7.65.3 for internet handling (https://curl.haxx.se/libcurl/, see documentation in Docfolder!)
   
 **Controls (configurable):**
   
