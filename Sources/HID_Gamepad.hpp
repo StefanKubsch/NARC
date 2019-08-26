@@ -24,10 +24,16 @@ namespace HID_Gamepad
 
 	inline lwmf::Gamepad GameController;
 
-	constexpr std::int_fast32_t VirtMouseUp{ VK_UP };
-	constexpr std::int_fast32_t VirtMouseDown{ VK_DOWN };
-	constexpr std::int_fast32_t VirtMouseLeft{ VK_LEFT };
-	constexpr std::int_fast32_t VirtMouseRight{ VK_RIGHT };
+	constexpr char VirtMouseUp{ VK_UP };
+	constexpr char VirtMouseDown{ VK_DOWN };
+	constexpr char VirtMouseLeft{ VK_LEFT };
+	constexpr char VirtMouseRight{ VK_RIGHT };
+	constexpr char FireSingleShotKey{ ',' };
+	constexpr char RapidFireKey{ '.' };
+	constexpr char ReloadWeaponKey{ 'R' };
+	constexpr char ChangeWeaponUpKey{ ';' };
+	constexpr char ChangeWeaponDownKey{ ':' };
+	constexpr char ActionKey{ VK_SPACE };
 
 	//
 	// Functions
@@ -39,16 +45,18 @@ namespace HID_Gamepad
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init XBOX controller...");
 
+			GameController.SetButtons();
+
 			if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				const float DeadZone{ lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "DeadZone") };
 				GameController.Sensitivity = lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");
 				GameController.RotationXLimit = lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "RotationXLimit");
-				GameController.SetRepeatIntervalMsAll(lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GAMECONTROLLER", "RepeatIntervall"));
+				GameController.SetIntervalAll(lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GAMECONTROLLER", "RepeatIntervall"));
 
 				GameController.SetDeadzone(DeadZone, DeadZone);
-				
-				GameController.ClearMappings();
+
+				GameController.DeleteMappings();
 				GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::LeftStickLeft, DeadZone, HID_Keyboard::MovePlayerStrafeLeftKey);
 				GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::LeftStickRight, DeadZone, HID_Keyboard::MovePlayerStrafeRightKey);
 				GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::LeftStickUp, DeadZone, HID_Keyboard::MovePlayerForwardKey);
@@ -58,6 +66,24 @@ namespace HID_Gamepad
 				GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::RightStickRight, DeadZone, VirtMouseRight);
 				GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::RightStickUp, DeadZone, VirtMouseUp);
 				GameController.AddAnalogKeyMapping(lwmf::Gamepad::AnalogButtons::RightStickDown, DeadZone, VirtMouseDown);
+
+				GameController.SetInterval(XINPUT_GAMEPAD_RIGHT_SHOULDER, 0);
+				GameController.AddKeyMapping(XINPUT_GAMEPAD_RIGHT_SHOULDER, FireSingleShotKey);
+
+				GameController.SetInterval(XINPUT_GAMEPAD_LEFT_SHOULDER, 150);
+				GameController.AddKeyMapping(XINPUT_GAMEPAD_LEFT_SHOULDER, RapidFireKey);
+
+				GameController.SetInterval(XINPUT_GAMEPAD_DPAD_RIGHT, 0);
+				GameController.AddKeyMapping(XINPUT_GAMEPAD_DPAD_RIGHT, ReloadWeaponKey);
+
+				GameController.SetInterval(XINPUT_GAMEPAD_DPAD_UP, 0);
+				GameController.AddKeyMapping(XINPUT_GAMEPAD_DPAD_UP, ChangeWeaponUpKey);
+
+				GameController.SetInterval(XINPUT_GAMEPAD_DPAD_DOWN, 0);
+				GameController.AddKeyMapping(XINPUT_GAMEPAD_DPAD_DOWN, ChangeWeaponDownKey);
+
+				GameController.SetInterval(XINPUT_GAMEPAD_X, 0);
+				GameController.AddKeyMapping(XINPUT_GAMEPAD_X, ActionKey);
 			}
 		}
 	}

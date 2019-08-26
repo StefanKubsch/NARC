@@ -386,7 +386,7 @@ namespace Game_WeaponHandling
 			// Is weapon loaded and ready?
 			if (Weapons[Player.SelectedWeapon].LoadedRounds > 0 && Weapons[Player.SelectedWeapon].CadenceCounter <= 0)
 			{
-				Weapons[Player.SelectedWeapon].CadenceCounter = 1000 / Weapons[Player.SelectedWeapon].Cadence;
+				Weapons[Player.SelectedWeapon].CadenceCounter = (3600 / Weapons[Player.SelectedWeapon].Cadence) ;
 
 				PlayAudio(Player.SelectedWeapon, WeaponsSounds::Shot);
 

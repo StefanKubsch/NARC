@@ -131,72 +131,6 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			DispatchMessage(&Message);
 		}
 
-		/*
-		if (GameControllerFlag)
-		{
-			static SDL_Event Event{};
-
-			while (SDL_PollEvent(&Event) == 1)
-			{
-				switch (Event.type)
-				{
-					case SDL_CONTROLLERBUTTONDOWN:
-					{
-						switch (Event.cbutton.button)
-						{
-							case SDL_CONTROLLER_BUTTON_X:
-							{
-								Game_Doors::TriggerDoor();
-								break;
-							}
-							case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-							{
-								Game_WeaponHandling::InitiateRapidFire();
-								break;
-							}
-							case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-							{
-								Game_WeaponHandling::InitiateSingleShot();
-								break;
-							}
-							case SDL_CONTROLLER_BUTTON_DPAD_UP:
-							{
-								Game_WeaponHandling::InitiateWeaponChangeUp();
-								break;
-							}
-							case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-							{
-								Game_WeaponHandling::InitiateWeaponChangeDown();
-								break;
-							}
-							case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-							{
-								Game_WeaponHandling::InitiateReload();
-								break;
-							}
-							default: {}
-						}
-						break;
-					}
-					case SDL_CONTROLLERBUTTONUP:
-					{
-						switch (Event.cbutton.button)
-						{
-							case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-							{
-								Game_WeaponHandling::ReleaseRapidFire();
-								break;
-							}
-							default: {}
-						}
-						break;
-					}
-					default: {}
-				}
-			}
-		}
-		*/
-
 		while (Lag >= LengthOfFrame)
 		{
 			if (!GamePausedFlag)
@@ -319,6 +253,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					HID_Gamepad::GameController.RightStickPos.Y = 1;
 				}
+
+				if (wParam == HID_Gamepad::FireSingleShotKey)
+				{
+					Game_WeaponHandling::InitiateSingleShot();
+				}
+
+				if (wParam == HID_Gamepad::RapidFireKey)
+				{
+					Game_WeaponHandling::InitiateRapidFire();
+				}
+
+				if (wParam == HID_Gamepad::ReloadWeaponKey)
+				{
+					Game_WeaponHandling::InitiateReload();
+				}
+
+				if (wParam == HID_Gamepad::ActionKey)
+				{
+					Game_Doors::TriggerDoor();
+				}
+
+				if (wParam == HID_Gamepad::ChangeWeaponUpKey)
+				{
+					Game_WeaponHandling::InitiateWeaponChangeUp();
+				}
+
+				if (wParam == HID_Gamepad::ChangeWeaponDownKey)
+				{
+					Game_WeaponHandling::InitiateWeaponChangeDown();
+				}
 			}
 			break;
 		}
@@ -329,7 +293,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wParam == HID_Keyboard::MovePlayerForwardKey)
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
-					break;
 				}
 
 				if (wParam == HID_Keyboard::MovePlayerBackwardKey)
@@ -340,13 +303,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wParam == HID_Keyboard::MovePlayerStrafeLeftKey)
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
-					break;
 				}
 
 				if (wParam == HID_Keyboard::MovePlayerStrafeRightKey)
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
-					break;
 				}
 
 				if (wParam == HID_Gamepad::VirtMouseLeft)
@@ -367,6 +328,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wParam == HID_Gamepad::VirtMouseDown)
 				{
 					HID_Gamepad::GameController.RightStickPos.Y = 0;
+				}
+
+				if (wParam == HID_Gamepad::RapidFireKey)
+				{
+					Game_WeaponHandling::ReleaseRapidFire();
 				}
 			}
 			break;
@@ -726,7 +692,7 @@ void ControlPlayerMovement()
 
 	if (HID_Mouse::MousePos.X != HID_Mouse::OldMousePos.X)
 	{
-		const float RotationX{ GameControllerFlag ? HID_Gamepad::GameController.RotationXLimit * (HID_Gamepad::GameController.RightStickX / 0.3F) : HID_Mouse::MousePos.X * InputSensitivity * (lwmf::PI / 180.0F) };
+		const float RotationX{ GameControllerFlag ? HID_Gamepad::GameController.RotationXLimit * (HID_Gamepad::GameController.RightStick.X / InputSensitivity) : HID_Mouse::MousePos.X * InputSensitivity * (lwmf::PI / 180.0F) };
 		const float oldDirX{ Player.Dir.X };
 		const float TmpCos{ std::cosf(-RotationX) };
 		const float TmpSin{ std::sinf(-RotationX) };
