@@ -12,6 +12,7 @@
 
 #include <Windows.h>
 #include <Xinput.h>
+#include <cstdint>
 #include <algorithm>
 #include <string>
 #include <map>
@@ -26,7 +27,7 @@ namespace lwmf
 	class Gamepad
 	{
 	public:
-		enum AnalogButtons
+		enum class AnalogButtons
 		{
 			LeftStickLeft,
 			LeftStickRight,
@@ -43,375 +44,336 @@ namespace lwmf
 
 		struct AnalogMapping
 		{
-			float threshold;
-			int key;
+			std::int_fast32_t Key{};
+			float Threshold{};
 		};
 
-	private:
-		int cId;
-		XINPUT_STATE state;
-		HWND targetWindow;
-		float deadzoneX;
-		float deadzoneY;
-		std::map<WORD, int> keyMap;
-		std::map<AnalogButtons, AnalogMapping> analogMap;
-		std::map<WORD, unsigned int> repeatMs;
-		std::map<AnalogButtons, unsigned int> analogRepeatMs;
-		std::map<WORD, DWORD> lastPress;
-		std::map<AnalogButtons, DWORD> analogLastPress;
-
-
-		XINPUT_STATE previous;
-
-		float prevLeftStickX;
-		float prevLeftStickY;
-		float prevRightStickX;
-		float prevRightStickY;
-		float prevLeftTrigger;
-		float prevRightTrigger;
-
-		void sendKeysOnThreshold(AnalogButtons, float, float, float, int);
-
-	public:
-		Gamepad() : deadzoneX(0.05f), deadzoneY(0.02f), targetWindow(MainWindow) { SetRepeatIntervalMsAll(0); }
-		Gamepad(float dzX, float dzY) : deadzoneX(dzX), deadzoneY(dzY), targetWindow(MainWindow) { SetRepeatIntervalMsAll(0); }
-		std::map<WORD, std::string> Buttons;
-		void SetDeadzone(float, float);
-		void SetWindow(HWND);
-		void AddKeyMapping(WORD, int);
-		void RemoveKeyMappingByButton(WORD);
-		void RemoveKeyMapping(int);
-		void AddAnalogKeyMapping(AnalogButtons, float, int);
-		void RemoveAnalogKeyMapping(AnalogButtons);
-		void ClearMappings();
-		void SetRepeatIntervalMsAll(unsigned int);
-		void SetRepeatIntervalMs(WORD, unsigned int);
-		void SetAnalogRepeatIntervalMs(AnalogButtons, unsigned int);
-
-		float leftStickX;
-		float leftStickY;
-		float rightStickX;
-		float rightStickY;
-		float leftTrigger;
-		float rightTrigger;
-		int  GetPort();
-		XINPUT_GAMEPAD* GetState();
+		void SetDeadzone(float x, float y);
 		bool CheckConnection();
-		bool Refresh();
-		bool IsPressed(WORD);
+		void Refresh();
+		bool IsPressed(WORD Button);
+		void AddKeyMapping(WORD Button, std::int_fast32_t Key);
+		void RemoveKeyMappingByButton(WORD Button);
+		void RemoveKeyMapping(std::int_fast32_t Key);
+		void AddAnalogKeyMapping(const AnalogButtons& Button, float Threshold, std::int_fast32_t Key);
+		void RemoveAnalogKeyMapping(AnalogButtons Button);
+		void ClearMappings();
+		void SetRepeatIntervalMsAll(std::uint_fast32_t ms);
+		void SetRepeatIntervalMs(WORD Button, std::uint_fast32_t ms);
+		void SetAnalogRepeatIntervalMs(const AnalogButtons& Button, std::uint_fast32_t ms);
 
+		std::map<WORD, std::string> Buttons;
+		lwmf::IntPointStruct RightStickPos;
+		float LeftStickX{};
+		float LeftStickY{};
+		float RightStickX{};
+		float RightStickY{};
+		float TriggerLeft{};
+		float TriggerRight{};
 		float RotationXLimit{ 0.01F };
 		float Sensitivity{ 0.3F };
-		lwmf::IntPointStruct RightStickPos;
+
+	private:
+		void SendAnalogKeys(const AnalogButtons& Button, float Now, float Before, float Threshold, std::int_fast32_t Key);
+
+		XINPUT_STATE State{};
+		XINPUT_STATE Previous{};
+
+		std::map<WORD, std::int_fast32_t> KeyMap;
+		std::map<AnalogButtons, AnalogMapping> AnalogMap;
+		std::map<WORD, std::uint32_t> RepeatMs;
+		std::map<AnalogButtons, std::uint32_t> AnalogRepeatMs;
+		std::map<WORD, DWORD> LastPress;
+		std::map<AnalogButtons, DWORD> AnalogLastPress;
+
+		std::int_fast32_t ControllerID{};
+		
+		float DeadZoneX{ 0.3F };
+		float DeadZoneY{ 0.3F };
+		float PreviousLeftStickX{};
+		float PreviousLeftStickY{};
+		float PreviousRightStickX{};
+		float PreviousRightStickY{};
+		float PreviousLeftTrigger{};
+		float PreviousRightTrigger{};
 	};
 
-	int Gamepad::GetPort()
+	inline void Gamepad::SetDeadzone(const float x, const float y)
 	{
-		return cId + 1;
+		DeadZoneX = x;
+		DeadZoneY = y;
 	}
 
-	XINPUT_GAMEPAD* Gamepad::GetState()
+	inline bool Gamepad::CheckConnection()
 	{
-		return &state.Gamepad;
-	}
+		std::int_fast32_t ID{ -1 };
 
-	bool Gamepad::CheckConnection()
-	{
-		int controllerId = -1;
-
-		// Check each port for a connection until one is found
-		for (DWORD i = 0; i < XUSER_MAX_COUNT && controllerId == -1; i++)
+		for (DWORD i{}; i < XUSER_MAX_COUNT && ID == -1; i++)
 		{
-			XINPUT_STATE State;
-			ZeroMemory(&State, sizeof(XINPUT_STATE));
+			XINPUT_STATE XInputState;
+			ZeroMemory(&XInputState, sizeof(XINPUT_STATE));
 
-			if (XInputGetState(i, &State) == ERROR_SUCCESS)
-				controllerId = i;
+			if (XInputGetState(i, &XInputState) == ERROR_SUCCESS)
+			{
+				ID = i;
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "XBOX controller found...");
+			}
+			else
+			{
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "No XBOX controller found...");
+			}
 		}
 
-		cId = controllerId;
+		ControllerID = ID;
 
-		return controllerId != -1;
+		return ID != -1;
 	}
 
-	// Returns false if the controller has been disconnected
-	bool Gamepad::Refresh()
+	inline void Gamepad::Refresh()
 	{
-		// Try to establish a connection with the controller if none was connected last time
-		if (cId == -1)
-			CheckConnection();
+		Previous = State;
+		PreviousLeftStickX = LeftStickX;
+		PreviousLeftStickY = LeftStickY;
+		PreviousRightStickX = RightStickX;
+		PreviousRightStickY = RightStickY;
+		PreviousLeftTrigger = TriggerLeft;
+		PreviousRightTrigger = TriggerRight;
 
-		// If the controller is connected...
-		if (cId != -1)
+		ZeroMemory(&State, sizeof(XINPUT_STATE));
+		XInputGetState(ControllerID, &State);
+
+		const float NormalizedLX{ max(-1.0F, static_cast<float>(State.Gamepad.sThumbLX / 32767)) };
+		const float NormalizedLY{ max(-1.0F, static_cast<float>(State.Gamepad.sThumbLY / 32767)) };
+
+		LeftStickX = (std::abs(NormalizedLX) < DeadZoneX ? 0.0F : (std::fabsf(NormalizedLX) - DeadZoneX) * (NormalizedLX / std::fabsf(NormalizedLX)));
+		LeftStickY = (std::abs(NormalizedLY) < DeadZoneY ? 0.0F : (std::fabsf(NormalizedLY) - DeadZoneY) * (NormalizedLY / std::fabsf(NormalizedLY)));
+
+		if (DeadZoneX > 0)
 		{
-			// Store previous state
-			previous = state;
+			LeftStickX *= 1 / (1 - DeadZoneX);
+		}
 
-			prevLeftStickX = leftStickX;
-			prevLeftStickY = leftStickY;
-			prevRightStickX = rightStickX;
-			prevRightStickY = rightStickY;
-			prevLeftTrigger = leftTrigger;
-			prevRightTrigger = rightTrigger;
+		if (DeadZoneY > 0)
+		{
+			LeftStickY *= 1 / (1 - DeadZoneY);
+		}
 
-			// Check state and check for disconnection
-			ZeroMemory(&state, sizeof(XINPUT_STATE));
-			if (XInputGetState(cId, &state) != ERROR_SUCCESS)
+		const float NormalizedRX{ max(-1.0F, static_cast<float>(State.Gamepad.sThumbRX / 32767)) };
+		const float NormalizedRY{ max(-1.0F, static_cast<float>(State.Gamepad.sThumbRY / 32767)) };
+
+		RightStickX = (std::abs(NormalizedRX) < DeadZoneX ? 0.0F : (std::fabsf(NormalizedRX) - DeadZoneX) * (NormalizedRX / std::fabsf(NormalizedRX)));
+		RightStickY = (std::abs(NormalizedRY) < DeadZoneY ? 0.0F : (std::fabsf(NormalizedRY) - DeadZoneY) * (NormalizedRY / std::fabsf(NormalizedRY)));
+
+		if (DeadZoneX > 0.0F)
+		{
+			RightStickX *= 1.0F / (1.0F - DeadZoneX);
+		}
+
+		if (DeadZoneY > 0.0F)
+		{
+			RightStickY *= 1.0F / (1.0F - DeadZoneY);
+		}
+
+		TriggerLeft = static_cast<float>(State.Gamepad.bLeftTrigger / 255);
+		TriggerRight = static_cast<float>(State.Gamepad.bRightTrigger / 255);
+
+		if (WindowHandle != nullptr)
+		{
+			for (const auto& Button : Buttons)
 			{
-				cId = -1;
-				return false;
-			}
-
-			// Calculate deadzone-normalized percentages of movement for the
-			// analog sticks and triggers
-
-			float normLX = max(-1, (float)state.Gamepad.sThumbLX / 32767);
-			float normLY = max(-1, (float)state.Gamepad.sThumbLY / 32767);
-
-			leftStickX = (abs(normLX) < deadzoneX ? 0 : (fabsf(normLX) - deadzoneX) * (normLX / fabsf(normLX)));
-			leftStickY = (abs(normLY) < deadzoneY ? 0 : (fabsf(normLY) - deadzoneY) * (normLY / fabsf(normLY)));
-
-			if (deadzoneX > 0) leftStickX *= 1 / (1 - deadzoneX);
-			if (deadzoneY > 0) leftStickY *= 1 / (1 - deadzoneY);
-
-			float normRX = max(-1, (float)state.Gamepad.sThumbRX / 32767);
-			float normRY = max(-1, (float)state.Gamepad.sThumbRY / 32767);
-
-			rightStickX = (abs(normRX) < deadzoneX ? 0 : (fabsf(normRX) - deadzoneX) * (normRX / fabsf(normRX)));
-			rightStickY = (abs(normRY) < deadzoneY ? 0 : (fabsf(normRY) - deadzoneY) * (normRY / fabsf(normRY)));
-
-			if (deadzoneX > 0) rightStickX *= 1 / (1 - deadzoneX);
-			if (deadzoneY > 0) rightStickY *= 1 / (1 - deadzoneY);
-
-			leftTrigger = (float)state.Gamepad.bLeftTrigger / 255;
-			rightTrigger = (float)state.Gamepad.bRightTrigger / 255;
-
-			// Dispatch keyboard events if desired
-			if (targetWindow != NULL)
-			{
-				for (auto button : Buttons)
+				if ((State.Gamepad.wButtons & Button.first) != 0)
 				{
-					// If button is pushed
-					if ((state.Gamepad.wButtons & button.first) != 0)
+					const WORD Mapping{ (KeyMap.find(Button.first) != KeyMap.end() ? static_cast<WORD>(KeyMap.find(Button.first)->second) : static_cast<WORD>(Button.first)) };
+					const DWORD Now{ GetTickCount() };
+					const DWORD Last{ (LastPress.find(Button.first) != LastPress.end() ? LastPress.find(Button.first)->second : 0) };
+					const std::uint_fast32_t ms{ RepeatMs.find(Button.first)->second };
+
+					if ((Now - Last >= ms && ms > 0) || Last == 0 || (ms == 0 && (Previous.Gamepad.wButtons & Button.first) == 0))
 					{
-						// Get key mapping or use XINPUT_GAMEPAD_* value if no mapping exists
-						WORD mapping = (keyMap.find(button.first) != keyMap.end() ?
-							static_cast<WORD>(keyMap.find(button.first)->second) : static_cast<WORD>(button.first));
+						LastPress.erase(Button.first);
+						LastPress.insert(std::map<WORD, DWORD>::value_type(Button.first, Now));
 
-						// Get current time and last WM_KEYDOWN message for repeat interval check
-						DWORD now = GetTickCount();
-						DWORD last = (lastPress.find(button.first) != lastPress.end() ?
-							lastPress.find(button.first)->second : 0);
-
-						// Find desired repeat interval for this button
-						unsigned int ms = repeatMs.find(button.first)->second;
-
-						// If first press, or repeat interval passed (and repeat interval != 0)
-						if ((now - last >= ms && ms > 0)
-							|| last == 0
-							|| (ms == 0 && (previous.Gamepad.wButtons & button.first) == 0))
-						{
-							// Update last press time
-							lastPress.erase(button.first);
-							lastPress.insert(std::map<WORD, DWORD>::value_type(button.first, now));
-
-							// Send keyboard event
-							SendMessage(targetWindow, WM_KEYDOWN, mapping,
-								((previous.Gamepad.wButtons & button.first) == 0 ? 0 << 30 : 1 << 30));
-						}
-					}
-
-					// Checking for button release events, will cause the state
-					// packet number to be incremented
-					if (previous.dwPacketNumber < state.dwPacketNumber)
-					{
-						// If the button was pressed but is no longer pressed
-						if ((state.Gamepad.wButtons & button.first) == 0
-							&& (previous.Gamepad.wButtons & button.first) != 0)
-						{
-							// Get key mapping if one exists
-							WORD mapping = (keyMap.find(button.first) != keyMap.end() ?
-								static_cast<WORD>(keyMap.find(button.first)->second) : static_cast<WORD>(button.first));
-
-							// Remove last press time
-							lastPress.erase(button.first);
-
-							// Send keyboard event
-							SendMessage(targetWindow, WM_KEYUP, mapping, 0);
-						}
+						SendMessage(MainWindow, WM_KEYDOWN, Mapping, ((Previous.Gamepad.wButtons & Button.first) == 0 ? 0 << 30 : 1 << 30));
 					}
 				}
 
-				// Do keyboard event dispatch processing for analog items
-				// (unmapped items won't have events generated for them)
-				for (auto item : analogMap)
+				if (Previous.dwPacketNumber < State.dwPacketNumber)
 				{
-					WORD mapping = static_cast<WORD>(item.second.key);
+					if ((State.Gamepad.wButtons & Button.first) == 0 && (Previous.Gamepad.wButtons & Button.first) != 0)
+					{
+						const WORD Mapping{ (KeyMap.find(Button.first) != KeyMap.end() ? static_cast<WORD>(KeyMap.find(Button.first)->second) : static_cast<WORD>(Button.first)) };
+						LastPress.erase(Button.first);
+						SendMessage(MainWindow, WM_KEYUP, Mapping, 0);
+					}
+				}
+			}
 
-					switch (item.first) {
+			for (const auto& Item : AnalogMap)
+			{
+				const WORD Mapping{ static_cast<WORD>(Item.second.Key) };
+
+				switch (Item.first) 
+				{
 					case AnalogButtons::LeftStickLeft:
-						sendKeysOnThreshold(AnalogButtons::LeftStickLeft, leftStickX, prevLeftStickX, -item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::LeftStickRight:
-						sendKeysOnThreshold(AnalogButtons::LeftStickRight, leftStickX, prevLeftStickX, item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::LeftStickUp:
-						sendKeysOnThreshold(AnalogButtons::LeftStickUp, leftStickY, prevLeftStickY, item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::LeftStickDown:
-						sendKeysOnThreshold(AnalogButtons::LeftStickDown, leftStickY, prevLeftStickY, -item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::RightStickLeft:
-						sendKeysOnThreshold(AnalogButtons::RightStickLeft, rightStickX, prevRightStickX, -item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::RightStickRight:
-						sendKeysOnThreshold(AnalogButtons::RightStickRight, rightStickX, prevRightStickX, item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::RightStickUp:
-						sendKeysOnThreshold(AnalogButtons::RightStickUp, rightStickY, prevRightStickY, item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::RightStickDown:
-						sendKeysOnThreshold(AnalogButtons::RightStickDown, rightStickY, prevRightStickY, -item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::LeftTrigger:
-						sendKeysOnThreshold(AnalogButtons::LeftTrigger, leftTrigger, prevLeftTrigger, item.second.threshold, mapping);
-						break;
-
-					case AnalogButtons::RightTrigger:
-						sendKeysOnThreshold(AnalogButtons::RightTrigger, rightTrigger, prevRightTrigger, item.second.threshold, mapping);
+					{
+						SendAnalogKeys(AnalogButtons::LeftStickLeft, LeftStickX, PreviousLeftStickX, -Item.second.Threshold, Mapping);
 						break;
 					}
+					case AnalogButtons::LeftStickRight:
+					{
+						SendAnalogKeys(AnalogButtons::LeftStickRight, LeftStickX, PreviousLeftStickX, Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::LeftStickUp:
+					{
+						SendAnalogKeys(AnalogButtons::LeftStickUp, LeftStickY, PreviousLeftStickY, Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::LeftStickDown:
+					{
+						SendAnalogKeys(AnalogButtons::LeftStickDown, LeftStickY, PreviousLeftStickY, -Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::RightStickLeft:
+					{
+						SendAnalogKeys(AnalogButtons::RightStickLeft, RightStickX, PreviousRightStickX, -Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::RightStickRight:
+					{
+						SendAnalogKeys(AnalogButtons::RightStickRight, RightStickX, PreviousRightStickX, Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::RightStickUp:
+					{
+						SendAnalogKeys(AnalogButtons::RightStickUp, RightStickY, PreviousRightStickY, Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::RightStickDown:
+					{
+						SendAnalogKeys(AnalogButtons::RightStickDown, RightStickY, PreviousRightStickY, -Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::LeftTrigger:
+					{
+						SendAnalogKeys(AnalogButtons::LeftTrigger, TriggerLeft, PreviousLeftTrigger, Item.second.Threshold, Mapping);
+						break;
+					}
+					case AnalogButtons::RightTrigger:
+					{
+						SendAnalogKeys(AnalogButtons::RightTrigger, TriggerRight, PreviousRightTrigger, Item.second.Threshold, Mapping);
+						break;
+					}
+					default: {}
 				}
 			}
-
-			return true;
 		}
-		return false;
 	}
 
-	// Processing of analog item key event dispatch
-	void Gamepad::sendKeysOnThreshold(AnalogButtons button, float now, float before, float threshold, int key)
+	inline bool Gamepad::IsPressed(const WORD Button)
 	{
-		// Check whether the item is and was passed the threshold or not
-		bool isPressed = (now >= threshold && threshold > 0) || (now <= threshold && threshold < 0);
-		bool wasPressed = (before >= threshold && threshold > 0) || (before <= threshold && threshold < 0);
-		// If currently pressed
-		if (isPressed)
+		return (State.Gamepad.wButtons & Button) != 0;
+	}
+
+	inline void Gamepad::AddKeyMapping(const WORD Button, const std::int_fast32_t Key)
+	{
+		KeyMap.erase(Button);
+		KeyMap.insert(std::map<WORD, std::int_fast32_t>::value_type(Button, Key));
+	}
+
+	inline void Gamepad::RemoveKeyMapping(const std::int_fast32_t Key)
+	{
+		for (auto it{ KeyMap.begin() }; it != KeyMap.end(); ++it)
 		{
-			// Repeat interval calculation
-			DWORD Now = GetTickCount();
-			DWORD last = (analogLastPress.find(button) != analogLastPress.end() ?
-				analogLastPress.find(button)->second : 0);
-
-			unsigned int ms = analogRepeatMs.find(button)->second;
-
-			// Send message (uses same logic as digital buttons)
-			if ((Now - last >= ms && ms > 0) || last == 0 || (ms == 0 && !wasPressed))
+			if (it->second == Key)
 			{
-				analogLastPress.erase(button);
-				analogLastPress.insert(std::map<AnalogButtons, DWORD>::value_type(button, Now));
-
-				SendMessage(targetWindow, WM_KEYDOWN, key, (wasPressed ? 1 << 30 : 0 << 30));
-			}
-		}
-
-		// Same logic as digital buttons
-		if (previous.dwPacketNumber < state.dwPacketNumber)
-			if (!isPressed && wasPressed)
-			{
-				analogLastPress.erase(button);
-
-				SendMessage(targetWindow, WM_KEYUP, key, 0);
-			}
-	}
-
-	bool Gamepad::IsPressed(WORD button)
-	{
-		return (state.Gamepad.wButtons & button) != 0;
-	}
-
-	void Gamepad::SetDeadzone(float x, float y)
-	{
-		deadzoneX = x;
-		deadzoneY = y;
-	}
-
-	void Gamepad::SetWindow(HWND hwnd)
-	{
-		targetWindow = hwnd;
-	}
-
-	void Gamepad::AddKeyMapping(WORD button, int key)
-	{
-		keyMap.erase(button);
-		keyMap.insert(std::map<WORD, int>::value_type(button, key));
-	}
-
-	void Gamepad::RemoveKeyMapping(int key)
-	{
-		for (auto it = keyMap.begin(); it != keyMap.end(); ++it)
-			if (it->second == key)
-			{
-				keyMap.erase(it);
+				KeyMap.erase(it);
 				break;
 			}
+		}
 	}
 
-	void Gamepad::RemoveKeyMappingByButton(WORD button)
+	inline void Gamepad::RemoveKeyMappingByButton(const WORD Button)
 	{
-		keyMap.erase(button);
+		KeyMap.erase(Button);
 	}
 
-	void Gamepad::AddAnalogKeyMapping(AnalogButtons button, float threshold, int key)
+	inline void Gamepad::AddAnalogKeyMapping(const AnalogButtons& Button, const float Threshold, const std::int_fast32_t Key)
 	{
-		AnalogMapping a = { threshold, key };
+		AnalogMapping AnalogKeyMapping { Key, Threshold };
 
-		analogMap.erase(button);
-		analogMap.insert(std::make_pair(button, a));
+		AnalogMap.erase(Button);
+		AnalogMap.insert(std::make_pair(Button, AnalogKeyMapping));
 	}
 
-	void Gamepad::RemoveAnalogKeyMapping(AnalogButtons button)
+	inline void Gamepad::RemoveAnalogKeyMapping(AnalogButtons Button)
 	{
-		analogMap.erase(button);
+		AnalogMap.erase(Button);
 	}
 
-	void Gamepad::ClearMappings()
+	inline void Gamepad::ClearMappings()
 	{
-		keyMap.clear();
-		analogMap.clear();
+		KeyMap.clear();
+		AnalogMap.clear();
 	}
 
-	void Gamepad::SetRepeatIntervalMsAll(unsigned int ms)
+	inline void Gamepad::SetRepeatIntervalMsAll(const std::uint_fast32_t ms)
 	{
-		repeatMs.clear();
+		RepeatMs.clear();
 
-		for (auto button : Buttons)
-			repeatMs.insert(std::map<WORD, unsigned int>::value_type(button.first, ms));
+		for (const auto& Button : Buttons)
+		{
+			RepeatMs.insert(std::map<WORD, std::uint_fast32_t>::value_type(Button.first, ms));
+		}
 
-		analogRepeatMs.clear();
+		AnalogRepeatMs.clear();
 
-		for (int i = 0; i < AnalogButtons::EndOfButtons; i++)
-			analogRepeatMs.insert(std::map<AnalogButtons, unsigned int>::value_type((AnalogButtons)i, ms));
+		for (std::int_fast32_t i{}; i < static_cast<std::int_fast32_t>(AnalogButtons::EndOfButtons); ++i)
+		{
+			AnalogRepeatMs.insert(std::map<AnalogButtons, std::uint_fast32_t>::value_type(static_cast<AnalogButtons>(i), ms));
+		}
 	}
 
-	void Gamepad::SetRepeatIntervalMs(WORD button, unsigned int ms)
+	inline void Gamepad::SetRepeatIntervalMs(const WORD Button, const std::uint_fast32_t ms)
 	{
-		repeatMs.erase(button);
-		repeatMs.insert(std::map<WORD, unsigned int>::value_type(button, ms));
+		RepeatMs.erase(Button);
+		RepeatMs.insert(std::map<WORD, std::uint_fast32_t>::value_type(Button, ms));
 	}
 
-	void Gamepad::SetAnalogRepeatIntervalMs(AnalogButtons button, unsigned int ms)
+	inline void Gamepad::SetAnalogRepeatIntervalMs(const AnalogButtons& Button, const std::uint_fast32_t ms)
 	{
-		analogRepeatMs.erase(button);
-		analogRepeatMs.insert(std::map<AnalogButtons, unsigned int>::value_type(button, ms));
+		AnalogRepeatMs.erase(Button);
+		AnalogRepeatMs.insert(std::map<AnalogButtons, std::uint_fast32_t>::value_type(Button, ms));
+	}
+
+	inline void Gamepad::SendAnalogKeys(const AnalogButtons& Button, const float Now, const float Before, const float Threshold, const std::int_fast32_t Key)
+	{
+		const bool IsPressed{ (Now >= Threshold && Threshold > 0.0F) || (Now <= Threshold && Threshold < 0.0F) };
+		const bool WasPressed{ (Before >= Threshold && Threshold > 0.0F) || (Before <= Threshold && Threshold < 0.0F) };
+
+		if (IsPressed)
+		{
+			const DWORD TempNow{ GetTickCount() };
+			const DWORD TempBefore{ (AnalogLastPress.find(Button) != AnalogLastPress.end() ? AnalogLastPress.find(Button)->second : 0) };
+			const std::uint_fast32_t ms{ AnalogRepeatMs.find(Button)->second };
+
+			if ((TempNow - TempBefore >= ms && ms > 0) || TempBefore == 0 || (ms == 0 && !WasPressed))
+			{
+				AnalogLastPress.erase(Button);
+				AnalogLastPress.insert(std::map<AnalogButtons, DWORD>::value_type(Button, TempNow));
+				SendMessage(MainWindow, WM_KEYDOWN, Key, (WasPressed ? 1 << 30 : 0 << 30));
+			}
+		}
+
+		if (Previous.dwPacketNumber < State.dwPacketNumber)
+		{
+			if (!IsPressed && WasPressed)
+			{
+				AnalogLastPress.erase(Button);
+
+				SendMessage(MainWindow, WM_KEYUP, Key, 0);
+			}
+		}
 	}
 
 

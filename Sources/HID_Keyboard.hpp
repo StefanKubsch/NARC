@@ -34,11 +34,6 @@ namespace HID_Keyboard
 	inline char MovePlayerBackwardKey;
 	inline char MovePlayerStrafeLeftKey;
 	inline char MovePlayerStrafeRightKey;
-	inline char MouseUp = '1';
-	inline char MouseDown = '2';
-	inline char MouseLeft = '3';
-	inline char MouseRight = '4';
-
 	inline char ReloadWeaponKey;
 	inline char HUDKey;
 	inline char MiniMapKey;

@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\HID_Gamepad.hpp" />
     <ClInclude Include="Sources\Game_PathFinding.hpp" />
     <ClInclude Include="Sources\Game_Raycaster.hpp" />
     <ClInclude Include="Sources\GFX_ImageHandling.hpp" />
