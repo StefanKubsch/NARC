@@ -35,7 +35,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - pixel-precise detection of hits on enemies
   - A* pathfinding algorithm (started, path between entities and player is calculated)
   - pickup ammo boxes and gain new ammo
-  - variable texture size (from 64x64 to 2048x2048) for level textures and entities
+  - variable texture size (from 64x64 to 8192x8192) for level textures and entities
   - entities and weapons implemented as structures
   - really large map size if desired
   - maps, weapons and entities can be defined in textfiles which will be loaded into program at runtime
