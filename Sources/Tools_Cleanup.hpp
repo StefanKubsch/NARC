@@ -22,8 +22,8 @@ namespace Tools_Cleanup
 
 	inline void DestroySubsystems()
 	{
-		lwmf::UnregisterRawInputDevice(lwmf::HID_MOUSE);
-		lwmf::UnregisterRawInputDevice(lwmf::HID_KEYBOARD);
+		lwmf::UnregisterRawInputDevice(lwmf::DeviceIdentifier::HID_MOUSE);
+		lwmf::UnregisterRawInputDevice(lwmf::DeviceIdentifier::HID_KEYBOARD);
 		lwmf::DeleteOpenGLContext();
 	}
 

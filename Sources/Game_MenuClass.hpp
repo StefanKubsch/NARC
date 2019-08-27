@@ -138,6 +138,11 @@ inline void Game_MenuClass::ExecuteChoice()
 	else if (MenuItems[HighLightedItem].Entry == "Toogle Mouse / GameController")
 	{
 		GameControllerFlag = !GameControllerFlag;
+
+		while (GamePausedFlag)
+		{
+			LevelUp();
+		}
 	}
 }
 

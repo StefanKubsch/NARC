@@ -23,12 +23,12 @@ namespace lwmf
 	struct TextureStruct final
 	{
 		std::vector<std::int_fast32_t> Pixels;
+		size_t Stride{};
+		std::int_fast32_t Size{};
 		std::int_fast32_t Width{};
 		std::int_fast32_t Height{};
 		std::int_fast32_t WidthMid{};
 		std::int_fast32_t HeightMid{};
-		std::int_fast32_t Size{};
-		size_t Stride{};
 	};
 
 	void SetTextureMetrics(TextureStruct& Texture, std::int_fast32_t Width, std::int_fast32_t Height);

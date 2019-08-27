@@ -521,6 +521,7 @@ namespace lwmf
 	{
 		struct Info
 		{
+			std::vector<unsigned char> Palette;
 			std::int_fast32_t Width{};
 			std::int_fast32_t Height{};
 			std::int_fast32_t ColorType{};
@@ -532,7 +533,6 @@ namespace lwmf
 			std::int_fast32_t KeyG{};
 			std::int_fast32_t KeyB{};
 			bool KeyDefined{};
-			std::vector<unsigned char> Palette;
 		} PNGInfo;
 
 		std::int_fast32_t Error{};

@@ -815,3 +815,7 @@ x64/Debug/DATA/Assets_Entities/Demon/AssetData.ini
 x64/Debug/DATA/Assets_Entities/AmmoBox/AssetData.ini
 x64/Debug/DATA/Assets_Doors/Door_1_Data.ini
 .vs/NARC/v16/ipch/AutoPCH/f29b01f93becd61e/GAME_GAMEPAD.ipch
+x64/Debug/GFX/HUD/Mouse.png
+x64/Debug/GFX/HUD/XBoxController.png
+x64/Release/GFX/HUD/Mouse.png
+x64/Release/GFX/HUD/XBoxController.png

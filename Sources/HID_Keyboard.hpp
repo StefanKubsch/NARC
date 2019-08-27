@@ -62,7 +62,7 @@ namespace HID_Keyboard
 			SelectNextLevelKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SelectNextLevelKey");
 			SwitchLightingKey = lwmf::ReadINIValue<std::int_fast8_t>(INIFile, "KEYBOARD", "SwitchLightingKey");
 
-			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_KEYBOARD);
+			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::DeviceIdentifier::HID_KEYBOARD);
 		}
 	}
 

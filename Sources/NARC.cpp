@@ -171,7 +171,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		if (HUDEnabled)
 		{
 			HUDHealthBar.Display();
-			lwmf::DisplayFPSCounter(ScreenTexture, 570, 10, 0xFFFFFFFF);
+			lwmf::DisplayFPSCounter(ScreenTexture, ScreenTexture.Width - 70, 7, 0xFFFFFFFF);
 		}
 
 		if (Player.IsDead && !GamePausedFlag)
@@ -194,6 +194,15 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		if (HUDEnabled)
 		{
 			HUDWeaponDisplay.Display();
+
+			if (GameControllerFlag)
+			{
+				HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture);
+			}
+			else
+			{
+				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconTexture);
+			}
 		}
 
 		if (GamePausedFlag)
@@ -214,6 +223,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
+		// Gamecontroller handling
 		case WM_KEYDOWN:
 		{
 			if (GameControllerFlag)
@@ -258,8 +268,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					Game_WeaponHandling::InitiateSingleShot();
 				}
-
-				if (wParam == HID_Gamepad::RapidFireKey)
+				else if (wParam == HID_Gamepad::RapidFireKey)
 				{
 					Game_WeaponHandling::InitiateRapidFire();
 				}
@@ -278,8 +287,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					Game_WeaponHandling::InitiateWeaponChangeUp();
 				}
-
-				if (wParam == HID_Gamepad::ChangeWeaponDownKey)
+				else if (wParam == HID_Gamepad::ChangeWeaponDownKey)
 				{
 					Game_WeaponHandling::InitiateWeaponChangeDown();
 				}
@@ -337,6 +345,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
+		// Mouse and keyboard handling
 		case WM_INPUT:
 		{
 			static RAWINPUT RawDev;
@@ -545,13 +554,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case MCI_NOTIFY_SUCCESSFUL:
 				{
 					// "rewind" player footsteps audio if played completely
-					if (lParam == Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].GetDeviceID())
+					if (lParam == static_cast<LPARAM>(Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].GetDeviceID()))
 					{
 						Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].RewindToStart();
 					}
 
 					// "rewind" and restart background music
-					if (Game_LevelHandling::BackgroundMusicEnabled && lParam == Game_LevelHandling::BackgroundMusic.GetDeviceID())
+					if (Game_LevelHandling::BackgroundMusicEnabled && lParam == static_cast<LPARAM>(Game_LevelHandling::BackgroundMusic.GetDeviceID()))
 					{
 						Game_LevelHandling::BackgroundMusic.RewindToStart();
 						Game_LevelHandling::BackgroundMusic.Play(lwmf::MP3::PlayModes::NOTIFY);
@@ -728,58 +737,52 @@ void ControlPlayerMovement()
 
 	if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerForwardKey))
 	{
-		const float StepXTemp{ Player.Dir.X * Player.MoveSpeed };
-		const float StepYTemp{ Player.Dir.Y * Player.MoveSpeed };
+		const lwmf::FloatPointStruct StepTemp{ Player.Dir.X * Player.MoveSpeed, Player.Dir.Y * Player.MoveSpeed };
 
-		Player.Pos.X += StepXTemp;
-		Player.Pos.Y += StepYTemp;
+		Player.Pos.X += StepTemp.X;
+		Player.Pos.Y += StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X + Player.Dir.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y + Player.Dir.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = -StepXTemp;
-		Player.StepWidth.Y = -StepYTemp;
+		Player.StepWidth.X = -StepTemp.X;
+		Player.StepWidth.Y = -StepTemp.Y;
 
 		MovePlayerAndCheckCollision();
 	}
 	else if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerBackwardKey))
 	{
-		const float StepXTemp{ Player.Dir.X * Player.MoveSpeed };
-		const float StepYTemp{ Player.Dir.Y * Player.MoveSpeed };
+		const lwmf::FloatPointStruct StepTemp{ Player.Dir.X * Player.MoveSpeed, Player.Dir.Y * Player.MoveSpeed };
 
-		Player.Pos.X -= StepXTemp;
-		Player.Pos.Y -= StepYTemp;
+		Player.Pos.X -= StepTemp.X;
+		Player.Pos.Y -= StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X - Player.Dir.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y - Player.Dir.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = StepXTemp;
-		Player.StepWidth.Y = StepYTemp;
+		Player.StepWidth = StepTemp;
 
 		MovePlayerAndCheckCollision();
 	}
 
 	if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerStrafeRightKey))
 	{
-		const float StepXTemp{ Plane.X * Player.MoveSpeed };
-		const float StepYTemp{ Plane.Y * Player.MoveSpeed };
+		const lwmf::FloatPointStruct StepTemp{ Plane.X * Player.MoveSpeed, Plane.Y * Player.MoveSpeed };
 
-		Player.Pos.X += StepXTemp;
-		Player.Pos.Y += StepYTemp;
+		Player.Pos.X += StepTemp.X;
+		Player.Pos.Y += StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X + Plane.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y + Plane.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = -StepXTemp;
-		Player.StepWidth.Y = -StepYTemp;
+		Player.StepWidth.X = -StepTemp.X;
+		Player.StepWidth.Y = -StepTemp.Y;
 
 		MovePlayerAndCheckCollision();
 	}
 	else if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey))
 	{
-		const float StepXTemp{ Plane.X * Player.MoveSpeed };
-		const float StepYTemp{ Plane.Y * Player.MoveSpeed };
+		const lwmf::FloatPointStruct StepTemp{ Plane.X * Player.MoveSpeed, Plane.Y * Player.MoveSpeed };
 
-		Player.Pos.X -= StepXTemp;
-		Player.Pos.Y -= StepYTemp;
+		Player.Pos.X -= StepTemp.X;
+		Player.Pos.Y -= StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X - Plane.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y - Plane.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = StepXTemp;
-		Player.StepWidth.Y = StepYTemp;
+		Player.StepWidth = StepTemp;
 
 		MovePlayerAndCheckCollision();
 	}

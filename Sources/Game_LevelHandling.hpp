@@ -134,14 +134,13 @@ namespace Game_LevelHandling
 				std::ifstream StaticLightsDataFile(FileName, std::ios::in);
 
 				std::int_fast32_t Location{};
-				float PosX{};
-				float PosY{};
+				lwmf::FloatPointStruct Pos{};
 				float Radius{};
 				float Intensity{};
 
-				while (StaticLightsDataFile >> PosX >> PosY >> Location >> Radius >> Intensity)
+				while (StaticLightsDataFile >> Pos.X >> Pos.Y >> Location >> Radius >> Intensity)
 				{
-					StaticLights.emplace_back(PosX, PosY, Location, Radius, Intensity);
+					StaticLights.emplace_back(Pos.X, Pos.Y, Location, Radius, Intensity);
 				}
 			}
 		}

@@ -24,6 +24,9 @@ namespace HID_Gamepad
 
 	inline lwmf::Gamepad GameController;
 
+	inline lwmf::ShaderClass XBoxControllerIconShader{};
+	inline GLuint XBoxControllerIconTexture{};
+
 	constexpr char VirtMouseUp{ VK_UP };
 	constexpr char VirtMouseDown{ VK_DOWN };
 	constexpr char VirtMouseLeft{ VK_LEFT };
@@ -44,8 +47,6 @@ namespace HID_Gamepad
 		if (GameController.CheckConnection())
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init XBOX controller...");
-
-			GameController.SetButtons();
 
 			if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
@@ -84,6 +85,11 @@ namespace HID_Gamepad
 
 				GameController.SetInterval(XINPUT_GAMEPAD_X, 0);
 				GameController.AddKeyMapping(XINPUT_GAMEPAD_X, ActionKey);
+
+				// Load XBoxControllerIcon
+				lwmf::TextureStruct TempXBoxControllerIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "GAMECONTROLLER", "XBoxControllerIcon")) };
+				XBoxControllerIconShader.LoadShader("Default", ScreenTexture);
+				XBoxControllerIconShader.LoadStaticTextureInGPU(TempXBoxControllerIconTexture, &XBoxControllerIconTexture, ScreenTexture.Width - 153, 0, TempXBoxControllerIconTexture.Width, TempXBoxControllerIconTexture.Height);
 			}
 		}
 	}

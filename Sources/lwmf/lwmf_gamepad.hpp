@@ -39,7 +39,7 @@ namespace lwmf
 			RightStickDown,
 			LeftTrigger,
 			RightTrigger,
-			EndOfButtons
+			Counter
 		};
 
 		struct AnalogMapping
@@ -48,6 +48,8 @@ namespace lwmf
 			float Threshold{};
 		};
 
+		Gamepad();
+		~Gamepad();
 		void SetButtons();
 		void SetDeadzone(float x, float y);
 		bool CheckConnection();
@@ -84,14 +86,20 @@ namespace lwmf
 		std::map<WORD, DWORD> LastPress;
 		std::map<AnalogButtons, DWORD> AnalogLastPress;
 
-		std::int_fast32_t ControllerID{};
-
 		lwmf::FloatPointStruct DeadZone{ 0.3F, 0.3F };
 		lwmf::FloatPointStruct PreviousLeftStick{};
 		lwmf::FloatPointStruct PreviousRightStick{};
+		std::int_fast32_t ControllerID{};
 		float PreviousLeftTrigger{};
 		float PreviousRightTrigger{};
 	};
+
+	inline Gamepad::Gamepad()
+	{
+		SetButtons();
+	}
+
+	inline Gamepad::~Gamepad() = default;
 
 	inline void Gamepad::SetButtons()
 	{
@@ -99,22 +107,21 @@ namespace lwmf
 		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_B, "B"));
 		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_X, "X"));
 		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_Y, "Y"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_LEFT, "Left"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_RIGHT, "Right"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_UP, "Up"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_DOWN, "Down"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_SHOULDER, "LB"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_SHOULDER, "RB"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_LEFT, "DPLeft"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_RIGHT, "DPRight"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_UP, "DPUp"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_DOWN, "DPDown"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_SHOULDER, "LSB"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_SHOULDER, "RSB"));
 		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_BACK, "Back"));
 		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_START, "Start"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_THUMB, "LS"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_THUMB, "RS"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_THUMB, "LT"));
+		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_THUMB, "RT"));
 	}
 
 	inline void Gamepad::SetDeadzone(const float x, const float y)
 	{
-		DeadZone.X = x;
-		DeadZone.Y = y;
+		DeadZone = { x, y };
 	}
 
 	inline bool Gamepad::CheckConnection()
@@ -145,10 +152,8 @@ namespace lwmf
 	inline void Gamepad::Refresh()
 	{
 		Previous = State;
-		PreviousLeftStick.X = LeftStick.X;
-		PreviousLeftStick.Y = LeftStick.Y;
-		PreviousRightStick.X = RightStick.X;
-		PreviousRightStick.Y = RightStick.Y;
+		PreviousLeftStick = LeftStick;
+		PreviousRightStick = RightStick;
 		PreviousLeftTrigger = TriggerLeft;
 		PreviousRightTrigger = TriggerRight;
 
@@ -197,9 +202,9 @@ namespace lwmf
 				const WORD Mapping{ (KeyMap.find(Button.first) != KeyMap.end() ? static_cast<WORD>(KeyMap.find(Button.first)->second) : static_cast<WORD>(Button.first)) };
 				const DWORD Now{ GetTickCount() };
 				const DWORD Last{ (LastPress.find(Button.first) != LastPress.end() ? LastPress.find(Button.first)->second : 0) };
-				const std::uint_fast32_t ms{ Repeat.find(Button.first)->second };
+				const std::uint_fast32_t Time{ Repeat.find(Button.first)->second };
 
-				if ((Now - Last >= ms && ms > 0) || Last == 0 || (ms == 0 && (Previous.Gamepad.wButtons & Button.first) == 0))
+				if ((Now - Last >= Time && Time > 0) || Last == 0 || (Time == 0 && (Previous.Gamepad.wButtons & Button.first) == 0))
 				{
 					LastPress.erase(Button.first);
 					LastPress.insert(std::map<WORD, DWORD>::value_type(Button.first, Now));
@@ -212,9 +217,8 @@ namespace lwmf
 			{
 				if ((State.Gamepad.wButtons & Button.first) == 0 && (Previous.Gamepad.wButtons & Button.first) != 0)
 				{
-					const WORD Mapping{ (KeyMap.find(Button.first) != KeyMap.end() ? static_cast<WORD>(KeyMap.find(Button.first)->second) : static_cast<WORD>(Button.first)) };
 					LastPress.erase(Button.first);
-					SendMessage(MainWindow, WM_KEYUP, Mapping, 0);
+					SendMessage(MainWindow, WM_KEYUP, (KeyMap.find(Button.first) != KeyMap.end() ? static_cast<WORD>(KeyMap.find(Button.first)->second) : static_cast<WORD>(Button.first)), 0);
 				}
 			}
 		}
@@ -305,7 +309,7 @@ namespace lwmf
 
 	inline void Gamepad::AddAnalogKeyMapping(const AnalogButtons& Button, const float Threshold, const std::int_fast32_t Key)
 	{
-		AnalogMapping AnalogKeyMapping { Key, Threshold };
+		const AnalogMapping AnalogKeyMapping { Key, Threshold };
 
 		AnalogMap.erase(Button);
 		AnalogMap.insert(std::make_pair(Button, AnalogKeyMapping));
@@ -333,7 +337,7 @@ namespace lwmf
 
 		AnalogRepeat.clear();
 
-		for (std::int_fast32_t i{}; i < static_cast<std::int_fast32_t>(AnalogButtons::EndOfButtons); ++i)
+		for (std::int_fast32_t i{}; i < static_cast<std::int_fast32_t>(AnalogButtons::Counter); ++i)
 		{
 			AnalogRepeat.insert(std::map<AnalogButtons, std::uint_fast32_t>::value_type(static_cast<AnalogButtons>(i), Time));
 		}
@@ -359,14 +363,14 @@ namespace lwmf
 		if (IsPressed)
 		{
 			const DWORD TempNow{ GetTickCount() };
-			const DWORD TempBefore{ (AnalogLastPress.find(Button) != AnalogLastPress.end() ? AnalogLastPress.find(Button)->second : 0) };
-			const std::uint_fast32_t ms{ AnalogRepeat.find(Button)->second };
+			const DWORD TempBefore{ (AnalogLastPress.find(Button) != AnalogLastPress.end() ? AnalogLastPress.find(Button)->second : 0) }; //-V783
+			const std::uint_fast32_t Time{ AnalogRepeat.find(Button)->second }; //-V783
 
-			if ((TempNow - TempBefore >= ms && ms > 0) || TempBefore == 0 || (ms == 0 && !WasPressed))
+			if ((TempNow - TempBefore >= Time && Time > 0) || TempBefore == 0 || (Time == 0 && !WasPressed))
 			{
 				AnalogLastPress.erase(Button);
 				AnalogLastPress.insert(std::map<AnalogButtons, DWORD>::value_type(Button, TempNow));
-				SendMessage(MainWindow, WM_KEYDOWN, Key, (WasPressed ? 1 << 30 : 0 << 30));
+				SendMessage(MainWindow, WM_KEYDOWN, static_cast<WPARAM>(Key), (WasPressed ? 1 << 30 : 0 << 30));
 			}
 		}
 
@@ -376,7 +380,7 @@ namespace lwmf
 			{
 				AnalogLastPress.erase(Button);
 
-				SendMessage(MainWindow, WM_KEYUP, Key, 0);
+				SendMessage(MainWindow, WM_KEYUP, static_cast<WPARAM>(Key), 0);
 			}
 		}
 	}

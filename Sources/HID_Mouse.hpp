@@ -24,6 +24,9 @@ namespace HID_Mouse
 	// Variables and constants
 	//
 
+	inline lwmf::ShaderClass MouseIconShader{};
+	inline GLuint MouseIconTexture{};
+
 	inline lwmf::IntPointStruct MousePos{};
 	inline lwmf::IntPointStruct OldMousePos{};
 
@@ -45,7 +48,12 @@ namespace HID_Mouse
 			MouseSensitivityUpperLimit = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityUpperLimit");
 			MouseSensitivityStep = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityStep");
 
-			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::HID_MOUSE);
+			// Load MouseIcon
+			lwmf::TextureStruct TempMouseIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "MOUSE", "MouseIcon")) };
+			MouseIconShader.LoadShader("Default", ScreenTexture);
+			MouseIconShader.LoadStaticTextureInGPU(TempMouseIconTexture, &MouseIconTexture, ScreenTexture.Width - 153, 0, TempMouseIconTexture.Width, TempMouseIconTexture.Height);
+
+			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::DeviceIdentifier::HID_MOUSE);
 			ShowCursor(FALSE);
 		}
 	}

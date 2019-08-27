@@ -53,8 +53,7 @@ namespace Game_Raycaster
 
 	inline void RefreshSettings()
 	{
-		Plane.X = PlaneStartValue.X;
-		Plane.Y = PlaneStartValue.Y;
+		Plane = PlaneStartValue;
 		VerticalLook = 0;
 		VerticalLookCamera = 0.0F;
 	}
@@ -169,23 +168,19 @@ namespace Game_Raycaster
 
 				if (!WallSide && RayDir.X > 0.0F)
 				{
-					FloorWall.X = static_cast<float>(MapPos.X);
-					FloorWall.Y = MapPos.Y + WallX; //-V537
+					FloorWall = { static_cast<float>(MapPos.X), MapPos.Y + WallX };
 				}
 				else if (!WallSide && RayDir.X < 0.0F)
 				{
-					FloorWall.X = static_cast<float>(MapPos.X + 1);
-					FloorWall.Y = MapPos.Y + WallX; //-V537
+					FloorWall = { static_cast<float>(MapPos.X + 1), MapPos.Y + WallX };
 				}
 				else if (WallSide && RayDir.Y > 0.0F)
 				{
-					FloorWall.X = MapPos.X + WallX;
-					FloorWall.Y = static_cast<float>(MapPos.Y);
+					FloorWall = { MapPos.X + WallX, static_cast<float>(MapPos.Y) };
 				}
 				else
 				{
-					FloorWall.X = MapPos.X + WallX;
-					FloorWall.Y = static_cast<float>(MapPos.Y + 1);
+					FloorWall = { MapPos.X + WallX, static_cast<float>(MapPos.Y + 1) };
 				}
 
 				// Store WallDist in 1D-ZBuffer for later calculation of entity distance
