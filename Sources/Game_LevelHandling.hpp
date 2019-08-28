@@ -84,7 +84,7 @@ namespace Game_LevelHandling
 			{
 				std::istringstream Stream(Line);
 				std::vector<std::int_fast32_t> TempVector;
-				std::int_fast32_t TempInt{ 0 };
+				std::int_fast32_t TempInt{};
 				char Delimiter{ '\0' };
 
 				while (Stream >> TempInt)
@@ -108,6 +108,7 @@ namespace Game_LevelHandling
 	inline void InitMapData()
 	{
 		LevelMap.clear();
+		LevelMap.shrink_to_fit();
 		LevelMap.resize(NumberOfLevelMapLayers);
 
 		const std::string LevelPath{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/" };

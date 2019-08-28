@@ -231,7 +231,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	// Have a look here:
 	// https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/x98tx3cf(v=vs.120)
 	//
-	// _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); 
+	// _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// _CrtDumpMemoryLeaks();
 
 	return EXIT_SUCCESS;
@@ -251,7 +251,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
 					break;
 				}
-				
+
 				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerBackwardKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
@@ -263,7 +263,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
 					break;
 				}
-				
+
 				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeRightKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
@@ -275,7 +275,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					HID_Gamepad::GameController.RightStickPos.X = -1;
 					break;
 				}
-				
+
 				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseRightKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.X = 1;
@@ -287,7 +287,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					HID_Gamepad::GameController.RightStickPos.Y = -1;
 					break;
 				}
-				
+
 				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseDownKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.Y = 1;
@@ -299,7 +299,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					Game_WeaponHandling::InitiateSingleShot();
 					break;
 				}
-				
+
 				if (wParam == static_cast<WPARAM>(HID_Gamepad::RapidFireKey))
 				{
 					Game_WeaponHandling::InitiateRapidFire();
@@ -323,7 +323,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					Game_WeaponHandling::InitiateWeaponChangeUp();
 					break;
 				}
-				
+
 				if (wParam == static_cast<WPARAM>(HID_Gamepad::ChangeWeaponDownKey))
 				{
 					Game_WeaponHandling::InitiateWeaponChangeDown();

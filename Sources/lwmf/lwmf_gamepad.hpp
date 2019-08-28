@@ -27,7 +27,7 @@ namespace lwmf
 	class Gamepad
 	{
 	public:
-		enum class AnalogButtons
+		enum class AnalogButtons : std::int_fast32_t
 		{
 			LeftStickLeft,
 			LeftStickRight,
@@ -49,7 +49,6 @@ namespace lwmf
 		};
 
 		Gamepad();
-		~Gamepad();
 		void SetButtons();
 		void SetDeadzone(float x, float y);
 		bool CheckConnection();
@@ -98,8 +97,6 @@ namespace lwmf
 	{
 		SetButtons();
 	}
-
-	inline Gamepad::~Gamepad() = default;
 
 	inline void Gamepad::SetButtons()
 	{
@@ -160,8 +157,8 @@ namespace lwmf
 		ZeroMemory(&State, sizeof(XINPUT_STATE));
 		XInputGetState(ControllerID, &State);
 
-		const float NormalizedLX{ max(-1, static_cast<float>(State.Gamepad.sThumbLX) / 32767) };
-		const float NormalizedLY{ max(-1, static_cast<float>(State.Gamepad.sThumbLY) / 32767) };
+		const float NormalizedLX{ max(-1, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX) };
+		const float NormalizedLY{ max(-1, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
 
 		LeftStick.X = (std::abs(NormalizedLX) < DeadZone.X ? 0.0F : (std::fabsf(NormalizedLX) - DeadZone.X) * (NormalizedLX / std::fabsf(NormalizedLX)));
 		LeftStick.Y = (std::abs(NormalizedLY) < DeadZone.Y ? 0.0F : (std::fabsf(NormalizedLY) - DeadZone.Y) * (NormalizedLY / std::fabsf(NormalizedLY)));
@@ -176,8 +173,8 @@ namespace lwmf
 			LeftStick.Y *= 1.0F / (1.0F - DeadZone.Y);
 		}
 
-		const float NormalizedRX{ max(-1, static_cast<float>(State.Gamepad.sThumbRX) / 32767) };
-		const float NormalizedRY{ max(-1, static_cast<float>(State.Gamepad.sThumbRY) / 32767) };
+		const float NormalizedRX{ max(-1, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX) };
+		const float NormalizedRY{ max(-1, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
 
 		RightStick.X = (std::abs(NormalizedRX) < DeadZone.X ? 0.0F : (std::fabsf(NormalizedRX) - DeadZone.X) * (NormalizedRX / std::fabsf(NormalizedRX)));
 		RightStick.Y = (std::abs(NormalizedRY) < DeadZone.Y ? 0.0F : (std::fabsf(NormalizedRY) - DeadZone.Y) * (NormalizedRY / std::fabsf(NormalizedRY)));

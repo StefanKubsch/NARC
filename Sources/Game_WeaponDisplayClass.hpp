@@ -57,11 +57,11 @@ inline void Game_WeaponDisplayClass::Init()
 
 		WeaponHUDShader.LoadShader("Default", ScreenTexture);
 		WeaponHUDShader.LoadStaticTextureInGPU(TempTextureWeaponHUD, &WeaponHUDTexture, WeaponHUDRect.X, WeaponHUDRect.Y, WeaponHUDRect.Width, WeaponHUDRect.Height);
-	}
 
-	AmmoText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDAMMOFONT");
-	CarriedAmmoText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDCARRIEDAMMOFONT");
-	WeaponText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDWEAPONFONT");
+		AmmoText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDAMMOFONT");
+		CarriedAmmoText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDCARRIEDAMMOFONT");
+		WeaponText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDWEAPONFONT");
+	}
 }
 
 inline void Game_WeaponDisplayClass::Display()

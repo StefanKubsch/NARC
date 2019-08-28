@@ -18,6 +18,8 @@
 
 // Set LoggingEnabled to "false" if you don´t want to write any logsfiles!
 constexpr bool LoggingEnabled{ true };
+// Set ThrowExceptions to "false" if you don´t want to handle errors by exceptions!
+constexpr bool ThrowExceptions{ true };
 
 #include "lwmf_logging.hpp"
 

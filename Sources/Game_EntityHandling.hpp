@@ -134,9 +134,6 @@ namespace Game_EntityHandling
 					// Get SFX
 					//
 
-					EntityAssets[AssetIndex].Sounds.clear();
-					EntityAssets[AssetIndex].Sounds.shrink_to_fit();
-
 					if (const std::string AssetType{ lwmf::ReadINIValue<std::string>(INIFile, "GENERAL", "AssetType") }; AssetType == "AmmoBox")
 					{
 						// Get Pickup audio
@@ -229,6 +226,7 @@ namespace Game_EntityHandling
 		EntityDistance.clear();
 		EntityDistance.shrink_to_fit();
 		ZBuffer.clear();
+		ZBuffer.shrink_to_fit();
 		ZBuffer.resize(static_cast<size_t>(ScreenTexture.Width));
 
 		EntityMap = std::vector<std::vector<EntityTypes>>(static_cast<size_t>(Game_LevelHandling::LevelMapWidth), std::vector<EntityTypes>(static_cast<size_t>(Game_LevelHandling::LevelMapHeight), EntityTypes::Clear));

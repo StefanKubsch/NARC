@@ -125,7 +125,7 @@ namespace lwmf
 					Logfile << "\n" << GetTimeStamp() << LogLevelString << Filename << ": " << Message << "\n";
 					Logfile.close();
 
-					throw std::runtime_error(Message);
+					ThrowExceptions ? throw std::runtime_error(Message) : exit(EXIT_FAILURE);
 				}
 			}
 		}

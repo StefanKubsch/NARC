@@ -28,7 +28,7 @@ namespace lwmf
 	class MP3 final
 	{
 	public:
-		enum class PlayModes
+		enum class PlayModes : std::int_fast32_t
 		{
 			FROMSTART,
 			NOTIFY

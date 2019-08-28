@@ -44,13 +44,13 @@ namespace HID_Gamepad
 	// Change weapon up		= VK_PRIOR		= 33 (PageUp)
 	// Change weapon down	= VK_NEXT		= 35 (PageDown)
 
-	inline std::int_fast32_t VirtMouseUpKey{};			
-	inline std::int_fast32_t VirtMouseDownKey{};		
-	inline std::int_fast32_t VirtMouseLeftKey{};		
-	inline std::int_fast32_t VirtMouseRightKey{};	
+	inline std::int_fast32_t VirtMouseUpKey{};
+	inline std::int_fast32_t VirtMouseDownKey{};
+	inline std::int_fast32_t VirtMouseLeftKey{};
+	inline std::int_fast32_t VirtMouseRightKey{};
 	inline std::int_fast32_t FireSingleShotKey{};
 	inline std::int_fast32_t RapidFireKey{};
-	inline std::int_fast32_t ChangeWeaponUpKey{};	
+	inline std::int_fast32_t ChangeWeaponUpKey{};
 	inline std::int_fast32_t ChangeWeaponDownKey{};
 
 	//
