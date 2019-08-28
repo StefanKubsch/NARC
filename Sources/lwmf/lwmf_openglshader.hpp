@@ -15,8 +15,6 @@
 #include <cstdint>
 #include <cstring>
 #include <fstream>
-#include <limits>
-#include <sstream>
 
 #include "lwmf_logging.hpp"
 #include "lwmf_texture.hpp"
@@ -113,20 +111,24 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the vertex shader...");
-		const GLchar* VertexShaderSource{ LoadShaderSource(VertexShaderPath + ShaderName + VertexShaderFileSuffix, ShaderName).c_str() };
+		const std::string VertexShaderString{ LoadShaderSource(VertexShaderPath + ShaderName + VertexShaderFileSuffix, ShaderName) };
+		const GLchar* VertexShaderSource{ VertexShaderString.c_str() };
+		const GLint VertexShaderSourceLength{ static_cast<GLint>(VertexShaderString.size()) };
 		const GLint VertexShader{ glCreateShader(GL_VERTEX_SHADER) };
 		glCheckError();
-		glShaderSource(VertexShader, 1, &VertexShaderSource, nullptr);
+		glShaderSource(VertexShader, 1, &VertexShaderSource, &VertexShaderSourceLength);
 		glCheckError();
 		glCompileShader(VertexShader);
 		glCheckError();
 		CheckCompileError(VertexShader, Components::Shader);
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the fragment shader...");
-		const GLchar* FragmentShaderSource{ LoadShaderSource(FragmentShaderPath + ShaderName + FragmentShaderFileSuffix, ShaderName).c_str() };
+		const std::string FragmentShaderString{ LoadShaderSource(FragmentShaderPath + ShaderName + FragmentShaderFileSuffix, ShaderName) };
+		const GLchar* FragmentShaderSource{ FragmentShaderString.c_str() };
+		const GLint FragmentShaderSourceLength{ static_cast<GLint>(FragmentShaderString.size()) };
 		const GLint FragmentShader{ glCreateShader(GL_FRAGMENT_SHADER) };
 		glCheckError();
-		glShaderSource(FragmentShader, 1, &FragmentShaderSource, nullptr);
+		glShaderSource(FragmentShader, 1, &FragmentShaderSource, &FragmentShaderSourceLength);
 		glCheckError();
 		glCompileShader(FragmentShader);
 		glCheckError();
@@ -310,9 +312,12 @@ namespace lwmf
 		}
 		else
 		{
-			std::ostringstream VertexBuffer;
-			VertexBuffer << ShaderFile.rdbuf();
-			Result = VertexBuffer.str();
+			std::string Line;
+
+			while (std::getline(ShaderFile, Line))
+			{
+				Result = Result + Line + "\n";
+			}
 		}
 
 		return Result;

@@ -21,6 +21,15 @@
 #include <cmath>
 #include <chrono>
 
+// Uncomment to find memory leaks in debug mode
+//
+// Have a look here:
+// https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/x98tx3cf(v=vs.120)
+//
+// #define _CRTDBG_MAP_ALLOC
+// #include <stdlib.h>
+// #include <crtdbg.h>
+
 // ****************************
 // * TECHNICAL HEADERS FIRST! *
 // ****************************
@@ -216,6 +225,15 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	Tools_Cleanup::CloseAllAudio();
 	Tools_Cleanup::DestroySubsystems();
 	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Exit program...");
+
+	// Uncomment to find memory leaks in debug mode
+	//
+	// Have a look here:
+	// https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/x98tx3cf(v=vs.120)
+	//
+	// _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); 
+	// _CrtDumpMemoryLeaks();
+
 	return EXIT_SUCCESS;
 }
 
@@ -228,68 +246,88 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (GameControllerFlag)
 			{
-				if (wParam == HID_Keyboard::MovePlayerForwardKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerForwardKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
+					break;
 				}
-				else if (wParam == HID_Keyboard::MovePlayerBackwardKey)
+				
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerBackwardKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
+					break;
 				}
 
-				if (wParam == HID_Keyboard::MovePlayerStrafeLeftKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeLeftKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
+					break;
 				}
-				else if (wParam == HID_Keyboard::MovePlayerStrafeRightKey)
+				
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeRightKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
+					break;
 				}
 
-				if (wParam == HID_Gamepad::VirtMouseLeft)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseLeftKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.X = -1;
+					break;
 				}
-				else if (wParam == HID_Gamepad::VirtMouseRight)
+				
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseRightKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.X = 1;
+					break;
 				}
 
-				if (wParam == HID_Gamepad::VirtMouseUp)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseUpKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.Y = -1;
+					break;
 				}
-				else if (wParam == HID_Gamepad::VirtMouseDown)
+				
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseDownKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.Y = 1;
+					break;
 				}
 
-				if (wParam == HID_Gamepad::FireSingleShotKey)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::FireSingleShotKey))
 				{
 					Game_WeaponHandling::InitiateSingleShot();
+					break;
 				}
-				else if (wParam == HID_Gamepad::RapidFireKey)
+				
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::RapidFireKey))
 				{
 					Game_WeaponHandling::InitiateRapidFire();
+					break;
 				}
 
-				if (wParam == HID_Gamepad::ReloadWeaponKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::ReloadWeaponKey))
 				{
 					Game_WeaponHandling::InitiateReload();
+					break;
 				}
 
-				if (wParam == HID_Gamepad::ActionKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::ActionKey))
 				{
 					Game_Doors::TriggerDoor();
+					break;
 				}
 
-				if (wParam == HID_Gamepad::ChangeWeaponUpKey)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::ChangeWeaponUpKey))
 				{
 					Game_WeaponHandling::InitiateWeaponChangeUp();
+					break;
 				}
-				else if (wParam == HID_Gamepad::ChangeWeaponDownKey)
+				
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::ChangeWeaponDownKey))
 				{
 					Game_WeaponHandling::InitiateWeaponChangeDown();
+					break;
 				}
 			}
 			break;
@@ -298,49 +336,58 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (GameControllerFlag)
 			{
-				if (wParam == HID_Keyboard::MovePlayerForwardKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerForwardKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
+					break;
 				}
 
-				if (wParam == HID_Keyboard::MovePlayerBackwardKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerBackwardKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
+					break;
 				}
 
-				if (wParam == HID_Keyboard::MovePlayerStrafeLeftKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeLeftKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
+					break;
 				}
 
-				if (wParam == HID_Keyboard::MovePlayerStrafeRightKey)
+				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeRightKey))
 				{
 					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
+					break;
 				}
 
-				if (wParam == HID_Gamepad::VirtMouseLeft)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseLeftKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.X = 0;
+					break;
 				}
 
-				if (wParam == HID_Gamepad::VirtMouseRight)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseRightKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.X = 0;
+					break;
 				}
 
-				if (wParam == HID_Gamepad::VirtMouseUp)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseUpKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.Y = 0;
+					break;
 				}
 
-				if (wParam == HID_Gamepad::VirtMouseDown)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseDownKey))
 				{
 					HID_Gamepad::GameController.RightStickPos.Y = 0;
+					break;
 				}
 
-				if (wParam == HID_Gamepad::RapidFireKey)
+				if (wParam == static_cast<WPARAM>(HID_Gamepad::RapidFireKey))
 				{
 					Game_WeaponHandling::ReleaseRapidFire();
+					break;
 				}
 			}
 			break;
@@ -399,7 +446,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					if (RawDev.data.keyboard.Message == WM_KEYDOWN || RawDev.data.keyboard.Message == WM_SYSKEYDOWN)
 					{
-						if (RawDev.data.keyboard.VKey == VK_ESCAPE)
+						if (RawDev.data.keyboard.VKey == HID_Keyboard::PauseKey)
 						{
 							MainMenu.LevelUp();
 							break;
@@ -407,26 +454,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 						if (GamePausedFlag)
 						{
-							if (RawDev.data.keyboard.VKey == VK_DOWN)
+							if (RawDev.data.keyboard.VKey == HID_Keyboard::MenuItemDownKey)
 							{
 								MainMenu.ItemDown();
 								break;
 							}
 
-							if (RawDev.data.keyboard.VKey == VK_UP)
+							if (RawDev.data.keyboard.VKey == HID_Keyboard::MenuItemUpKey)
 							{
 								MainMenu.ItemUp();
 								break;
 							}
 
-							if (RawDev.data.keyboard.VKey == VK_RETURN)
+							if (RawDev.data.keyboard.VKey == HID_Keyboard::MenuItemSelectKey)
 							{
 								MainMenu.ItemSelect();
 								break;
 							}
 						}
 
-						if (RawDev.data.keyboard.VKey == VK_SPACE)
+						if (RawDev.data.keyboard.VKey == HID_Keyboard::ActionKey)
 						{
 							Game_Doors::TriggerDoor();
 							break;
@@ -467,6 +514,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							if (NumberOfLevels > 0)
 							{
 								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = 0;
+
 								try
 								{
 									InitAndLoadLevel();
@@ -557,6 +605,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if (lParam == static_cast<LPARAM>(Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].GetDeviceID()))
 					{
 						Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].RewindToStart();
+						break;
 					}
 
 					// "rewind" and restart background music

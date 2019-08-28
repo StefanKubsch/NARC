@@ -2968,7 +2968,7 @@ inline static void stbtt__rasterize(stbtt__bitmap* result, stbtt__point* pts, co
 		n += wcount[i];
 	}
 
-	stbtt__edge* e{ new stbtt__edge[n + 1] }; // add an extra one as a sentinel
+	stbtt__edge* e{ new stbtt__edge[n + 1] }; // add an extra one as a sentinel //-V121
 
 	if (e == nullptr) //-V668
 	{
@@ -3133,7 +3133,7 @@ inline static stbtt__point* stbtt_FlattenCurves(stbtt_vertex* vertices, const st
 		return nullptr;
 	}
 
-	*contour_lengths = new int_fast32_t[n];
+	*contour_lengths = new int_fast32_t[n]; //-V121
 
 	if (*contour_lengths == nullptr)
 	{
@@ -3155,7 +3155,7 @@ inline static stbtt__point* stbtt_FlattenCurves(stbtt_vertex* vertices, const st
 
 		if (pass == 1)
 		{
-			points = new stbtt__point[num_points];
+			points = new stbtt__point[num_points]; //-V121
 
 			if (points == nullptr) //-V668
 			{
