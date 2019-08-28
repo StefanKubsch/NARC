@@ -12,6 +12,7 @@
 
 #include <string>
 #include <fstream>
+#include <iostream>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_Console.hpp"

@@ -9,6 +9,11 @@
 
 #pragma once
 
+#include "Game_LevelHandling.hpp"
+#include "Game_EntityHandling.hpp"
+#include "Game_Doors.hpp"
+#include "Game_WeaponHandling.hpp"
+
 namespace Tools_Cleanup
 {
 
