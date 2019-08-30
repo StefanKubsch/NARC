@@ -28,11 +28,11 @@ namespace lwmf
 	public:
 		void LoadShader(const std::string& ShaderName, const TextureStruct& Texture);
 		void LoadTextureInGPU(const TextureStruct& Texture, GLuint* TextureID);
-		void RenderTexture(const GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, float Opacity);
+		void RenderTexture(const GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, bool Blend, float Opacity);
 		void LoadStaticTextureInGPU(const TextureStruct& Texture, GLuint* TextureID, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-		void RenderStaticTexture(const GLuint* TextureID, float Opacity);
+		void RenderStaticTexture(const GLuint* TextureID, bool Blend, float Opacity);
 		void PrepareLWMFTexture(const TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY);
-		void RenderLWMFTexture(const TextureStruct& Texture, float Opacity);
+		void RenderLWMFTexture(const TextureStruct& Texture, bool Blend, float Opacity);
 
 	private:
 		enum class Components : std::int_fast32_t
@@ -41,13 +41,14 @@ namespace lwmf
 			Program
 		};
 
-		void Ortho2D(GLfloat* Matrix, GLfloat Left, GLfloat Right, GLfloat Bottom, GLfloat Top);
+		void Ortho2D(std::vector<GLfloat>& Matrix, GLfloat Left, GLfloat Right, GLfloat Bottom, GLfloat Top);
 		void UpdateVertices(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
 		const std::string LoadShaderSource(const std::string& FileName, const std::string& ShaderName);
 		void CheckError(std::int_fast32_t Line);
 		void CheckCompileError(GLint Task, Components Component);
 
-		GLfloat Vertices[16]{};
+		std::vector<GLfloat> Vertices;
+		GLint OpacityLocation{};
 		GLuint ShaderProgram{};
 		GLuint VertexArrayObject{};
 		GLuint VertexBufferObject{};
@@ -62,6 +63,8 @@ namespace lwmf
 		const std::string FragmentShaderFileSuffix{ ".frag" };
 
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
+
+		Vertices.resize(16);
 
 		// Set texture coordinates
 		// Top-Left
@@ -94,7 +97,7 @@ namespace lwmf
 		glCheckError();
 		glBufferData(GL_ARRAY_BUFFER, 2048, nullptr, GL_DYNAMIC_DRAW);
 		glCheckError();
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertices), Vertices);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create vertex array object...");
@@ -169,12 +172,15 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create projection matrix...");
-		GLfloat ProjectionMatrix[16]{};
+		std::vector<GLfloat> ProjectionMatrix(16);
 		Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(Texture.Width), static_cast<GLfloat>(Texture.Height), 0.0F);
 		glCheckError();
 		const GLint Projection{ glGetUniformLocation(ShaderProgram, "MVP") };
 		glCheckError();
-		glUniformMatrix4fv(Projection, 1, GL_FALSE, ProjectionMatrix);
+		glUniformMatrix4fv(Projection, 1, GL_FALSE, ProjectionMatrix.data());
+		glCheckError();
+
+		OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Since the shader program is now loaded into GPU, we can delete the shader program...");
@@ -186,6 +192,9 @@ namespace lwmf
 		glCheckError();
 		glDeleteShader(VertexShader);
 		glCheckError();
+
+		// Set blend mode
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	inline void ShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID)
@@ -202,19 +211,23 @@ namespace lwmf
 		glCheckError();
 	}
 
-	inline void ShaderClass::RenderTexture(const GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const float Opacity)
+	inline void ShaderClass::RenderTexture(const GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const bool Blend, const float Opacity)
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if (Blend)
+		{
+			glEnable(GL_BLEND);
+		}
 
 		glUseProgram(ShaderProgram);
-		GLint OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
 		glUniform1f(OpacityLocation, Opacity);
 		UpdateVertices(PosX, PosY, Width, Height);
 		glBindTexture(GL_TEXTURE_2D, *TextureID);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-		glDisable(GL_BLEND);
+		if (Blend)
+		{
+			glDisable(GL_BLEND);
+		}
 	}
 
 	inline void ShaderClass::LoadStaticTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
@@ -223,19 +236,23 @@ namespace lwmf
 		LoadTextureInGPU(Texture, TextureID);
 	}
 
-	inline void ShaderClass::RenderStaticTexture(const GLuint* TextureID, const float Opacity)
+	inline void ShaderClass::RenderStaticTexture(const GLuint* TextureID, const bool Blend, const float Opacity)
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if (Blend)
+		{
+			glEnable(GL_BLEND);
+		}
 
 		glUseProgram(ShaderProgram);
-		GLint OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
 		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
 		glBindTexture(GL_TEXTURE_2D, *TextureID);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-		glDisable(GL_BLEND);
+		if (Blend)
+		{
+			glDisable(GL_BLEND);
+		}
 	}
 
 	inline void ShaderClass::PrepareLWMFTexture(const lwmf::TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY)
@@ -258,51 +275,54 @@ namespace lwmf
 		glCheckError();
 	}
 
-	inline void ShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture, const float Opacity)
+	inline void ShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture, const bool Blend, const float Opacity)
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if (Blend)
+		{
+			glEnable(GL_BLEND);
+		}
 
 		glUseProgram(ShaderProgram);
-		GLint OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
 		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
 		glBindTexture(GL_TEXTURE_2D, LWMFTextureID);
 		FullscreenFlag == 1 ? glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data()) : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-		glDisable(GL_BLEND);
-
+		if (Blend)
+		{
+			glDisable(GL_BLEND);
+		}
 	}
 
-	inline void ShaderClass::Ortho2D(GLfloat* Matrix, const GLfloat Left, const GLfloat Right, const GLfloat Bottom, const GLfloat Top)
+	inline void ShaderClass::Ortho2D(std::vector<GLfloat>& Matrix, const GLfloat Left, const GLfloat Right, const GLfloat Bottom, const GLfloat Top)
 	{
 		const GLfloat InvY{ 1.0F / (Top - Bottom) };
 		const GLfloat InvX{ 1.0F / (Right - Left) };
 
 		// First column
-		*Matrix++ = 2.0F * InvX;
-		*Matrix++ = 0.0F;
-		*Matrix++ = 0.0F;
-		*Matrix++ = 0.0F;
+		Matrix[0] = 2.0F * InvX;
+		Matrix[1] = 0.0F;
+		Matrix[2] = 0.0F;
+		Matrix[3] = 0.0F;
 
 		// Second
-		*Matrix++ = 0.0F;
-		*Matrix++ = 2.0F * InvY;
-		*Matrix++ = 0.0F;
-		*Matrix++ = 0.0F;
+		Matrix[4] = 0.0F;
+		Matrix[5] = 2.0F * InvY;
+		Matrix[6] = 0.0F;
+		Matrix[7] = 0.0F;
 
 		// Third
-		*Matrix++ = 0.0F;
-		*Matrix++ = 0.0F;
-		*Matrix++ = -1.0F;
-		*Matrix++ = 0.0F;
+		Matrix[8] = 0.0F;
+		Matrix[9] = 0.0F;
+		Matrix[10] = -1.0F;
+		Matrix[11] = 0.0F;
 
 		// Fourth
-		*Matrix++ = -(Right + Left) * InvX;
-		*Matrix++ = -(Top + Bottom) * InvY;
-		*Matrix++ = 0.0F;
-		*Matrix++ = 1.0F;
+		Matrix[12] = -(Right + Left) * InvX;
+		Matrix[13] = -(Top + Bottom) * InvY;
+		Matrix[14] = 0.0F;
+		Matrix[15] = 1.0F;
 	}
 
 	inline void ShaderClass::UpdateVertices(const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
@@ -322,7 +342,7 @@ namespace lwmf
 		Vertices[12] = static_cast<GLfloat>(PosX);
 		Vertices[13] = static_cast<GLfloat>(PosY + Height);
 
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertices), Vertices);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
 	}
 
 	inline const std::string ShaderClass::LoadShaderSource(const std::string& FileName, const std::string& ShaderName)

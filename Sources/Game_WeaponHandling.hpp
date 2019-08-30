@@ -523,10 +523,10 @@ namespace Game_WeaponHandling
 		// Draw muzzle flash if weapon is fired
 		if (WeaponMuzzleFlashFlag)
 		{
-			Weapons[Player.SelectedWeapon].MuzzleFlashShader.RenderTexture(&Weapons[Player.SelectedWeapon].MuzzleFlashTexture, Sway.X + Weapons[Player.SelectedWeapon].MuzzleFlashRect.X, Sway.Y - Weapons[Player.SelectedWeapon].MuzzleFlashRect.Y, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Width, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Height, 1.0F); //-V807
+			Weapons[Player.SelectedWeapon].MuzzleFlashShader.RenderTexture(&Weapons[Player.SelectedWeapon].MuzzleFlashTexture, Sway.X + Weapons[Player.SelectedWeapon].MuzzleFlashRect.X, Sway.Y - Weapons[Player.SelectedWeapon].MuzzleFlashRect.Y, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Width, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Height, true, 1.0F); //-V807
 		}
 		// Draw weapon
-		Weapons[Player.SelectedWeapon].WeaponShader.RenderTexture(&Weapons[Player.SelectedWeapon].WeaponTexture, Sway.X, Sway.Y + WeaponFadeInOutY, Weapons[Player.SelectedWeapon].WeaponRect.Width, Weapons[Player.SelectedWeapon].WeaponRect.Height, 1.0F);
+		Weapons[Player.SelectedWeapon].WeaponShader.RenderTexture(&Weapons[Player.SelectedWeapon].WeaponTexture, Sway.X, Sway.Y + WeaponFadeInOutY, Weapons[Player.SelectedWeapon].WeaponRect.Width, Weapons[Player.SelectedWeapon].WeaponRect.Height, true, 1.0F);
 	}
 
 	inline void PlayAudio(const std::int_fast32_t SelectedPlayerWeapon, const WeaponsSounds WeaponSound)

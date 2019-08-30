@@ -54,7 +54,7 @@ namespace Game_Transitions
 		lwmf::ClearBuffer();
 		lwmf::ClearTexture(ScreenTexture, 0);
 		GeneralText.RenderTextCentered(NextLevelText, ScreenTexture.Height - GeneralText.GetFontHeight() - 50);
-		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, 1.0F);
+		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
 		lwmf::SwapBuffer();
 	}
 
@@ -119,7 +119,7 @@ namespace Game_Transitions
 			}
 
 			lwmf::ClearBuffer();
-			ScreenTextureShader.RenderLWMFTexture(ScreenTexture, 1.0F);
+			ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
 			lwmf::SwapBuffer();
 		}
 

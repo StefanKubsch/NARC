@@ -199,7 +199,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			HUDMinimap.Display();
 		}
 
-		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, 1.0F);
+		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
 		Game_WeaponHandling::DrawWeapon();
 
 		if (HUDEnabled)
@@ -208,11 +208,11 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 			if (GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1)
 			{
-				HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture, 1.0F);
+				HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture, true, 1.0F);
 			}
 			else
 			{
-				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconTexture, 1.0F);
+				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconTexture, true, 1.0F);
 			}
 		}
 

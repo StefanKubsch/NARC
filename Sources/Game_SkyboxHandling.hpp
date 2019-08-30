@@ -70,11 +70,11 @@ namespace Game_SkyboxHandling
 			const std::int_fast32_t Left{ static_cast<std::int_fast32_t>(std::atan2f(Plane.X, Plane.Y) / lwmf::DoublePI * -SkyboxWidth) };
 			const std::int_fast32_t Top{ static_cast<std::int_fast32_t>(VerticalLookCamera * 360.0F - 180.0F) };
 
-			SkyboxShader.RenderTexture(&SkyboxTexture, Left, Top, SkyboxWidth, SkyboxHeight, 1.0F);
+			SkyboxShader.RenderTexture(&SkyboxTexture, Left, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
 
 			if (Left < SkyboxWidth - ScreenTexture.Width)
 			{
-				SkyboxShader.RenderTexture(&SkyboxTexture, Left - SkyboxWidth, Top, SkyboxWidth, SkyboxHeight, 1.0F);
+				SkyboxShader.RenderTexture(&SkyboxTexture, Left - SkyboxWidth, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
 			}
 		}
 	}
