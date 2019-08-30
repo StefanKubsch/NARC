@@ -58,6 +58,7 @@ using GLintptr = std::ptrdiff_t;
 	OG(void,	glLinkProgram,				GLuint program) \
 	OG(void,	glShaderSource,				GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length) \
 	OG(void,	glTexStorage2D,				GLenum target,GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) \
+	OG(void,	glUniform1f,				GLint location, GLfloat v0) \
 	OG(void,	glUniform2f,				GLint location, GLfloat v0, GLfloat v1) \
 	OG(void,	glUniformMatrix4fv,			GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) \
 	OG(void,	glUseProgram,				GLuint program) \

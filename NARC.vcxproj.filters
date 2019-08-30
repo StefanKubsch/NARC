@@ -99,6 +99,9 @@
     <ClInclude Include="Sources\HID_Gamepad.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Game_Effects.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NARC.cpp">

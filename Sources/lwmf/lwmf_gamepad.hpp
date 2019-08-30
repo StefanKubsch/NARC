@@ -67,6 +67,7 @@ namespace lwmf
 		lwmf::IntPointStruct RightStickPos;
 		lwmf::FloatPointStruct LeftStick{};
 		lwmf::FloatPointStruct RightStick{};
+		std::int_fast32_t ControllerID{ -1 };
 		float TriggerLeft{};
 		float TriggerRight{};
 		float RotationXLimit{ 0.01F };
@@ -88,7 +89,6 @@ namespace lwmf
 		lwmf::FloatPointStruct DeadZone{ 0.3F, 0.3F };
 		lwmf::FloatPointStruct PreviousLeftStick{};
 		lwmf::FloatPointStruct PreviousRightStick{};
-		std::int_fast32_t ControllerID{};
 		float PreviousLeftTrigger{};
 		float PreviousRightTrigger{};
 	};
@@ -123,16 +123,14 @@ namespace lwmf
 
 	inline bool Gamepad::CheckConnection()
 	{
-		std::int_fast32_t ID{ -1 };
-
-		for (DWORD i{}; i < XUSER_MAX_COUNT && ID == -1; i++)
+		for (DWORD i{}; i < XUSER_MAX_COUNT && ControllerID == -1; i++)
 		{
 			XINPUT_STATE XInputState;
 			ZeroMemory(&XInputState, sizeof(XINPUT_STATE));
 
 			if (XInputGetState(i, &XInputState) == ERROR_SUCCESS)
 			{
-				ID = i;
+				ControllerID = i;
 				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "XBOX controller found...");
 			}
 			else
@@ -141,9 +139,7 @@ namespace lwmf
 			}
 		}
 
-		ControllerID = ID;
-
-		return ID != -1;
+		return ControllerID != -1;
 	}
 
 	inline void Gamepad::Refresh()

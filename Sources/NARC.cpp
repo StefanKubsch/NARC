@@ -67,6 +67,7 @@ inline lwmf::ShaderClass ScreenTextureShader;
 #include "Game_SkyboxHandling.hpp"
 #include "Game_PathFinding.hpp"
 #include "Game_EntityHandling.hpp"
+#include "Game_Effects.hpp"
 #include "Game_Doors.hpp"
 #include "Game_WeaponHandling.hpp"
 #include "Game_HealthBarClass.hpp"
@@ -151,6 +152,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 				Game_WeaponHandling::CheckReloadStatus();
 				Game_WeaponHandling::CountdownMuzzleFlashCounter();
 				Game_WeaponHandling::CountdownCadenceCounter();
+				Game_Effects::CountdownBloodstainCounter();
 			}
 
 			Lag -= LengthOfFrame;
@@ -197,22 +199,24 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			HUDMinimap.Display();
 		}
 
-		ScreenTextureShader.RenderLWMFTexture(ScreenTexture);
+		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, 1.0F);
 		Game_WeaponHandling::DrawWeapon();
 
 		if (HUDEnabled)
 		{
 			HUDWeaponDisplay.Display();
 
-			if (GameControllerFlag)
+			if (GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1)
 			{
-				HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture);
+				HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture, 1.0F);
 			}
 			else
 			{
-				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconTexture);
+				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconTexture, 1.0F);
 			}
 		}
+
+		Game_Effects::DrawBloodstain();
 
 		if (GamePausedFlag)
 		{
@@ -244,151 +248,145 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Gamecontroller handling
 		case WM_KEYDOWN:
 		{
-			if (GameControllerFlag)
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerForwardKey))
 			{
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerForwardKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
-					break;
-				}
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, true);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerBackwardKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerBackwardKey))
+			{
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, true);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeLeftKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeLeftKey))
+			{
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, true);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeRightKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeRightKey))
+			{
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, true);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseLeftKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.X = -1;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseLeftKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.X = -1;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseRightKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.X = 1;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseRightKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.X = 1;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseUpKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.Y = -1;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseUpKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.Y = -1;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseDownKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.Y = 1;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseDownKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.Y = 1;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::FireSingleShotKey))
-				{
-					Game_WeaponHandling::InitiateSingleShot();
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::FireSingleShotKey))
+			{
+				Game_WeaponHandling::InitiateSingleShot();
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::RapidFireKey))
-				{
-					Game_WeaponHandling::InitiateRapidFire();
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::RapidFireKey))
+			{
+				Game_WeaponHandling::InitiateRapidFire();
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::ReloadWeaponKey))
-				{
-					Game_WeaponHandling::InitiateReload();
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::ReloadWeaponKey))
+			{
+				Game_WeaponHandling::InitiateReload();
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::ActionKey))
-				{
-					Game_Doors::TriggerDoor();
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::ActionKey))
+			{
+				Game_Doors::TriggerDoor();
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::ChangeWeaponUpKey))
-				{
-					Game_WeaponHandling::InitiateWeaponChangeUp();
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::ChangeWeaponUpKey))
+			{
+				Game_WeaponHandling::InitiateWeaponChangeUp();
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::ChangeWeaponDownKey))
-				{
-					Game_WeaponHandling::InitiateWeaponChangeDown();
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::ChangeWeaponDownKey))
+			{
+				Game_WeaponHandling::InitiateWeaponChangeDown();
+				break;
 			}
 			break;
 		}
 		case WM_KEYUP:
 		{
-			if (GameControllerFlag)
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerForwardKey))
 			{
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerForwardKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
-					break;
-				}
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerForwardKey, false);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerBackwardKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerBackwardKey))
+			{
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerBackwardKey, false);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeLeftKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeLeftKey))
+			{
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey, false);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeRightKey))
-				{
-					HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Keyboard::MovePlayerStrafeRightKey))
+			{
+				HID_Keyboard::SetKeyState(HID_Keyboard::MovePlayerStrafeRightKey, false);
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseLeftKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.X = 0;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseLeftKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.X = 0;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseRightKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.X = 0;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseRightKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.X = 0;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseUpKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.Y = 0;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseUpKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.Y = 0;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseDownKey))
-				{
-					HID_Gamepad::GameController.RightStickPos.Y = 0;
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::VirtMouseDownKey))
+			{
+				HID_Gamepad::GameController.RightStickPos.Y = 0;
+				break;
+			}
 
-				if (wParam == static_cast<WPARAM>(HID_Gamepad::RapidFireKey))
-				{
-					Game_WeaponHandling::ReleaseRapidFire();
-					break;
-				}
+			if (wParam == static_cast<WPARAM>(HID_Gamepad::RapidFireKey))
+			{
+				Game_WeaponHandling::ReleaseRapidFire();
+				break;
 			}
 			break;
 		}
@@ -639,6 +637,7 @@ void InitAndLoadGameConfig()
 	Game_WeaponHandling::InitConfig();
 	Game_WeaponHandling::InitTextures();
 	Game_WeaponHandling::InitAudio();
+	Game_Effects::InitEffects();
 	HUDWeaponDisplay.Init();
 	HUDHealthBar.Init();
 	HUDMinimap.Init();
@@ -707,7 +706,7 @@ void ControlPlayerMovement()
 	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = Game_EntityHandling::EntityTypes::Clear;
 	Game_WeaponHandling::WeaponPaceFlag = false;
 
-	if (GameControllerFlag)
+	if (GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1)
 	{
 		switch (HID_Gamepad::GameController.RightStickPos.X)
 		{

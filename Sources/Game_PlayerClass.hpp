@@ -15,6 +15,7 @@
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
+#include "Game_Effects.hpp"
 
 class Game_PlayerClass final
 {
@@ -44,6 +45,7 @@ public:
 	bool IsDead{};
 };
 
+
 inline void Game_PlayerClass::InitConfig()
 {
 	if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
@@ -51,6 +53,7 @@ inline void Game_PlayerClass::InitConfig()
 		MoveSpeed = lwmf::ReadINIValue<float>(INIFile, "GENERAL", "MoveSpeed");
 		Hitpoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "Hitpoints");
 		CollisionDetectionFactor = MoveSpeed + lwmf::ReadINIValue<float>(INIFile, "GENERAL", "CollisionDetectionWallDist");
+
 		Pos.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosX");
 		Pos.Y = lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosY");
 		Dir.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "DirX");
@@ -87,6 +90,7 @@ inline void Game_PlayerClass::HurtPlayer(const std::int_fast32_t DamageDealt)
 	if (Hitpoints > 0)
 	{
 		PlayAudio(PlayerSounds::Hurt);
+		Game_Effects::StartBloodstainDrawing();
 	}
 
 	if (Hitpoints <= 0)
@@ -119,4 +123,3 @@ inline void Game_PlayerClass::CloseAudio()
 		Sound.Close();
 	}
 }
-

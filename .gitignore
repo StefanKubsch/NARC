@@ -819,3 +819,12 @@ x64/Debug/GFX/HUD/Mouse.png
 x64/Debug/GFX/HUD/XBoxController.png
 x64/Release/GFX/HUD/Mouse.png
 x64/Release/GFX/HUD/XBoxController.png
+.vs/NARC/v16/ipch/AutoPCH/1e89f3ebcc428089/GAME_EFFECTS.ipch
+x64/Debug/DATA/GameConfig/EffectsConfig.ini
+x64/Debug/GFX/Effects/Bloodstains.png
+x64/Debug/Shader/Default.frag
+x64/Debug/Shader/Default.vert
+x64/Release/DATA/GameConfig/EffectsConfig.ini
+x64/Release/GFX/Effects/Bloodstains.png
+x64/Release/Shader/Default.frag
+x64/Release/Shader/Default.vert

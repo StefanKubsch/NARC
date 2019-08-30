@@ -28,11 +28,11 @@ namespace lwmf
 	public:
 		void LoadShader(const std::string& ShaderName, const TextureStruct& Texture);
 		void LoadTextureInGPU(const TextureStruct& Texture, GLuint* TextureID);
-		void RenderTexture(const GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
+		void RenderTexture(const GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, float Opacity);
 		void LoadStaticTextureInGPU(const TextureStruct& Texture, GLuint* TextureID, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-		void RenderStaticTexture(const GLuint* TextureID);
+		void RenderStaticTexture(const GLuint* TextureID, float Opacity);
 		void PrepareLWMFTexture(const TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY);
-		void RenderLWMFTexture(const TextureStruct& Texture);
+		void RenderLWMFTexture(const TextureStruct& Texture, float Opacity);
 
 	private:
 		enum class Components : std::int_fast32_t
@@ -48,6 +48,7 @@ namespace lwmf
 		void CheckCompileError(GLint Task, Components Component);
 
 		GLfloat Vertices[16]{};
+		GLuint ShaderProgram{};
 		GLuint VertexArrayObject{};
 		GLuint VertexBufferObject{};
 		GLuint LWMFTextureID{};
@@ -55,8 +56,8 @@ namespace lwmf
 
 	inline void ShaderClass::LoadShader(const std::string& ShaderName, const TextureStruct& Texture)
 	{
-		const std::string VertexShaderPath{ "./Shader/Vertex/" };
-		const std::string FragmentShaderPath{ "./Shader/Fragment/" };
+		const std::string VertexShaderPath{ "./Shader/" };
+		const std::string FragmentShaderPath{ "./Shader/" };
 		const std::string VertexShaderFileSuffix{ ".vert" };
 		const std::string FragmentShaderFileSuffix{ ".frag" };
 
@@ -135,7 +136,7 @@ namespace lwmf
 		CheckCompileError(FragmentShader, Components::Shader);
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Link the vertex and fragment shader into a shader program...");
-		const GLint ShaderProgram{ glCreateProgram() };
+		ShaderProgram = glCreateProgram();
 		glCheckError();
 		glAttachShader(ShaderProgram, VertexShader);
 		glCheckError();
@@ -201,11 +202,19 @@ namespace lwmf
 		glCheckError();
 	}
 
-	inline void ShaderClass::RenderTexture(const GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
+	inline void ShaderClass::RenderTexture(const GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const float Opacity)
 	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glUseProgram(ShaderProgram);
+		GLint OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
+		glUniform1f(OpacityLocation, Opacity);
 		UpdateVertices(PosX, PosY, Width, Height);
 		glBindTexture(GL_TEXTURE_2D, *TextureID);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+		glDisable(GL_BLEND);
 	}
 
 	inline void ShaderClass::LoadStaticTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
@@ -214,11 +223,19 @@ namespace lwmf
 		LoadTextureInGPU(Texture, TextureID);
 	}
 
-	inline void ShaderClass::RenderStaticTexture(const GLuint* TextureID)
+	inline void ShaderClass::RenderStaticTexture(const GLuint* TextureID, const float Opacity)
 	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glUseProgram(ShaderProgram);
+		GLint OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
+		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
 		glBindTexture(GL_TEXTURE_2D, *TextureID);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+		glDisable(GL_BLEND);
 	}
 
 	inline void ShaderClass::PrepareLWMFTexture(const lwmf::TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY)
@@ -241,12 +258,21 @@ namespace lwmf
 		glCheckError();
 	}
 
-	inline void ShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture)
+	inline void ShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture, const float Opacity)
 	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glUseProgram(ShaderProgram);
+		GLint OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
+		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
 		glBindTexture(GL_TEXTURE_2D, LWMFTextureID);
 		FullscreenFlag == 1 ? glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data()) : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+		glDisable(GL_BLEND);
+
 	}
 
 	inline void ShaderClass::Ortho2D(GLfloat* Matrix, const GLfloat Left, const GLfloat Right, const GLfloat Bottom, const GLfloat Top)

@@ -141,7 +141,7 @@ inline void GFX_TextClass::RenderText(const std::string& Text, std::int_fast32_t
 {
 	for (const char& Char : Text)
 	{
-		GlyphShader.RenderTexture(&Glyphs[Char].Texture, x, y - Glyphs[Char].Baseline + FontHeight, Glyphs[Char].Width, Glyphs[Char].Height);
+		GlyphShader.RenderTexture(&Glyphs[Char].Texture, x, y - Glyphs[Char].Baseline + FontHeight, Glyphs[Char].Width, Glyphs[Char].Height, 1.0F);
 		x += Glyphs[Char].Advance;
 	}
 }
