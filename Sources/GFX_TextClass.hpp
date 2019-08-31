@@ -18,6 +18,7 @@
 #include "stb/stb_truetype.hpp"
 
 #include "Game_GlobalDefinitions.hpp"
+#include "Tools_ErrorHandling.hpp"
 
 class GFX_TextClass final
 {

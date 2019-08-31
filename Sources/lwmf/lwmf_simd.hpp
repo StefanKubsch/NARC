@@ -12,6 +12,7 @@
 
 #include <intrin.h>
 #include <cstdint>
+#include <vector>
 
 #include "lwm_logging.hpp"
 
@@ -29,8 +30,8 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Checking for SSE 4.2 Extensions...");
 
-		std::int_fast32_t CPUInfo[4];
-		__cpuid(CPUInfo, 1);
+		std::vector<std::int_fast32_t> CPUInfo(4);
+		__cpuid(CPUInfo.data(), 1);
 
 		if ((CPUInfo[2] & (1 << 20)) == 0)
 		{

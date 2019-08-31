@@ -13,7 +13,8 @@
 #define glCheckError() CheckError(__LINE__)
 
 #include <cstdint>
-#include <cstring>
+#include <string>
+#include <vector>
 #include <fstream>
 
 #include "lwmf_logging.hpp"
@@ -61,10 +62,9 @@ namespace lwmf
 		const std::string FragmentShaderPath{ "./Shader/" };
 		const std::string VertexShaderFileSuffix{ ".vert" };
 		const std::string FragmentShaderFileSuffix{ ".frag" };
-
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
 
-		Vertices.resize(16);
+		Vertices.resize(16, 0.0F);
 
 		// Set texture coordinates
 		// Top-Left
@@ -88,8 +88,6 @@ namespace lwmf
 			2, 3, 0
 		};
 
-		GLuint ElementBufferObject{};
-
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create vertex buffer object...");
 		glGenBuffers(1, &VertexBufferObject);
 		glCheckError();
@@ -107,6 +105,7 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create element buffer object...");
+		GLuint ElementBufferObject{};
 		glGenBuffers(1, &ElementBufferObject);
 		glCheckError();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
@@ -183,7 +182,7 @@ namespace lwmf
 		OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Since the shader program is now loaded into GPU, we can delete the shader program...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Since the shader program is now loaded into GPU, we can delete the shaders...");
 		glDetachShader(ShaderProgram, FragmentShader);
 		glCheckError();
 		glDetachShader(ShaderProgram, VertexShader);
@@ -193,11 +192,13 @@ namespace lwmf
 		glDeleteShader(VertexShader);
 		glCheckError();
 
-		// Set blend mode
+		// Set some flags
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_DITHER);
 	}
 
-	inline void ShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID)
+	inline void ShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& Texture, GLuint *TextureID)
 	{
 		glGenTextures(1, TextureID);
 		glCheckError();
@@ -362,7 +363,7 @@ namespace lwmf
 
 			while (std::getline(ShaderFile, Line))
 			{
-				Result = Result + Line + "\n";
+				Result += Line + "\n";
 			}
 		}
 
@@ -424,7 +425,7 @@ namespace lwmf
 	inline void ShaderClass::CheckCompileError(const GLint Task, const Components Component)
 	{
 		GLint ErrorResult{};
-		GLchar ErrorLog[512];
+		std::vector<GLchar> ErrorLog(512);
 
 		switch (Component)
 		{
@@ -434,8 +435,8 @@ namespace lwmf
 
 				if (ErrorResult == GL_FALSE)
 				{
-					glGetShaderInfoLog(Task, 512, nullptr, ErrorLog);
-					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog));
+					glGetShaderInfoLog(Task, 512, nullptr, ErrorLog.data());
+					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog.data()));
 				}
 
 				break;
@@ -446,8 +447,8 @@ namespace lwmf
 
 				if (ErrorResult == GL_FALSE)
 				{
-					glGetProgramInfoLog(Task, 512, nullptr, ErrorLog);
-					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog));
+					glGetProgramInfoLog(Task, 512, nullptr, ErrorLog.data());
+					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog.data()));
 				}
 
 				break;
