@@ -35,6 +35,8 @@
 // ****************************
 
 // lightweight media framework
+#define LWMF_LOGGINGENABLED
+#define LWMF_THROWEXCEPTIONS
 #include "lwmf/lwmf.hpp"
 
 // Establish logging for NARC itself - system-logging for lwmf is hardcoded!
@@ -654,11 +656,9 @@ void InitAndLoadGameConfig()
 void InitAndLoadLevel()
 {
 	Game_Transitions::LevelTransition();
-
 	Game_LevelHandling::CloseBackgroundMusic();
 	Game_EntityHandling::CloseAudio();
 	Player.CloseAudio();
-
 	Game_LevelHandling::InitConfig();
 	Game_LevelHandling::InitMapData();
 	Game_LevelHandling::InitLights();
@@ -675,7 +675,6 @@ void InitAndLoadLevel()
 	Player.InitAudio();
 	Game_EntityHandling::InitEntityAssets();
 	Game_EntityHandling::InitEntities();
-
 	Game_LevelHandling::PlayBackgroundMusic();
 	Game_Raycaster::RefreshSettings();
 

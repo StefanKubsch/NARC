@@ -91,6 +91,7 @@ namespace lwmf
 				}
 
 				Tree2D.clear();
+				Tree2D.shrink_to_fit();
 				Tree2D.resize((static_cast<size_t>(NumCodes) << 1), 32767);
 
 				for (std::int_fast32_t n{}; n < NumCodes; ++n)

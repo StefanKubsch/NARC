@@ -16,15 +16,24 @@
 // ** YOU CAN MAKE SOME SETTINGS HERE !!!         **
 // *************************************************
 
-// Set LoggingEnabled to "false" if you don´t want to write any logsfiles!
-constexpr bool LoggingEnabled{ true };
-// Set ThrowExceptions to "false" if you don´t want to handle errors by exceptions!
-constexpr bool ThrowExceptions{ true };
+// #define LWMF_LOGGINGENABLED if you want to write any logsfiles
+#ifdef LWMF_LOGGINGENABLED
+	constexpr bool LoggingEnabled{ true };
+#elif
+	constexpr bool LoggingEnabled{ false };
+#endif
+
+// #define LWMF_THROWEXCEPTIONS if you want to handle errors by exceptions
+#ifdef LWMF_THROWEXCEPTIONS
+	constexpr bool ThrowExceptions{ true };
+#elif
+	constexpr bool ThrowExceptions{ false };
+#endif
 
 #include "lwmf_logging.hpp"
 
 // Establish lwmf system logfile
-// Will not be created if "LoggingEnabled" = false !
+// Will not be created if "LoggingEnabled" = false
 inline lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 
 #include "lwmf_simd.hpp"

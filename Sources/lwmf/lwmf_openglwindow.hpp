@@ -48,7 +48,7 @@ namespace lwmf
 
 		Texture.Pixels.clear();
 		Texture.Pixels.shrink_to_fit();
-		Texture.Pixels.resize(static_cast<size_t>(Texture.Size), 0);
+		Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
 	}
 
 	inline void CreateOpenGLWindow(const HINSTANCE hInstance, TextureStruct& RenderTarget, const std::int_fast32_t Width, const std::int_fast32_t Height, const LPCSTR WindowName, const bool Fullscreen)
@@ -103,7 +103,7 @@ namespace lwmf
 
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Create OpenGL context...");
 
-			const PIXELFORMATDESCRIPTOR PFD =
+			const PIXELFORMATDESCRIPTOR PFD
 			{
 				sizeof(PIXELFORMATDESCRIPTOR),
 				1,

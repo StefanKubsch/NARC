@@ -66,11 +66,9 @@ namespace Game_Effects
 
 	inline void DrawBloodstain()
 	{
-		const float Opacity{ std::clamp(0.5F - (0.5F / static_cast<float>(BloodstainCounter)), 0.0F, 0.5F) };
-
 		if (BloodstainFlag)
 		{
-			BloodstainShader.RenderStaticTexture(&BloodstainTexture, true, Opacity);
+			BloodstainShader.RenderStaticTexture(&BloodstainTexture, true, std::clamp(0.5F - (0.5F / static_cast<float>(BloodstainCounter)), 0.0F, 0.5F));
 		}
 	}
 

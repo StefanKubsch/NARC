@@ -64,7 +64,7 @@ namespace lwmf
 		const std::string FragmentShaderFileSuffix{ ".frag" };
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
 
-		Vertices.resize(16, 0.0F);
+		Vertices.resize(16);
 
 		// Set texture coordinates
 		// Top-Left

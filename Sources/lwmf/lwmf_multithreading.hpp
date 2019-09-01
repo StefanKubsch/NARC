@@ -107,6 +107,7 @@ namespace lwmf
 		}
 
 		Results.clear();
+		Results.shrink_to_fit();
 	}
 
 
