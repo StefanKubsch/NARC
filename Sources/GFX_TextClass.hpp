@@ -61,18 +61,18 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			Offset = { lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetY") };
 
 			// Get raw (binary) font data
-			std::vector<char> FontBuffer;
+			std::vector<unsigned char> FontBuffer;
 			std::ifstream FontFile(FontName.c_str(), std::ifstream::binary);
 			FontFile.seekg(0, std::ios_base::end);
 			FontBuffer.resize(FontFile.tellg());
 			FontFile.seekg(0, std::ios_base::beg);
-			FontFile.read(FontBuffer.data(), FontBuffer.size());
+			FontFile.read(reinterpret_cast<char*>(FontBuffer.data()), FontBuffer.size());
 
 			// Render the glyphs for ASCII chars from 32 ("space") to 127 (last official ASCII char)
 			// This makes 96 printable chars
 
 			stbtt_fontinfo FontInfo{};
-			stbtt_InitFont(&FontInfo, reinterpret_cast<unsigned char*>(FontBuffer.data()), 0);
+			stbtt_InitFont(FontInfo, reinterpret_cast<unsigned char*>(FontBuffer.data()), 0);
 
 			std::int_fast32_t Width{};
 			FontHeight = static_cast<std::int_fast32_t>(FontSize + 1.0F);
@@ -86,14 +86,14 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				lwmf::IntPointStruct i0{};
 				lwmf::IntPointStruct i1{};
 
-				stbtt_GetCodepointBitmapBox(&FontInfo, Char, 1.0F, 1.0F, &i0.X, &i0.Y, &i1.X, &i1.Y);
+				stbtt_GetCodepointBitmapBox(FontInfo, Char, 1.0F, 1.0F, &i0.X, &i0.Y, &i1.X, &i1.Y);
 				Width += 1 + static_cast<std::int_fast32_t>((i1.X * FontSize / 1000.0F) + 1.0F) - static_cast<std::int_fast32_t>(i0.X * FontSize / 1000.0F);
 			}
 
 			std::vector<unsigned char> BakedFontGreyscale(Width * Height);
 			std::vector<std::int_fast32_t> FontColor(Width * Height);
-			stbtt_bakedchar CharData[NumberOfASCIIChars];
-			stbtt_BakeFontBitmap(reinterpret_cast<unsigned char*>(FontBuffer.data()), 0, FontSize, BakedFontGreyscale.data(), Width, Height, FirstASCIIChar, NumberOfASCIIChars, CharData);
+			std::vector<stbtt_bakedchar> CharData(NumberOfASCIIChars);
+			stbtt_BakeFontBitmap(FontBuffer, 0, FontSize, BakedFontGreyscale.data(), Width, Height, FirstASCIIChar, NumberOfASCIIChars, CharData.data());
 
 			// Since the glyphs were rendered in greyscale, they need to be colored...
 			for (std::int_fast32_t i{}; i < BakedFontGreyscale.size(); ++i)
@@ -107,7 +107,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			{
 				lwmf::FloatPointStruct QuadPos{};
 				stbtt_aligned_quad Quad;
-				stbtt_GetBakedQuad(CharData, Width, Height, Char - FirstASCIIChar, &QuadPos.X, &QuadPos.Y, &Quad, 1);
+				stbtt_GetBakedQuad(CharData, Width, Height, Char - FirstASCIIChar, QuadPos.X, QuadPos.Y, Quad, 1);
 
 				lwmf::IntPointStruct Pos{};
 
