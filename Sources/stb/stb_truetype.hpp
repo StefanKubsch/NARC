@@ -129,9 +129,9 @@
 ////
 
 // private structure
-using stbtt__buf = struct
+struct stbtt__buf
 {
-	unsigned char* data{};
+	std::vector<unsigned char> data;
 	std::int_fast32_t cursor{};
 	std::int_fast32_t size{};
 };
@@ -143,7 +143,7 @@ using stbtt__buf = struct
 // If you use this API, you only have to call two functions ever.
 //
 
-using stbtt_bakedchar = struct
+struct stbtt_bakedchar
 {
 	// coordinates of bbox in bitmap
 	std::int_fast32_t x0{};
@@ -165,7 +165,7 @@ std::int_fast32_t stbtt_BakeFontBitmap(const std::vector<unsigned char>& data, s
 // if return is 0, no characters fit and no rows were used
 // This uses a very crappy packing.
 
-using stbtt_aligned_quad = struct
+struct stbtt_aligned_quad
 {
 	// top-left
 	float x0{};
@@ -275,7 +275,7 @@ enum class GlyphShapeType
 	STBTT_vcubic	= 4
 };
 
-using stbtt_vertex = struct
+struct stbtt_vertex
 {
 	short x{};
 	short y{};
@@ -322,7 +322,7 @@ void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo& info, unsigned char* ou
 void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo& font, std::int_fast32_t glyph, float scale_x, float scale_y, std::int_fast32_t* ix0, std::int_fast32_t* iy0, std::int_fast32_t* ix1, std::int_fast32_t* iy1);
 void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo& font, std::int_fast32_t glyph, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t* ix0, std::int_fast32_t* iy0, std::int_fast32_t* ix1, std::int_fast32_t* iy1);
 
-using stbtt__bitmap = struct
+struct stbtt__bitmap
 {
 	std::int_fast32_t w{};
 	std::int_fast32_t h{};
@@ -425,7 +425,7 @@ inline static std::int_fast32_t stbtt__buf_get(stbtt__buf& b, const std::int_fas
 inline static stbtt__buf stbtt__new_buf(void* p, const size_t size)
 {
 	stbtt__buf r{};
-	r.data = static_cast<unsigned char*>(p);
+	std::memcpy(r.data.data(), p, size * sizeof(void*));
 	r.size = static_cast<std::int_fast32_t>(size);
 	r.cursor = 0;
 	return r;
@@ -440,9 +440,8 @@ inline static stbtt__buf stbtt__buf_range(const stbtt__buf& b, const std::int_fa
 		return r;
 	}
 
-	r.data = b.data + o;
+	std::memcpy(r.data.data(), reinterpret_cast<void*>(b.data[o]), s * sizeof(void*));
 	r.size = s;
-
 	return r;
 }
 
@@ -598,7 +597,7 @@ inline static std::int_fast32_t ttULONG(const unsigned char* p)
 	return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3];
 }
 
-inline static std::int_fast32_t stbtt__find_table(const unsigned char* data, const std::int_fast32_t fontstart, const char* tag)
+inline static std::int_fast32_t stbtt__find_table(const unsigned char* data, const std::int_fast32_t fontstart, const std::string& tag)
 {
 	const std::int_fast32_t num_tables{ ttUSHORT(data + fontstart + 4) };
 	const std::int_fast32_t tabledir{ fontstart + 12 };
