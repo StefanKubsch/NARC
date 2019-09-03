@@ -72,7 +72,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			// This makes 96 printable chars
 
 			stbtt_fontinfo FontInfo{};
-			stbtt_InitFont(FontInfo, reinterpret_cast<unsigned char*>(FontBuffer.data()), 0);
+			stbtt_InitFont(FontInfo, FontBuffer, 0);
 
 			std::int_fast32_t Width{};
 			FontHeight = static_cast<std::int_fast32_t>(FontSize + 1.0F);

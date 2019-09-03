@@ -56,6 +56,12 @@ namespace lwmf
 		// Create window
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Create window...");
+
+		if (Width <= 0 || Height <= 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Value for window width or height is zero or negative! Check your parameters in lwmf::CreateOpenGLWindow()!");
+		}
+
 		WNDCLASS WindowClass{};
 		WindowClass.lpfnWndProc = WndProc;
 		WindowClass.hInstance = hInstance;
@@ -86,7 +92,7 @@ namespace lwmf
 					dwStyle = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 					ShowCursor(FALSE);
 
-					FullscreenFlag = 1;
+					FullscreenFlag = true;
 				}
 			}
 

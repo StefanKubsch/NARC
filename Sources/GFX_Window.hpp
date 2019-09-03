@@ -38,7 +38,7 @@ namespace GFX_Window
 			VSync ?	lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 
 			// Fullscreenflag is always true, since window cannot be resized - so we can create faster OpenGL textures
-			lwmf::FullscreenFlag = 1;
+			lwmf::FullscreenFlag = true;
 			lwmf::InitOpenGLLoader();
 
 			ScreenTextureShader.LoadShader("Default", ScreenTexture);

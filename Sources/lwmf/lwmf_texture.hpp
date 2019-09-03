@@ -31,20 +31,18 @@ namespace lwmf
 		std::int_fast32_t HeightMid{};
 	};
 
+	enum class FilterModes
+	{
+		NEAREST,
+		BILINEAR
+	};
+
 	void SetTextureMetrics(TextureStruct& Texture, std::int_fast32_t Width, std::int_fast32_t Height);
 	void CropTexture(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Width, std::int_fast32_t Height);
-	void ResizeTexture(TextureStruct& Texture, std::int_fast32_t TargetWidth, std::int_fast32_t TargetHeight, std::int_fast32_t FilterMode);
+	void ResizeTexture(TextureStruct& Texture, std::int_fast32_t TargetWidth, std::int_fast32_t TargetHeight, FilterModes FilterMode);
 	void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, std::int_fast32_t PosX, std::int_fast32_t PosY);
 	void BlitTransTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t TransparentColor);
 	void ClearTexture(TextureStruct& Texture, std::int_fast32_t Color);
-
-	//
-	// Variables and constants
-	//
-
-	// Define Filtermodes for ResizeBMP
-	constexpr std::int_fast32_t NEAREST{ 1 };
-	constexpr std::int_fast32_t BILINEAR{ 2 };
 
 	//
 	// Functions
@@ -52,6 +50,11 @@ namespace lwmf
 
 	inline void SetTextureMetrics(TextureStruct& Texture, const std::int_fast32_t Width, const std::int_fast32_t Height)
 	{
+		if (Width <= 0 || Height <= 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::SetTextureMetrics()!");
+		}
+
 		Texture.Width = Width;
 		Texture.Height = Height;
 		Texture.WidthMid = Width >> 1;
@@ -60,8 +63,22 @@ namespace lwmf
 		Texture.Stride = static_cast<size_t>(Width) << 2;
 	}
 
-	inline void CropTexture(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Width, const std::int_fast32_t Height)
+	inline void CropTexture(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, std::int_fast32_t Width, std::int_fast32_t Height)
 	{
+		if (Width <= 0 || Height <= 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::CropTexture()!");
+		}
+
+		if (x < 0 || y < 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Value for texture x or y is negative! Check your parameters in lwmf::CropTexture()!");
+		}
+
+		// Make sure that Width and Height are within texture size limits!
+		Width = std::clamp(Width, 0, Texture.Width);
+		Height = std::clamp(Height, 0, Texture.Height);
+
 		std::vector<std::int_fast32_t>TempBuffer(Width * Height);
 		std::int_fast32_t SourceVerticalOffset{ y * Texture.Width };
 		std::int_fast32_t DestVerticalOffset{};
@@ -77,7 +94,16 @@ namespace lwmf
 			{
 				DestTotalOffset = DestVerticalOffset + DestHorizontalOffset;
 				SourceTotalOffset = SourceVerticalOffset + SourceHorizontalOffset;
-				TempBuffer[DestTotalOffset] = Texture.Pixels[SourceTotalOffset];
+
+				try
+				{
+					TempBuffer.at(static_cast<size_t>(DestTotalOffset)) = Texture.Pixels.at(static_cast<size_t>(SourceTotalOffset));
+				}
+				catch (const std::out_of_range& Error)
+				{
+					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
+				}
+
 				++DestHorizontalOffset;
 				++SourceHorizontalOffset;
 			}
@@ -90,58 +116,82 @@ namespace lwmf
 		SetTextureMetrics(Texture, Width, Height);
 	}
 
-	inline void ResizeTexture(TextureStruct& Texture, const std::int_fast32_t TargetWidth, const std::int_fast32_t TargetHeight, const std::int_fast32_t FilterMode)
+	inline void ResizeTexture(TextureStruct& Texture, const std::int_fast32_t TargetWidth, const std::int_fast32_t TargetHeight, const FilterModes FilterMode)
 	{
+		if (TargetWidth <= 0 || TargetHeight <= 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::ResizeTexture()!");
+		}
+
 		std::vector<std::int_fast32_t> TempBuffer(TargetWidth * TargetHeight);
 
-		if (FilterMode == NEAREST)
+		switch (FilterMode)
 		{
-			const IntPointStruct Ratio{ ((Texture.Width << 16) / TargetWidth) + 1, ((Texture.Height << 16) / TargetHeight) + 1 };
-
-			for (std::int_fast32_t Offset{}, i{}; i < TargetHeight; ++i)
+			case FilterModes::NEAREST:
 			{
-				const std::int_fast32_t TempY{ ((i * Ratio.Y) >> 16) * Texture.Width };
+				const IntPointStruct Ratio{ ((Texture.Width << 16) / TargetWidth) + 1, ((Texture.Height << 16) / TargetHeight) + 1 };
 
-				for (std::int_fast32_t j{}; j < TargetWidth; ++j)
+				for (std::int_fast32_t Offset{}, i{}; i < TargetHeight; ++i)
 				{
-					TempBuffer[Offset++] = Texture.Pixels[TempY + ((j * Ratio.X) >> 16)];
+					const std::int_fast32_t TempY{ ((i * Ratio.Y) >> 16) * Texture.Width };
+
+					for (std::int_fast32_t j{}; j < TargetWidth; ++j)
+					{
+						try
+						{
+							TempBuffer.at(static_cast<size_t>(Offset++)) = Texture.Pixels.at(static_cast<size_t>(TempY) + static_cast<size_t>(((j * Ratio.X) >> 16)));
+						}
+						catch (const std::out_of_range& Error)
+						{
+							LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
+						}
+					}
 				}
+				break;
+			}
+			case FilterModes::BILINEAR:
+			{
+				const FloatPointStruct Ratio{ static_cast<float>((Texture.Width - 1)) / TargetWidth, static_cast<float>((Texture.Height - 1)) / TargetHeight };
+
+				for (std::int_fast32_t Offset{}, i{}; i < TargetHeight; ++i)
+				{
+					const std::int_fast32_t PosY{ static_cast<std::int_fast32_t>(Ratio.Y * i) };
+					const std::int_fast32_t TempY{ PosY * Texture.Width };
+					const float Height{ Ratio.Y * i - PosY };
+
+					for (std::int_fast32_t j{}; j < TargetWidth; ++j)
+					{
+						const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(Ratio.X * j) };
+						const std::int_fast32_t Index{ TempY + PosX };
+
+						try
+						{
+							const std::int_fast32_t P1{ Texture.Pixels.at(static_cast<size_t>(Index)) };
+							const std::int_fast32_t P2{ Texture.Pixels.at(static_cast<size_t>(Index) + 1) };
+							const std::int_fast32_t P3{ Texture.Pixels.at(static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width)) };
+							const std::int_fast32_t P4{ Texture.Pixels.at(static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width) + 1) };
+
+							const float Width{ Ratio.X * j - PosX };
+							const float t1{ (1.0F - Width) * (1.0F - Height) };
+							const float t2{ Width * (1.0F - Height) };
+							const float t3{ Height * (1.0F - Width) };
+							const float t4{ Width * Height };
+
+							TempBuffer.at(static_cast<size_t>(Offset++)) = RGBAtoINT(
+								static_cast<std::int_fast32_t>((P1 & 255) * t1 + (P2 & 255) * t2 + (P3 & 255) * t3 + (P4 & 255) * t4),
+								static_cast<std::int_fast32_t>(((P1 >> 8) & 255) * t1 + ((P2 >> 8) & 255) * t2 + ((P3 >> 8) & 255) * t3 + ((P4 >> 8) & 255) * t4),
+								static_cast<std::int_fast32_t>(((P1 >> 16) & 255) * t1 + ((P2 >> 16) & 255) * t2 + ((P3 >> 16) & 255) * t3 + ((P4 >> 16) & 255) * t4)
+								, AMask);
+						}
+						catch (const std::out_of_range& Error)
+						{
+							LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
+						}
+					}
+				}
+				break;
 			}
 		}
-		else if (FilterMode == BILINEAR)
-		{
-			const FloatPointStruct Ratio{ static_cast<float>((Texture.Width - 1)) / TargetWidth, static_cast<float>((Texture.Height - 1)) / TargetHeight };
-
-			for (std::int_fast32_t Offset{}, i{}; i < TargetHeight; ++i)
-			{
-				const std::int_fast32_t PosY{ static_cast<std::int_fast32_t>(Ratio.Y * i) };
-				const std::int_fast32_t TempY{ PosY * Texture.Width };
-				const float Height{ Ratio.Y * i - PosY };
-
-				for (std::int_fast32_t j{}; j < TargetWidth; ++j)
-				{
-					const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(Ratio.X * j) };
-					const std::int_fast32_t Index{ TempY + PosX };
-					const std::int_fast32_t P1{ Texture.Pixels[Index] };
-					const std::int_fast32_t P2{ Texture.Pixels[Index + 1] };
-					const std::int_fast32_t P3{ Texture.Pixels[Index + Texture.Width] };
-					const std::int_fast32_t P4{ Texture.Pixels[Index + Texture.Width + 1] };
-
-					const float Width{ Ratio.X * j - PosX };
-					const float t1{ (1.0F - Width) * (1.0F - Height) };
-					const float t2{ Width * (1.0F - Height) };
-					const float t3{ Height * (1.0F - Width) };
-					const float t4{ Width * Height };
-
-					TempBuffer[Offset++] = RGBAtoINT(
-						static_cast<std::int_fast32_t>((P1 & 255) * t1 + (P2 & 255) * t2 + (P3 & 255) * t3 + (P4 & 255) * t4),
-						static_cast<std::int_fast32_t>(((P1 >> 8) & 255) * t1 + ((P2 >> 8) & 255) * t2 + ((P3 >> 8) & 255) * t3 + ((P4 >> 8) & 255) * t4),
-						static_cast<std::int_fast32_t>(((P1 >> 16) & 255) * t1 + ((P2 >> 16) & 255) * t2 + ((P3 >> 16) & 255) * t3 + ((P4 >> 16) & 255) * t4)
-						, AMask);
-				}
-			}
-		}
-
 		Texture.Pixels = std::move(TempBuffer);
 		SetTextureMetrics(Texture, TargetWidth, TargetHeight);
 	}

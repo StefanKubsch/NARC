@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <string>
 #include <regex>
+#include <vector>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -39,7 +40,7 @@ namespace lwmf
 		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
 
 		T OutputVar{};
-		std::ifstream INIFile(INIFileName);
+		std::ifstream INIFile(INIFileName, std::ios::in);
 		std::smatch Match;
 		std::string CurrentSection;
 		std::string Line;
@@ -84,7 +85,7 @@ namespace lwmf
 		// Read INI file into vector of strings
 
 		std::vector<std::string> VectorOfStrings;
-		std::ifstream InputINIFile(INIFileName);
+		std::ifstream InputINIFile(INIFileName, std::ios::in);
 		std::string InputLine;
 
 		while (std::getline(InputINIFile, InputLine))
@@ -100,7 +101,7 @@ namespace lwmf
 		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
 
 		std::string CurrentSection;
-		std::ofstream OutputINIFile(INIFileName);
+		std::ofstream OutputINIFile(INIFileName, std::ios::in);
 		std::smatch Match;
 
 		for (auto&& Line : VectorOfStrings)

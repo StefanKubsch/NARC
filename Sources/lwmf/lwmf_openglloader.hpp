@@ -97,8 +97,14 @@ namespace lwmf
 		}
 	}
 
-	inline void SetVSync(const std::int_fast32_t Sync)
+	inline void SetVSync(std::int_fast32_t Sync)
 	{
+		if (Sync != 0 && Sync != -1)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "lwmf::SetVSync() must be either 0(off) or -1(on). Assuming lwmf::SetVSync(-1)!");
+			Sync = -1;
+		}
+
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Set vsync (" + std::to_string(Sync) + ")...");
 		using PFNWGLSWAPINTERVALFARPROC = PROC WINAPI(std::int_fast32_t);
 		PFNWGLSWAPINTERVALFARPROC* wglSwapIntervalEXT{ reinterpret_cast<PFNWGLSWAPINTERVALFARPROC*>(wglGetProcAddress("wglSwapIntervalEXT")) };

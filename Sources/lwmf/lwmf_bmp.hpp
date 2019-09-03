@@ -65,7 +65,15 @@ namespace lwmf
 				for (std::int_fast32_t x{}; x < Texture.Width; ++x)
 				{
 					const std::int_fast32_t TempPos{ 3 * (TempY + x) };
-					Texture.Pixels[Offset++] = RGBAtoINT(InputBuffer[TempPos + 2] & 255, InputBuffer[TempPos + 1] & 255, InputBuffer[TempPos] & 255, 255);
+
+					try
+					{
+						Texture.Pixels.at(static_cast<size_t>(Offset++)) = RGBAtoINT(InputBuffer.at(static_cast<size_t>(TempPos) + 2) & 255, InputBuffer.at(static_cast<size_t>(TempPos) + 1) & 255, InputBuffer.at(static_cast<size_t>(TempPos)) & 255, 255);
+					}
+					catch (const std::out_of_range& Error)
+					{
+						LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
+					}
 				}
 			}
 		}
