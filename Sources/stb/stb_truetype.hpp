@@ -365,15 +365,6 @@ enum class encodingIDMicrosoft // for STBTT_PLATFORM_ID_MICROSOFT
 ////
 
 #ifdef STB_TRUETYPE_IMPLEMENTATION
-constexpr std::int_fast32_t STBTT_MAX_OVERSAMPLE{ 8 };
-
-using stbtt__test_oversample_pow2 = std::int_fast32_t[(STBTT_MAX_OVERSAMPLE & (STBTT_MAX_OVERSAMPLE - 1)) == 0 ? 1 : -1];
-
-#ifdef _MSC_VER
-	#define STBTT__NOTUSED(v)  static_cast<void>(v)
-#else
-	#define STBTT__NOTUSED(v)  static_cast<void>(sizeof(v))
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -491,28 +482,6 @@ inline static std::int_fast32_t stbtt__cff_int(stbtt__buf& b)
 	return 0;
 }
 
-inline static void stbtt__cff_skip_operand(stbtt__buf& b)
-{
-	if (const std::int_fast32_t b0{ stbtt__buf_peek8(b) }; b0 == 30)
-	{
-		stbtt__buf_skip(b, 1);
-
-		while (b.cursor < b.size)
-		{
-			const std::int_fast32_t v{ stbtt__buf_get8(b) };
-
-			if ((v & 0xF) == 0xF || (v >> 4) == 0xF)
-			{
-				break;
-			}
-		}
-	}
-	else
-	{
-		stbtt__cff_int(b);
-	}
-}
-
 inline static stbtt__buf stbtt__dict_get(stbtt__buf& b, const std::int_fast32_t key)
 {
 	stbtt__buf_seek(b, 0);
@@ -523,7 +492,24 @@ inline static stbtt__buf stbtt__dict_get(stbtt__buf& b, const std::int_fast32_t 
 
 		while (stbtt__buf_peek8(b) >= 28)
 		{
-			stbtt__cff_skip_operand(b);
+			if (const std::int_fast32_t b0{ stbtt__buf_peek8(b) }; b0 == 30)
+			{
+				stbtt__buf_skip(b, 1);
+
+				while (b.cursor < b.size)
+				{
+					const std::int_fast32_t v{ stbtt__buf_get8(b) };
+
+					if ((v & 0xF) == 0xF || (v >> 4) == 0xF)
+					{
+						break;
+					}
+				}
+			}
+			else
+			{
+				stbtt__cff_int(b);
+			}
 		}
 
 		const std::int_fast32_t end{ b.cursor };
@@ -543,7 +529,7 @@ inline static stbtt__buf stbtt__dict_get(stbtt__buf& b, const std::int_fast32_t 
 	return stbtt__buf_range(b, 0, 0);
 }
 
-inline static void stbtt__dict_get_ints(stbtt__buf& b, const std::int_fast32_t key, const std::int_fast32_t outcount, std::int_fast32_t* out)
+inline static void stbtt__dict_get_ints(stbtt__buf& b, const std::int_fast32_t key, const std::int_fast32_t outcount, std::vector<std::int_fast32_t>& out)
 {
 	stbtt__buf operands{ stbtt__dict_get(b, key) };
 
@@ -551,13 +537,6 @@ inline static void stbtt__dict_get_ints(stbtt__buf& b, const std::int_fast32_t k
 	{
 		out[i] = stbtt__cff_int(operands);
 	}
-}
-
-inline static std::int_fast32_t stbtt__cff_index_count(stbtt__buf& b)
-{
-	stbtt__buf_seek(b, 0);
-
-	return stbtt__buf_get((b), 2);
 }
 
 inline static stbtt__buf stbtt__cff_index_get(stbtt__buf b, const std::int_fast32_t i)
@@ -619,7 +598,7 @@ inline static stbtt__buf stbtt__get_subrs(stbtt__buf cff, stbtt__buf fontdict)
 {
 	std::vector<std::int_fast32_t> private_loc(2);
 
-	stbtt__dict_get_ints(fontdict, 18, 2, private_loc.data());
+	stbtt__dict_get_ints(fontdict, 18, 2, private_loc);
 
 	if (private_loc[1] == 0 || private_loc[0] == 0)
 	{
@@ -628,16 +607,16 @@ inline static stbtt__buf stbtt__get_subrs(stbtt__buf cff, stbtt__buf fontdict)
 
 	stbtt__buf pdict{ stbtt__buf_range(cff, private_loc[1], private_loc[0]) };
 
-	std::int_fast32_t subrsoff{};
+	std::vector<std::int_fast32_t> subrsoff;
 
-	stbtt__dict_get_ints(pdict, 19, 1, &subrsoff);
+	stbtt__dict_get_ints(pdict, 19, 1, subrsoff);
 
-	if (subrsoff == 0)
+	if (subrsoff.empty())
 	{
 		return stbtt__new_buf(nullptr, 0);
 	}
 
-	stbtt__buf_seek(cff, private_loc[1] + subrsoff);
+	stbtt__buf_seek(cff, private_loc[1] + subrsoff[0]);
 
 	return stbtt__cff_get_index(cff);
 }
@@ -700,42 +679,42 @@ inline static std::int_fast32_t stbtt_InitFont_internal(stbtt_fontinfo& info, un
 		stbtt__cff_get_index(b);  // string INDEX
 		info.gsubrs = stbtt__cff_get_index(b);
 
-		std::int_fast32_t cstype{ 2 };
-		std::int_fast32_t charstrings{};
-		std::int_fast32_t fdarrayoff{};
-		std::int_fast32_t fdselectoff{};
+		std::vector<std::int_fast32_t> cstype(2);
+		std::vector<std::int_fast32_t> charstrings(1);
+		std::vector<std::int_fast32_t> fdarrayoff(1);
+		std::vector<std::int_fast32_t> fdselectoff(1);
 
-		stbtt__dict_get_ints(topdict, 17, 1, &charstrings);
-		stbtt__dict_get_ints(topdict, 0x100 | 6, 1, &cstype);
-		stbtt__dict_get_ints(topdict, 0x100 | 36, 1, &fdarrayoff);
-		stbtt__dict_get_ints(topdict, 0x100 | 37, 1, &fdselectoff);
+		stbtt__dict_get_ints(topdict, 17, 1, charstrings);
+		stbtt__dict_get_ints(topdict, 0x100 | 6, 1, cstype);
+		stbtt__dict_get_ints(topdict, 0x100 | 36, 1, fdarrayoff);
+		stbtt__dict_get_ints(topdict, 0x100 | 37, 1, fdselectoff);
 		info.subrs = stbtt__get_subrs(b, topdict);
 
 		// we only support Type 2 charstrings
-		if (cstype != 2)
+		if (cstype[0] != 2)
 		{
 			return 0;
 		}
 
-		if (charstrings == 0)
+		if (charstrings[0] == 0)
 		{
 			return 0;
 		}
 
-		if (fdarrayoff != 0)
+		if (fdarrayoff[0] != 0)
 		{
 			// looks like a CID font
-			if (fdselectoff == 0)
+			if (fdselectoff[0] == 0)
 			{
 				return 0;
 			}
 
-			stbtt__buf_seek(b, fdarrayoff);
+			stbtt__buf_seek(b, fdarrayoff[0]);
 			info.fontdicts = stbtt__cff_get_index(b);
-			info.fdselect = stbtt__buf_range(b, fdselectoff, b.size-fdselectoff);
+			info.fdselect = stbtt__buf_range(b, fdselectoff[0], b.size - fdselectoff[0]);
 		}
 
-		stbtt__buf_seek(b, charstrings);
+		stbtt__buf_seek(b, charstrings[0]);
 		info.charstrings = stbtt__cff_get_index(b);
 	}
 
@@ -1449,7 +1428,8 @@ inline static void stbtt__csctx_rccurve_to(stbtt__csctx& ctx, const float dx1, c
 
 inline static stbtt__buf stbtt__get_subr(stbtt__buf idx, std::int_fast32_t n)
 {
-	const std::int_fast32_t count{ stbtt__cff_index_count(idx) };
+	stbtt__buf_seek(idx, 0);
+	const std::int_fast32_t count{ stbtt__buf_get((idx), 2) };
 	std::int_fast32_t bias{ 107 };
 
 	if (count >= 33900)
@@ -2586,8 +2566,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 	stbtt__active_edge* active{};
 	std::vector<float> scanline_data(129);
 
-	STBTT__NOTUSED(vsubsample);
-
+	static_cast<void>(vsubsample);
 	float* scanline{ (result.w > 64) ? new float[result.w * 2 + 1] : scanline_data.data() };
 	float* scanline2{ scanline + result.w };
 	std::int_fast32_t y{ off_y };
@@ -2819,9 +2798,9 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, co
 		n += wcount[i];
 	}
 
-	stbtt__edge* e{ new stbtt__edge[n + 1] }; // add an extra one as a sentinel //-V121
+	std::vector<stbtt__edge> e(n + 1); // add an extra one as a sentinel //-V121
 
-	if (e == nullptr) //-V668
+	if (e.empty())
 	{
 		return;
 	}
@@ -2871,17 +2850,15 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, co
 
 	// now sort the edges by their highest point (should snap to integer, and then by x)
 	//STBTT_sort(e, n, sizeof(e[0]), stbtt__edge_compare);
-	stbtt__sort_edges(e, n);
+	stbtt__sort_edges(e.data(), n);
 
 	// now, traverse the scanlines and find the intersections on each scanline, use xor winding rule
-	stbtt__rasterize_sorted_edges(result, e, n, vsubsample, off_x, off_y, userdata);
-
-	delete[] e;
+	stbtt__rasterize_sorted_edges(result, e.data(), n, vsubsample, off_x, off_y, userdata);
 }
 
-inline static void stbtt__add_point(stbtt__point* points, const std::int_fast32_t n, const float x, const float y)
+inline static void stbtt__add_point(std::vector<stbtt__point>& points, const std::int_fast32_t n, const float x, const float y)
 {
-	if (points == nullptr)
+	if (points.empty())
 	{
 		return; // during first pass, it's unallocated
 	}
@@ -2891,7 +2868,7 @@ inline static void stbtt__add_point(stbtt__point* points, const std::int_fast32_
 }
 
 // tessellate until threshold p is happy...
-inline static std::int_fast32_t stbtt__tesselate_curve(stbtt__point* points, std::int_fast32_t& num_points, const float x0, const float y0, const float x1, const float y1, const float x2, const float y2, const float objspace_flatness_squared, const std::int_fast32_t n)
+inline static std::int_fast32_t stbtt__tesselate_curve(std::vector<stbtt__point>& points, std::int_fast32_t& num_points, const float x0, const float y0, const float x1, const float y1, const float x2, const float y2, const float objspace_flatness_squared, const std::int_fast32_t n)
 {
 	if (n > 16) // 65536 segments on one curve better be enough!
 	{
@@ -2919,7 +2896,7 @@ inline static std::int_fast32_t stbtt__tesselate_curve(stbtt__point* points, std
 	return 1;
 }
 
-inline static void stbtt__tesselate_cubic(stbtt__point* points, std::int_fast32_t& num_points, const float x0, const float y0, const float x1, const float y1, const float x2, const float y2, const float x3, const float y3, const float objspace_flatness_squared, const std::int_fast32_t n)
+inline static void stbtt__tesselate_cubic(std::vector<stbtt__point>& points, std::int_fast32_t& num_points, const float x0, const float y0, const float x1, const float y1, const float x2, const float y2, const float x3, const float y3, const float objspace_flatness_squared, const std::int_fast32_t n)
 {
 	if (n > 16) // 65536 segments on one curve better be enough!
 	{
@@ -2966,7 +2943,7 @@ inline static void stbtt__tesselate_cubic(stbtt__point* points, std::int_fast32_
 }
 
 // returns number of contours
-inline static stbtt__point* stbtt_FlattenCurves(stbtt_vertex* vertices, const std::int_fast32_t num_verts, const float objspace_flatness, std::int_fast32_t** contour_lengths, std::int_fast32_t& num_contours)
+inline static std::vector<stbtt__point> stbtt_FlattenCurves(stbtt_vertex* vertices, const std::int_fast32_t num_verts, const float objspace_flatness, std::int_fast32_t** contour_lengths, std::int_fast32_t& num_contours)
 {
 	std::int_fast32_t n{};
 
@@ -2981,7 +2958,7 @@ inline static stbtt__point* stbtt_FlattenCurves(stbtt_vertex* vertices, const st
 
 	if (n == 0)
 	{
-		return nullptr;
+		return {};
 	}
 
 	*contour_lengths = new int_fast32_t[n]; //-V121
@@ -2989,12 +2966,12 @@ inline static stbtt__point* stbtt_FlattenCurves(stbtt_vertex* vertices, const st
 	if (*contour_lengths == nullptr)
 	{
 		num_contours = 0;
-		return nullptr;
+		return {};
 	}
 
 	num_contours = n;
 	const float objspace_flatness_squared{ objspace_flatness * objspace_flatness };
-	stbtt__point* points{};
+	std::vector<stbtt__point> points;
 	std::int_fast32_t num_points{};
 	std::int_fast32_t start{};
 
@@ -3006,14 +2983,13 @@ inline static stbtt__point* stbtt_FlattenCurves(stbtt_vertex* vertices, const st
 
 		if (pass == 1)
 		{
-			points = new stbtt__point[num_points]; //-V121
+			points.resize(num_points);
 
-			if (points == nullptr) //-V668
+			if (points.empty()) //-V668
 			{
-				delete[] points;
 				delete[] *contour_lengths;
 				num_contours = 0;
-				return nullptr;
+				return {};
 			}
 		}
 
@@ -3076,12 +3052,11 @@ inline void stbtt_Rasterize(stbtt__bitmap& result, const float flatness_in_pixel
 	std::int_fast32_t winding_count{};
 	std::unique_ptr<std::int_fast32_t> winding_lengths;
 
-	stbtt__point* windings{ stbtt_FlattenCurves(vertices, num_verts, flatness_in_pixels / scale, reinterpret_cast<std::int_fast32_t**>(&winding_lengths), winding_count) };
+	std::vector<stbtt__point> windings{ stbtt_FlattenCurves(vertices, num_verts, flatness_in_pixels / scale, reinterpret_cast<std::int_fast32_t**>(&winding_lengths), winding_count) };
 
-	if (windings != nullptr)
+	if (!windings.empty())
 	{
-		stbtt__rasterize(result, windings, winding_lengths.get(), winding_count, scale_x, scale_y, shift_x, shift_y, x_off, y_off, invert, userdata);
-		static_cast<void>(userdata), free(windings);
+		stbtt__rasterize(result, windings.data(), winding_lengths.get(), winding_count, scale_x, scale_y, shift_x, shift_y, x_off, y_off, invert, userdata);
 	}
 }
 
