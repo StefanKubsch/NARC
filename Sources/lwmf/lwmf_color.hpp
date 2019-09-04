@@ -75,7 +75,7 @@ namespace lwmf
 			_mm_mul_ps(_mm_setr_ps(static_cast<float>(Color1 & RMask), static_cast<float>(Color1 & GMask), static_cast<float>(Color1 & BMask), 0.0F), _mm_set_ps1(1.0F - Ratio)),
 			_mm_mul_ps(_mm_setr_ps(static_cast<float>(Color2 & RMask), static_cast<float>(Color2 & GMask), static_cast<float>(Color2 & BMask), 0.0F), _mm_set_ps1(Ratio)))) };
 
-		return _mm_extract_epi32(ResultVec, 0) | (_mm_extract_epi32(ResultVec, 1) & GMask) | (_mm_extract_epi32(ResultVec, 2) & BMask) | (Color2 & AMask);
+		return static_cast<std::int_fast32_t>(_mm_extract_epi32(ResultVec, 0) | (_mm_extract_epi32(ResultVec, 1) & GMask) | (_mm_extract_epi32(ResultVec, 2) & BMask) | (Color2 & AMask));
 	}
 
 

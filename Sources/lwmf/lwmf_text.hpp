@@ -144,14 +144,14 @@ namespace lwmf
 			{
 				for (std::int_fast32_t y{}; y < 8; ++y)
 				{
-					const std::int_fast32_t TempY{ ((PosY + y) * Texture.Width) + PosX };
+					const std::int_fast32_t TempY{ PosY + y };
 					const std::int_fast32_t TempChar{ ASCIIFont8x8[Char - 32][y] };
 
 					for (std::int_fast32_t x{}; x < 8; ++x)
 					{
 						if ((TempChar & 1 << x) != 0)
 						{
-							Texture.Pixels[TempY + x] = Color;
+							SetPixelSafe(Texture, PosX + x, TempY, Color);
 						}
 					}
 				}

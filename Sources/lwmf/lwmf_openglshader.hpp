@@ -46,7 +46,7 @@ namespace lwmf
 		void UpdateVertices(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
 		const std::string LoadShaderSource(const std::string& FileName, const std::string& ShaderName);
 		void CheckError(std::int_fast32_t Line);
-		void CheckCompileError(GLint Task, Components Component);
+		void CheckCompileError(GLuint Task, Components Component);
 
 		std::vector<GLfloat> Vertices;
 		GLint OpacityLocation{};
@@ -125,7 +125,7 @@ namespace lwmf
 		const std::string VertexShaderString{ LoadShaderSource(VertexShaderPath + ShaderName + VertexShaderFileSuffix, ShaderName) };
 		const GLchar* VertexShaderSource{ VertexShaderString.c_str() };
 		const GLint VertexShaderSourceLength{ static_cast<GLint>(VertexShaderString.size()) };
-		const GLint VertexShader{ glCreateShader(GL_VERTEX_SHADER) };
+		const GLuint VertexShader{ static_cast<GLuint>(glCreateShader(GL_VERTEX_SHADER)) };
 		glCheckError();
 		glShaderSource(VertexShader, 1, &VertexShaderSource, &VertexShaderSourceLength);
 		glCheckError();
@@ -137,7 +137,7 @@ namespace lwmf
 		const std::string FragmentShaderString{ LoadShaderSource(FragmentShaderPath + ShaderName + FragmentShaderFileSuffix, ShaderName) };
 		const GLchar* FragmentShaderSource{ FragmentShaderString.c_str() };
 		const GLint FragmentShaderSourceLength{ static_cast<GLint>(FragmentShaderString.size()) };
-		const GLint FragmentShader{ glCreateShader(GL_FRAGMENT_SHADER) };
+		const GLuint FragmentShader{ static_cast<GLuint>(glCreateShader(GL_FRAGMENT_SHADER)) };
 		glCheckError();
 		glShaderSource(FragmentShader, 1, &FragmentShaderSource, &FragmentShaderSourceLength);
 		glCheckError();
@@ -146,7 +146,7 @@ namespace lwmf
 		CheckCompileError(FragmentShader, Components::Shader);
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Link the vertex and fragment shader into a shader program...");
-		ShaderProgram = glCreateProgram();
+		ShaderProgram = static_cast<GLuint>(glCreateProgram());
 		glCheckError();
 		glAttachShader(ShaderProgram, VertexShader);
 		glCheckError();
@@ -164,14 +164,14 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Specify the layout of the vertex data...");
-		const GLint PositionAttrib{ glGetAttribLocation(ShaderProgram, "position") };
+		const GLuint PositionAttrib{ static_cast<GLuint>(glGetAttribLocation(ShaderProgram, "position")) };
 		glCheckError();
 		glEnableVertexAttribArray(PositionAttrib);
 		glCheckError();
 		glVertexAttribPointer(PositionAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
 		glCheckError();
 
-		const GLint TextureAttrib{ glGetAttribLocation(ShaderProgram, "texcoord") };
+		const GLuint TextureAttrib{ static_cast<GLuint>(glGetAttribLocation(ShaderProgram, "texcoord")) };
 		glCheckError();
 		glEnableVertexAttribArray(TextureAttrib);
 		glCheckError();
@@ -437,7 +437,7 @@ namespace lwmf
 		}
 	}
 
-	inline void ShaderClass::CheckCompileError(const GLint Task, const Components Component)
+	inline void ShaderClass::CheckCompileError(const GLuint Task, const Components Component)
 	{
 		GLint ErrorResult{};
 		std::vector<GLchar> ErrorLog(512);

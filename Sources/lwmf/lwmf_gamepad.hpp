@@ -123,7 +123,7 @@ namespace lwmf
 
 	inline bool Gamepad::CheckConnection()
 	{
-		for (DWORD i{}; i < XUSER_MAX_COUNT && ControllerID == -1; ++i)
+		for (std::int_fast32_t i{}; i < XUSER_MAX_COUNT && ControllerID == -1; ++i)
 		{
 			XINPUT_STATE XInputState;
 			ZeroMemory(&XInputState, sizeof(XINPUT_STATE));

@@ -599,7 +599,7 @@ namespace lwmf
 						return;
 					}
 
-					for (std::int_fast32_t i{}; i < PNGInfo.Palette.size(); i += 4)
+					for (std::int_fast32_t i{}; i < static_cast<std::int_fast32_t>(PNGInfo.Palette.size()); i += 4)
 					{
 						for (std::int_fast32_t j{}; j < 3; ++j)
 						{

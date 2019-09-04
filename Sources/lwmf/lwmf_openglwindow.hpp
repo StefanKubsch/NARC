@@ -81,8 +81,8 @@ namespace lwmf
 				DEVMODE ScreenSettings;
 				std::memset(&ScreenSettings, 0, sizeof(ScreenSettings));
 				ScreenSettings.dmSize = sizeof(ScreenSettings);
-				ScreenSettings.dmPelsWidth = Width;
-				ScreenSettings.dmPelsHeight = Height;
+				ScreenSettings.dmPelsWidth = static_cast<DWORD>(Width);
+				ScreenSettings.dmPelsHeight = static_cast<DWORD>(Height);
 				ScreenSettings.dmBitsPerPel = 32;
 				ScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
