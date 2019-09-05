@@ -23,7 +23,6 @@ namespace lwmf
 	struct TextureStruct final
 	{
 		std::vector<std::int_fast32_t> Pixels;
-		size_t Stride{};
 		std::int_fast32_t Size{};
 		std::int_fast32_t Width{};
 		std::int_fast32_t Height{};
@@ -60,7 +59,6 @@ namespace lwmf
 		Texture.WidthMid = Width >> 1;
 		Texture.HeightMid = Height >> 1;
 		Texture.Size = Width * Height;
-		Texture.Stride = static_cast<size_t>(Width) << 2;
 	}
 
 	inline void CropTexture(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, std::int_fast32_t Width, std::int_fast32_t Height)
@@ -200,13 +198,13 @@ namespace lwmf
 	{
 		if (PosX == 0 && PosY == 0 && TargetTexture.Width == SourceTexture.Width && TargetTexture.Height == SourceTexture.Height)
 		{
-			std::memcpy(TargetTexture.Pixels.data(), SourceTexture.Pixels.data(), SourceTexture.Stride * static_cast<size_t>(SourceTexture.Height));
+			std::copy(SourceTexture.Pixels.begin(), SourceTexture.Pixels.end(), TargetTexture.Pixels.begin());
 		}
 		else
 		{
 			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
 			{
-				std::memcpy(TargetTexture.Pixels.data() + static_cast<size_t>(PosY) * static_cast<size_t>(SourceTexture.Width) + static_cast<size_t>(PosX), SourceTexture.Pixels.data() + static_cast<size_t>(y) * static_cast<size_t>(SourceTexture.Width), SourceTexture.Stride);
+				std::copy(SourceTexture.Pixels.begin() + y * SourceTexture.Width, SourceTexture.Pixels.begin() + y * SourceTexture.Width + SourceTexture.Width, TargetTexture.Pixels.begin() + PosY * TargetTexture.Width + PosX);
 			}
 		}
 	}
