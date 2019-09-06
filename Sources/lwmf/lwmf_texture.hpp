@@ -74,8 +74,8 @@ namespace lwmf
 		}
 
 		// Make sure that Width and Height are within texture size limits!
-		Width = std::clamp(Width, 0, Texture.Width);
-		Height = std::clamp(Height, 0, Texture.Height);
+		Width = std::clamp(Width, 0, Texture.Width - 1);
+		Height = std::clamp(Height, 0, Texture.Height - 1);
 
 		std::vector<std::int_fast32_t>TempBuffer(Width * Height);
 		std::int_fast32_t SourceVerticalOffset{ y * Texture.Width };
@@ -85,10 +85,7 @@ namespace lwmf
 
 		for (std::int_fast32_t i{}; i < Height; ++i)
 		{
-			std::int_fast32_t DestHorizontalOffset{};
-			std::int_fast32_t SourceHorizontalOffset{ x };
-
-			for (std::int_fast32_t j{}; j < Width; ++j)
+			for (std::int_fast32_t DestHorizontalOffset{}, SourceHorizontalOffset{ x }, j{}; j < Width; ++j)
 			{
 				DestTotalOffset = DestVerticalOffset + DestHorizontalOffset;
 				SourceTotalOffset = SourceVerticalOffset + SourceHorizontalOffset;
