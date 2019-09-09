@@ -90,14 +90,7 @@ namespace lwmf
 				DestTotalOffset = DestVerticalOffset + DestHorizontalOffset;
 				SourceTotalOffset = SourceVerticalOffset + SourceHorizontalOffset;
 
-				try
-				{
-					TempBuffer.at(static_cast<size_t>(DestTotalOffset)) = Texture.Pixels.at(static_cast<size_t>(SourceTotalOffset));
-				}
-				catch (const std::out_of_range& Error)
-				{
-					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
-				}
+				TempBuffer[static_cast<size_t>(DestTotalOffset)] = Texture.Pixels[static_cast<size_t>(SourceTotalOffset)];
 
 				++DestHorizontalOffset;
 				++SourceHorizontalOffset;
@@ -132,14 +125,7 @@ namespace lwmf
 
 					for (std::int_fast32_t j{}; j < TargetWidth; ++j)
 					{
-						try
-						{
-							TempBuffer.at(static_cast<size_t>(Offset++)) = Texture.Pixels.at(static_cast<size_t>(TempY) + static_cast<size_t>(((j * Ratio.X) >> 16)));
-						}
-						catch (const std::out_of_range& Error)
-						{
-							LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
-						}
+						TempBuffer[static_cast<size_t>(Offset++)] = Texture.Pixels[static_cast<size_t>(TempY) + static_cast<size_t>(((j * Ratio.X) >> 16))];
 					}
 				}
 				break;
@@ -159,29 +145,22 @@ namespace lwmf
 						const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(Ratio.X * j) };
 						const std::int_fast32_t Index{ TempY + PosX };
 
-						try
-						{
-							const std::int_fast32_t P1{ Texture.Pixels.at(static_cast<size_t>(Index)) };
-							const std::int_fast32_t P2{ Texture.Pixels.at(static_cast<size_t>(Index) + 1) };
-							const std::int_fast32_t P3{ Texture.Pixels.at(static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width)) };
-							const std::int_fast32_t P4{ Texture.Pixels.at(static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width) + 1) };
+						const std::int_fast32_t P1{ Texture.Pixels[static_cast<size_t>(Index)] };
+						const std::int_fast32_t P2{ Texture.Pixels[static_cast<size_t>(Index) + 1] };
+						const std::int_fast32_t P3{ Texture.Pixels[static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width)] };
+						const std::int_fast32_t P4{ Texture.Pixels[static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width) + 1] };
 
-							const float Width{ Ratio.X * j - PosX };
-							const float t1{ (1.0F - Width) * (1.0F - Height) };
-							const float t2{ Width * (1.0F - Height) };
-							const float t3{ Height * (1.0F - Width) };
-							const float t4{ Width * Height };
+						const float Width{ Ratio.X * j - PosX };
+						const float t1{ (1.0F - Width) * (1.0F - Height) };
+						const float t2{ Width * (1.0F - Height) };
+						const float t3{ Height * (1.0F - Width) };
+						const float t4{ Width * Height };
 
-							TempBuffer.at(static_cast<size_t>(Offset++)) = RGBAtoINT(
-								static_cast<std::int_fast32_t>((P1 & 255) * t1 + (P2 & 255) * t2 + (P3 & 255) * t3 + (P4 & 255) * t4),
-								static_cast<std::int_fast32_t>(((P1 >> 8) & 255) * t1 + ((P2 >> 8) & 255) * t2 + ((P3 >> 8) & 255) * t3 + ((P4 >> 8) & 255) * t4),
-								static_cast<std::int_fast32_t>(((P1 >> 16) & 255) * t1 + ((P2 >> 16) & 255) * t2 + ((P3 >> 16) & 255) * t3 + ((P4 >> 16) & 255) * t4)
-								, AMask);
-						}
-						catch (const std::out_of_range& Error)
-						{
-							LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
-						}
+						TempBuffer[static_cast<size_t>(Offset++)] = RGBAtoINT(
+							static_cast<std::int_fast32_t>((P1 & 255) * t1 + (P2 & 255) * t2 + (P3 & 255) * t3 + (P4 & 255) * t4),
+							static_cast<std::int_fast32_t>(((P1 >> 8) & 255) * t1 + ((P2 >> 8) & 255) * t2 + ((P3 >> 8) & 255) * t3 + ((P4 >> 8) & 255) * t4),
+							static_cast<std::int_fast32_t>(((P1 >> 16) & 255) * t1 + ((P2 >> 16) & 255) * t2 + ((P3 >> 16) & 255) * t3 + ((P4 >> 16) & 255) * t4)
+							, AMask);
 					}
 				}
 				break;
@@ -193,21 +172,53 @@ namespace lwmf
 
 	inline void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY)
 	{
+		// Case 1: Exit early if coords are out of visual boundaries
+		if (PosX + SourceTexture.Width < 0 || PosY + SourceTexture.Height < 0 || PosX > TargetTexture.Width || PosY > TargetTexture.Height)
+		{
+			return;
+		}
+
+		// Case 2: Bitmap fits 1:1 into target texture
 		if (PosX == 0 && PosY == 0 && TargetTexture.Width == SourceTexture.Width && TargetTexture.Height == SourceTexture.Height)
 		{
 			std::copy(SourceTexture.Pixels.begin(), SourceTexture.Pixels.end(), TargetTexture.Pixels.begin());
 		}
-		else
+		// Case 3: Bitmap fits (= smaller than target texture and within boundaries)
+		else if (PosX > 0 && PosY > 0 && SourceTexture.Width + PosX <= TargetTexture.Width && SourceTexture.Height + PosY <= TargetTexture.Height)
 		{
 			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
 			{
 				std::copy(SourceTexture.Pixels.begin() + y * SourceTexture.Width, SourceTexture.Pixels.begin() + y * SourceTexture.Width + SourceTexture.Width, TargetTexture.Pixels.begin() + PosY * TargetTexture.Width + PosX);
 			}
 		}
+		// Case 4: Each pixel has to be checked if within boundaries
+		else
+		{
+			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
+			{
+				const std::int_fast32_t DestOffset{ PosY * TargetTexture.Width };
+				const std::int_fast32_t SrcOffset{ y * SourceTexture.Width };
+
+				for (std::int_fast32_t x{}; x < SourceTexture.Width; ++x)
+				{
+					if (static_cast<std::uint_fast32_t>(PosX + x) < static_cast<std::uint_fast32_t>(TargetTexture.Width) && static_cast<std::uint_fast32_t>(PosY) < static_cast<std::uint_fast32_t>(TargetTexture.Height))
+					{
+						TargetTexture.Pixels[DestOffset + PosX + x] = SourceTexture.Pixels[SrcOffset + x];
+					}
+				}
+			}
+		}
 	}
 
 	inline void BlitTransTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY, const std::int_fast32_t TransparentColor)
 	{
+		// Case 1: Exit early if coords are out of visual boundaries
+		if (PosX + SourceTexture.Width < 0 || PosY + SourceTexture.Height < 0 || PosX > TargetTexture.Width || PosY > TargetTexture.Height)
+		{
+			return;
+		}
+
+		// Case 2: Bitmap fits 1:1 into target texture
 		if (PosX == 0 && PosY == 0 && TargetTexture.Width == SourceTexture.Width && TargetTexture.Height == SourceTexture.Height)
 		{
 			for (std::int_fast32_t i{}; i < SourceTexture.Size; ++i)
@@ -218,7 +229,8 @@ namespace lwmf
 				}
 			}
 		}
-		else
+		// Case 3: Bitmap fits (= smaller than target texture and within boundaries)
+		else if (PosX > 0 && PosY > 0 && SourceTexture.Width + PosX <= TargetTexture.Width && SourceTexture.Height + PosY <= TargetTexture.Height)
 		{
 			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
 			{
@@ -230,6 +242,26 @@ namespace lwmf
 					if (const std::int_fast32_t Color{ SourceTexture.Pixels[SrcOffset + x] }; Color != TransparentColor)
 					{
 						TargetTexture.Pixels[DestOffset + PosX + x] = Color;
+					}
+				}
+			}
+		}
+		// Case 4: Each pixel has to be checked if within boundaries
+		else
+		{
+			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
+			{
+				const std::int_fast32_t DestOffset{ PosY * TargetTexture.Width };
+				const std::int_fast32_t SrcOffset{ y * SourceTexture.Width };
+
+				for (std::int_fast32_t x{}; x < SourceTexture.Width; ++x)
+				{
+					if (static_cast<std::uint_fast32_t>(PosX + x) < static_cast<std::uint_fast32_t>(TargetTexture.Width) && static_cast<std::uint_fast32_t>(PosY) < static_cast<std::uint_fast32_t>(TargetTexture.Height))
+					{
+						if (const std::int_fast32_t Color{ SourceTexture.Pixels[SrcOffset + x] }; Color != TransparentColor)
+						{
+							TargetTexture.Pixels[DestOffset + PosX + x] = Color;
+						}
 					}
 				}
 			}
