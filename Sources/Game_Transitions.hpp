@@ -79,7 +79,7 @@ namespace Game_Transitions
 		const std::int_fast32_t HalfBits{ Bits >> 1 };
 		const std::int_fast32_t HalfMask{ static_cast<std::int_fast32_t>(std::pow(2, HalfBits)) - 1 };
 		std::int_fast32_t Frame{};
-		std::uint_fast64_t Lag{};
+		std::uint_fast32_t Lag{};
 		std::chrono::time_point<std::chrono::steady_clock> EndTime{ std::chrono::steady_clock::now() };
 
 		lwmf::SetVSync(-1);
@@ -89,7 +89,7 @@ namespace Game_Transitions
 			std::chrono::time_point<std::chrono::steady_clock> StartTime{ std::chrono::steady_clock::now() };
 			auto ElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(StartTime - EndTime));
 			EndTime = StartTime;
-			Lag += static_cast<std::uint_fast64_t>(ElapsedTime.count());
+			Lag += static_cast<std::uint_fast32_t>(ElapsedTime.count());
 
 			while (Lag >= LengthOfFrame)
 			{

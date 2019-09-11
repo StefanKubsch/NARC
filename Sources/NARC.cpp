@@ -116,7 +116,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	// loop until ESC is pressed
 
 	LengthOfFrame = 1000 / FrameLock;
-	std::uint_fast64_t Lag{};
+	std::uint_fast32_t Lag{};
 	std::chrono::time_point<std::chrono::steady_clock> EndTime{ std::chrono::steady_clock::now() };
 
 	while (!QuitGameFlag)
@@ -126,7 +126,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		std::chrono::time_point<std::chrono::steady_clock> StartTime{ std::chrono::steady_clock::now() };
 		auto ElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(StartTime - EndTime));
 		EndTime = StartTime;
-		Lag += static_cast<std::uint_fast64_t>(ElapsedTime.count());
+		Lag += static_cast<std::uint_fast32_t>(ElapsedTime.count());
 
 		HID_Gamepad::GameController.Refresh();
 

@@ -27,7 +27,7 @@ namespace lwmf
 	void BoundaryFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
 	void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
 	void Rectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
-	void FilledRectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
+	void FilledRectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
 	void Circle(TextureStruct& Texture, std::int_fast32_t CenterX, std::int_fast32_t CenterY, std::int_fast32_t Radius, std::int_fast32_t Color);
 	void FilledCircle(TextureStruct& Texture, std::int_fast32_t CenterX, std::int_fast32_t CenterY, std::int_fast32_t Radius, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
 	IntPointStruct GetPolygonCentroid(const std::vector<IntPointStruct>& Points);
@@ -282,7 +282,7 @@ namespace lwmf
 		Line(Texture, PosX + Width, PosY, PosX + Width, PosY + Height, Color);
 	}
 
-	inline void FilledRectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
+	inline void FilledRectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
 		// Exit early if coords are out of visual boundaries
 		if (PosX > Texture.Width || PosX + Width < 0 || PosY > Texture.Height || PosY + Height < 0)
@@ -292,7 +292,12 @@ namespace lwmf
 
 		for (std::int_fast32_t y{ PosY }; y <= PosY + Height; ++y)
 		{
-			Line(Texture, PosX, y, PosX + Width, y, Color);
+			Line(Texture, PosX, y, PosX + Width, y, FillColor);
+		}
+
+		if (BorderColor != FillColor)
+		{
+			Rectangle(Texture, PosX, PosY, Width, Height, BorderColor);
 		}
 	}
 
@@ -355,20 +360,17 @@ namespace lwmf
 			return;
 		}
 
-		Circle(Texture, CenterX, CenterY, Radius, BorderColor);
-
-		const std::int_fast32_t InnerRadius{ Radius - 1 };
-		const std::int_fast32_t PowInnerRadius{ InnerRadius * InnerRadius };
+		const std::int_fast32_t PowInnerRadius{ Radius * Radius };
 
 		// if complete circle is within screen boundaries, there is no reason to use SetPixelSafe...
 		if (CenterX - Radius >= 0 && CenterX + Radius < Texture.Width && CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)
 		{
-			for (std::int_fast32_t y{ -InnerRadius }; y <= InnerRadius; ++y)
+			for (std::int_fast32_t y{ -Radius }; y <= Radius; ++y)
 			{
 				const std::int_fast32_t PowY{ y * y };
 				const std::int_fast32_t TempY{ (CenterY + y) * Texture.Width };
 
-				for (std::int_fast32_t x{ -InnerRadius }; x <= InnerRadius; ++x)
+				for (std::int_fast32_t x{ -Radius }; x <= Radius; ++x)
 				{
 					if (x * x + PowY <= PowInnerRadius)
 					{
@@ -380,11 +382,11 @@ namespace lwmf
 		// ...or use the "safe" version!
 		else
 		{
-			for (std::int_fast32_t y{ -InnerRadius }; y <= InnerRadius; ++y)
+			for (std::int_fast32_t y{ -Radius }; y <= Radius; ++y)
 			{
 				const std::int_fast32_t PowY{ y * y };
 
-				for (std::int_fast32_t x{ -InnerRadius }; x <= InnerRadius; ++x)
+				for (std::int_fast32_t x{ -Radius }; x <= Radius; ++x)
 				{
 					if (x * x + PowY <= PowInnerRadius)
 					{
@@ -392,6 +394,11 @@ namespace lwmf
 					}
 				}
 			}
+		}
+
+		if (BorderColor != FillColor)
+		{
+			Circle(Texture, CenterX, CenterY, Radius, BorderColor);
 		}
 	}
 

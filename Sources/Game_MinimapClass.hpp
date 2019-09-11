@@ -91,39 +91,39 @@ inline void Game_MinimapClass::Display()
 		{
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, WallColor);
+				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, WallColor, WallColor);
 			}
 
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, DoorColor);
+				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, DoorColor, DoorColor);
 			}
 
 			switch (Game_EntityHandling::EntityMap[MapPosX][MapPosY])
 			{
 				case Game_EntityHandling::EntityTypes::Player:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, PlayerColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, PlayerColor, PlayerColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Enemy:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor); //-V1037
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor, EnemyColor); //-V1037
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Turret:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor, EnemyColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Neutral:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, NeutralColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, NeutralColor, NeutralColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::AmmoBox:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, AmmoBoxColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, AmmoBoxColor, AmmoBoxColor);
 					break;
 				}
 				default: {}

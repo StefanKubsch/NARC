@@ -30,9 +30,9 @@ namespace lwmf
 	// Variables and constants
 	//
 
-	inline std::uint_fast64_t FPSUpdate{};
-	inline std::int_fast64_t FPSFrames{};
-	inline std::int_fast64_t FPS{};
+	inline std::int_fast32_t FPSUpdate{};
+	inline std::int_fast32_t FPSFrames{};
+	inline std::int_fast32_t FPS{};
 
 	//
 	// Functions
@@ -40,7 +40,7 @@ namespace lwmf
 
 	inline void FPSCounter()
 	{
-		if (const std::uint_fast64_t SystemTime{ GetTickCount64() }; SystemTime - FPSUpdate >= 1000)
+		if (const std::int_fast32_t SystemTime{ static_cast<std::int_fast32_t>(GetTickCount()) }; SystemTime - FPSUpdate >= 1000)
 		{
 			FPS = FPSFrames;
 			FPSUpdate = SystemTime;
