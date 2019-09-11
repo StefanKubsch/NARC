@@ -67,28 +67,21 @@ namespace lwmf
 		Vertices.resize(16);
 
 		// Set texture coordinates
-		try
-		{
-			// Top-Left
-			Vertices.at(2) = 0.0F;
-			Vertices.at(3) = 0.0F;
+		// Top-Left
+		Vertices[2] = 0.0F;
+		Vertices[3] = 0.0F;
 
-			// Top-Right
-			Vertices.at(6) = 1.0F;
-			Vertices.at(7) = 0.0F;
+		// Top-Right
+		Vertices[6] = 1.0F;
+		Vertices[7] = 0.0F;
 
-			// Bottom-Right
-			Vertices.at(10) = 1.0F;
-			Vertices.at(11) = 1.0F;
+		// Bottom-Right
+		Vertices[10] = 1.0F;
+		Vertices[11] = 1.0F;
 
-			// Bottom-Left
-			Vertices.at(14) = 0.0F;
-			Vertices.at(15) = 1.0F;
-		}
-		catch (const std::out_of_range& Error)
-		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
-		}
+		// Bottom-Left
+		Vertices[14] = 0.0F;
+		Vertices[15] = 1.0F;
 
 		std::vector<GLint> Elements
 		{
@@ -309,36 +302,29 @@ namespace lwmf
 		const GLfloat InvY{ 1.0F / (Top - Bottom) };
 		const GLfloat InvX{ 1.0F / (Right - Left) };
 
-		try
-		{
-			// First column
-			Matrix.at(0) = 2.0F * InvX;
-			Matrix.at(1) = 0.0F;
-			Matrix.at(2) = 0.0F;
-			Matrix.at(3) = 0.0F;
+		// First column
+		Matrix[0] = 2.0F * InvX;
+		Matrix[1] = 0.0F;
+		Matrix[2] = 0.0F;
+		Matrix[3] = 0.0F;
 
-			// Second
-			Matrix.at(4) = 0.0F;
-			Matrix.at(5) = 2.0F * InvY;
-			Matrix.at(6) = 0.0F;
-			Matrix.at(7) = 0.0F;
+		// Second
+		Matrix[4] = 0.0F;
+		Matrix[5] = 2.0F * InvY;
+		Matrix[6] = 0.0F;
+		Matrix[7] = 0.0F;
 
-			// Third
-			Matrix.at(8) = 0.0F;
-			Matrix.at(9) = 0.0F;
-			Matrix.at(10) = -1.0F;
-			Matrix.at(11) = 0.0F;
+		// Third
+		Matrix[8] = 0.0F;
+		Matrix[9] = 0.0F;
+		Matrix[10] = -1.0F;
+		Matrix[11] = 0.0F;
 
-			// Fourth
-			Matrix.at(12) = -(Right + Left) * InvX;
-			Matrix.at(13) = -(Top + Bottom) * InvY;
-			Matrix.at(14) = 0.0F;
-			Matrix.at(15) = 1.0F;
-		}
-		catch (const std::out_of_range& Error)
-		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Out of range error, " + std::string(Error.what()));
-		}
+		// Fourth
+		Matrix[12] = -(Right + Left) * InvX;
+		Matrix[13] = -(Top + Bottom) * InvY;
+		Matrix[14] = 0.0F;
+		Matrix[15] = 1.0F;
 	}
 
 	inline void ShaderClass::UpdateVertices(const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)

@@ -416,7 +416,7 @@ inline static std::int_fast32_t stbtt__buf_get(stbtt__buf& b, const std::int_fas
 inline static stbtt__buf stbtt__new_buf(void* p, const std::size_t size)
 {
 	stbtt__buf r{};
-	std::memcpy(r.data.data(), p, size * sizeof(void*));
+	std::memcpy(r.data.data(), p, size * sizeof(void*)); //-V522
 	r.size = static_cast<std::int_fast32_t>(size);
 	r.cursor = 0;
 	return r;

@@ -58,7 +58,15 @@ namespace lwmf
 
 	inline std::int_fast32_t GetPixel(const TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y)
 	{
-		return Texture.Pixels[y * Texture.Width + x];
+		if (static_cast<std::uint_fast32_t>(x) < static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y) < static_cast<std::uint_fast32_t>(Texture.Height))
+		{
+			return Texture.Pixels[y * Texture.Width + x];
+		}
+		// If out of boundaries, return 0 (=black)
+		else
+		{
+			return 0x00000000;
+		}
 	}
 
 	//
@@ -125,6 +133,12 @@ namespace lwmf
 
 	inline void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, const std::int_fast32_t x2, const std::int_fast32_t y2, const std::int_fast32_t Color)
 	{
+		// Exit early if coords are out of visual boundaries
+		if ((x1 < 0 && x2 < 0) || (x1 > Texture.Width && x2 > Texture.Width) || (y1 < 0 && y2 < 0) || (y1 > Texture.Height && y2 > Texture.Height))
+		{
+			return;
+		}
+
 		// Case 1: Straight horizontal line within screen boundaries
 		if ((y1 == y2) && (x2 > x1) && (x1 >= 0 && x2 < Texture.Width && y1 >= 0 && y1 < Texture.Height))
 		{
@@ -157,7 +171,7 @@ namespace lwmf
 				{
 					LongLength += y1;
 
-					for (int j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
+					for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
 					{
 						Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
 						j += DecInc;
@@ -168,7 +182,7 @@ namespace lwmf
 
 				LongLength += y1;
 
-				for (int j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
+				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
 				{
 					Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
 					j -= DecInc;
@@ -181,7 +195,7 @@ namespace lwmf
 			{
 				LongLength += x1;
 
-				for (int j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
+				for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
 				{
 					Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
 					j += DecInc;
@@ -192,7 +206,7 @@ namespace lwmf
 
 			LongLength += x1;
 
-			for (int j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
+			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
 			{
 				Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
 				j -= DecInc;
@@ -207,7 +221,7 @@ namespace lwmf
 				{
 					LongLength += y1;
 
-					for (int j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
+					for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
 					{
 						SetPixelSafe(Texture, j >> 16, y1, Color);
 						j += DecInc;
@@ -218,7 +232,7 @@ namespace lwmf
 
 				LongLength += y1;
 
-				for (int j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
+				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
 				{
 					SetPixelSafe(Texture, j >> 16, y1, Color);
 					j -= DecInc;
@@ -231,7 +245,7 @@ namespace lwmf
 			{
 				LongLength += x1;
 
-				for (int j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
+				for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
 				{
 					SetPixelSafe(Texture, x1, j >> 16, Color);
 					j += DecInc;
@@ -242,7 +256,7 @@ namespace lwmf
 
 			LongLength += x1;
 
-			for (int j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
+			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
 			{
 				SetPixelSafe(Texture, x1, j >> 16, Color);
 				j -= DecInc;
@@ -256,6 +270,12 @@ namespace lwmf
 
 	inline void Rectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
+		// Exit early if coords are out of visual boundaries
+		if (PosX > Texture.Width || PosX + Width < 0 || PosY > Texture.Height || PosY + Height < 0)
+		{
+			return;
+		}
+
 		Line(Texture, PosX, PosY, PosX + Width, PosY, Color);
 		Line(Texture, PosX, PosY, PosX, PosY + Height, Color);
 		Line(Texture, PosX, PosY + Height, PosX + Width, PosY + Height, Color);
@@ -264,6 +284,12 @@ namespace lwmf
 
 	inline void FilledRectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
+		// Exit early if coords are out of visual boundaries
+		if (PosX > Texture.Width || PosX + Width < 0 || PosY > Texture.Height || PosY + Height < 0)
+		{
+			return;
+		}
+
 		for (std::int_fast32_t y{ PosY }; y <= PosY + Height; ++y)
 		{
 			Line(Texture, PosX, y, PosX + Width, y, Color);
@@ -276,6 +302,12 @@ namespace lwmf
 
 	inline void Circle(TextureStruct& Texture, const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, std::int_fast32_t Radius, const std::int_fast32_t Color)
 	{
+		// Exit early if coords are out of visual boundaries
+		if (CenterX + Radius < 0 || CenterX - Radius > Texture.Width || CenterY + Radius < 0 || CenterY - Radius > Texture.Height)
+		{
+			return;
+		}
+
 		std::int_fast32_t y{};
 		std::int_fast32_t Error{};
 
@@ -317,6 +349,12 @@ namespace lwmf
 
 	inline void FilledCircle(TextureStruct& Texture, const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, const std::int_fast32_t Radius, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
+		// Exit early if coords are out of visual boundaries
+		if (CenterX + Radius < 0 || CenterX - Radius > Texture.Width || CenterY + Radius < 0 || CenterY - Radius > Texture.Height)
+		{
+			return;
+		}
+
 		Circle(Texture, CenterX, CenterY, Radius, BorderColor);
 
 		const std::int_fast32_t InnerRadius{ Radius - 1 };
