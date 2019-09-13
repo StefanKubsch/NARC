@@ -106,6 +106,7 @@ namespace lwmf
 			}
 
 			// Create OpenGL context
+			// https://www.khronos.org/opengl/wiki/Creating_an_OpenGL_Context_(WGL)
 
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Create OpenGL context...");
 
@@ -155,6 +156,21 @@ namespace lwmf
 						ResizeViewportAndRenderTarget(RenderTarget, Width, Height);
 					}
 				}
+
+				// Get OpenGL system information
+
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Gather OpenGL system information...");
+
+				GLint MajorVersion{};
+				GLint MinorVersion{};
+
+				glGetIntegerv(GL_MAJOR_VERSION, &MajorVersion);
+				glGetIntegerv(GL_MINOR_VERSION, &MinorVersion);
+
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL version: " + std::to_string(MajorVersion) + "." + std::to_string(MinorVersion));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL vendor: " + std::string((const char*)glGetString(GL_VENDOR)));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL renderer: " + std::string((const char*)glGetString(GL_RENDERER)));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Primary OpenGL shading language version: " + std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
 			}
 		}
 	}

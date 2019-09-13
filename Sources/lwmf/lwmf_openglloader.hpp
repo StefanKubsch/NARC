@@ -16,15 +16,25 @@
 
 #include "lwm_logging.hpp"
 
+// For more information about how to load OpenGL functions, have a look here:
+// https://www.khronos.org/opengl/wiki/Load_OpenGL_Functions#Windows_2
+
 #pragma comment (lib, "opengl32.lib")
+
+// Definitions can be found here:
+// https://www.khronos.org/registry/OpenGL/api/GL/glext.h
 
 #define GL_ARRAY_BUFFER						0x8892
 #define GL_COMPILE_STATUS					0x8B81
+#define GL_CONTEXT_LOST						0x0507
 #define GL_DYNAMIC_DRAW						0x88E8
 #define GL_ELEMENT_ARRAY_BUFFER				0x8893
 #define GL_FRAGMENT_SHADER					0x8B30
 #define GL_INVALID_FRAMEBUFFER_OPERATION	0x0506
 #define GL_LINK_STATUS						0x8B82
+#define GL_MAJOR_VERSION					0x821B
+#define GL_MINOR_VERSION					0x821C
+#define GL_SHADING_LANGUAGE_VERSION			0x8B8C
 #define GL_STATIC_DRAW						0x88E4
 #define GL_TEXTURE0							0x84C0
 #define GL_VERTEX_SHADER					0x8B31
@@ -32,6 +42,9 @@
 using GLchar = char;
 using GLsizeiptr = std::ptrdiff_t;
 using GLintptr = std::ptrdiff_t;
+
+// And all those nice functions definitions can be found here:
+// https://www.khronos.org/registry/OpenGL-Refpages/gl4/
 
 #define OGL \
 	OG(void,	glAttachShader,				GLuint program, GLuint shader) \

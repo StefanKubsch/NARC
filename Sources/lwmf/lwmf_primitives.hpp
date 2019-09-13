@@ -62,11 +62,9 @@ namespace lwmf
 		{
 			return Texture.Pixels[y * Texture.Width + x];
 		}
+
 		// If out of boundaries, return 0 (=black)
-		else
-		{
-			return 0x00000000;
-		}
+		return 0x00000000;
 	}
 
 	//
@@ -313,42 +311,53 @@ namespace lwmf
 			return;
 		}
 
+		std::int_fast32_t x{ -Radius };
 		std::int_fast32_t y{};
-		std::int_fast32_t Error{};
+		std::int_fast32_t Error{ 2 - (Radius << 1) };
 
 		// if complete circle is within screen boundaries, there is no reason to use SetPixelSafe...
 		if ((CenterX - Radius >= 0 && CenterX + Radius < Texture.Width) && (CenterY - Radius >= 0 && CenterY + Radius < Texture.Height))
 		{
-			while (Radius >= y)
+			do
 			{
-				Texture.Pixels[(CenterY + y) * Texture.Width + CenterX + Radius] = Color;
-				Texture.Pixels[(CenterY + Radius) * Texture.Width + CenterX + y] = Color;
-				Texture.Pixels[(CenterY + Radius) * Texture.Width + CenterX - y] = Color;
-				Texture.Pixels[(CenterY + y) * Texture.Width + CenterX - Radius] = Color;
-				Texture.Pixels[(CenterY - y) * Texture.Width + CenterX - Radius] = Color;
-				Texture.Pixels[(CenterY - Radius) * Texture.Width + CenterX - y] = Color;
-				Texture.Pixels[(CenterY - Radius) * Texture.Width + CenterX + y] = Color;
-				Texture.Pixels[(CenterY - y) * Texture.Width + CenterX + Radius] = Color;
+				Texture.Pixels[((CenterY + y) * Texture.Width) + (CenterX - x)] = Color;
+				Texture.Pixels[((CenterY - x) * Texture.Width) + (CenterX - y)] = Color;
+				Texture.Pixels[((CenterY - y) * Texture.Width) + (CenterX + x)] = Color;
+				Texture.Pixels[((CenterY + x) * Texture.Width) + (CenterX + y)] = Color;
+				Radius = Error;
 
-				Error <= 0 ? (++y, Error += (y << 1) + 1) : (--Radius, Error -= (Radius << 1) + 1);
-			}
+				if (Radius <= y)
+				{
+					Error += (++y << 1) + 1;
+				}
+
+				if (Radius > x || Error > y)
+				{
+					Error += (++x << 1) + 1;
+				}
+			} while (x < 0);
 		}
 		// ...or use the "safe" version!
 		else
 		{
-			while (Radius >= y)
+			do
 			{
-				SetPixelSafe(Texture, CenterX + Radius, CenterY + y, Color);
-				SetPixelSafe(Texture, CenterX + y, CenterY + Radius, Color);
-				SetPixelSafe(Texture, CenterX - y, CenterY + Radius, Color);
-				SetPixelSafe(Texture, CenterX - Radius, CenterY + y, Color);
-				SetPixelSafe(Texture, CenterX - Radius, CenterY - y, Color);
-				SetPixelSafe(Texture, CenterX - y, CenterY - Radius, Color);
-				SetPixelSafe(Texture, CenterX + y, CenterY - Radius, Color);
-				SetPixelSafe(Texture, CenterX + Radius, CenterY - y, Color);
+				SetPixelSafe(Texture, CenterX - x, CenterY + y, Color);
+				SetPixelSafe(Texture, CenterX - y, CenterY - x, Color);
+				SetPixelSafe(Texture, CenterX + x, CenterY - y, Color);
+				SetPixelSafe(Texture, CenterX + y, CenterY + x, Color);
+				Radius = Error;
 
-				Error <= 0 ? (++y, Error += (y << 1) + 1) : (--Radius, Error -= (Radius << 1) + 1);
-			}
+				if (Radius <= y)
+				{
+					Error += (++y << 1) + 1;
+				}
+
+				if (Radius > x || Error > y)
+				{
+					Error += (++x << 1) + 1;
+				}
+			} while (x < 0);
 		}
 	}
 
@@ -360,38 +369,21 @@ namespace lwmf
 			return;
 		}
 
-		const std::int_fast32_t PowInnerRadius{ Radius * Radius };
+		std::int_fast32_t LargestX{ Radius };
+		const std::int_fast32_t POWRadius{ Radius * Radius };
 
-		// if complete circle is within screen boundaries, there is no reason to use SetPixelSafe...
-		if (CenterX - Radius >= 0 && CenterX + Radius < Texture.Width && CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)
+		for (std::int_fast32_t y{}; y <= Radius; ++y)
 		{
-			for (std::int_fast32_t y{ -Radius }; y <= Radius; ++y)
-			{
-				const std::int_fast32_t PowY{ y * y };
-				const std::int_fast32_t TempY{ (CenterY + y) * Texture.Width };
+			const std::int_fast32_t POWY{ y * y };
 
-				for (std::int_fast32_t x{ -Radius }; x <= Radius; ++x)
-				{
-					if (x * x + PowY <= PowInnerRadius)
-					{
-						Texture.Pixels[TempY + CenterX + x] = FillColor;
-					}
-				}
-			}
-		}
-		// ...or use the "safe" version!
-		else
-		{
-			for (std::int_fast32_t y{ -Radius }; y <= Radius; ++y)
+			for (std::int_fast32_t x{ LargestX }; x >= 0; --x)
 			{
-				const std::int_fast32_t PowY{ y * y };
-
-				for (std::int_fast32_t x{ -Radius }; x <= Radius; ++x)
+				if ((x * x) + POWY <= POWRadius)
 				{
-					if (x * x + PowY <= PowInnerRadius)
-					{
-						SetPixelSafe(Texture, CenterX + x, CenterY + y, FillColor);
-					}
+					Line(Texture, CenterX - x, CenterY + y, CenterX + x, CenterY + y, FillColor);
+					Line(Texture, CenterX - x, CenterY - y, CenterX + x, CenterY - y, FillColor);
+					LargestX = x;
+					break;
 				}
 			}
 		}

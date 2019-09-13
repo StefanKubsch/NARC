@@ -195,8 +195,11 @@ namespace lwmf
 
 		// Set some flags
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glCheckError();
 		glDisable(GL_DEPTH_TEST);
+		glCheckError();
 		glDisable(GL_DITHER);
+		glCheckError();
 	}
 
 	inline void ShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& Texture, GLuint *TextureID)
@@ -373,6 +376,8 @@ namespace lwmf
 
 	inline void ShaderClass::CheckError(const std::int_fast32_t Line)
 	{
+		// https://www.khronos.org/opengl/wiki/OpenGL_Error
+
 		GLenum ErrorCode{};
 
 		while ((ErrorCode = glGetError()) != GL_NO_ERROR)
@@ -416,6 +421,11 @@ namespace lwmf
 					Error = "INVALID_FRAMEBUFFER_OPERATION";
 					break;
 				}
+				case GL_CONTEXT_LOST:
+				{
+					Error = "GL_CONTEXT_LOST";
+					break;
+				}
 				default: {}
 			}
 
@@ -433,10 +443,12 @@ namespace lwmf
 			case Components::Shader:
 			{
 				glGetShaderiv(Task, GL_COMPILE_STATUS, &ErrorResult);
+				glCheckError();
 
 				if (ErrorResult == GL_FALSE)
 				{
 					glGetShaderInfoLog(Task, 512, nullptr, ErrorLog.data());
+					glCheckError();
 					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog.data()));
 				}
 
@@ -445,10 +457,12 @@ namespace lwmf
 			case Components::Program:
 			{
 				glGetProgramiv(Task, GL_LINK_STATUS, &ErrorResult);
+				glCheckError();
 
 				if (ErrorResult == GL_FALSE)
 				{
 					glGetProgramInfoLog(Task, 512, nullptr, ErrorLog.data());
+					glCheckError();
 					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog.data()));
 				}
 
