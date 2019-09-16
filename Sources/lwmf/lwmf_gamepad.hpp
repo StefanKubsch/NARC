@@ -156,8 +156,8 @@ namespace lwmf
 		const float NormalizedLX{ max(-1, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX) };
 		const float NormalizedLY{ max(-1, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
 
-		LeftStick.X = (std::abs(NormalizedLX) < DeadZone.X ? 0.0F : (std::fabsf(NormalizedLX) - DeadZone.X) * (NormalizedLX / std::fabsf(NormalizedLX)));
-		LeftStick.Y = (std::abs(NormalizedLY) < DeadZone.Y ? 0.0F : (std::fabsf(NormalizedLY) - DeadZone.Y) * (NormalizedLY / std::fabsf(NormalizedLY)));
+		LeftStick.X = (std::abs(NormalizedLX) < DeadZone.X ? 0.0F : (std::abs(NormalizedLX) - DeadZone.X) * (NormalizedLX / std::abs(NormalizedLX)));
+		LeftStick.Y = (std::abs(NormalizedLY) < DeadZone.Y ? 0.0F : (std::abs(NormalizedLY) - DeadZone.Y) * (NormalizedLY / std::abs(NormalizedLY)));
 
 		if (DeadZone.X > 0.0F)
 		{
@@ -172,8 +172,8 @@ namespace lwmf
 		const float NormalizedRX{ max(-1, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX) };
 		const float NormalizedRY{ max(-1, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
 
-		RightStick.X = (std::abs(NormalizedRX) < DeadZone.X ? 0.0F : (std::fabsf(NormalizedRX) - DeadZone.X) * (NormalizedRX / std::fabsf(NormalizedRX)));
-		RightStick.Y = (std::abs(NormalizedRY) < DeadZone.Y ? 0.0F : (std::fabsf(NormalizedRY) - DeadZone.Y) * (NormalizedRY / std::fabsf(NormalizedRY)));
+		RightStick.X = (std::abs(NormalizedRX) < DeadZone.X ? 0.0F : (std::abs(NormalizedRX) - DeadZone.X) * (NormalizedRX / std::abs(NormalizedRX)));
+		RightStick.Y = (std::abs(NormalizedRY) < DeadZone.Y ? 0.0F : (std::abs(NormalizedRY) - DeadZone.Y) * (NormalizedRY / std::abs(NormalizedRY)));
 
 		if (DeadZone.X > 0.0F)
 		{

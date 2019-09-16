@@ -1392,7 +1392,7 @@ inline static void stbtt__csctx_v(stbtt__csctx& c, const unsigned char type, con
 
 inline static void stbtt__csctx_close_shape(stbtt__csctx& ctx)
 {
-	if (ctx.first_x != ctx.x || ctx.first_y != ctx.y) //-V550
+	if (std::abs(ctx.first_x - ctx.x) > FLT_EPSILON || std::abs(ctx.first_y - ctx.y) > FLT_EPSILON)
 	{
 		stbtt__csctx_v(ctx, static_cast<unsigned char>(GlyphShapeType::STBTT_vline), static_cast<std::int_fast32_t>(ctx.first_x), static_cast<std::int_fast32_t>(ctx.first_y), 0, 0, 0, 0);
 	}
@@ -1855,10 +1855,10 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 							return STBTT__CSERR("flex1 stack");
 						}
 
-						const float dx = s[0] + s[2] + s[4] + s[6] + s[8];
-						const float dy = s[1] + s[3] + s[5] + s[7] + s[9];
+						const float dx{ s[0] + s[2] + s[4] + s[6] + s[8] };
+						const float dy{ s[1] + s[3] + s[5] + s[7] + s[9] };
 
-						std::fabs(dx) > std::fabs(dy) ? s[10] = -dy : s[10] = -dx;
+						std::abs(dx) > std::abs(dy) ? s[10] = -dy : s[10] = -dx;
 
 						stbtt__csctx_rccurve_to(c, s[0], s[1], s[2], s[3], s[4], s[5]);
 						stbtt__csctx_rccurve_to(c, s[6], s[7], s[8], s[9], s[10], s[10]);
@@ -1893,10 +1893,13 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 				break;
 			}
 
+			// This is some original code that is not reachable...
+			/*
 			if (clear_stack != 0)
 			{
 				sp = 0;
 			}
+			*/
 		}
 	}
 
@@ -2340,7 +2343,7 @@ inline static stbtt__active_edge* stbtt__new_active(stbtt__hheap& hh, stbtt__edg
 	const float dxdy{ (e->x1 - e->x0) / (e->y1 - e->y0) };
 
 	z->fdx = dxdy;
-	z->fdy = dxdy != 0.0F ? (1.0F / dxdy) : 0.0F; //-V550
+	z->fdy = std::abs(dxdy) > FLT_EPSILON ? (1.0F / dxdy) : 0.0F;
 	z->fx = e->x0 + dxdy * (start_point - e->y0);
 	z->fx -= off_x;
 	z->direction = (e->invert != 0) ? 1.0F : -1.0F;
@@ -2355,7 +2358,7 @@ inline static stbtt__active_edge* stbtt__new_active(stbtt__hheap& hh, stbtt__edg
 // (i.e. it has already been clipped to those)
 inline static void stbtt__handle_clipped_edge(float* scanline, const std::int_fast32_t x, stbtt__active_edge* e, float x0, float y0, float x1, float y1)
 {
-	if (y0 == y1) //-V550
+	if (std::abs(y0 - y1) < FLT_EPSILON)
 	{
 		return;
 	}
@@ -2639,7 +2642,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 			for (std::int_fast32_t i{}; i < result.w; ++i)
 			{
 				sum += scanline2[i];
-				std::int_fast32_t m{ static_cast<std::int_fast32_t>(std::fabsf(scanline[i] + sum) * 255.0F + 0.5F) };
+				std::int_fast32_t m{ static_cast<std::int_fast32_t>(std::abs(scanline[i] + sum) * 255.0F + 0.5F) };
 
 				if (m > 255)
 				{

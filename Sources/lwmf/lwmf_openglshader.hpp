@@ -168,7 +168,7 @@ namespace lwmf
 		glCheckError();
 		glEnableVertexAttribArray(TextureAttrib);
 		glCheckError();
-		glVertexAttribPointer(TextureAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(2 * sizeof(GLfloat))); //-V566
+		glVertexAttribPointer(TextureAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), reinterpret_cast<char*>(0 + (2 * sizeof(GLfloat))));
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create projection matrix...");

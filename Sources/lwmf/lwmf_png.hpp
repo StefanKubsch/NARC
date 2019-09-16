@@ -707,7 +707,7 @@ namespace lwmf
 					{
 						const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * PNGInfo.Width * ByteWidth] };
 
-						UnFilterScanline(&NewOut[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength); //-V522
+						UnFilterScanline(&NewOut[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
 
 						if (Error != 0)
 						{
@@ -723,7 +723,7 @@ namespace lwmf
 
 					for (std::int_fast32_t y{}, OBP{}; y < PNGInfo.Height; ++y)
 					{
-						const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * PNGInfo.Width * ByteWidth] }; //-V522
+						const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * PNGInfo.Width * ByteWidth] };
 
 						UnFilterScanline(TempLine.data(), &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
 
@@ -1190,7 +1190,7 @@ namespace lwmf
 					NewOut[Offset] = static_cast<unsigned char>(Value);
 					NewOut[Offset + 1] = static_cast<unsigned char>(Value);
 					NewOut[Offset + 2] = static_cast<unsigned char>(Value);
-					NewOut[Offset + 3] = (InfoIn.KeyDefined && (Value != 0) && (((1 << InfoIn.BitDepth) - 1) != 0) == (InfoIn.KeyR != 0) && (((1 << InfoIn.BitDepth) - 1)) != 0) ? 0 : 255; //-V793
+					NewOut[Offset + 3] = (InfoIn.KeyDefined && (Value != 0) && (((1 << InfoIn.BitDepth) - 1) != 0) == (InfoIn.KeyR != 0) && (((1 << InfoIn.BitDepth) - 1)) != 0) ? 0 : 255;
 				}
 			}
 			else if (InfoIn.BitDepth < 8 && InfoIn.ColorType == 3)
