@@ -14,7 +14,7 @@ There is a long way to go with the engine, from entity AI to weapon handling, le
 
 The whole engine is modular and written in C++ v17.
 
-All low-level functions for OpenGL, graphics, audio, input handling, multithreading, logging, game-relevant math etc. is provided by my own C++ library, "lwmf - lightweight media framework". This framework is still under development, but already stable and fast.
+All low-level functions for OpenGL, graphics, audio, bitmap and input handling, multithreading, logging, game-relevant math etc. is provided by my own C++ library, "lwmf - lightweight media framework". This framework is still under development, but already stable and fast.
 
 Due to (partial) use of SIMD Intrinsics a CPU with SSE 4.2 support is needed (virtually all Intel CPUs from 2007 on).
 
