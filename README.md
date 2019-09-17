@@ -41,7 +41,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - maps, weapons and entities can be defined in textfiles which will be loaded into program at runtime
   - complete separation of content/config from code
   - fixed timestep gameloop with 60fps (or chooseable) framelock
-  - multidirectional, animated or non-animated entities with basic automovement
+  - multidirectional, animated or non-animated billboard sprites/entities with basic automovement
   - animated doors (in work, but you can open them and they will close automatically, as there is sound)
   - multi-threaded rendering of graphics with dynamic resolving of concurrent threads and use of a threadpool
   - collision detection between walls, entities and player
