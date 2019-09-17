@@ -32,7 +32,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - indoor & outdoor levels (ceilings and/or skybox, lighting or not)
   - you can shoot entities and they will vanish after they lose their hitpoints
   - entities will attack you - and you can die...DIE...
-  - pixel-precise detection of hits on enemies
+  - pixel-precise detection of hits on enemies (used technique here is "hitscan")
   - A* pathfinding algorithm (started, path between entities and player is calculated)
   - pickup ammo boxes and gain new ammo
   - variable texture size (from 64x64 to 8192x8192) for level textures and entities
