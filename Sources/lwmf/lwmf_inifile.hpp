@@ -17,7 +17,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "lwm_logging.hpp"
+#include "lwmf_logging.hpp"
 
 namespace lwmf
 {

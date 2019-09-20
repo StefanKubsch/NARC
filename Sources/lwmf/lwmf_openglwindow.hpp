@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "lwm_logging.hpp"
+#include "lwmf_logging.hpp"
 #include "lwmf_texture.hpp"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

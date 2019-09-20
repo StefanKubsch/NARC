@@ -12,7 +12,7 @@
 
 #include <Windows.h>
 
-#include "lwm_logging.hpp"
+#include "lwmf_logging.hpp"
 
 namespace lwmf
 {

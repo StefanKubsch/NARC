@@ -25,14 +25,14 @@
 // #define LWMF_LOGGINGENABLED in your application if you want to write any logsfiles
 #ifdef LWMF_LOGGINGENABLED
 	constexpr bool LoggingEnabled{ true };
-#elif
+#else
 	constexpr bool LoggingEnabled{ false };
 #endif
 
 // #define LWMF_THROWEXCEPTIONS in your application if you want to handle errors by exceptions
 #ifdef LWMF_THROWEXCEPTIONS
 	constexpr bool ThrowExceptions{ true };
-#elif
+#else
 	constexpr bool ThrowExceptions{ false };
 #endif
 

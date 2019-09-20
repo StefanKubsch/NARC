@@ -19,7 +19,7 @@
 
 #pragma comment(lib, "Winmm.lib")
 
-#include "lwm_logging.hpp"
+#include "lwmf_logging.hpp"
 
 namespace lwmf
 {

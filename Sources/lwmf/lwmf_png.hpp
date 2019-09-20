@@ -16,7 +16,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "lwm_logging.hpp"
+#include "lwmf_logging.hpp"
 #include "lwmf_texture.hpp"
 
 namespace lwmf

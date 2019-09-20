@@ -16,7 +16,7 @@
 #include <vector>
 #include <fstream>
 
-#include "lwm_logging.hpp"
+#include "lwmf_logging.hpp"
 #include "lwmf_color.hpp"
 #include "lwmf_texture.hpp"
 
