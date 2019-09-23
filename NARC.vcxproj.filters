@@ -93,9 +93,6 @@
     <ClInclude Include="Sources\GFX_Window.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\stb\stb_truetype.hpp">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\HID_Gamepad.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>

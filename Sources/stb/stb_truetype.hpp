@@ -159,7 +159,7 @@ std::int_fast32_t stbtt_BakeFontBitmap(const std::vector<unsigned char>& data, s
                                 float pixel_height,															// height of font in pixels
                                 unsigned char* pixels, std::int_fast32_t pw, std::int_fast32_t ph,			// bitmap to be filled in
                                 std::int_fast32_t first_char, std::int_fast32_t num_chars,					// characters to bake
-                                stbtt_bakedchar* chardata);													// you allocate this, it's num_chars long
+                                std::vector<stbtt_bakedchar>& chardata);									// you allocate this, it's num_chars long
 // if return is positive, the first unused row of the bitmap
 // if return is negative, returns the negative of the number of characters that fit
 // if return is 0, no characters fit and no rows were used
@@ -1085,7 +1085,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 			{
 				if ((flags & 16) == 0)
 				{
-					x = x + static_cast<std::int_fast32_t>((points[0] << 8) + points[1]);
+					x += static_cast<std::int_fast32_t>((points[0] << 8) + points[1]);
 					points += 2;
 				}
 			}
@@ -1103,7 +1103,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 			if ((flags & 4) != 0)
 			{
 				short dy{ *points++ };
-				y += (flags & 32) != 0 ? dy : -dy; // ???
+				y += (flags & 32) != 0 ? dy : -dy;
 			}
 			else
 			{
@@ -1289,7 +1289,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 				}
 
 				// Append vertices.
-				stbtt_vertex* tmp { new stbtt_vertex[num_vertices + comp_num_verts] };
+				stbtt_vertex* tmp { new stbtt_vertex[static_cast<std::size_t>(num_vertices) + static_cast<std::size_t>(comp_num_verts)] };
 
 				if (tmp == nullptr) //-V668
 				{
@@ -1915,7 +1915,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeT2(const stbtt_fontinfo& inf
 
 	if (stbtt__run_charstring(info, glyph_index, count_ctx) != 0)
 	{
-		*pvertices = new stbtt_vertex[count_ctx.num_vertices];
+		*pvertices = new stbtt_vertex[static_cast<std::size_t>(count_ctx.num_vertices)];
 
 		stbtt__csctx output_ctx{ 0, 0, 0.0F, 0.0F, 0.0F, 0.0F, 0, 0, 0, 0, nullptr, 0 };
 		output_ctx.pvertices = *pvertices;
@@ -2331,7 +2331,7 @@ using stbtt__active_edge = struct stbtt__active_edge
 	float ey{};
 };
 
-inline static stbtt__active_edge* stbtt__new_active(stbtt__hheap& hh, stbtt__edge* e, const std::int_fast32_t off_x, const float start_point, void* userdata)
+inline static stbtt__active_edge* stbtt__new_active(stbtt__hheap& hh, stbtt__edge* e, const std::int_fast32_t off_x, const float start_point)
 {
 	stbtt__active_edge* z{ static_cast<stbtt__active_edge*>(stbtt__hheap_alloc(hh, sizeof(*z))) };
 
@@ -2398,7 +2398,7 @@ inline static void stbtt__handle_clipped_edge(float* scanline, const std::int_fa
 	}
 }
 
-inline static void stbtt__fill_active_edges_new(float* scanline, float* scanline_fill, const std::int_fast32_t len, stbtt__active_edge* e, const float y_top)
+inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, float* scanline_fill, const std::int_fast32_t len, stbtt__active_edge* e, const float y_top)
 {
 	const float y_bottom{ y_top + 1.0F };
 
@@ -2416,7 +2416,7 @@ inline static void stbtt__fill_active_edges_new(float* scanline, float* scanline
 			{
 				if (x0 >= 0.0F)
 				{
-					stbtt__handle_clipped_edge(scanline, static_cast<std::int_fast32_t>(x0), e, x0, y_top, x0, y_bottom);
+					stbtt__handle_clipped_edge(scanline.data(), static_cast<std::int_fast32_t>(x0), e, x0, y_top, x0, y_bottom);
 					stbtt__handle_clipped_edge(scanline_fill - 1, static_cast<std::int_fast32_t>(x0) + 1, e, x0, y_top, x0, y_bottom);
 				}
 				else
@@ -2520,39 +2520,39 @@ inline static void stbtt__fill_active_edges_new(float* scanline, float* scanline
 
 					if (x0 < x1 && xb > x2)
 					{         // three segments descending down-right
-						stbtt__handle_clipped_edge(scanline, x, e, x0, y_top, x1, y1);
-						stbtt__handle_clipped_edge(scanline, x, e, x1, y1, x2, y2);
-						stbtt__handle_clipped_edge(scanline, x, e, x2, y2, xb, y_bottom);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x1, y1);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x1, y1, x2, y2);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x2, y2, xb, y_bottom);
 					}
 					else if (xb < x1 && x0 > x2)
 					{  // three segments descending down-left
-						stbtt__handle_clipped_edge(scanline, x, e, x0, y_top, x2, y2);
-						stbtt__handle_clipped_edge(scanline, x, e, x2, y2, x1, y1);
-						stbtt__handle_clipped_edge(scanline, x, e, x1, y1, xb, y_bottom);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x2, y2);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x2, y2, x1, y1);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x1, y1, xb, y_bottom);
 					}
 					else if (x0 < x1 && xb > x1)
 					{  // two segments across x, down-right
-						stbtt__handle_clipped_edge(scanline, x, e, x0, y_top, x1, y1);
-						stbtt__handle_clipped_edge(scanline, x, e, x1, y1, xb, y_bottom);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x1, y1);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x1, y1, xb, y_bottom);
 					}
 					else if (xb < x1 && x0 > x1)
 					{  // two segments across x, down-left
-						stbtt__handle_clipped_edge(scanline, x, e, x0, y_top, x1, y1);
-						stbtt__handle_clipped_edge(scanline, x, e, x1, y1, xb, y_bottom);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x1, y1);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x1, y1, xb, y_bottom);
 					}
 					else if (x0 < x2 && xb > x2)
 					{  // two segments across x+1, down-right
-						stbtt__handle_clipped_edge(scanline, x, e, x0, y_top, x2, y2);
-						stbtt__handle_clipped_edge(scanline, x, e, x2, y2, xb, y_bottom);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x2, y2);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x2, y2, xb, y_bottom);
 					}
 					else if (xb < x2 && x0 > x2)
 					{  // two segments across x+1, down-left
-						stbtt__handle_clipped_edge(scanline, x, e, x0, y_top, x2, y2);
-						stbtt__handle_clipped_edge(scanline, x, e, x2, y2, xb, y_bottom);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x2, y2);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x2, y2, xb, y_bottom);
 					}
 					else
 					{  // one segment
-						stbtt__handle_clipped_edge(scanline, x, e, x0, y_top, xb, y_bottom);
+						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, xb, y_bottom);
 					}
 				}
 			}
@@ -2567,11 +2567,15 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 {
 	stbtt__hheap hh{};
 	stbtt__active_edge* active{};
-	std::vector<float> scanline_data(129);
-
 	static_cast<void>(vsubsample);
-	float* scanline{ (result.w > 64) ? new float[result.w * 2 + 1] : scanline_data.data() };
-	float* scanline2{ scanline + result.w };
+	std::vector<float> scanline(129);
+
+	if (result.w > 64)
+	{
+		scanline.resize(static_cast<std::size_t>(result.w) * 2 + 1);
+	}
+
+	std::vector<float> scanline2(scanline.size() + result.w);
 	std::int_fast32_t y{ off_y };
 
 	e[n].y0 = static_cast<float>((off_y + result.h)) + 1.0F;
@@ -2586,8 +2590,8 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 
 		stbtt__active_edge** step{ &active };
 
-		std::memset(scanline, 0, result.w * sizeof(scanline[0]));
-		std::memset(scanline2, 0, (result.w + 1) * sizeof(scanline[0]));
+		std::fill(scanline.begin(), scanline.end(), 0.0F);
+		std::fill(scanline2.begin(), scanline2.end(), 0.0F);
 
 		// update all active edges;
 		// remove all active edges that terminate before the top of this scanline
@@ -2610,7 +2614,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 		{
 			if (e->y0 != e->y1)
 			{
-				if (stbtt__active_edge* z{ stbtt__new_active(hh, e, off_x, scan_y_top, userdata) }; z != nullptr)
+				if (stbtt__active_edge* z{ stbtt__new_active(hh, e, off_x, scan_y_top) }; z != nullptr)
 				{
 					if (j == 0 && off_y != 0)
 					{
@@ -2633,7 +2637,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 		// now process all active edges
 		if (active != nullptr)
 		{
-			stbtt__fill_active_edges_new(scanline, scanline2 + 1, result.w, active, scan_y_top);
+			stbtt__fill_active_edges_new(scanline, scanline2.data() + 1, result.w, active, scan_y_top);
 		}
 
 		{
@@ -2668,14 +2672,9 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 	}
 
 	stbtt__hheap_cleanup(hh, userdata);
-
-	if (scanline != scanline_data.data())
-	{
-		delete[] scanline;
-	}
 }
 
-inline static void stbtt__sort_edges_ins_sort(stbtt__edge* p, const std::int_fast32_t n)
+inline static void stbtt__sort_edges_ins_sort(std::vector<stbtt__edge>& p, const std::int_fast32_t n)
 {
 	for (std::int_fast32_t i{ 1 }; i < n; ++i)
 	{
@@ -2703,29 +2702,29 @@ inline static void stbtt__sort_edges_ins_sort(stbtt__edge* p, const std::int_fas
 
 inline static void stbtt__sort_edges_quicksort(stbtt__edge* p, std::int_fast32_t n)
 {
-	/* threshold for transitioning to insertion sort */
+	// threshold for transitioning to insertion sort
 	while (n > 12)
 	{
-		/* compute median of three */
+		// compute median of three
 		const std::int_fast32_t m{ n >> 1 };
 		const std::int_fast32_t c01{ static_cast<std::int_fast32_t>((&p[0])->y0 < (&p[m])->y0) };
 		const std::int_fast32_t c12{ static_cast<std::int_fast32_t>((&p[m])->y0 < (&p[n - 1])->y0) };
 
-		/* if 0 >= mid >= end, or 0 < mid < end, then use mid */
+		// if 0 >= mid >= end, or 0 < mid < end, then use mid
 		if (c01 != c12)
 		{
-			/* otherwise, we'll need to swap something else to middle */
+			// otherwise, we'll need to swap something else to middle
 			const std::int_fast32_t c{ static_cast<std::int_fast32_t>((&p[0])->y0 < (&p[n - 1])->y0) };
 
-			/* 0>mid && mid<n:  0>n => n; 0<n => 0 */
-			/* 0<mid && mid>n:  0>n => 0; 0<n => n */
+			// 0>mid && mid<n:  0>n => n; 0<n => 0
+			// 0<mid && mid>n:  0>n => 0; 0<n => n
 			const std::int_fast32_t z{ (c == c12) ? 0 : n - 1 };
 
 			std::swap(p[z], p[m]);
 		}
 
-		/* now p[m] is the median-of-three */
-		/* swap it to the beginning so it won't move around */
+		// now p[m] is the median-of-three
+		// swap it to the beginning so it won't move around
 		std::swap(p[0], p[m]);
 
 		/* partition loop */
@@ -2734,8 +2733,8 @@ inline static void stbtt__sort_edges_quicksort(stbtt__edge* p, std::int_fast32_t
 
 		for(;;)
 		{
-			/* handling of equality is crucial here */
-			/* for sentinels & efficiency with duplicates */
+			// handling of equality is crucial here
+			// for sentinels & efficiency with duplicates
 			for (;;++i)
 			{
 				if (!((&p[i])->y0 < (&p[0])->y0))
@@ -2752,7 +2751,7 @@ inline static void stbtt__sort_edges_quicksort(stbtt__edge* p, std::int_fast32_t
 				}
 			}
 
-			/* make sure we haven't crossed */
+			// make sure we haven't crossed
 			if (i >= j)
 			{
 				break;
@@ -2764,7 +2763,7 @@ inline static void stbtt__sort_edges_quicksort(stbtt__edge* p, std::int_fast32_t
 			--j;
 		}
 
-		/* recurse on smaller side, iterate on larger */
+		// recurse on smaller side, iterate on larger
 		if (j < (n - i))
 		{
 			stbtt__sort_edges_quicksort(p, j);
@@ -2779,9 +2778,9 @@ inline static void stbtt__sort_edges_quicksort(stbtt__edge* p, std::int_fast32_t
 	}
 }
 
-inline static void stbtt__sort_edges(stbtt__edge* p, const std::int_fast32_t n)
+inline static void stbtt__sort_edges(std::vector<stbtt__edge>& p, const std::int_fast32_t n)
 {
-	stbtt__sort_edges_quicksort(p, n);
+	stbtt__sort_edges_quicksort(p.data(), n);
 	stbtt__sort_edges_ins_sort(p, n);
 }
 
@@ -2852,8 +2851,7 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, co
 	}
 
 	// now sort the edges by their highest point (should snap to integer, and then by x)
-	//STBTT_sort(e, n, sizeof(e[0]), stbtt__edge_compare);
-	stbtt__sort_edges(e.data(), n);
+	stbtt__sort_edges(e, n);
 
 	// now, traverse the scanlines and find the intersections on each scanline, use xor winding rule
 	stbtt__rasterize_sorted_edges(result, e.data(), n, vsubsample, off_x, off_y, userdata);
@@ -3091,7 +3089,7 @@ inline void stbtt_MakeGlyphBitmap(const stbtt_fontinfo& info, unsigned char* out
 //
 // This is SUPER-CRAPPY packing to keep source code small
 
-inline static std::int_fast32_t stbtt_BakeFontBitmap_internal(std::vector<unsigned char>& data, const std::int_fast32_t offset, const float pixel_height, unsigned char* pixels, const std::int_fast32_t pw, const std::int_fast32_t ph, const std::int_fast32_t first_char, const std::int_fast32_t num_chars, stbtt_bakedchar* chardata)
+inline static std::int_fast32_t stbtt_BakeFontBitmap_internal(std::vector<unsigned char>& data, const std::int_fast32_t offset, const float pixel_height, std::vector<unsigned char>& pixels, const std::int_fast32_t pw, const std::int_fast32_t ph, const std::int_fast32_t first_char, const std::int_fast32_t num_chars, std::vector<stbtt_bakedchar>& chardata)
 {
 	stbtt_fontinfo f{};
 
@@ -3100,7 +3098,7 @@ inline static std::int_fast32_t stbtt_BakeFontBitmap_internal(std::vector<unsign
 		return -1;
 	}
 
-	std::memset(pixels, 0, static_cast<std::size_t>(pw) * static_cast<std::size_t>(ph)); // background of 0 around pixels
+	std::fill(pixels.begin(), pixels.end(), static_cast<unsigned char>(0));
 
 	float scale{ stbtt_ScaleForPixelHeight(f, pixel_height) };
 	std::int_fast32_t x{ 1 };
@@ -3134,7 +3132,7 @@ inline static std::int_fast32_t stbtt_BakeFontBitmap_internal(std::vector<unsign
 			return -i;
 		}
 
-		stbtt_MakeGlyphBitmap(f, pixels + x + y * pw, gw, gh, pw, scale, scale, g);
+		stbtt_MakeGlyphBitmap(f, pixels.data() + x + y * pw, gw, gh, pw, scale, scale, g);
 
 		chardata[i].x0 = x;
 		chardata[i].y0 = y;
@@ -3177,7 +3175,7 @@ inline void stbtt_GetBakedQuad(const std::vector<stbtt_bakedchar>& chardata, con
 	xpos += b.xadvance;
 }
 
-inline std::int_fast32_t stbtt_BakeFontBitmap(std::vector<unsigned char>& data, const std::int_fast32_t offset, const float pixel_height, unsigned char* pixels, const std::int_fast32_t pw, const std::int_fast32_t ph, const std::int_fast32_t first_char, const std::int_fast32_t num_chars, stbtt_bakedchar* chardata)
+inline std::int_fast32_t stbtt_BakeFontBitmap(std::vector<unsigned char>& data, const std::int_fast32_t offset, const float pixel_height, std::vector<unsigned char>& pixels, const std::int_fast32_t pw, const std::int_fast32_t ph, const std::int_fast32_t first_char, const std::int_fast32_t num_chars, std::vector<stbtt_bakedchar>& chardata)
 {
 	return stbtt_BakeFontBitmap_internal(data, offset, pixel_height, pixels, pw, ph, first_char, num_chars, chardata);
 }

@@ -68,7 +68,7 @@ The whole engine is public domain - you can do what you want with the code. It w
 **Used libraries/APIs:**
 
   - lwmf, the lightweight media framework for graphics, audio, multithreading, input handling, logging etc. (my own work, have a look here: https://github.com/StefanKubsch/lwmf)
-  - stb_truetype.hpp for TrueType font rendering, work in progress of converting to C++ (original lib here:https://github.com/nothings/stb)
+  - stb_truetype.hpp for TrueType font rendering, work in progress of converting to C++ (https://github.com/StefanKubsch/stb_truetype.hpp)
   
 **Controls (configurable):**
   

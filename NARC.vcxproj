@@ -164,7 +164,6 @@
     <ClInclude Include="Sources\Game_WeaponDisplayClass.hpp" />
     <ClInclude Include="Sources\GFX_LightingClass.hpp" />
     <ClInclude Include="Sources\Game_MenuClass.hpp" />
-    <ClInclude Include="Sources\stb\stb_truetype.hpp" />
     <ClInclude Include="Sources\Tools_Cleanup.hpp" />
     <ClInclude Include="Sources\Tools_Console.hpp" />
     <ClInclude Include="Sources\Game_PlayerClass.hpp" />

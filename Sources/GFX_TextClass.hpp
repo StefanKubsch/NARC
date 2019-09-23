@@ -13,9 +13,10 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <istream>
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include "stb/stb_truetype.hpp"
+#include "./stb/stb_truetype.hpp"
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -52,6 +53,8 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 	{
 		if (const std::string FontName{ lwmf::ReadINIValue<std::string>(INIFileName, Section, "FontName") }; Tools_ErrorHandling::CheckFileExistence(FontName, StopOnError))
 		{
+			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Loading font " + FontName);
+
 			GlyphShader.LoadShader("Default", ScreenTexture);
 
 			const float FontSize{ lwmf::ReadINIValue<float>(INIFileName, Section, "FontSize") };
@@ -61,11 +64,16 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			Offset = { lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetY") };
 
 			// Get raw (binary) font data
-			std::vector<unsigned char> FontBuffer;
 			std::ifstream FontFile(FontName.c_str(), std::ifstream::binary);
-			FontFile.seekg(0, std::ios_base::end);
-			FontBuffer.resize(FontFile.tellg());
-			FontFile.seekg(0, std::ios_base::beg);
+
+			if (FontFile.fail())
+			{
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "Loading of font failed!");
+			}
+
+			FontFile.seekg(0, FontFile.end);
+			std::vector<unsigned char> FontBuffer(FontFile.tellg());
+			FontFile.seekg(0, FontFile.beg);
 			FontFile.read(reinterpret_cast<char*>(FontBuffer.data()), FontBuffer.size());
 
 			// Render the glyphs for ASCII chars from 32 ("space") to 127 (last official ASCII char)
@@ -77,9 +85,9 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			std::int_fast32_t Width{};
 			FontHeight = static_cast<std::int_fast32_t>(FontSize + 1.0F);
 			const std::int_fast32_t Height{ FontHeight + 5 };
-			const std::int_fast32_t FirstASCIIChar{ 32 };
-			const std::int_fast32_t LastASCIIChar{ 127 };
-			const std::int_fast32_t NumberOfASCIIChars{ LastASCIIChar - FirstASCIIChar };
+			constexpr std::int_fast32_t FirstASCIIChar{ 32 };
+			constexpr std::int_fast32_t LastASCIIChar{ 127 };
+			constexpr std::int_fast32_t NumberOfASCIIChars{ LastASCIIChar - FirstASCIIChar };
 
 			for (char Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
 			{
@@ -90,13 +98,14 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				Width += 1 + static_cast<std::int_fast32_t>((i1.X * FontSize / 1000.0F) + 1.0F) - static_cast<std::int_fast32_t>(i0.X * FontSize / 1000.0F);
 			}
 
-			std::vector<unsigned char> BakedFontGreyscale(Width * Height);
-			std::vector<std::int_fast32_t> FontColor(Width * Height);
+			std::vector<unsigned char> BakedFontGreyscale(static_cast<std::size_t>(Width) * static_cast<std::size_t>(Height));
 			std::vector<stbtt_bakedchar> CharData(NumberOfASCIIChars);
-			stbtt_BakeFontBitmap(FontBuffer, 0, FontSize, BakedFontGreyscale.data(), Width, Height, FirstASCIIChar, NumberOfASCIIChars, CharData.data());
+			stbtt_BakeFontBitmap(FontBuffer, 0, static_cast<float>(FontSize), BakedFontGreyscale, Width, Height, FirstASCIIChar, NumberOfASCIIChars, CharData);
 
 			// Since the glyphs were rendered in greyscale, they need to be colored...
-			for (std::int_fast32_t i{}; i < BakedFontGreyscale.size(); ++i)
+			std::vector<std::int_fast32_t> FontColor(static_cast<std::size_t>(Width) * static_cast<std::size_t>(Height));
+
+			for (std::size_t i{}; i < BakedFontGreyscale.size(); ++i)
 			{
 				FontColor[i] = lwmf::RGBAtoINT(FontColorRed, FontColorGreen, FontColorBlue, BakedFontGreyscale[i]);
 			}
@@ -109,10 +118,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				stbtt_aligned_quad Quad;
 				stbtt_GetBakedQuad(CharData, Width, Height, Char - FirstASCIIChar, QuadPos.X, QuadPos.Y, Quad, 1);
 
-				lwmf::IntPointStruct Pos{};
-
-				Pos.X = static_cast<std::int_fast32_t>(Quad.s0 * Width);
-				Pos.Y = static_cast<std::int_fast32_t>(Quad.t0 * Height);
+				const lwmf::IntPointStruct Pos{ static_cast<std::int_fast32_t>(Quad.s0 * Width), static_cast<std::int_fast32_t>(Quad.t0 * Height) };
 				Glyphs[Char].Width = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.s1 - Quad.s0) * Width) + 1.0F));
 				Glyphs[Char].Height = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.t1 - Quad.t0) * Height) + 1.0F));
 				Glyphs[Char].Advance = static_cast<std::int_fast32_t>(QuadPos.X + 0.5F);

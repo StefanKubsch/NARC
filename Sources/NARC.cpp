@@ -37,7 +37,7 @@
 // lightweight media framework
 #define LWMF_LOGGINGENABLED
 #define LWMF_THROWEXCEPTIONS
-#include "lwmf/lwmf.hpp"
+#include "./lwmf/lwmf.hpp"
 
 // Establish logging for NARC itself - system-logging for lwmf is hardcoded!
 lwmf::Logging NARCLog("NARC.log");
