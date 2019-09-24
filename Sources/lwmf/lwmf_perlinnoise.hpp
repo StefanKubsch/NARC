@@ -18,7 +18,7 @@
 namespace lwmf
 {
 
-	// Perlin noise, based on Ken Perlin´s famous and brilliant work
+	// Perlin noise, based on Ken PerlinÂ´s famous and brilliant work
 	//
 	// https://cs.nyu.edu/~perlin/noise/
 
