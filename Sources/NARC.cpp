@@ -90,10 +90,10 @@ void MovePlayerAndCheckCollision();
 void ControlPlayerMovement();
 
 // Init objects
-Game_MenuClass MainMenu;
-Game_HealthBarClass HUDHealthBar;
-Game_MinimapClass HUDMinimap;
-Game_WeaponDisplayClass HUDWeaponDisplay;
+inline Game_MenuClass MainMenu;
+inline Game_HealthBarClass HUDHealthBar;
+inline Game_MinimapClass HUDMinimap;
+inline Game_WeaponDisplayClass HUDWeaponDisplay;
 
 std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -170,7 +170,6 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		SortEntities(Game_EntityHandling::SortOrder::BackToFront);
 
 		lwmf::ClearTexture(ScreenTexture, 0);
-
 		lwmf::FPSCounter();
 
 		ThreadPool.AddThread(&Game_Raycaster::CastGraphics, Game_Raycaster::Renderpart::WallLeft);
@@ -208,14 +207,8 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		{
 			HUDWeaponDisplay.Display();
 
-			if (GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1)
-			{
-				HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture, true, 1.0F);
-			}
-			else
-			{
+			(GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1) ? HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture, true, 1.0F) :
 				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconTexture, true, 1.0F);
-			}
 		}
 
 		Game_Effects::DrawBloodstain();
@@ -243,7 +236,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	return EXIT_SUCCESS;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -626,7 +619,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-void InitAndLoadGameConfig()
+inline void InitAndLoadGameConfig()
 {
 	Tools_Console::CreateConsole();
 	Game_Config::GatherNumberOfLevels();
@@ -653,7 +646,7 @@ void InitAndLoadGameConfig()
 	Tools_Console::CloseConsole();
 }
 
-void InitAndLoadLevel()
+inline void InitAndLoadLevel()
 {
 	Game_Transitions::LevelTransition();
 	Game_LevelHandling::CloseBackgroundMusic();
@@ -681,18 +674,17 @@ void InitAndLoadLevel()
 	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = Game_EntityHandling::EntityTypes::Player;
 }
 
-void MovePlayerAndCheckCollision()
+inline void MovePlayerAndCheckCollision()
 {
-	if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][Player.FuturePos.X][Player.FuturePos.Y] != 0
-		|| Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] == Game_EntityHandling::EntityTypes::Enemy
-		|| Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] == Game_EntityHandling::EntityTypes::Neutral
-		|| Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] == Game_EntityHandling::EntityTypes::Turret)
+	if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][Player.FuturePos.X][static_cast<std::int_fast32_t>(Player.Pos.Y)] == 0
+		&& Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(Player.Pos.X)][Player.FuturePos.Y] == 0
+		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != Game_EntityHandling::EntityTypes::Enemy
+		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != Game_EntityHandling::EntityTypes::Neutral
+		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != Game_EntityHandling::EntityTypes::Turret)
 	{
 		Player.Pos.X += Player.StepWidth.X;
 		Player.Pos.Y += Player.StepWidth.Y;
-	}
-	else
-	{
+
 		Game_WeaponHandling::WeaponPaceFlag = !Game_WeaponHandling::WeaponPaceFlag;
 		Game_WeaponHandling::WeaponPaceFlag ? Game_WeaponHandling::WeaponPace += Weapons[Player.SelectedWeapon].PaceFactor : Game_WeaponHandling::WeaponPace;
 		Game_WeaponHandling::HandleAmmoBoxPickup();
@@ -700,7 +692,7 @@ void MovePlayerAndCheckCollision()
 	}
 }
 
-void ControlPlayerMovement()
+inline void ControlPlayerMovement()
 {
 	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = Game_EntityHandling::EntityTypes::Clear;
 	Game_WeaponHandling::WeaponPaceFlag = false;
@@ -785,52 +777,36 @@ void ControlPlayerMovement()
 	if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerForwardKey))
 	{
 		const lwmf::FloatPointStruct StepTemp{ Player.Dir.X * Player.MoveSpeed, Player.Dir.Y * Player.MoveSpeed };
-
-		Player.Pos.X += StepTemp.X;
-		Player.Pos.Y += StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X + Player.Dir.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y + Player.Dir.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = -StepTemp.X;
-		Player.StepWidth.Y = -StepTemp.Y;
-
+		Player.StepWidth = StepTemp;
 		MovePlayerAndCheckCollision();
 	}
 	else if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerBackwardKey))
 	{
 		const lwmf::FloatPointStruct StepTemp{ Player.Dir.X * Player.MoveSpeed, Player.Dir.Y * Player.MoveSpeed };
-
-		Player.Pos.X -= StepTemp.X;
-		Player.Pos.Y -= StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X - Player.Dir.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y - Player.Dir.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth = StepTemp;
-
+		Player.StepWidth.X = -StepTemp.X;
+		Player.StepWidth.Y = -StepTemp.Y;
 		MovePlayerAndCheckCollision();
 	}
 
 	if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerStrafeRightKey))
 	{
 		const lwmf::FloatPointStruct StepTemp{ Plane.X * Player.MoveSpeed, Plane.Y * Player.MoveSpeed };
-
-		Player.Pos.X += StepTemp.X;
-		Player.Pos.Y += StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X + Plane.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y + Plane.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = -StepTemp.X;
-		Player.StepWidth.Y = -StepTemp.Y;
-
+		Player.StepWidth = StepTemp;
 		MovePlayerAndCheckCollision();
 	}
 	else if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey))
 	{
 		const lwmf::FloatPointStruct StepTemp{ Plane.X * Player.MoveSpeed, Plane.Y * Player.MoveSpeed };
-
-		Player.Pos.X -= StepTemp.X;
-		Player.Pos.Y -= StepTemp.Y;
 		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X - Plane.X * Player.CollisionDetectionFactor);
 		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y - Plane.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth = StepTemp;
-
+		Player.StepWidth.X = -StepTemp.X;
+		Player.StepWidth.Y = -StepTemp.Y;
 		MovePlayerAndCheckCollision();
 	}
 
