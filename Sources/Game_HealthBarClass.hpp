@@ -43,8 +43,7 @@ inline void Game_HealthBarClass::Init()
 {
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDHealthBarConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		Pos.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX");
-		Pos.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY");
+		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY") };
 		HealthBarWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "HealthBarWidth");
 		const std::int_fast32_t HealthBarLength{ lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "HealthBarLength") };
 		HealthBarFactor = HealthBarLength / 100;

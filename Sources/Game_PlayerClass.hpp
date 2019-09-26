@@ -54,10 +54,8 @@ inline void Game_PlayerClass::InitConfig()
 		Hitpoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "Hitpoints");
 		CollisionDetectionFactor = MoveSpeed + lwmf::ReadINIValue<float>(INIFile, "GENERAL", "CollisionDetectionWallDist");
 
-		Pos.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosX");
-		Pos.Y = lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosY");
-		Dir.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "DirX");
-		Dir.Y = lwmf::ReadINIValue<float>(INIFile, "POSITION", "DirY");
+		Pos = { lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosX"), lwmf::ReadINIValue<float>(INIFile, "POSITION", "PosY") };
+		Dir = { lwmf::ReadINIValue<float>(INIFile, "POSITION", "DirX"), lwmf::ReadINIValue<float>(INIFile, "POSITION", "DirY") };
 		SelectedWeapon = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WEAPON", "SelectedWeapon");
 	}
 }

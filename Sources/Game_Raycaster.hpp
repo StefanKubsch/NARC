@@ -42,8 +42,7 @@ namespace Game_Raycaster
 	{
 		if (const std::string INIFile{ "./DATA/GameConfig/RaycasterConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			PlaneStartValue.X = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue");
-			PlaneStartValue.Y = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue");
+			PlaneStartValue = { lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue"), lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue") };
 			VerticalLookUpLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookUpLimit");
 			VerticalLookDownLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookDownLimit");
 			VerticalLookStep = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookStep");

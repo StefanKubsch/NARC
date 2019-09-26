@@ -42,8 +42,7 @@ inline void Game_MinimapClass::Init()
 {
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDMinimapConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		Pos.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX");
-		Pos.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY");
+		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY") };
 		PlayerColor = lwmf::ReadINIValueRGBA(INIFile, "PLAYER");
 		EnemyColor = lwmf::ReadINIValueRGBA(INIFile, "ENEMY");
 		NeutralColor = lwmf::ReadINIValueRGBA(INIFile, "NEUTRAL");

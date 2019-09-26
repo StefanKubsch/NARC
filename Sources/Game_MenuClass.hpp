@@ -56,8 +56,7 @@ inline void Game_MenuClass::Init()
 {
 	if (const std::string INIFile{ "./DATA/GameConfig/MenuConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
-		Pos.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosX");
-		Pos.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosY");
+		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosY") };
 		Text.InitFont("./DATA/GameConfig/MenuConfig.ini", "MENUFONT");
 		TextHighlight.InitFont("./DATA/GameConfig/MenuConfig.ini", "MENUFONTHIGHLIGHT");
 	}

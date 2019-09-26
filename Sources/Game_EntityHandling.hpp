@@ -266,10 +266,8 @@ namespace Game_EntityHandling
 				Entities[Index].MoveSpeed = lwmf::ReadINIValue<float>(INIFile, "MOVEMENT", "MoveSpeed");
 				Entities[Index].MovementBehaviour = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MOVEMENT", "MovementBehaviour");
 				Entities[Index].AttackMode = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MOVEMENT", "AttackMode");
-				Entities[Index].Pos.X = lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosX");
-				Entities[Index].Pos.Y = lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosY");
-				Entities[Index].Dir.X = lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirX");
-				Entities[Index].Dir.Y = lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirY");
+				Entities[Index].Pos = { lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosX"), lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosY") };
+				Entities[Index].Dir = { lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirX"), lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirY") };
 				Entities[Index].Direction = lwmf::ReadINIValue<char>(INIFile, "DIRECTION", "Direction");
 				Entities[Index].RotationFactor = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DIRECTION", "RotationFactor");
 				Entities[Index].Hitpoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "STATUS", "Hitpoints");
@@ -450,32 +448,28 @@ namespace Game_EntityHandling
 				// Turn left (-> West) if moved North previously
 				if (Entity.Dir.X == -1.0F) //-V550
 				{
-					Entity.Dir.X = 0.0F;
-					Entity.Dir.Y = -1.0F;
+					Entity.Dir = { 0.0F, -1.0F };
 					Entity.Direction = 'W';
 					Entity.RotationFactor = 6;
 				}
 				// Turn left (-> East) if moved South previously
 				else if (Entity.Dir.X == 1.0F) //-V550
 				{
-					Entity.Dir.X = 0.0F;
-					Entity.Dir.Y = 1.0F;
+					Entity.Dir = { 0.0F, 1.0F };
 					Entity.Direction = 'E';
 					Entity.RotationFactor = 2;
 				}
 				// Turn left (-> North) if moved East previously
 				else if (Entity.Dir.Y == 1.0F) //-V550
 				{
-					Entity.Dir.X = -1.0F;
-					Entity.Dir.Y = 0.0F;
+					Entity.Dir = { -1.0F, 0.0F };
 					Entity.Direction = 'N';
 					Entity.RotationFactor = 0;
 				}
 				// Turn left (-> South) if moved West previously
 				else if (Entity.Dir.Y == -1.0F) //-V550
 				{
-					Entity.Dir.X = 1.0F;
-					Entity.Dir.Y = 0.0F;
+					Entity.Dir = { 1.0F, 0.0F };
 					Entity.Direction = 'S';
 					Entity.RotationFactor = 4;
 				}
@@ -486,32 +480,28 @@ namespace Game_EntityHandling
 				// Turn right (-> East) if moved North previously
 				if (Entity.Dir.X == -1.0F) //-V550
 				{
-					Entity.Dir.X = 0.0F;
-					Entity.Dir.Y = 1.0F;
+					Entity.Dir = { 0.0F, 1.0F };
 					Entity.Direction = 'E';
 					Entity.RotationFactor = 2;
 				}
 				// Turn right (-> West) if moved South previously
 				else if (Entity.Dir.X == 1.0F) //-V550
 				{
-					Entity.Dir.X = 0.0F;
-					Entity.Dir.Y = -1.0F;
+					Entity.Dir = { 0.0F, -1.0F };
 					Entity.Direction = 'W';
 					Entity.RotationFactor = 6;
 				}
 				// Turn right (-> South) if moved East previously
 				else if (Entity.Dir.Y == 1.0F) //-V550
 				{
-					Entity.Dir.X = 1.0F;
-					Entity.Dir.Y = 0.0F;
+					Entity.Dir = { 1.0F, 0.0F };
 					Entity.Direction = 'S';
 					Entity.RotationFactor = 4;
 				}
 				// Turn right (-> North) if moved West previously
 				else if (Entity.Dir.Y == -1.0F) //-V550
 				{
-					Entity.Dir.X = -1.0F;
-					Entity.Dir.Y = 0.0F;
+					Entity.Dir = { -1.0F, 0.0F };
 					Entity.Direction = 'N';
 					Entity.RotationFactor = 0;
 				}
@@ -528,32 +518,28 @@ namespace Game_EntityHandling
 		{
 			case 'N':
 			{
-				Entity.Dir.X = 1.0F;
-				Entity.Dir.Y = 0.0F;
+				Entity.Dir = { 1.0F, 0.0F };
 				Entity.Direction = 'S';
 				Entity.RotationFactor = 4;
 				break;
 			}
 			case 'E':
 			{
-				Entity.Dir.X = 0.0F;
-				Entity.Dir.Y = -1.0F;
+				Entity.Dir = { 0.0F, -1.0F };
 				Entity.Direction = 'W';
 				Entity.RotationFactor = 6;
 				break;
 			}
 			case 'S':
 			{
-				Entity.Dir.X = -1.0F;
-				Entity.Dir.Y = 0.0F;
+				Entity.Dir = { -1.0F, 0.0F };
 				Entity.Direction = 'N';
 				Entity.RotationFactor = 0;
 				break;
 			}
 			case 'W':
 			{
-				Entity.Dir.X = 0.0F;
-				Entity.Dir.Y = 1.0F;
+				Entity.Dir = { 0.0F, 1.0F };
 				Entity.Direction = 'E';
 				Entity.RotationFactor = 2;
 				break;

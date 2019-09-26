@@ -398,8 +398,7 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			{
 				case RIM_TYPEMOUSE:
 				{
-					HID_Mouse::MousePos.X = RawDev.data.mouse.lLastX;
-					HID_Mouse::MousePos.Y = RawDev.data.mouse.lLastY;
+					HID_Mouse::MousePos = { RawDev.data.mouse.lLastX, RawDev.data.mouse.lLastY };
 
 					if ((RawDev.data.mouse.ulButtons & RI_MOUSE_LEFT_BUTTON_DOWN) != 0)
 					{
@@ -740,28 +739,24 @@ inline void ControlPlayerMovement()
 
 	if (HID_Mouse::MousePos.X != HID_Mouse::OldMousePos.X)
 	{
-		const float RotationX{ GameControllerFlag ? HID_Gamepad::GameController.RotationXLimit * (HID_Gamepad::GameController.RightStick.X / InputSensitivity) : HID_Mouse::MousePos.X * InputSensitivity * (lwmf::PI / 180.0F) };
-		const float oldDirX{ Player.Dir.X };
-		const float TmpCos{ std::cosf(-RotationX) };
-		const float TmpSin{ std::sinf(-RotationX) };
+		const float RotationX{ GameControllerFlag ? HID_Gamepad::GameController.RotationXLimit * (HID_Gamepad::GameController.RightStick.X / InputSensitivity) : HID_Mouse::MousePos.X * InputSensitivity * lwmf::RAD2DEG };
+		const float TempCos{ std::cosf(-RotationX) };
+		const float TempSin{ std::sinf(-RotationX) };
 
-		Player.Dir.X = Player.Dir.X * TmpCos - Player.Dir.Y * TmpSin;
-		Player.Dir.Y = oldDirX * TmpSin + Player.Dir.Y * TmpCos;
-		const float oldPlaneX{ Plane.X };
-		Plane.X = Plane.X * TmpCos - Plane.Y * TmpSin;
-		Plane.Y = oldPlaneX * TmpSin + Plane.Y * TmpCos;
+		Player.Dir = { Player.Dir.X * TempCos - Player.Dir.Y * TempSin, Player.Dir.X * TempSin + Player.Dir.Y * TempCos };
+		Plane = { Plane.X * TempCos - Plane.Y * TempSin, Plane.X * TempSin + Plane.Y * TempCos };
 	}
 
 	if (HID_Mouse::MousePos.Y != HID_Mouse::OldMousePos.Y)
 	{
 		// Check if "future" view is in given boundaries and apply if true!
-		if (HID_Mouse::MousePos.Y < 0 && VerticalLookCamera + VerticalLookStep * -(HID_Mouse::MousePos.Y * InputSensitivity) < VerticalLookUpLimit)
+		if (const float LookTemp1{ VerticalLookStep * -(HID_Mouse::MousePos.Y * InputSensitivity) }; HID_Mouse::MousePos.Y < 0 && VerticalLookCamera + LookTemp1 < VerticalLookUpLimit)
 		{
-			VerticalLookCamera += VerticalLookStep * -(HID_Mouse::MousePos.Y * InputSensitivity);
+			VerticalLookCamera += LookTemp1;
 		}
-		else if (HID_Mouse::MousePos.Y > 0 && -(VerticalLookCamera - VerticalLookStep * (HID_Mouse::MousePos.Y * InputSensitivity)) < VerticalLookDownLimit)
+		else if (const float LookTemp2{ VerticalLookStep * (HID_Mouse::MousePos.Y * InputSensitivity) }; HID_Mouse::MousePos.Y > 0 && -(VerticalLookCamera - LookTemp2) < VerticalLookDownLimit)
 		{
-			VerticalLookCamera -= VerticalLookStep * (HID_Mouse::MousePos.Y * InputSensitivity);
+			VerticalLookCamera -= LookTemp2;
 		}
 
 		VerticalLook = static_cast<std::int_fast32_t>(ScreenTexture.Height * VerticalLookCamera);
@@ -776,37 +771,27 @@ inline void ControlPlayerMovement()
 
 	if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerForwardKey))
 	{
-		const lwmf::FloatPointStruct StepTemp{ Player.Dir.X * Player.MoveSpeed, Player.Dir.Y * Player.MoveSpeed };
-		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X + Player.Dir.X * Player.CollisionDetectionFactor);
-		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y + Player.Dir.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth = StepTemp;
+		Player.FuturePos = { static_cast<std::int_fast32_t>(Player.Pos.X + Player.Dir.X * Player.CollisionDetectionFactor), static_cast<std::int_fast32_t>(Player.Pos.Y + Player.Dir.Y * Player.CollisionDetectionFactor) };
+		Player.StepWidth = { Player.Dir.X * Player.MoveSpeed, Player.Dir.Y * Player.MoveSpeed };
 		MovePlayerAndCheckCollision();
 	}
 	else if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerBackwardKey))
 	{
-		const lwmf::FloatPointStruct StepTemp{ Player.Dir.X * Player.MoveSpeed, Player.Dir.Y * Player.MoveSpeed };
-		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X - Player.Dir.X * Player.CollisionDetectionFactor);
-		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y - Player.Dir.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = -StepTemp.X;
-		Player.StepWidth.Y = -StepTemp.Y;
+		Player.FuturePos = { static_cast<std::int_fast32_t>(Player.Pos.X - Player.Dir.X * Player.CollisionDetectionFactor), static_cast<std::int_fast32_t>(Player.Pos.Y - Player.Dir.Y * Player.CollisionDetectionFactor) };
+		Player.StepWidth = { -(Player.Dir.X * Player.MoveSpeed), -(Player.Dir.Y * Player.MoveSpeed) };
 		MovePlayerAndCheckCollision();
 	}
 
 	if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerStrafeRightKey))
 	{
-		const lwmf::FloatPointStruct StepTemp{ Plane.X * Player.MoveSpeed, Plane.Y * Player.MoveSpeed };
-		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X + Plane.X * Player.CollisionDetectionFactor);
-		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y + Plane.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth = StepTemp;
+		Player.FuturePos = { static_cast<std::int_fast32_t>(Player.Pos.X + Plane.X * Player.CollisionDetectionFactor), static_cast<std::int_fast32_t>(Player.Pos.Y + Plane.Y * Player.CollisionDetectionFactor) };
+		Player.StepWidth = { Plane.X * Player.MoveSpeed, Plane.Y * Player.MoveSpeed };
 		MovePlayerAndCheckCollision();
 	}
 	else if (HID_Keyboard::GetKeyState(HID_Keyboard::MovePlayerStrafeLeftKey))
 	{
-		const lwmf::FloatPointStruct StepTemp{ Plane.X * Player.MoveSpeed, Plane.Y * Player.MoveSpeed };
-		Player.FuturePos.X = static_cast<std::int_fast32_t>(Player.Pos.X - Plane.X * Player.CollisionDetectionFactor);
-		Player.FuturePos.Y = static_cast<std::int_fast32_t>(Player.Pos.Y - Plane.Y * Player.CollisionDetectionFactor);
-		Player.StepWidth.X = -StepTemp.X;
-		Player.StepWidth.Y = -StepTemp.Y;
+		Player.FuturePos = { static_cast<std::int_fast32_t>(Player.Pos.X - Plane.X * Player.CollisionDetectionFactor), static_cast<std::int_fast32_t>(Player.Pos.Y - Plane.Y * Player.CollisionDetectionFactor) };
+		Player.StepWidth = { -(Plane.X * Player.MoveSpeed), -(Plane.Y * Player.MoveSpeed) };
 		MovePlayerAndCheckCollision();
 	}
 

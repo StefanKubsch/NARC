@@ -29,8 +29,7 @@ private:
 
 inline GFX_LightingClass::GFX_LightingClass(const float PosX, const float PosY, const std::int_fast32_t Location, const float Radius, const float Intensity)
 {
-	this->Pos.X		= PosX;
-	this->Pos.Y		= PosY;
+	this->Pos		= { PosX, PosY };
 	this->Location	= Location;
 	this->Radius	= Radius;
 	this->Intensity	= Intensity;

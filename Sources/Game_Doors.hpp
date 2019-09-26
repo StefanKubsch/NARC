@@ -90,8 +90,7 @@ namespace Game_Doors
 					Doors[Index].DoorType = FoundDoorType;
 					Doors[Index].AnimTexture = DoorTypes[FoundDoorType].OriginalTexture;
 					Doors[Index].Number = Index;
-					Doors[Index].Pos.X = MapPosX;
-					Doors[Index].Pos.Y = MapPosY;
+					Doors[Index].Pos = { MapPosX, MapPosY };
 
 					++Index;
 				}
