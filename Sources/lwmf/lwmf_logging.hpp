@@ -15,6 +15,7 @@
 
 #include <cstring>
 #include <string>
+#include <vector>
 #include <exception>
 #include <stdexcept>
 #include <fstream>
@@ -51,8 +52,8 @@ namespace lwmf
 	class Logging final
 	{
 	public:
-		Logging(const std::string& Logfilename);
-		~Logging();
+		Logging(const std::string& Logfilename) noexcept;
+		~Logging() noexcept;
 		void AddEntry(LogLevel Level, const char* Filename, const std::string& Message);
 
 	private:
@@ -61,7 +62,7 @@ namespace lwmf
 		std::ofstream Logfile;
 	};
 
-	Logging::Logging(const std::string& Logfilename)
+	Logging::Logging(const std::string& Logfilename) noexcept
 	{
 		if (LoggingEnabled)
 		{
@@ -78,7 +79,7 @@ namespace lwmf
 		}
 	}
 
-	Logging::~Logging()
+	Logging::~Logging() noexcept
 	{
 		if (LoggingEnabled)
 		{
@@ -148,10 +149,10 @@ namespace lwmf
 	inline std::string Logging::GetTimeStamp()
 	{
 		const auto CurrentTime{ std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) };
-		char TimeString[26];
-		ctime_s(TimeString, sizeof(TimeString), &CurrentTime);
-
-		return std::string(TimeString);
+		std::vector<char> TimeString(26);
+		ctime_s(TimeString.data(), TimeString.size(), &CurrentTime);
+		const std::string ReturnString(TimeString.begin(), TimeString.end());
+		return ReturnString;
 	}
 
 

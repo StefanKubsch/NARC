@@ -314,7 +314,7 @@ void stbtt_GetCodepointBitmapBoxSubpixel(const stbtt_fontinfo& font, std::int_fa
 // the following functions are equivalent to the above functions, but operate
 // on glyph indices instead of Unicode codepoints (for efficiency)
 void stbtt_MakeGlyphBitmap(const stbtt_fontinfo& info, unsigned char* output, std::int_fast32_t out_w, std::int_fast32_t out_h, std::int_fast32_t out_stride, float scale_x, float scale_y, std::int_fast32_t glyph);
-void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo& info, unsigned char* output, std::int_fast32_t out_w, std::int_fast32_t out_h, std::int_fast32_t out_stride, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t glyph);
+void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo& info, const unsigned char* output, std::int_fast32_t out_w, std::int_fast32_t out_h, std::int_fast32_t out_stride, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t glyph);
 void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo& font, std::int_fast32_t glyph, float scale_x, float scale_y, std::int_fast32_t& ix0, std::int_fast32_t& iy0, std::int_fast32_t& ix1, std::int_fast32_t& iy1);
 void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo& font, std::int_fast32_t glyph, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t& ix0, std::int_fast32_t& iy0, std::int_fast32_t& ix1, std::int_fast32_t& iy1);
 
@@ -1472,7 +1472,6 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 	while (b.cursor < b.size)
 	{
 		std::int_fast32_t i{};
-		std::int_fast32_t clear_stack{ 1 };
 		const std::int_fast32_t b0{ stbtt__buf_get8(b) };
 
 		switch (b0)
@@ -1751,7 +1750,6 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 				}
 
 				b.cursor = 0;
-				clear_stack = 0;
 				break;
 			}
 			case 0x0B: // return
@@ -1762,7 +1760,6 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 				}
 
 				b = subr_stack[--subr_stack_height];
-				clear_stack = 0;
 				break;
 			}
 			case 0x0E: // endchar
@@ -1841,7 +1838,7 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 
 				// push immediate
 				float f{};
-				b0 == 255 ? f = static_cast<float>(static_cast<std::int_fast32_t>(stbtt__buf_get((b), 4)) / 0x10000) : (stbtt__buf_skip(b, -1), f = static_cast<float>(stbtt__cff_int(b)));
+				b0 == 255 ? f = static_cast<float>(stbtt__buf_get(b, 4)) / 65536.0F : (stbtt__buf_skip(b, -1), f = static_cast<float>(stbtt__cff_int(b)));
 
 				if (sp >= 48)
 				{
@@ -1849,7 +1846,6 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 				}
 
 				s[sp++] = f;
-				clear_stack = 0;
 				break;
 			}
 		}
@@ -1918,7 +1914,7 @@ inline void stbtt_GetGlyphHMetrics(const stbtt_fontinfo& info, const std::int_fa
 
 inline float stbtt_ScaleForPixelHeight(const stbtt_fontinfo& info, const float height)
 {
-	return static_cast<float>(height / (ttSHORT(info.data + info.hhea + 4) - ttSHORT(info.data + info.hhea + 6)));
+	return height / static_cast<float>((ttSHORT(info.data + info.hhea + 4) - ttSHORT(info.data + info.hhea + 6)));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2106,7 +2102,7 @@ inline static void stbtt__handle_clipped_edge(float* scanline, const std::int_fa
 	{
 		scanline[x] += e->direction * (y1 - y0);
 	}
-	else if (x0 >= x + 1 && x1 >= x + 1)
+	else if (x0 >= static_cast<float>(x) + 1.0F && x1 >= static_cast<float>(x) + 1.0F)
 	{
 		// dummy
 	}
@@ -2189,12 +2185,12 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 					const std::int_fast32_t x1{ static_cast<std::int_fast32_t>(x_top) };
 					const std::int_fast32_t x2{ static_cast<std::int_fast32_t>(x_bottom) };
 					// compute intersection with y axis at x1+1
-					float y_crossing{ (x1 + 1 - x0) * dy + y_top };
+					float y_crossing{ (static_cast<float>(x1) + 1.0F - x0) * dy + y_top };
 					const float sign{ e->direction };
 					// area of the rectangle covered from y0..y_crossing
 					float area{ sign * (y_crossing - sy0) };
 					// area of the triangle (x_top,y0), (x+1,y0), (x+1,y_crossing)
-					scanline[x1] += area * (1 - ((x_top - x1) + (x1 + 1 - x1)) / 2);
+					scanline[x1] += area * (1.0F - ((x_top - static_cast<float>(x1)) + (static_cast<float>(x1) + 1.0F - static_cast<float>(x1))) / 2.0F);
 					const float step{ sign * dy };
 
 					for (std::int_fast32_t x{ x1 + 1 }; x < x2; ++x)
@@ -2203,8 +2199,8 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 						area += step;
 					}
 
-					y_crossing += dy * (x2 - (x1 + 1));
-					scanline[x2] += area + sign * (1 - ((x2 - x2) + (x_bottom - x2)) / 2.0F) * (sy1 - y_crossing);
+					y_crossing += dy * (static_cast<float>(x2) - (static_cast<float>(x1) + 1.0F));
+					scanline[x2] += area + sign * (1.0F - ((static_cast<float>(x2) - static_cast<float>(x2)) + (x_bottom - static_cast<float>(x2))) / 2.0F) * (sy1 - y_crossing);
 					scanline_fill[x2] += sign * (sy1 - sy0);
 				}
 			}
@@ -2230,9 +2226,9 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 					// that, we need to explicitly produce segments based on x positions.
 
 					const float x1{ static_cast<float>(x) };
-					const float x2{ static_cast<float>(x + 1) };
-					const float y1{ (x - x0) / dx + y_top };
-					const float y2{ (x + 1 - x0) / dx + y_top };
+					const float x2{ static_cast<float>(x) + 1.0F };
+					const float y1{ (static_cast<float>(x) - x0) / dx + y_top };
+					const float y2{ (static_cast<float>(x) + 1.0F - x0) / dx + y_top };
 
 					if (x0 < x1 && xb > x2)
 					{	// three segments descending down-right
@@ -2873,8 +2869,8 @@ inline void stbtt_GetBakedQuad(const std::vector<stbtt_bakedchar>& chardata, con
 
 	q.x0 = round_x + d3d_bias;
 	q.y0 = round_y + d3d_bias;
-	q.x1 = round_x + b.x1 - b.x0 + d3d_bias;
-	q.y1 = round_y + b.y1 - b.y0 + d3d_bias;
+	q.x1 = static_cast<float>(round_x + b.x1 - b.x0) + d3d_bias;
+	q.y1 = static_cast<float>(round_y + b.y1 - b.y0) + d3d_bias;
 
 	q.s0 = b.x0 * ipw;
 	q.t0 = b.y0 * iph;

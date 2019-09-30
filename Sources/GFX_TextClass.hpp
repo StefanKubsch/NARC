@@ -87,7 +87,6 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			const std::int_fast32_t Height{ FontHeight + 5 };
 			constexpr std::int_fast32_t FirstASCIIChar{ 32 };
 			constexpr std::int_fast32_t LastASCIIChar{ 127 };
-			constexpr std::int_fast32_t NumberOfASCIIChars{ LastASCIIChar - FirstASCIIChar };
 
 			for (char Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
 			{
@@ -95,15 +94,17 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				lwmf::IntPointStruct i1{};
 
 				stbtt_GetCodepointBitmapBox(FontInfo, Char, 1.0F, 1.0F, i0.X, i0.Y, i1.X, i1.Y);
-				Width += 1 + static_cast<std::int_fast32_t>((i1.X * FontSize / 1000.0F) + 1.0F) - static_cast<std::int_fast32_t>(i0.X * FontSize / 1000.0F);
+				Width += 1 + (i1.X * static_cast<std::int_fast32_t>(FontSize) / 1000) + 1 - (i0.X * static_cast<std::int_fast32_t>(FontSize) / 1000);
 			}
 
-			std::vector<unsigned char> BakedFontGreyscale(static_cast<std::size_t>(Width) * static_cast<std::size_t>(Height));
+			const std::size_t Size{ static_cast<std::size_t>(Width)* static_cast<std::size_t>(Height) };
+			std::vector<unsigned char> BakedFontGreyscale(Size);
+			constexpr std::int_fast32_t NumberOfASCIIChars{ LastASCIIChar - FirstASCIIChar };
 			std::vector<stbtt_bakedchar> CharData(NumberOfASCIIChars);
 			stbtt_BakeFontBitmap(FontBuffer, 0, static_cast<float>(FontSize), BakedFontGreyscale, Width, Height, FirstASCIIChar, NumberOfASCIIChars, CharData);
 
 			// Since the glyphs were rendered in greyscale, they need to be colored...
-			std::vector<std::int_fast32_t> FontColor(static_cast<std::size_t>(Width) * static_cast<std::size_t>(Height));
+			std::vector<std::int_fast32_t> FontColor(Size);
 
 			for (std::size_t i{}; i < BakedFontGreyscale.size(); ++i)
 			{
