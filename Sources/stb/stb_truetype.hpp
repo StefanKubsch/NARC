@@ -1179,7 +1179,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 
 		while (more != 0)
 		{
-			float mtx[6]{ 1, 0, 0, 1, 0, 0 };
+			std::vector<float> mtx{ 1, 0, 0, 1, 0, 0 };
 
 			const std::int_fast32_t flags{ static_cast<std::int_fast32_t>(ttSHORT(comp)) };
 			comp += 2;
@@ -1206,7 +1206,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 
 			if ((flags & (1 << 3)) != 0)
 			{ // WE_HAVE_A_SCALE
-				mtx[0] = ttSHORT(comp) / 16384.0F;
+				mtx[0] = static_cast<float>(ttSHORT(comp)) / 16384.0F;
 				mtx[3] = mtx[0];
 				comp += 2;
 				mtx[1] = 0;
@@ -1214,22 +1214,22 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 			}
 			else if ((flags & (1 <<6 )) != 0)
 			{ // WE_HAVE_AN_X_AND_YSCALE
-				mtx[0] = ttSHORT(comp) / 16384.0F;
+				mtx[0] = static_cast<float>(ttSHORT(comp)) / 16384.0F;
 				comp += 2;
 				mtx[1] = 0;
 				mtx[2] = 0;
-				mtx[3] = ttSHORT(comp) / 16384.0F;
+				mtx[3] = static_cast<float>(ttSHORT(comp)) / 16384.0F;
 				comp+=2;
 			}
 			else if ((flags & (1 << 7)) != 0)
 			{ // WE_HAVE_A_TWO_BY_TWO
-				mtx[0] = ttSHORT(comp) / 16384.0F;
+				mtx[0] = static_cast<float>(ttSHORT(comp)) / 16384.0F;
 				comp += 2;
-				mtx[1] = ttSHORT(comp) / 16384.0F;
+				mtx[1] = static_cast<float>(ttSHORT(comp)) / 16384.0F;
 				comp += 2;
-				mtx[2] = ttSHORT(comp) / 16384.0F;
+				mtx[2] = static_cast<float>(ttSHORT(comp)) / 16384.0F;
 				comp += 2;
-				mtx[3] = ttSHORT(comp) / 16384.0F;
+				mtx[3] = static_cast<float>(ttSHORT(comp)) / 16384.0F;
 				comp += 2;
 			}
 
@@ -2362,7 +2362,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 			for (std::int_fast32_t i{}; i < result.w; ++i)
 			{
 				sum += scanline2[i];
-				std::int_fast32_t m{ static_cast<std::int_fast32_t>(std::abs(scanline[i] + sum) * 255.0F + 0.5F) };
+				std::int_fast32_t m{ static_cast<std::int_fast32_t>(std::round(std::abs(scanline[i] + sum) * 255.0F)) };
 
 				if (m > 255)
 				{

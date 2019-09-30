@@ -44,7 +44,7 @@ namespace lwmf
 
 		void Ortho2D(std::vector<GLfloat>& Matrix, GLfloat Left, GLfloat Right, GLfloat Bottom, GLfloat Top);
 		void UpdateVertices(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-		const std::string LoadShaderSource(const std::string& FileName, const std::string& ShaderName);
+		std::string LoadShaderSource(const std::string& FileName, const std::string& ShaderName);
 		void CheckError(std::int_fast32_t Line);
 		void CheckCompileError(GLuint Task, Components Component);
 
@@ -350,7 +350,7 @@ namespace lwmf
 		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
 	}
 
-	inline const std::string ShaderClass::LoadShaderSource(const std::string& FileName, const std::string& ShaderName)
+	inline std::string ShaderClass::LoadShaderSource(const std::string& FileName, const std::string& ShaderName)
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "(Shadername " + ShaderName + ") - Loading shaderfile " + FileName);
 

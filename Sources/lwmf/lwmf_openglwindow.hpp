@@ -168,9 +168,9 @@ namespace lwmf
 				glGetIntegerv(GL_MINOR_VERSION, &MinorVersion);
 
 				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL version: " + std::to_string(MajorVersion) + "." + std::to_string(MinorVersion));
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL vendor: " + std::string((const char*)glGetString(GL_VENDOR)));
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL renderer: " + std::string((const char*)glGetString(GL_RENDERER)));
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Primary OpenGL shading language version: " + std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL vendor: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL renderer: " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Primary OpenGL shading language version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))));
 			}
 		}
 	}

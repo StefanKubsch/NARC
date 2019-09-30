@@ -18,6 +18,8 @@
 #include <map>
 #include <cmath>
 
+#include "lwmf_general.hpp"
+
 #pragma comment(lib, "xinput")
 
 namespace lwmf
@@ -153,11 +155,10 @@ namespace lwmf
 		ZeroMemory(&State, sizeof(XINPUT_STATE));
 		XInputGetState(ControllerID, &State);
 
-		const float NormalizedLX{ max(-1, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX) };
-		const float NormalizedLY{ max(-1, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
+		const FloatPointStruct NormalizedL{ max(-1, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX), max(-1, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
 
-		LeftStick.X = (std::abs(NormalizedLX) < DeadZone.X ? 0.0F : (std::abs(NormalizedLX) - DeadZone.X) * (NormalizedLX / std::abs(NormalizedLX)));
-		LeftStick.Y = (std::abs(NormalizedLY) < DeadZone.Y ? 0.0F : (std::abs(NormalizedLY) - DeadZone.Y) * (NormalizedLY / std::abs(NormalizedLY)));
+		LeftStick.X = (std::abs(NormalizedL.X) < DeadZone.X ? 0.0F : (std::abs(NormalizedL.X) - DeadZone.X) * (NormalizedL.X / std::abs(NormalizedL.X)));
+		LeftStick.Y = (std::abs(NormalizedL.Y) < DeadZone.Y ? 0.0F : (std::abs(NormalizedL.Y) - DeadZone.Y) * (NormalizedL.Y / std::abs(NormalizedL.Y)));
 
 		if (DeadZone.X > 0.0F)
 		{
@@ -169,11 +170,10 @@ namespace lwmf
 			LeftStick.Y *= 1.0F / (1.0F - DeadZone.Y);
 		}
 
-		const float NormalizedRX{ max(-1, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX) };
-		const float NormalizedRY{ max(-1, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
+		const FloatPointStruct NormalizedR{ max(-1, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX), max(-1, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
 
-		RightStick.X = (std::abs(NormalizedRX) < DeadZone.X ? 0.0F : (std::abs(NormalizedRX) - DeadZone.X) * (NormalizedRX / std::abs(NormalizedRX)));
-		RightStick.Y = (std::abs(NormalizedRY) < DeadZone.Y ? 0.0F : (std::abs(NormalizedRY) - DeadZone.Y) * (NormalizedRY / std::abs(NormalizedRY)));
+		RightStick.X = (std::abs(NormalizedR.X) < DeadZone.X ? 0.0F : (std::abs(NormalizedR.X) - DeadZone.X) * (NormalizedR.X / std::abs(NormalizedR.X)));
+		RightStick.Y = (std::abs(NormalizedR.Y) < DeadZone.Y ? 0.0F : (std::abs(NormalizedR.Y) - DeadZone.Y) * (NormalizedR.Y / std::abs(NormalizedR.Y)));
 
 		if (DeadZone.X > 0.0F)
 		{

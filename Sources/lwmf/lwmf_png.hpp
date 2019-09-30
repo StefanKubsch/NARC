@@ -558,7 +558,6 @@ namespace lwmf
 			std::int_fast32_t Pos{ 33 };
 			std::vector<unsigned char> ImageData;
 			bool ImageEnd{};
-			bool KnownType{ true };
 			PNGInfo.KeyDefined = false;
 
 			while (!ImageEnd)
@@ -673,7 +672,6 @@ namespace lwmf
 					}
 
 					Pos += (ChunkLength + 4);
-					KnownType = false;
 				}
 
 				Pos += 4;

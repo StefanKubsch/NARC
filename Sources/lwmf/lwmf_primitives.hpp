@@ -311,8 +311,7 @@ namespace lwmf
 			return;
 		}
 
-		std::int_fast32_t x{ -Radius };
-		std::int_fast32_t y{};
+		IntPointStruct Dot{ -Radius, 0 };
 		std::int_fast32_t Error{ 2 - (Radius << 1) };
 
 		// if complete circle is within screen boundaries, there is no reason to use SetPixelSafe...
@@ -320,44 +319,44 @@ namespace lwmf
 		{
 			do
 			{
-				Texture.Pixels[((CenterY + y) * Texture.Width) + (CenterX - x)] = Color;
-				Texture.Pixels[((CenterY - x) * Texture.Width) + (CenterX - y)] = Color;
-				Texture.Pixels[((CenterY - y) * Texture.Width) + (CenterX + x)] = Color;
-				Texture.Pixels[((CenterY + x) * Texture.Width) + (CenterX + y)] = Color;
+				Texture.Pixels[((CenterY + Dot.Y) * Texture.Width) + (CenterX - Dot.X)] = Color;
+				Texture.Pixels[((CenterY - Dot.X) * Texture.Width) + (CenterX - Dot.Y)] = Color;
+				Texture.Pixels[((CenterY - Dot.Y) * Texture.Width) + (CenterX + Dot.X)] = Color;
+				Texture.Pixels[((CenterY + Dot.X) * Texture.Width) + (CenterX + Dot.Y)] = Color;
 				Radius = Error;
 
-				if (Radius <= y)
+				if (Radius <= Dot.Y)
 				{
-					Error += (++y << 1) + 1;
+					Error += (++Dot.Y << 1) + 1;
 				}
 
-				if (Radius > x || Error > y)
+				if (Radius > Dot.X || Error > Dot.Y)
 				{
-					Error += (++x << 1) + 1;
+					Error += (++Dot.X << 1) + 1;
 				}
-			} while (x < 0);
+			} while (Dot.X < 0);
 		}
 		// ...or use the "safe" version!
 		else
 		{
 			do
 			{
-				SetPixelSafe(Texture, CenterX - x, CenterY + y, Color);
-				SetPixelSafe(Texture, CenterX - y, CenterY - x, Color);
-				SetPixelSafe(Texture, CenterX + x, CenterY - y, Color);
-				SetPixelSafe(Texture, CenterX + y, CenterY + x, Color);
+				SetPixelSafe(Texture, CenterX - Dot.X, CenterY + Dot.Y, Color);
+				SetPixelSafe(Texture, CenterX - Dot.Y, CenterY - Dot.X, Color);
+				SetPixelSafe(Texture, CenterX + Dot.X, CenterY - Dot.Y, Color);
+				SetPixelSafe(Texture, CenterX + Dot.Y, CenterY + Dot.X, Color);
 				Radius = Error;
 
-				if (Radius <= y)
+				if (Radius <= Dot.Y)
 				{
-					Error += (++y << 1) + 1;
+					Error += (++Dot.Y << 1) + 1;
 				}
 
-				if (Radius > x || Error > y)
+				if (Radius > Dot.X || Error > Dot.Y)
 				{
-					Error += (++x << 1) + 1;
+					Error += (++Dot.X << 1) + 1;
 				}
-			} while (x < 0);
+			} while (Dot.X < 0);
 		}
 	}
 
