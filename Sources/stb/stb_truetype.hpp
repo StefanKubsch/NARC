@@ -1249,14 +1249,14 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 					short x{ comp_verts[i].x };
 					short y{ comp_verts[i].y };
 
-					comp_verts[i].x = static_cast<short>(m * (mtx[0] * x + mtx[2] * y + mtx[4]));
-					comp_verts[i].y = static_cast<short>(n * (mtx[1] * x + mtx[3] * y + mtx[5]));
+					comp_verts[i].x = static_cast<short>(m* (mtx[0] * static_cast<float>(x) + mtx[2] * static_cast<float>(y) + mtx[4]));
+					comp_verts[i].y = static_cast<short>(n* (mtx[1] * static_cast<float>(x) + mtx[3] * static_cast<float>(y) + mtx[5]));
 
 					x = comp_verts[i].cx;
 					y = comp_verts[i].cy;
 
-					comp_verts[i].cx = static_cast<short>(m * (mtx[0] * x + mtx[2] * y + mtx[4]));
-					comp_verts[i].cy = static_cast<short>(n * (mtx[1] * x + mtx[3] * y + mtx[5]));
+					comp_verts[i].cx = static_cast<short>(m* (mtx[0] * static_cast<float>(x) + mtx[2] * static_cast<float>(y) + mtx[4]));
+					comp_verts[i].cy = static_cast<short>(n* (mtx[1] * static_cast<float>(x) + mtx[3] * static_cast<float>(y) + mtx[5]));
 				}
 
 				// Append vertices.
@@ -2275,11 +2275,10 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 }
 
 // directly AA rasterize edges w/o supersampling
-inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__edge* e, const std::int_fast32_t n, const std::int_fast32_t vsubsample, const std::int_fast32_t off_x, const std::int_fast32_t off_y, void* userdata)
+inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__edge* e, const std::int_fast32_t n, const std::int_fast32_t off_x, const std::int_fast32_t off_y, void* userdata)
 {
 	stbtt__hheap hh{};
 	stbtt__active_edge* active{};
-	static_cast<void>(vsubsample);
 	std::vector<float> scanline(129);
 
 	if (result.w > 64)
@@ -2290,15 +2289,15 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 	std::vector<float> scanline2(scanline.size() + static_cast<std::size_t>(result.w));
 	std::int_fast32_t y{ off_y };
 
-	e[n].y0 = static_cast<float>((off_y + result.h)) + 1.0F;
+	e[n].y0 = static_cast<float>(off_y + result.h) + 1.0F;
 
 	std::int_fast32_t j{};
 
 	while (j < result.h)
 	{
 		// find center of pixel for this scanline
-		const float scan_y_top{ y + 0.0F };
-		const float scan_y_bottom{ y + 1.0F };
+		const float scan_y_top{ static_cast<float>(y) };
+		const float scan_y_bottom{ static_cast<float>(y) + 1.0F };
 
 		stbtt__active_edge** step{ &active };
 
@@ -2419,14 +2418,14 @@ inline static void stbtt__sort_edges_quicksort(stbtt__edge* p, std::int_fast32_t
 	{
 		// compute median of three
 		const std::int_fast32_t m{ n >> 1 };
-		const std::int_fast32_t c01{ static_cast<std::int_fast32_t>((&p[0])->y0 < (&p[m])->y0) };
-		const std::int_fast32_t c12{ static_cast<std::int_fast32_t>((&p[m])->y0 < (&p[n - 1])->y0) };
+		const bool c01{ (&p[0])->y0 < (&p[m])->y0 };
+		const bool c12{ (&p[m])->y0 < (&p[n - 1])->y0 };
 
 		// if 0 >= mid >= end, or 0 < mid < end, then use mid
 		if (c01 != c12)
 		{
 			// otherwise, we'll need to swap something else to middle
-			const std::int_fast32_t c{ static_cast<std::int_fast32_t>((&p[0])->y0 < (&p[n - 1])->y0) };
+			const bool c{ (&p[0])->y0 < (&p[n - 1])->y0 };
 
 			// 0>mid && mid<n:  0>n => n; 0<n => 0
 			// 0<mid && mid>n:  0>n => 0; 0<n => n
@@ -2518,8 +2517,6 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, co
 
 	std::int_fast32_t m{};
 	const float y_scale_inv{ (invert != 0) ? -scale_y : scale_y };
-	constexpr std::int_fast32_t vsubsample{ 1 };
-	// vsubsample should divide 255 evenly; otherwise we won't reach full opacity
 
 	for (std::int_fast32_t i{}; i < windings; ++i)
 	{
@@ -2548,9 +2545,9 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, co
 			}
 
 			e[n].x0 = p[a].x * scale_x + shift_x;
-			e[n].y0 = (p[a].y * y_scale_inv + shift_y) * vsubsample;
+			e[n].y0 = (p[a].y * y_scale_inv + shift_y);
 			e[n].x1 = p[b].x * scale_x + shift_x;
-			e[n].y1 = (p[b].y * y_scale_inv + shift_y) * vsubsample;
+			e[n].y1 = (p[b].y * y_scale_inv + shift_y);
 
 			++n;
 		}
@@ -2560,7 +2557,7 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, co
 	stbtt__sort_edges(e, n);
 
 	// now, traverse the scanlines and find the intersections on each scanline, use xor winding rule
-	stbtt__rasterize_sorted_edges(result, e.data(), n, vsubsample, off_x, off_y, userdata);
+	stbtt__rasterize_sorted_edges(result, e.data(), n, off_x, off_y, userdata);
 }
 
 inline static void stbtt__add_point(std::vector<stbtt__point>& points, const std::int_fast32_t n, const float x, const float y)
