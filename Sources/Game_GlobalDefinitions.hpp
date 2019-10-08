@@ -35,9 +35,6 @@ inline bool VSync{};
 inline std::int_fast32_t TextureSize{};
 inline std::int_fast32_t EntitySize{};
 
-// Factor for bitwise texture operations is calculated correctly dependent on TextureSize in "Game_Config.hpp"
-inline std::int_fast32_t TextureSizeBitwiseAnd{};
-
 // Set factor for bitshifting from TextureSize
 // 7 for 128x128, 8 for 256x256, 9 for 512x512, 10 for 1024x1024
 // is calculated in "Game_Config.hpp" dependent on given TextureSize
@@ -49,7 +46,6 @@ inline std::uint_fast32_t FrameLock{};
 inline bool GamePausedFlag{};
 inline bool GameControllerFlag{};
 inline bool QuitGameFlag{};
-inline bool HUDEnabled{ true };
 
 // Random Number Generator
 // C++ 11 Mersenne-Twister-Engine

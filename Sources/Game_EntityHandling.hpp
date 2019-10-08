@@ -203,7 +203,17 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			if (const std::string Texture{ "./GFX/Entities/" + std::to_string(EntitySize) + "/" + AssetTypeName + "/" + AnimType + "/" + std::to_string(TextureIndex) + ".png" }; Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
+			std::string Texture{ "./GFX/Entities/" };
+			Texture += std::to_string(EntitySize);
+			Texture += "/";
+			Texture += AssetTypeName;
+			Texture += "/";
+			Texture += AnimType;
+			Texture += "/";
+			Texture += std::to_string(TextureIndex);
+			Texture += ".png";
+
+			if (Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
 			{
 				AnimVector.emplace_back(GFX_ImageHandling::ImportTexture(Texture, EntitySize));
 				++TextureIndex;
@@ -262,6 +272,7 @@ namespace Game_EntityHandling
 
 				Entities[Index].WalkAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "WalkAnimStepWidth");
 				Entities[Index].AttackAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "AttackAnimStepWidth");
+				Entities[Index].KillAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "KillAnimStepWidth");
 				Entities[Index].MoveV = lwmf::ReadINIValue<float>(INIFile, "ENTITY", "EntityMoveV");
 				Entities[Index].MoveSpeed = lwmf::ReadINIValue<float>(INIFile, "MOVEMENT", "MoveSpeed");
 				Entities[Index].MovementBehaviour = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MOVEMENT", "MovementBehaviour");
@@ -304,7 +315,8 @@ namespace Game_EntityHandling
 
 		for (std::int_fast32_t Index{}; Index < NumberOfEntities; ++Index)
 		{
-			if (!Entities[EntityOrder[Index]].IsDead)
+			// Additional check if Loot is not picked up...
+			if (!Entities[EntityOrder[Index]].IsPickedUp)
 			{
 				const lwmf::FloatPointStruct EntityPos{ Entities[EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[EntityOrder[Index]].Pos.Y - Player.Pos.Y };
 				const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
@@ -328,15 +340,33 @@ namespace Game_EntityHandling
 
 						for (std::int_fast32_t y{ LineStartY }; y < LineEndY; ++y)
 						{
-							const std::int_fast32_t Color{ Entities[Entities[EntityOrder[Index]].Number].AttackAnimEnabled ?
-								EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].AttackTextures[Entities[EntityOrder[Index]].AttackAnimStep].Pixels[((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX] :
-								EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[EntityOrder[Index]].WalkAnimStep].Pixels[((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX] };
+							std::int_fast32_t Color{};
+							const std::int_fast32_t PixelOffset{ ((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX };
+
+							if (Entities[Entities[EntityOrder[Index]].Number].AttackAnimEnabled)
+							{
+								Color = EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].AttackTextures[Entities[EntityOrder[Index]].AttackAnimStep].Pixels[PixelOffset];
+							}
+							else if (Entities[Entities[EntityOrder[Index]].Number].KillAnimEnabled)
+							{
+								Color = EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].KillTextures[Entities[EntityOrder[Index]].KillAnimStep].Pixels[PixelOffset];
+							}
+							else
+							{
+								Color = EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[EntityOrder[Index]].WalkAnimStep].Pixels[PixelOffset];
+							}
 
 							// Check if alphachannel of pixel ist not transparent and draw pixel
 							if ((Color & lwmf::AMask) != 0)
 							{
-								Entities[EntityOrder[Index]].IsHit ? lwmf::SetPixel(ScreenTexture, x, y, Color | 0xFFFFFF00) :
-									(Game_LevelHandling::LightingFlag ? lwmf::SetPixel(ScreenTexture, x, y, lwmf::ShadeColor(Color, TransY, FogOfWarDistance)) : lwmf::SetPixel(ScreenTexture, x, y, Color));
+								if (Entities[EntityOrder[Index]].IsHit && !Entities[EntityOrder[Index]].KillAnimEnabled)
+								{
+									lwmf::SetPixel(ScreenTexture, x, y, Color | 0xFFFFFF00);
+								}
+								else
+								{
+									Game_LevelHandling::LightingFlag ? (lwmf::SetPixel(ScreenTexture, x, y, lwmf::ShadeColor(Color, TransY, FogOfWarDistance))) : lwmf::SetPixel(ScreenTexture, x, y, Color);
+								}
 							}
 						}
 					}
@@ -418,17 +448,15 @@ namespace Game_EntityHandling
 				Entity.HitAnimCounter += Entity.HitAnimDuration;
 			}
 
-			if (Entity.Hitpoints <= 0)
+			if (Entity.Hitpoints <= 0 && !Entity.KillAnimEnabled)
 			{
 				PlayAudio(Entity.TypeNumber, EntitySounds::Kill);
 
-				// Entity is dead, but needs to be rendered one last time...
+				// Entity is killed, now the death animation needs to be rendered...
 				// Will be set to "IsDead" in MoveEntities()
-				Entity.WillBeDead = true;
-
-				// ...and gets cleared from EntityMap
-				Entity.MovementBehaviour = 0;
-				EntityMap[static_cast<std::int_fast32_t>(Entity.Pos.X)][static_cast<std::int_fast32_t>(Entity.Pos.Y)] = EntityTypes::Clear;
+				Entity.KillAnimEnabled = true;
+				Entity.AttackAnimEnabled = false;
+				Entity.AttackFinished = true;
 			}
 		}
 	}
@@ -569,12 +597,26 @@ namespace Game_EntityHandling
 			if (Entity.IsHit && --Entity.HitAnimCounter == 0)
 			{
 				Entity.IsHit = false;
-
-				// Don´t show entity in next gameloop cycle
-				Entity.IsDead = Entity.WillBeDead ? true : false;
 			}
 
-			if (!Entity.IsDead)
+			if (!Entity.IsDead && Entity.KillAnimEnabled && ++Entity.KillAnimCounter > Entity.KillAnimStepWidth)
+			{
+				if (Entity.KillAnimStep < static_cast<std::int_fast32_t>(EntityAssets[Entity.TypeNumber].KillTextures.size()) - 1)
+				{
+					++Entity.KillAnimStep;
+				}
+				else
+				{
+					Entity.IsDead = true;
+					// ...and gets cleared from EntityMap, but the pile stays...
+					Entity.MovementBehaviour = 0;
+					EntityMap[static_cast<std::int_fast32_t>(Entity.Pos.X)][static_cast<std::int_fast32_t>(Entity.Pos.Y)] = EntityTypes::Clear;
+				}
+
+				Entity.KillAnimCounter = 0;
+			}
+
+			if (!Entity.IsDead && !Entity.KillAnimEnabled)
 			{
 				// Run A* pathfinding routine...
 				CalculateEntityPath(Entity);

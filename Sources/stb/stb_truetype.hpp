@@ -203,8 +203,8 @@ void stbtt_GetBakedQuad(const std::vector<stbtt_bakedchar>& chardata, std::int_f
 // the stack or as a global or etc, but you should treat it as opaque.
 struct stbtt_fontinfo
 {
-	void* userdata{};
-	unsigned char* data{};					// pointer to .ttf file
+	std::shared_ptr<void> userdata;
+	std::vector<unsigned char> data;					// pointer to .ttf file
 	std::int_fast32_t fontstart{};			// offset of start of font
 	std::int_fast32_t numGlyphs{};			// number of glyphs, needed for range checking
 	// table locations as offset from start of .ttf
@@ -314,7 +314,7 @@ void stbtt_GetCodepointBitmapBoxSubpixel(const stbtt_fontinfo& font, std::int_fa
 // the following functions are equivalent to the above functions, but operate
 // on glyph indices instead of Unicode codepoints (for efficiency)
 void stbtt_MakeGlyphBitmap(const stbtt_fontinfo& info, unsigned char* output, std::int_fast32_t out_w, std::int_fast32_t out_h, std::int_fast32_t out_stride, float scale_x, float scale_y, std::int_fast32_t glyph);
-void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo& info, const unsigned char* output, std::int_fast32_t out_w, std::int_fast32_t out_h, std::int_fast32_t out_stride, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t glyph);
+void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo& info, unsigned char* output, std::int_fast32_t out_w, std::int_fast32_t out_h, std::int_fast32_t out_stride, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t glyph);
 void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo& font, std::int_fast32_t glyph, float scale_x, float scale_y, std::int_fast32_t& ix0, std::int_fast32_t& iy0, std::int_fast32_t& ix1, std::int_fast32_t& iy1);
 void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo& font, std::int_fast32_t glyph, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t& ix0, std::int_fast32_t& iy0, std::int_fast32_t& ix1, std::int_fast32_t& iy1);
 
@@ -335,7 +335,7 @@ void stbtt_Rasterize(stbtt__bitmap& result,									// 1-channel bitmap to draw 
 						float shift_x, float shift_y,						// translation applied to input vertices
 						std::int_fast32_t x_off, std::int_fast32_t y_off,	// another translation applied to input
 						std::int_fast32_t invert,							// if non-zero, vertically flip shape
-						void* userdata);									// context for to STBTT_MALLOC
+						std::shared_ptr<void> userdata);					// context for to STBTT_MALLOC
 
 enum class platformID
 {
@@ -571,18 +571,18 @@ inline static std::int_fast32_t ttULONG(const unsigned char* p)
 	return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3];
 }
 
-inline static std::int_fast32_t stbtt__find_table(const unsigned char* data, const std::int_fast32_t fontstart, const std::string& tag)
+inline static std::int_fast32_t stbtt__find_table(const std::vector<unsigned char>& data, const std::int_fast32_t fontstart, const std::string& tag)
 {
-	const std::int_fast32_t num_tables{ ttUSHORT(data + fontstart + 4) };
+	const std::int_fast32_t num_tables{ ttUSHORT(data.data() + fontstart + 4) };
 	const std::int_fast32_t tabledir{ fontstart + 12 };
 
 	for (std::int_fast32_t i{}; i < num_tables; ++i)
 	{
 		const std::int_fast32_t loc{ tabledir + 16 * i };
 
-		if ((data + loc)[0] == tag[0] && (data + loc)[1] == tag[1] && (data + loc)[2] == tag[2] && (data + loc)[3] == tag[3])
+		if ((data.data() + loc)[0] == tag[0] && (data.data() + loc)[1] == tag[1] && (data.data() + loc)[2] == tag[2] && (data.data() + loc)[3] == tag[3])
 		{
-			return ttULONG(data + loc + 8);
+			return ttULONG(data.data() + loc + 8);
 		}
 	}
 
@@ -618,19 +618,19 @@ inline static stbtt__buf stbtt__get_subrs(stbtt__buf cff, stbtt__buf fontdict)
 
 inline static std::int_fast32_t stbtt_InitFont_internal(stbtt_fontinfo& info, std::vector<unsigned char>& data, const std::int_fast32_t fontstart)
 {
-	info.data = data.data();
+	info.data = data;
 	info.fontstart = fontstart;
 	info.cff = stbtt__new_buf(nullptr, 0);
 
-	info.loca = stbtt__find_table(data.data(), fontstart, "loca"); // required
-	info.head = stbtt__find_table(data.data(), fontstart, "head"); // required
-	info.glyf = stbtt__find_table(data.data(), fontstart, "glyf"); // required
-	info.hhea = stbtt__find_table(data.data(), fontstart, "hhea"); // required
-	info.hmtx = stbtt__find_table(data.data(), fontstart, "hmtx"); // required
-	info.kern = stbtt__find_table(data.data(), fontstart, "kern"); // not required
-	info.gpos = stbtt__find_table(data.data(), fontstart, "GPOS"); // not required
+	info.loca = stbtt__find_table(data, fontstart, "loca"); // required
+	info.head = stbtt__find_table(data, fontstart, "head"); // required
+	info.glyf = stbtt__find_table(data, fontstart, "glyf"); // required
+	info.hhea = stbtt__find_table(data, fontstart, "hhea"); // required
+	info.hmtx = stbtt__find_table(data, fontstart, "hmtx"); // required
+	info.kern = stbtt__find_table(data, fontstart, "kern"); // not required
+	info.gpos = stbtt__find_table(data, fontstart, "GPOS"); // not required
 
-	const std::int_fast32_t cmap{ stbtt__find_table(data.data(), fontstart, "cmap") };       // required
+	const std::int_fast32_t cmap{ stbtt__find_table(data, fontstart, "cmap") };       // required
 
 	if (cmap == 0 || info.head == 0 || info.hhea == 0 || info.hmtx == 0)
 	{
@@ -648,7 +648,7 @@ inline static std::int_fast32_t stbtt_InitFont_internal(stbtt_fontinfo& info, st
 	else
 	{
 		// initialization for CFF / Type2 fonts (OTF)
-		const std::int_fast32_t cff{ stbtt__find_table(data.data(), fontstart, "CFF ") };
+		const std::int_fast32_t cff{ stbtt__find_table(data, fontstart, "CFF ") };
 
 		if (cff == 0)
 		{
@@ -713,7 +713,7 @@ inline static std::int_fast32_t stbtt_InitFont_internal(stbtt_fontinfo& info, st
 		info.charstrings = stbtt__cff_get_index(b);
 	}
 
-	const std::int_fast32_t t{ stbtt__find_table(data.data(), fontstart, "maxp") };
+	const std::int_fast32_t t{ stbtt__find_table(data, fontstart, "maxp") };
 	info.numGlyphs = (t != 0) ? ttUSHORT(data.data() + t + 4) : 0xFFFF;
 
 	// find a cmap encoding table we understand *now* to avoid searching later.
@@ -769,16 +769,16 @@ inline static std::int_fast32_t stbtt_InitFont_internal(stbtt_fontinfo& info, st
 
 inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const std::int_fast32_t unicode_codepoint)
 {
-	unsigned char* data{ info.data };
+	std::vector<unsigned char> data{ info.data };
 	const std::int_fast32_t index_map{ info.index_map };
-	const std::int_fast32_t format{ ttUSHORT(data + index_map + 0) };
+	const std::int_fast32_t format{ ttUSHORT(data.data() + index_map + 0) };
 
 	if (format == 0)
 	{
 		// apple byte encoding
-		if (unicode_codepoint < ttUSHORT(data + index_map + 2) - 6)
+		if (unicode_codepoint < ttUSHORT(data.data() + index_map + 2) - 6)
 		{
-			return *static_cast<unsigned char*>(data + index_map + 6 + unicode_codepoint);
+			return *static_cast<unsigned char*>(data.data() + index_map + 6 + unicode_codepoint);
 		}
 
 		return 0;
@@ -786,9 +786,9 @@ inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const 
 
 	if (format == 6)
 	{
-		if (const std::int_fast32_t first{ ttUSHORT(data + index_map + 6) }; unicode_codepoint >= first && unicode_codepoint < first + ttUSHORT(data + index_map + 8))
+		if (const std::int_fast32_t first{ ttUSHORT(data.data() + index_map + 6) }; unicode_codepoint >= first && unicode_codepoint < first + ttUSHORT(data.data() + index_map + 8))
 		{
-			return ttUSHORT(data + index_map + 10 + (unicode_codepoint - first) * 2);
+			return ttUSHORT(data.data() + index_map + 10 + (unicode_codepoint - first) * 2);
 		}
 
 		return 0;
@@ -807,10 +807,10 @@ inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const 
 		}
 
 		// standard mapping for windows fonts: binary search collection of ranges
-		const std::int_fast32_t segcount{ ttUSHORT(data + index_map + 6) >> 1 };
-		std::int_fast32_t searchRange{ttUSHORT(data + index_map + 8) >> 1 };
-		std::int_fast32_t entrySelector{ ttUSHORT(data + index_map + 10) };
-		const std::int_fast32_t rangeShift{ ttUSHORT(data + index_map + 12) >> 1 };
+		const std::int_fast32_t segcount{ ttUSHORT(data.data() + index_map + 6) >> 1 };
+		std::int_fast32_t searchRange{ttUSHORT(data.data() + index_map + 8) >> 1 };
+		std::int_fast32_t entrySelector{ ttUSHORT(data.data() + index_map + 10) };
+		const std::int_fast32_t rangeShift{ ttUSHORT(data.data() + index_map + 12) >> 1 };
 
 		// do a binary search of the segments
 		const std::int_fast32_t endCount{ index_map + 14 };
@@ -818,7 +818,7 @@ inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const 
 
 		// they lie from endCount .. endCount + segCount
 		// but searchRange is the nearest power of two, so...
-		if (unicode_codepoint >= ttUSHORT(data + search + (rangeShift << 1)))
+		if (unicode_codepoint >= ttUSHORT(data.data() + search + (rangeShift << 1)))
 		{
 			search += rangeShift << 1;
 		}
@@ -830,7 +830,7 @@ inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const 
 		{
 			searchRange >>= 1;
 
-			if (unicode_codepoint > ttUSHORT(data + search + (searchRange << 1)))
+			if (unicode_codepoint > ttUSHORT(data.data() + search + (searchRange << 1)))
 			{
 				search += searchRange << 1;
 			}
@@ -842,35 +842,35 @@ inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const 
 
 		{
 			const std::int_fast32_t item{ (search - endCount) >> 1 };
-			const std::int_fast32_t start{ ttUSHORT(data + index_map + 14 + segcount * 2 + 2 + 2 * item) };
+			const std::int_fast32_t start{ ttUSHORT(data.data() + index_map + 14 + segcount * 2 + 2 + 2 * item) };
 
 			if (unicode_codepoint < start)
 			{
 				return 0;
 			}
 
-			const std::int_fast32_t offset{ ttUSHORT(data + index_map + 14 + segcount * 6 + 2 + 2 * item) };
+			const std::int_fast32_t offset{ ttUSHORT(data.data() + index_map + 14 + segcount * 6 + 2 + 2 * item) };
 
 			if (offset == 0)
 			{
-				return unicode_codepoint + ttSHORT(data + index_map + 14 + segcount * 4 + 2 + 2 * item);
+				return unicode_codepoint + ttSHORT(data.data() + index_map + 14 + segcount * 4 + 2 + 2 * item);
 			}
 
-			return ttUSHORT(data + offset + (unicode_codepoint - start) * 2 + index_map + 14 + segcount * 6 + 2 + 2 * item);
+			return ttUSHORT(data.data() + offset + (unicode_codepoint - start) * 2 + index_map + 14 + segcount * 6 + 2 + 2 * item);
 		}
 	}
 
 	if (format == 12 || format == 13)
 	{
 		std::int_fast32_t low{};
-		std::int_fast32_t high{ ttULONG(data + index_map + 12) };
+		std::int_fast32_t high{ ttULONG(data.data() + index_map + 12) };
 		// Binary search the right group.
 
 		while (low < high)
 		{
 			const std::int_fast32_t mid{ low + ((high - low) >> 1) }; // rounds down, so low <= mid < high
-			std::int_fast32_t start_char{ ttULONG(data + index_map + 16 + mid * 12) };
-			std::int_fast32_t end_char{ ttULONG(data + index_map + 16 + mid * 12 + 4) };
+			std::int_fast32_t start_char{ ttULONG(data.data() + index_map + 16 + mid * 12) };
+			std::int_fast32_t end_char{ ttULONG(data.data() + index_map + 16 + mid * 12 + 4) };
 
 			if (unicode_codepoint < start_char)
 			{
@@ -882,7 +882,7 @@ inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const 
 			}
 			else
 			{
-				const std::int_fast32_t start_glyph{ ttULONG(data + index_map + 16 + mid * 12 + 8) };
+				const std::int_fast32_t start_glyph{ ttULONG(data.data() + index_map + 16 + mid * 12 + 8) };
 
 				if (format == 12)
 				{
@@ -928,13 +928,13 @@ inline static std::int_fast32_t stbtt__GetGlyfOffset(const stbtt_fontinfo& info,
 
 	if (info.indexToLocFormat == 0)
 	{
-		g1 = info.glyf + ttUSHORT(info.data + info.loca + glyph_index * 2) * 2;
-		g2 = info.glyf + ttUSHORT(info.data + info.loca + glyph_index * 2 + 2) * 2;
+		g1 = info.glyf + ttUSHORT(info.data.data() + info.loca + glyph_index * 2) * 2;
+		g2 = info.glyf + ttUSHORT(info.data.data() + info.loca + glyph_index * 2 + 2) * 2;
 	}
 	else
 	{
-		g1 = info.glyf + ttULONG (info.data + info.loca + glyph_index * 4);
-		g2 = info.glyf + ttULONG (info.data + info.loca + glyph_index * 4 + 4);
+		g1 = info.glyf + ttULONG (info.data.data() + info.loca + glyph_index * 4);
+		g2 = info.glyf + ttULONG (info.data.data() + info.loca + glyph_index * 4 + 4);
 	}
 
 	return g1 == g2 ? -1 : g1; // if length is 0, return -1
@@ -957,16 +957,16 @@ inline std::int_fast32_t stbtt_GetGlyphBox(const stbtt_fontinfo& info, const std
 			return 0;
 		}
 
-		x0 = ttSHORT(info.data + g + 2);
-		y0 = ttSHORT(info.data + g + 4);
-		x1 = ttSHORT(info.data + g + 6);
-		y1 = ttSHORT(info.data + g + 8);
+		x0 = ttSHORT(info.data.data() + g + 2);
+		y0 = ttSHORT(info.data.data() + g + 4);
+		x1 = ttSHORT(info.data.data() + g + 6);
+		y1 = ttSHORT(info.data.data() + g + 8);
 	}
 
 	return 1;
 }
 
-inline static std::int_fast32_t stbtt__close_shape(stbtt_vertex* vertices, std::int_fast32_t num_vertices, const std::int_fast32_t was_off, const std::int_fast32_t start_off, const std::int_fast32_t sx, const std::int_fast32_t sy, const std::int_fast32_t scx, const std::int_fast32_t scy, const std::int_fast32_t cx, const std::int_fast32_t cy)
+inline static std::int_fast32_t stbtt__close_shape(std::vector<stbtt_vertex>& vertices, std::int_fast32_t num_vertices, const std::int_fast32_t was_off, const std::int_fast32_t start_off, const std::int_fast32_t sx, const std::int_fast32_t sy, const std::int_fast32_t scx, const std::int_fast32_t scy, const std::int_fast32_t cx, const std::int_fast32_t cy)
 {
 	if (start_off != 0)
 	{
@@ -994,14 +994,14 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 		return 0;
 	}
 
-	unsigned char* data{ info.data };
+	std::vector<unsigned char> data{ info.data };
 	std::int_fast32_t num_vertices{};
-	const short numberOfContours{ ttSHORT(data + g) };
+	const short numberOfContours{ ttSHORT(data.data() + g) };
 	std::vector<stbtt_vertex> vertices;
 
 	if (numberOfContours > 0)
 	{
-		unsigned char* endPtsOfContours{ (data + g + 10) };
+		unsigned char* endPtsOfContours{ (data.data() + g + 10) };
 		const std::int_fast32_t n{ 1 + ttUSHORT(endPtsOfContours + (numberOfContours << 1) - 2) };
 		const std::int_fast32_t m{ n + (numberOfContours << 1) };  // a loose bound on how many vertices we might need
 		vertices.resize(m);
@@ -1020,7 +1020,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 
 		// first load flags
 		unsigned char flags{};
-		unsigned char* points{ data + g + 10 + (numberOfContours << 1) + 2 + ttUSHORT(data + g + 10 + (numberOfContours << 1)) };
+		unsigned char* points{ data.data() + g + 10 + (numberOfContours << 1) + 2 + ttUSHORT(data.data() + g + 10 + (numberOfContours << 1)) };
 
 		for (std::int_fast32_t i{}; i < n; ++i)
 		{
@@ -1110,7 +1110,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 			{
 				if (i != 0)
 				{
-					num_vertices = stbtt__close_shape(vertices.data(), num_vertices, was_off, start_off, sx, sy, scx, scy, cx, cy);
+					num_vertices = stbtt__close_shape(vertices, num_vertices, was_off, start_off, sx, sy, scx, scy, cx, cy);
 				}
 
 				// now start the new one
@@ -1169,13 +1169,13 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 			}
 		}
 
-		num_vertices = stbtt__close_shape(vertices.data(), num_vertices, was_off, start_off, sx, sy, scx, scy, cx, cy);
+		num_vertices = stbtt__close_shape(vertices, num_vertices, was_off, start_off, sx, sy, scx, scy, cx, cy);
 	}
 	else if (numberOfContours == -1)
 	{
 		// Compound shapes.
 		std::int_fast32_t more{ 1 };
-		unsigned char* comp{ data + g + 10 };
+		unsigned char* comp{ data.data() + g + 10 };
 
 		while (more != 0)
 		{
@@ -1239,9 +1239,8 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 
 			// Get indexed glyph.
 			std::vector<stbtt_vertex> comp_verts;
-			const std::int_fast32_t comp_num_verts{ stbtt_GetGlyphShape(info, gidx, comp_verts) };
 
-			if (comp_num_verts > 0)
+			if (const std::int_fast32_t comp_num_verts{ stbtt_GetGlyphShape(info, gidx, comp_verts) }; comp_num_verts > 0)
 			{
 				// Transform vertices.
 				for (std::int_fast32_t i{}; i < comp_num_verts; ++i)
@@ -1900,21 +1899,21 @@ inline std::int_fast32_t stbtt_GetGlyphShape(const stbtt_fontinfo& info, const s
 
 inline void stbtt_GetGlyphHMetrics(const stbtt_fontinfo& info, const std::int_fast32_t glyph_index, std::int_fast32_t& advanceWidth, std::int_fast32_t& leftSideBearing)
 {
-	if (const std::int_fast32_t numOfLongHorMetrics{ ttUSHORT(info.data + info.hhea + 34) }; glyph_index < numOfLongHorMetrics)
+	if (const std::int_fast32_t numOfLongHorMetrics{ ttUSHORT(info.data.data() + info.hhea + 34) }; glyph_index < numOfLongHorMetrics)
 	{
-		advanceWidth = ttSHORT(info.data + info.hmtx + 4 * glyph_index);
-		leftSideBearing = ttSHORT(info.data + info.hmtx + 4 * glyph_index + 2);
+		advanceWidth = ttSHORT(info.data.data() + info.hmtx + 4 * glyph_index);
+		leftSideBearing = ttSHORT(info.data.data() + info.hmtx + 4 * glyph_index + 2);
 	}
 	else
 	{
-		advanceWidth = ttSHORT(info.data + info.hmtx + 4 * (numOfLongHorMetrics - 1));
-		leftSideBearing = ttSHORT(info.data + info.hmtx + 4 * numOfLongHorMetrics + 2 * (glyph_index - numOfLongHorMetrics));
+		advanceWidth = ttSHORT(info.data.data() + info.hmtx + 4 * (numOfLongHorMetrics - 1));
+		leftSideBearing = ttSHORT(info.data.data() + info.hmtx + 4 * numOfLongHorMetrics + 2 * (glyph_index - numOfLongHorMetrics));
 	}
 }
 
 inline float stbtt_ScaleForPixelHeight(const stbtt_fontinfo& info, const float height)
 {
-	return height / static_cast<float>((ttSHORT(info.data + info.hhea + 4) - ttSHORT(info.data + info.hhea + 6)));
+	return height / static_cast<float>((ttSHORT(info.data.data() + info.hhea + 4) - ttSHORT(info.data.data() + info.hhea + 6)));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2501,7 +2500,7 @@ using stbtt__point = struct
 	float y{};
 };
 
-inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, const std::vector<std::int_fast32_t>& wcount, const std::int_fast32_t windings, const float scale_x, const float scale_y, const float shift_x, const float shift_y, const std::int_fast32_t off_x, const std::int_fast32_t off_y, const std::int_fast32_t invert, void* userdata)
+inline static void stbtt__rasterize(stbtt__bitmap& result, std::vector<stbtt__point>& pts, const std::vector<std::int_fast32_t>& wcount, const std::int_fast32_t windings, const float scale_x, const float scale_y, const float shift_x, const float shift_y, const std::int_fast32_t off_x, const std::int_fast32_t off_y, const std::int_fast32_t invert, void* userdata)
 {
 	// now we have to blow out the windings into explicit edge lists
 	std::int_fast32_t n{};
@@ -2515,12 +2514,11 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, stbtt__point* pts, co
 
 	n = 0;
 
-	std::int_fast32_t m{};
 	const float y_scale_inv{ (invert != 0) ? -scale_y : scale_y };
 
-	for (std::int_fast32_t i{}; i < windings; ++i)
+	for (std::int_fast32_t m{}, i{}; i < windings; ++i)
 	{
-		const stbtt__point* p{ pts + m };
+		const std::vector<stbtt__point> p(pts.begin() + m, pts.end());
 		m += wcount[i];
 
 		for (std::int_fast32_t j{ wcount[i] - 1 }, k{}; k < wcount[i]; j = k++)
@@ -2749,7 +2747,7 @@ inline static std::vector<stbtt__point> stbtt_FlattenCurves(stbtt_vertex* vertic
 	return points;
 }
 
-inline void stbtt_Rasterize(stbtt__bitmap& result, const float flatness_in_pixels, std::vector<stbtt_vertex>& vertices, const std::int_fast32_t num_verts, const float scale_x, const float scale_y, const float shift_x, const float shift_y, const std::int_fast32_t x_off, const std::int_fast32_t y_off, const std::int_fast32_t invert, void* userdata)
+inline void stbtt_Rasterize(stbtt__bitmap& result, const float flatness_in_pixels, std::vector<stbtt_vertex>& vertices, const std::int_fast32_t num_verts, const float scale_x, const float scale_y, const float shift_x, const float shift_y, const std::int_fast32_t x_off, const std::int_fast32_t y_off, const std::int_fast32_t invert, std::shared_ptr<void> userdata)
 {
 	const float scale{ scale_x > scale_y ? scale_y : scale_x };
 	std::int_fast32_t winding_count{};
@@ -2759,7 +2757,7 @@ inline void stbtt_Rasterize(stbtt__bitmap& result, const float flatness_in_pixel
 
 	if (!windings.empty())
 	{
-		stbtt__rasterize(result, windings.data(), winding_lengths, winding_count, scale_x, scale_y, shift_x, shift_y, x_off, y_off, invert, userdata);
+		stbtt__rasterize(result, windings, winding_lengths, winding_count, scale_x, scale_y, shift_x, shift_y, x_off, y_off, invert, &userdata);
 	}
 }
 

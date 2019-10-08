@@ -312,6 +312,7 @@ namespace Game_WeaponHandling
 				{
 					Game_EntityHandling::PlayAudio(Entity.TypeNumber, Game_EntityHandling::EntitySounds::AmmoBoxPickup);
 					Entity.IsDead = true;
+					Entity.IsPickedUp = true;
 
 					for (auto&& Weapon : Weapons)
 					{

@@ -57,6 +57,9 @@ struct EntityStruct final
 	std::int_fast32_t AttackAnimStepWidth{};
 	std::int_fast32_t HitAnimDuration{};
 	std::int_fast32_t HitAnimCounter{};
+	std::int_fast32_t KillAnimStep{};
+	std::int_fast32_t KillAnimStepWidth{};
+	std::int_fast32_t KillAnimCounter{};
 	std::int_fast32_t MovementBehaviour{};
 	std::int_fast32_t RotationFactor{};
 	std::int_fast32_t DamagePoints{};
@@ -69,7 +72,8 @@ struct EntityStruct final
 	char Direction{ '\0' };
 	bool AttackFinished{};
 	bool AttackAnimEnabled{};
-	bool WillBeDead{};
+	bool KillAnimEnabled{};
+	bool IsPickedUp{};
 	bool IsDead{};
 	bool IsHit{};
 	bool ValidPathFound{};

@@ -128,7 +128,7 @@ namespace Game_Raycaster
 
 			if (Part == Renderpart::WallLeft || Part == Renderpart::WalLRight)
 			{
-				const std::int_fast32_t TextureX{ static_cast<std::int_fast32_t>(WallX * TextureSize) & TextureSizeBitwiseAnd };
+				const std::int_fast32_t TextureX{ static_cast<std::int_fast32_t>(WallX * TextureSize) & (TextureSize - 1) };
 
 				for (std::int_fast32_t y{ LineStart }; y < LineEnd; ++y)
 				{
@@ -207,7 +207,7 @@ namespace Game_Raycaster
 							// Draw floor
 							if (y < ScreenTexture.Height)
 							{
-								const std::int_fast32_t FloorTexel{ Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Floor)][static_cast<std::int_fast32_t>(Floor.X)][static_cast<std::int_fast32_t>(Floor.Y)] - 1].Pixels[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & TextureSizeBitwiseAnd) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & TextureSizeBitwiseAnd)] };
+								const std::int_fast32_t FloorTexel{ Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Floor)][static_cast<std::int_fast32_t>(Floor.X)][static_cast<std::int_fast32_t>(Floor.Y)] - 1].Pixels[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & (TextureSize - 1)) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & (TextureSize - 1))] };
 
 								if (Game_LevelHandling::LightingFlag)
 								{
@@ -244,7 +244,7 @@ namespace Game_Raycaster
 							// Transparent ceiling tile is marked as "-1" in "Level_MapCeilingData.conf"
 							if (LevelCeilingMapPos >= 0 && (TempY >= 0 && TempY <= LineStart))
 							{
-								const std::int_fast32_t CeilingTexel{ Game_LevelHandling::LevelTextures[LevelCeilingMapPos].Pixels[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & TextureSizeBitwiseAnd) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & TextureSizeBitwiseAnd)] };
+								const std::int_fast32_t CeilingTexel{ Game_LevelHandling::LevelTextures[LevelCeilingMapPos].Pixels[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & (TextureSize - 1)) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & (TextureSize - 1))] };
 
 								if (Game_LevelHandling::LightingFlag)
 								{

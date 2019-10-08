@@ -34,9 +34,6 @@ namespace Game_Config
 			EntitySize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
 			FrameLock = lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GENERAL", "FrameLock");
 
-			// Factor for bitwise texture operations
-			TextureSizeBitwiseAnd = TextureSize - 1;
-
 			// Set factor for bitshifting from TextureSize
 			switch (TextureSize)
 			{
