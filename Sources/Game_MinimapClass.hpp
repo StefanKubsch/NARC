@@ -36,6 +36,7 @@ private:
 	std::int_fast32_t AmmoBoxColor{};
 	std::int_fast32_t WallColor{};
 	std::int_fast32_t DoorColor{};
+	std::int_fast32_t WayPointColor{};
 };
 
 inline void Game_MinimapClass::Init()
@@ -49,6 +50,7 @@ inline void Game_MinimapClass::Init()
 		AmmoBoxColor = lwmf::ReadINIValueRGBA(INIFile, "AMMO");
 		WallColor = lwmf::ReadINIValueRGBA(INIFile, "WALLS");
 		DoorColor = lwmf::ReadINIValueRGBA(INIFile, "DOORS");
+		WayPointColor = lwmf::ReadINIValueRGBA(INIFile, "WAYPOINT");
 	}
 }
 
@@ -126,6 +128,21 @@ inline void Game_MinimapClass::Display()
 					break;
 				}
 				default: {}
+			}
+
+			for (auto& Entity : Entities)
+			{
+				if (!Entity.IsDead && (Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Neutral) || Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Enemy)))
+				{
+					for (auto& WayPoint : Entity.PathFindingWayPoints)
+					{
+						if (WayPoint.X == MapPosX && WayPoint.Y == MapPosY)
+						{
+							lwmf::SetPixel(ScreenTexture, x + (IconRect.Width >> 1), y + (IconRect.Height >> 1), WayPointColor);
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

@@ -322,8 +322,12 @@ namespace Game_WeaponHandling
 							std::vector<char> CarriedAmmoString(MaximumCarriedAmmoDigits);
 							std::to_chars(CarriedAmmoString.data(), CarriedAmmoString.data() + CarriedAmmoString.size(), Weapon.CarriedAmmo);
 							Weapon.HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
+
+							break;
 						}
 					}
+
+					break;
 				}
 			}
 		}

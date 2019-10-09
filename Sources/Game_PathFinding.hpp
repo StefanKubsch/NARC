@@ -48,11 +48,6 @@ namespace Game_PathFinding
 		return Node1.Cost > Node2.Cost;
 	}
 
-	inline bool operator == (const NodeStruct& Node1, const NodeStruct& Node2)
-	{
-		return Node1.Index == Node2.Index;
-	}
-
 	inline std::int_fast32_t SetPathFindingPoint(const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Width)
 	{
 		return Width * y + x;
@@ -64,9 +59,9 @@ namespace Game_PathFinding
 		Map.shrink_to_fit();
 		Map.resize(static_cast<size_t>(Width) * static_cast<size_t>(Height), FLT_MAX);
 
-		for (std::int_fast32_t x{}; x < Width; ++x)
+		for (std::int_fast32_t y{}; y < Height; ++y)
 		{
-			for (std::int_fast32_t y{}; y < Height; ++y)
+			for (std::int_fast32_t x{}; x < Width; ++x)
 			{
 				if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][x][y] == 0)
 				{
@@ -104,9 +99,9 @@ namespace Game_PathFinding
 
 		while (!NodesToVisit.empty())
 		{
-			NodeStruct Current{ NodesToVisit.top() };
+			const NodeStruct Current{ NodesToVisit.top() };
 
-			if (Current == TargetNode)
+			if (Current.Index == TargetNode.Index)
 			{
 				PathFound = true;
 				break;

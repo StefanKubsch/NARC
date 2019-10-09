@@ -171,7 +171,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		// Sort entities back to front to draw them in right order
 		SortEntities(Game_EntityHandling::SortOrder::BackToFront);
 
-		lwmf::ClearTexture(ScreenTexture, 0);
+		lwmf::ClearTexture(ScreenTexture, 0x00000000);
 		lwmf::FPSCounter();
 
 		ThreadPool.AddThread(&Game_Raycaster::CastGraphics, Game_Raycaster::Renderpart::WallLeft);

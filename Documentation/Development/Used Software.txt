@@ -9,9 +9,6 @@ Development:
 	CLANG Power Tools (-> Tidy, Static Code Analyzer)
 		https://marketplace.visualstudio.com/items?itemName=caphyon.ClangPowerTools
 
-	git
-		https://git-scm.com/
-
 	Github Desktop
 		https://desktop.github.com/
 

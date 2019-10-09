@@ -830,3 +830,5 @@ x64/Release/Shader/Default.frag
 x64/Release/Shader/Default.vert
 x64/Release/NARC.nativecodeanalysis.xml
 .vs/NARC/v16/ipch/AutoPCH/4ab235347d05f4f8/GAME_MENUCLASS.ipch
+x64/Debug/GFX/Entities/64/Turret/Kill/0.png
+x64/Release/GFX/Entities/64/Turret/Kill/0.png
