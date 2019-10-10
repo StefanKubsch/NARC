@@ -37,6 +37,8 @@ private:
 	std::int_fast32_t WallColor{};
 	std::int_fast32_t DoorColor{};
 	std::int_fast32_t WayPointColor{};
+	std::int_fast32_t WaypointOffset{};
+	bool ShowWaypoints{};
 };
 
 inline void Game_MinimapClass::Init()
@@ -44,6 +46,7 @@ inline void Game_MinimapClass::Init()
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDMinimapConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY") };
+		ShowWaypoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "ShowWaypoints") == 1 ? true : false;
 		PlayerColor = lwmf::ReadINIValueRGBA(INIFile, "PLAYER");
 		EnemyColor = lwmf::ReadINIValueRGBA(INIFile, "ENEMY");
 		NeutralColor = lwmf::ReadINIValueRGBA(INIFile, "NEUTRAL");
@@ -79,6 +82,7 @@ inline void Game_MinimapClass::PreRender()
 
 	IconRect.Width = TileSize;
 	IconRect.Height = TileSize;
+	WaypointOffset = TileSize >> 1;
 
 	// Set map position
 	StartPosY = ScreenTexture.Height - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
@@ -130,16 +134,19 @@ inline void Game_MinimapClass::Display()
 				default: {}
 			}
 
-			for (auto& Entity : Entities)
+			if (ShowWaypoints)
 			{
-				if (!Entity.IsDead && (Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Neutral) || Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Enemy)))
+				for (auto& Entity : Entities)
 				{
-					for (auto& WayPoint : Entity.PathFindingWayPoints)
+					if (!Entity.IsDead && (Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Neutral) || Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Enemy)))
 					{
-						if (WayPoint.X == MapPosX && WayPoint.Y == MapPosY)
+						for (auto& WayPoint : Entity.PathFindingWayPoints)
 						{
-							lwmf::SetPixel(ScreenTexture, x + (IconRect.Width >> 1), y + (IconRect.Height >> 1), WayPointColor);
-							break;
+							if (WayPoint.X == MapPosX && WayPoint.Y == MapPosY)
+							{
+								lwmf::SetPixel(ScreenTexture, x + WaypointOffset, y + WaypointOffset, WayPointColor);
+								break;
+							}
 						}
 					}
 				}
