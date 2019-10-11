@@ -61,11 +61,13 @@ namespace Game_PathFinding
 
 		for (std::int_fast32_t y{}; y < Height; ++y)
 		{
+			const std::int_fast32_t TempY{ Width * y };
+
 			for (std::int_fast32_t x{}; x < Width; ++x)
 			{
 				if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][x][y] == 0)
 				{
-					Map[Width * y + x] = 1.0F;
+					Map[TempY + x] = 1.0F;
 				}
 			}
 		}
@@ -88,8 +90,8 @@ namespace Game_PathFinding
 		const std::int_fast32_t MapSize{ Width * Height };
 		const std::int_fast32_t TargetCalc1{ Target / Width };
 		const std::int_fast32_t TargetCalc2{ Target % Width };
-		std::vector<std::int_fast32_t> Paths(MapSize, 0);
-		std::vector<std::int_fast32_t> Neighbours(8, 0);
+		std::vector<std::int_fast32_t> Paths(MapSize);
+		std::vector<std::int_fast32_t> Neighbours(8);
 		std::vector<float> Costs(MapSize, FLT_MAX);
 		std::priority_queue<NodeStruct> NodesToVisit;
 		bool PathFound{};

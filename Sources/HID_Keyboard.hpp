@@ -101,17 +101,15 @@ namespace HID_Keyboard
 
 	inline bool WaitForKeypress(const std::int_fast32_t Key)
 	{
-		bool Result{};
-
-		while (!Result)
+		while (true)
 		{
 			if (GetAsyncKeyState(Key) != 0)
 			{
-				Result = true;
+				break;
 			}
 		}
 
-		return Result;
+		return true;
 	}
 
 	inline bool GetKeyState(const std::int_fast32_t Key)

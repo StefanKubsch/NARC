@@ -84,7 +84,10 @@ namespace Game_Raycaster
 		{
 			const float Camera{ static_cast<float>(x + x) / static_cast<float>(ScreenTexture.Width) - 1.0F };
 			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
+
 			const lwmf::FloatPointStruct DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
+			// This is the long version of DeltaDist calculation:
+			// const lwmf::FloatPointStruct DeltaDist{ std::sqrtf(1 + (RayDir.Y * RayDir.Y) / (RayDir.X * RayDir.X)), std::sqrtf(1 + (RayDir.X * RayDir.X) / (RayDir.Y * RayDir.Y)) };
 
 			lwmf::FloatPointStruct SideDist;
 			lwmf::IntPointStruct Step;

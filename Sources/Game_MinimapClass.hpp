@@ -27,8 +27,8 @@ public:
 	bool Enabled{ true };
 
 private:
-	lwmf::IntRectStruct IconRect{};
 	lwmf::IntPointStruct Pos{};
+	std::int_fast32_t TileSize{ 6 };
 	std::int_fast32_t StartPosY{};
 	std::int_fast32_t PlayerColor{};
 	std::int_fast32_t EnemyColor{};
@@ -46,7 +46,7 @@ inline void Game_MinimapClass::Init()
 	if (const std::string INIFile{ "./DATA/GameConfig/HUDMinimapConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY") };
-		ShowWaypoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "ShowWaypoints") == 1 ? true : false;
+		ShowWaypoints = lwmf::ReadINIValue<bool>(INIFile, "GENERAL", "ShowWaypoints");
 		PlayerColor = lwmf::ReadINIValueRGBA(INIFile, "PLAYER");
 		EnemyColor = lwmf::ReadINIValueRGBA(INIFile, "ENEMY");
 		NeutralColor = lwmf::ReadINIValueRGBA(INIFile, "NEUTRAL");
@@ -59,8 +59,6 @@ inline void Game_MinimapClass::Init()
 
 inline void Game_MinimapClass::PreRender()
 {
-	std::int_fast32_t TileSize{ 6 };
-
 	// The bigger the level, the smaller the tiles of the minimap...
 	if (Game_LevelHandling::LevelMapWidth + Game_LevelHandling::LevelMapHeight <= 50)
 	{
@@ -78,10 +76,6 @@ inline void Game_MinimapClass::PreRender()
 		TileSize >>= 1;
 	}
 
-	// Generate the "icon" textures which indicate the entities...
-
-	IconRect.Width = TileSize;
-	IconRect.Height = TileSize;
 	WaypointOffset = TileSize >> 1;
 
 	// Set map position
@@ -90,45 +84,45 @@ inline void Game_MinimapClass::PreRender()
 
 inline void Game_MinimapClass::Display()
 {
-	for (std::int_fast32_t x{ Pos.X }, MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY, x += IconRect.Width)
+	for (std::int_fast32_t x{ Pos.X }, MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY, x += TileSize)
 	{
-		for (std::int_fast32_t y{ StartPosY }, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX, y += IconRect.Height)
+		for (std::int_fast32_t y{ StartPosY }, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX, y += TileSize)
 		{
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, WallColor, WallColor);
+				lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, WallColor, WallColor);
 			}
 
 			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] != 0)
 			{
-				lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, DoorColor, DoorColor);
+				lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, DoorColor, DoorColor);
 			}
 
 			switch (Game_EntityHandling::EntityMap[MapPosX][MapPosY])
 			{
 				case Game_EntityHandling::EntityTypes::Player:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, PlayerColor, PlayerColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, PlayerColor, PlayerColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Enemy:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor, EnemyColor); //-V1037
+					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, EnemyColor, EnemyColor); //-V1037
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Turret:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, EnemyColor, EnemyColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, EnemyColor, EnemyColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::Neutral:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, NeutralColor, NeutralColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, NeutralColor, NeutralColor);
 					break;
 				}
 				case Game_EntityHandling::EntityTypes::AmmoBox:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, IconRect.Width, IconRect.Height, AmmoBoxColor, AmmoBoxColor);
+					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, AmmoBoxColor, AmmoBoxColor);
 					break;
 				}
 				default: {}
