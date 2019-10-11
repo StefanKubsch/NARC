@@ -113,6 +113,9 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 	lwmf::Multithreading ThreadPool;
 
+	const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
+	const std::int_fast32_t White{ lwmf::RGBAtoINT(255, 255, 255, 255) };
+
 	// Main game loop
 	// fixed timestep method
 	// loop until ESC is pressed
@@ -171,7 +174,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		// Sort entities back to front to draw them in right order
 		SortEntities(Game_EntityHandling::SortOrder::BackToFront);
 
-		lwmf::ClearTexture(ScreenTexture, 0x00000000);
+		lwmf::ClearTexture(ScreenTexture, BlackNoAlpha);
 		lwmf::FPSCounter();
 
 		ThreadPool.AddThread(&Game_Raycaster::CastGraphics, Game_Raycaster::Renderpart::WallLeft);
@@ -185,7 +188,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		if (HUDEnabled)
 		{
 			HUDHealthBar.Display();
-			lwmf::DisplayFPSCounter(ScreenTexture, ScreenTexture.Width - 70, 7, 0xFFFFFFFF);
+			lwmf::DisplayFPSCounter(ScreenTexture, ScreenTexture.Width - 70, 7, White);
 		}
 
 		if (Player.IsDead && !GamePausedFlag)

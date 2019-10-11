@@ -48,11 +48,12 @@ namespace Game_Transitions
 
 	inline void LevelTransition()
 	{
+		const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
 		const std::string NextLevelText{ "...loading level number " + std::to_string(SelectedLevel) + "..." };
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "\n\n" + NextLevelText + "\n\n");
 
 		lwmf::ClearBuffer();
-		lwmf::ClearTexture(ScreenTexture, 0);
+		lwmf::ClearTexture(ScreenTexture, BlackNoAlpha);
 		GeneralText.RenderTextCentered(NextLevelText, ScreenTexture.Height - GeneralText.GetFontHeight() - 50);
 		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
 		lwmf::SwapBuffer();
@@ -128,7 +129,10 @@ namespace Game_Transitions
 
 	inline void DeathSequence()
 	{
-		FizzleFade(0xFF0000FF, 50);
+		const std::int_fast32_t Red{ lwmf::RGBAtoINT(255, 0, 0, 255) };
+		const std::int_fast32_t Black{ lwmf::RGBAtoINT(0, 0, 0, 255) };
+
+		FizzleFade(Red, 50);
 
 		GameOverText.RenderTextCentered("You are dead. Game over...", ScreenTexture.HeightMid - (GameOverText.GetFontHeight() >> 1));
 		GameOverText1.RenderTextCentered("Press [SPACE] to continue", ScreenTexture.Height - GameOverText1.GetFontHeight() - 50);
@@ -138,7 +142,7 @@ namespace Game_Transitions
 		if (HID_Keyboard::WaitForKeypress(VK_SPACE))
 		{
 			GamePausedFlag = true;
-			lwmf::ClearTexture(ScreenTexture, 0);
+			lwmf::ClearTexture(ScreenTexture, Black);
 		}
 	}
 

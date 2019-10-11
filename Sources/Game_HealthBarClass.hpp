@@ -64,9 +64,9 @@ inline void Game_HealthBarClass::Display()
 {
 	const lwmf::IntRectStruct RectHealthGreen{ Pos.X, Pos.Y, Player.Hitpoints * HealthBarFactor, HealthBarWidth };
 
-	lwmf::FilledRectangle(ScreenTexture, RectBlack2.X, RectBlack2.Y, RectBlack2.Width, RectBlack2.Height, Black, Black);
+	lwmf::Rectangle(ScreenTexture, RectBlack2.X, RectBlack2.Y, RectBlack2.Width, RectBlack2.Height, Black);
 	lwmf::FilledRectangle(ScreenTexture, RectOrange.X, RectOrange.Y, RectOrange.Width, RectOrange.Height, Orange, Orange);
-	lwmf::FilledRectangle(ScreenTexture, RectBlack1.X, RectBlack1.Y, RectBlack1.Width, RectBlack1.Height, Black, Black);
+	lwmf::Rectangle(ScreenTexture, RectBlack1.X, RectBlack1.Y, RectBlack1.Width, RectBlack1.Height, Black);
 	lwmf::FilledRectangle(ScreenTexture, RectRed.X, RectRed.Y, RectRed.Width, RectRed.Height, Red, Red);
 	lwmf::FilledRectangle(ScreenTexture, RectHealthGreen.X, RectHealthGreen.Y, RectHealthGreen.Width, RectHealthGreen.Height, Green, Green);
 }

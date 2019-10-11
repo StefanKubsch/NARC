@@ -614,6 +614,7 @@ namespace Game_EntityHandling
 				}
 
 				Entity.KillAnimCounter = 0;
+				break;
 			}
 
 			if (!Entity.IsDead && !Entity.KillAnimEnabled)

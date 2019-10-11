@@ -30,6 +30,7 @@ namespace Game_Doors
 	void InitDoorAssets();
 	void InitDoors();
 	void TriggerDoor();
+	void ModifyDoorTexture(DoorStruct& Door);
 	void OpenCloseDoors();
 	void PlayAudio(const DoorStruct& Door, DoorSounds Sound);
 	void CloseAudio();
@@ -42,9 +43,9 @@ namespace Game_Doors
 	{
 		DoorTypes.clear();
 		DoorTypes.shrink_to_fit();
+		DoorTypes.resize(1);
 
 		// We start our DoorTypes counting at "1", since in the map definition it has to be greater zero!
-		DoorTypes.resize(1);
 		std::int_fast32_t Index{ 1 };
 
 		while (true)
@@ -107,6 +108,20 @@ namespace Game_Doors
 				Door.IsOpenTriggered = true;
 				Door.OpenCloseCounter = 0;
 				PlayAudio(Door, DoorSounds::OpenCloseSound);
+				break;
+			}
+		}
+	}
+
+	inline void ModifyDoorTexture(DoorStruct& Door)
+	{
+		for (std::int_fast32_t y{}; y < TextureSize; ++y)
+		{
+			const std::int_fast32_t TempY{ y * TextureSize };
+
+			for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < DoorTypes[Door.DoorType].OpenCloseWidth; ++x, ++SourceTextureX)
+			{
+				Door.AnimTexture.Pixels[TempY + x] = DoorTypes[Door.DoorType].OriginalTexture.Pixels[TempY + SourceTextureX];
 			}
 		}
 	}
@@ -124,14 +139,7 @@ namespace Game_Doors
 
 					// TODO(Stefan): Of course, you have to see what´s behind the door when opening/closing...Rendering needs to be changed for that!
 					std::fill(Door.AnimTexture.Pixels.begin(), Door.AnimTexture.Pixels.end(), lwmf::AMask);
-
-					for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < DoorTypes[Door.DoorType].OpenCloseWidth; ++x, ++SourceTextureX)
-					{
-						for (std::int_fast32_t y{}; y < TextureSize; ++y)
-						{
-							Door.AnimTexture.Pixels[y * TextureSize + x] = DoorTypes[Door.DoorType].OriginalTexture.Pixels[y * TextureSize + SourceTextureX];
-						}
-					}
+					ModifyDoorTexture(Door);
 				}
 
 				if (Door.OpenCloseCounter >= DoorTypes[Door.DoorType].OpenCloseWidth)
@@ -162,14 +170,7 @@ namespace Game_Doors
 						}
 
 						Door.OpenCloseCounter -= DoorTypes[Door.DoorType].OpenCloseSpeed;
-
-						for (std::int_fast32_t SourceTextureX{}, x{ Door.OpenCloseCounter }; x < DoorTypes[Door.DoorType].OpenCloseWidth; ++x, ++SourceTextureX)
-						{
-							for (std::int_fast32_t y{}; y < TextureSize; ++y)
-							{
-								Door.AnimTexture.Pixels[y * TextureSize + x] = DoorTypes[Door.DoorType].OriginalTexture.Pixels[y * TextureSize + SourceTextureX];
-							}
-						}
+						ModifyDoorTexture(Door);
 					}
 				}
 
