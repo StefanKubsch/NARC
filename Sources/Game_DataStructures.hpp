@@ -120,23 +120,16 @@ struct DoorTypeStruct final
 {
 	lwmf::TextureStruct OriginalTexture{};
 	std::vector<lwmf::MP3> Sounds{};
-	std::int_fast32_t OpenCloseWidth{};
-	std::int_fast32_t OpenCloseSpeed{};
-	std::int_fast32_t StayOpenTime{};
 };
 
 struct DoorStruct final
 {
 	lwmf::TextureStruct AnimTexture{};
-	lwmf::IntPointStruct Pos{};
+	lwmf::FloatPointStruct Pos{};
 	std::int_fast32_t DoorType{};
 	std::int_fast32_t Number{};
-	std::int_fast32_t OpenCloseCounter{};
-	std::int_fast32_t StayOpenCounter{};
-	bool IsOpen{};
-	bool IsOpenTriggered{};
-	bool IsCloseTriggered{};
-	bool OpenCloseAudioFlag{};
+	std::int_fast32_t OpenVelocity{};
+	float OpenPercent{};
 };
 
 //
