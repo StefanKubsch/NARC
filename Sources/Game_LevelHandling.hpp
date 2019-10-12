@@ -45,11 +45,11 @@ namespace Game_LevelHandling
 	// Variables and constants
 	//
 
-	inline std::vector<std::vector<std::vector<std::int_fast32_t>>> LevelMap;
-	inline std::vector<lwmf::TextureStruct> LevelTextures;
+	inline std::vector<std::vector<std::vector<std::int_fast32_t>>> LevelMap{};
+	inline std::vector<lwmf::TextureStruct> LevelTextures{};
 
-	inline std::vector<GFX_LightingClass> StaticLights;
-	inline lwmf::MP3 BackgroundMusic;
+	inline std::vector<GFX_LightingClass> StaticLights{};
+	inline lwmf::MP3 BackgroundMusic{};
 
 	static constexpr std::int_fast32_t NumberOfLevelMapLayers{ 4 };
 
@@ -77,13 +77,13 @@ namespace Game_LevelHandling
 		if (Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
 			std::ifstream LevelMapDataFile(FileName, std::ios::in);
-			std::vector<std::int_fast32_t> TempVectorCeiling;
+			std::vector<std::int_fast32_t> TempVectorCeiling{};
 			std::string Line;
 
 			while (std::getline(LevelMapDataFile, Line))
 			{
 				std::istringstream Stream(Line);
-				std::vector<std::int_fast32_t> TempVector;
+				std::vector<std::int_fast32_t> TempVector{};
 				std::int_fast32_t TempInt{};
 				char Delimiter{ '\0' };
 

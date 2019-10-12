@@ -24,10 +24,10 @@
 
 struct EntityAssetStruct final
 {
-	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures;
-	std::vector<lwmf::TextureStruct> AttackTextures;
-	std::vector<lwmf::TextureStruct> KillTextures;
-	std::vector<lwmf::MP3> Sounds;
+	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures{};
+	std::vector<lwmf::TextureStruct> AttackTextures{};
+	std::vector<lwmf::TextureStruct> KillTextures{};
+	std::vector<lwmf::MP3> Sounds{};
 	std::string Name;
 	std::int_fast32_t Number{};
 };
@@ -38,8 +38,8 @@ struct EntityAssetStruct final
 
 struct EntityStruct final
 {
-	std::list<lwmf::IntPointStruct> PathFindingWayPoints;
-	std::map<std::string, std::int_fast32_t> ContainedItem;
+	std::list<lwmf::IntPointStruct> PathFindingWayPoints{};
+	std::map<std::string, std::int_fast32_t> ContainedItem{};
 	lwmf::FloatPointStruct Pos{};
 	lwmf::FloatPointStruct Dir{};
 	std::string TypeName;
@@ -87,7 +87,7 @@ struct WeaponStruct final
 {
 	lwmf::ShaderClass WeaponShader{};
 	lwmf::ShaderClass MuzzleFlashShader{};
-	std::vector<lwmf::MP3> Sounds;
+	std::vector<lwmf::MP3> Sounds{};
 	lwmf::IntRectStruct WeaponRect{};
 	lwmf::IntRectStruct MuzzleFlashRect{};
 	std::string HUDAmmoInfo;
@@ -118,8 +118,8 @@ struct WeaponStruct final
 
 struct DoorTypeStruct final
 {
-	lwmf::TextureStruct OriginalTexture;
-	std::vector<lwmf::MP3> Sounds;
+	lwmf::TextureStruct OriginalTexture{};
+	std::vector<lwmf::MP3> Sounds{};
 	std::int_fast32_t OpenCloseWidth{};
 	std::int_fast32_t OpenCloseSpeed{};
 	std::int_fast32_t StayOpenTime{};
@@ -127,7 +127,7 @@ struct DoorTypeStruct final
 
 struct DoorStruct final
 {
-	lwmf::TextureStruct AnimTexture;
+	lwmf::TextureStruct AnimTexture{};
 	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t DoorType{};
 	std::int_fast32_t Number{};
@@ -143,9 +143,9 @@ struct DoorStruct final
 // Init all needed objects
 //
 
-inline std::vector<EntityAssetStruct> EntityAssets;
-inline std::vector<EntityStruct> Entities;
-inline std::vector<WeaponStruct> Weapons;
-inline std::vector<DoorTypeStruct> DoorTypes;
-inline std::vector<DoorStruct> Doors;
+inline std::vector<EntityAssetStruct> EntityAssets{};
+inline std::vector<EntityStruct> Entities{};
+inline std::vector<WeaponStruct> Weapons{};
+inline std::vector<DoorTypeStruct> DoorTypes{};
+inline std::vector<DoorStruct> Doors{};
 inline Game_PlayerClass Player;

@@ -43,8 +43,8 @@
 lwmf::Logging NARCLog("NARC.log");
 
 // "ScreenTexture" is the main render target in our game!
-inline lwmf::TextureStruct ScreenTexture;
-inline lwmf::ShaderClass ScreenTextureShader;
+inline lwmf::TextureStruct ScreenTexture{};
+inline lwmf::ShaderClass ScreenTextureShader{};
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_Console.hpp"

@@ -35,13 +35,13 @@ private:
 
 	struct MenuItemStruct final
 	{
-		std::vector<std::int_fast32_t> ChildItems;
+		std::vector<std::int_fast32_t> ChildItems{};
 		std::string Entry;
 		std::int_fast32_t Level{};
 		std::int_fast32_t ParentItem{};
 	};
 
-	std::vector<MenuItemStruct> MenuItems;
+	std::vector<MenuItemStruct> MenuItems{};
 
 	GFX_TextClass Text{};
 	GFX_TextClass TextHighlight{};

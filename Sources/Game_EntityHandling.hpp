@@ -77,11 +77,11 @@ namespace Game_EntityHandling
 
 	static constexpr float EntityCollisionDetectionWallDist{ 0.5F };
 
-	inline std::vector<std::vector<EntityTypes>> EntityMap;
+	inline std::vector<std::vector<EntityTypes>> EntityMap{};
 
 	// Vectors used to sort the entities
-	inline std::vector<std::int_fast32_t> EntityOrder;
-	inline std::vector<float> EntityDistance;
+	inline std::vector<std::int_fast32_t> EntityOrder{};
+	inline std::vector<float> EntityDistance{};
 
 	// 1D Zbuffer
 	inline std::vector<float> ZBuffer;

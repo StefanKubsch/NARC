@@ -48,7 +48,7 @@ namespace lwmf
 		void CheckError(std::int_fast32_t Line);
 		void CheckCompileError(GLuint Task, Components Component);
 
-		std::vector<GLfloat> Vertices;
+		std::vector<GLfloat> Vertices{};
 		GLint OpacityLocation{};
 		GLuint ShaderProgram{};
 		GLuint VertexArrayObject{};

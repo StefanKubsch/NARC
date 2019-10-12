@@ -127,8 +127,7 @@ namespace lwmf
 	{
 		for (std::int_fast32_t i{}; i < XUSER_MAX_COUNT && ControllerID == -1; ++i)
 		{
-			XINPUT_STATE XInputState;
-			ZeroMemory(&XInputState, sizeof(XINPUT_STATE));
+			XINPUT_STATE XInputState{};
 
 			if (XInputGetState(i, &XInputState) == ERROR_SUCCESS)
 			{
@@ -152,7 +151,7 @@ namespace lwmf
 		PreviousLeftTrigger = TriggerLeft;
 		PreviousRightTrigger = TriggerRight;
 
-		ZeroMemory(&State, sizeof(XINPUT_STATE));
+		SecureZeroMemory(&State, sizeof(XINPUT_STATE));
 		XInputGetState(ControllerID, &State);
 
 		const FloatPointStruct NormalizedL{ max(-1, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX), max(-1, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };

@@ -37,7 +37,7 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Register device " + std::to_string(static_cast<USHORT>(Device)) + "...");
 
-		RAWINPUTDEVICE RawInputDevice;
+		RAWINPUTDEVICE RawInputDevice{};
 		RawInputDevice.usUsagePage = 1;
 		RawInputDevice.usUsage = static_cast<USHORT>(Device);
 		RawInputDevice.dwFlags = RIDEV_DEVNOTIFY;
@@ -53,7 +53,7 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Unregister device " + std::to_string(static_cast<USHORT>(Device)) + "...");
 
-		RAWINPUTDEVICE RawInputDevice;
+		RAWINPUTDEVICE RawInputDevice{};
 		RawInputDevice.usUsagePage = 1;
 		RawInputDevice.usUsage = static_cast<USHORT>(Device);
 		RawInputDevice.dwFlags = RIDEV_REMOVE;

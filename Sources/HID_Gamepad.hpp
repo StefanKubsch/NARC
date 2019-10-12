@@ -24,7 +24,7 @@ namespace HID_Gamepad
 	// Variables and constants
 	//
 
-	inline lwmf::Gamepad GameController;
+	inline lwmf::Gamepad GameController{};
 
 	inline lwmf::ShaderClass XBoxControllerIconShader{};
 	inline GLuint XBoxControllerIconTexture{};

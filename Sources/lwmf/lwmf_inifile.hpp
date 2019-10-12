@@ -40,7 +40,7 @@ namespace lwmf
 
 		T OutputVar{};
 		std::ifstream INIFile(INIFileName, std::ios::in);
-		std::smatch Match;
+		std::smatch Match{};
 		std::string CurrentSection;
 		std::string Line;
 		bool ValueFound{};
@@ -83,7 +83,7 @@ namespace lwmf
 
 		// Read INI file into vector of strings
 
-		std::vector<std::string> VectorOfStrings;
+		std::vector<std::string> VectorOfStrings{};
 		std::ifstream InputINIFile(INIFileName, std::ios::in);
 		std::string InputLine;
 
@@ -101,7 +101,7 @@ namespace lwmf
 
 		std::string CurrentSection;
 		std::ofstream OutputINIFile(INIFileName, std::ios::in);
-		std::smatch Match;
+		std::smatch Match{};
 
 		for (auto&& Line : VectorOfStrings)
 		{

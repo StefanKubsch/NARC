@@ -33,7 +33,7 @@ public:
 	void PlayAudio(PlayerSounds Sound);
 	void CloseAudio();
 
-	std::vector<lwmf::MP3> Sounds;
+	std::vector<lwmf::MP3> Sounds{};
 	lwmf::IntPointStruct FuturePos{};
 	lwmf::FloatPointStruct Pos{};
 	lwmf::FloatPointStruct Dir{};

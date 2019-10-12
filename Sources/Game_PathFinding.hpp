@@ -93,7 +93,7 @@ namespace Game_PathFinding
 		std::vector<std::int_fast32_t> Paths(MapSize);
 		std::vector<std::int_fast32_t> Neighbours(8);
 		std::vector<float> Costs(MapSize, FLT_MAX);
-		std::priority_queue<NodeStruct> NodesToVisit;
+		std::priority_queue<NodeStruct> NodesToVisit{};
 		bool PathFound{};
 
 		Costs[Start] = 0.0F;

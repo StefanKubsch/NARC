@@ -52,7 +52,7 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
 
-		MCI_OPEN_PARMS OpenParams;
+		MCI_OPEN_PARMS OpenParams{};
 		OpenParams.dwCallback = NULL;
 		OpenParams.lpstrDeviceType = std::to_string(MCI_ALL_DEVICE_ID).c_str();
 		OpenParams.lpstrElementName = Filename.c_str();
@@ -62,7 +62,7 @@ namespace lwmf
 
 		DeviceID = OpenParams.wDeviceID;
 
-		MCI_SET_PARMS SetParams;
+		MCI_SET_PARMS SetParams{};
 		SetParams.dwCallback = NULL;
 		SetParams.dwTimeFormat = 0;
 
@@ -73,7 +73,7 @@ namespace lwmf
 
 	inline void MP3::Play(const PlayModes PlayMode)
 	{
-		MCI_PLAY_PARMS PlayParams;
+		MCI_PLAY_PARMS PlayParams{};
 		PlayParams.dwCallback = reinterpret_cast<DWORD_PTR>(MainWindow);
 
 		MCIERROR Error{};
@@ -102,14 +102,14 @@ namespace lwmf
 
 	inline void MP3::RewindToStart()
 	{
-		MCI_SEEK_PARMS SeekParams;
+		MCI_SEEK_PARMS SeekParams{};
 		SeekParams.dwCallback = reinterpret_cast<DWORD_PTR>(MainWindow);
 		mciSendCommand(DeviceID, MCI_SEEK, MCI_SEEK_TO_START, reinterpret_cast<DWORD_PTR>(&SeekParams));
 	}
 
 	inline std::int_fast32_t MP3::GetDuration()
 	{
-		MCI_STATUS_PARMS StatusParams;
+		MCI_STATUS_PARMS StatusParams{};
 		StatusParams.dwItem = MCI_STATUS_LENGTH;
 
 		const MCIERROR Error{ mciSendCommand(DeviceID, MCI_STATUS, MCI_WAIT | MCI_STATUS_ITEM, reinterpret_cast<DWORD_PTR>(&StatusParams)) };

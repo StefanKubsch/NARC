@@ -34,8 +34,8 @@ namespace lwmf
 	// Variables and constants
 	//
 
-	inline HDC WindowHandle;
-	inline HWND MainWindow;
+	inline HDC WindowHandle{};
+	inline HWND MainWindow{};
 
 	//
 	// Functions
@@ -78,8 +78,7 @@ namespace lwmf
 
 			if (Fullscreen)
 			{
-				DEVMODE ScreenSettings;
-				std::memset(&ScreenSettings, 0, sizeof(ScreenSettings));
+				DEVMODE ScreenSettings{};
 				ScreenSettings.dmSize = sizeof(ScreenSettings);
 				ScreenSettings.dmPelsWidth = static_cast<DWORD>(Width);
 				ScreenSettings.dmPelsHeight = static_cast<DWORD>(Height);

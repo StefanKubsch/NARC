@@ -34,11 +34,11 @@ namespace lwmf
 		void WaitForThreads();
 
 	private:
-		std::vector<std::thread> Workers;
-		std::vector<std::future<void>> Results;
-		std::queue<std::packaged_task<void()>> Tasks;
-		std::mutex QueueMutex;
-		std::condition_variable Condition;
+		std::vector<std::thread> Workers{};
+		std::vector<std::future<void>> Results{};
+		std::queue<std::packaged_task<void()>> Tasks{};
+		std::mutex QueueMutex{};
+		std::condition_variable Condition{};
 		bool Stop{};
 	};
 

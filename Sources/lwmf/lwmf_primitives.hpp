@@ -74,7 +74,7 @@ namespace lwmf
 	inline void BoundaryFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
 		IntPointStruct Points{ CenterPoint };
-		std::vector<IntPointStruct> Stack;
+		std::vector<IntPointStruct> Stack{};
 		Stack.push_back(Points);
 
 		while (!Stack.empty())
@@ -400,7 +400,7 @@ namespace lwmf
 	inline IntPointStruct GetPolygonCentroid(const std::vector<IntPointStruct>& Points)
 	{
 		float SignedArea{};
-		FloatPointStruct Centroid;
+		FloatPointStruct Centroid{};
 
 		const std::int_fast32_t NumberOfPoints{ static_cast<std::int_fast32_t>(Points.size()) };
 

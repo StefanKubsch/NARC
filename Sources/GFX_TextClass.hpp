@@ -41,7 +41,7 @@ private:
 	};
 
 	lwmf::ShaderClass GlyphShader{};
-	std::vector<GlyphStruct> Glyphs;
+	std::vector<GlyphStruct> Glyphs{};
 
 	lwmf::IntPointStruct Offset{};
 	std::int_fast32_t FontHeight{};
@@ -116,7 +116,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			for (std::int_fast32_t Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
 			{
 				lwmf::FloatPointStruct QuadPos{};
-				stbtt_aligned_quad Quad;
+				stbtt_aligned_quad Quad{};
 				stbtt_GetBakedQuad(CharData, Width, Height, Char - FirstASCIIChar, QuadPos.X, QuadPos.Y, Quad, 1);
 
 				const lwmf::IntPointStruct Pos{ static_cast<std::int_fast32_t>(Quad.s0 * Width), static_cast<std::int_fast32_t>(Quad.t0 * Height) };
@@ -126,7 +126,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				Glyphs[Char].Baseline = static_cast<std::int_fast32_t>(-Quad.y0);
 
 				// Blit single glyphs to individual textures
-				lwmf::TextureStruct TempGlyphTexture;
+				lwmf::TextureStruct TempGlyphTexture{};
 				TempGlyphTexture.Pixels.resize(Glyphs[Char].Width * Glyphs[Char].Height);
 				TempGlyphTexture.Width = Glyphs[Char].Width;
 				TempGlyphTexture.Height = Glyphs[Char].Height;
