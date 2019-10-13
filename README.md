@@ -44,7 +44,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - complete separation of content/config from code
   - fixed timestep gameloop with 60fps (or chooseable) framelock
   - multidirectional, animated or non-animated billboard sprites/entities with basic automovement
-  - animated doors (in work, but you can open them and they will close automatically, as there is sound)
+  - animated doors with audio
   - multi-threaded rendering of graphics with dynamic resolving of concurrent threads and use of a threadpool
   - collision detection between walls, entities and player
   - per-pixel softwareshading for viewsize-dependent darkening of environment
@@ -54,7 +54,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - adjustable input sensitivity
   - basic audio functions (background music, steps, weapon sounds, entity sounds, door sounds)
   - basic weapon behaviour (sway, muzzleflash, shooting, reloading, ammo pickup, change weapon)
-  - realtime minimap showing entity positions
+  - realtime minimap showing entity positions and pathfinding waypoints of enemies
   - basic implementation of HUD (weapon, healthbar and ammo info) / Crosshair
   - fps (frames per second) counter
   - error handling, file checks

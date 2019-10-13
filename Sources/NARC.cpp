@@ -154,7 +154,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			{
 				ControlPlayerMovement();
 				Game_EntityHandling::MoveEntities();
-				Game_Doors::UpdateDoors();
+				Game_Doors::OpenCloseDoors();
 				Game_WeaponHandling::ChangeWeapon();
 				Game_WeaponHandling::CheckReloadStatus();
 				Game_WeaponHandling::CountdownMuzzleFlashCounter();
@@ -316,6 +316,7 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 			if (wParam == static_cast<WPARAM>(HID_Keyboard::ActionKey))
 			{
+				Game_Doors::TriggerDoor();
 				break;
 			}
 
@@ -471,6 +472,7 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::ActionKey)
 						{
+							Game_Doors::TriggerDoor();
 							break;
 						}
 

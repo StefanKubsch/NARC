@@ -86,14 +86,14 @@ namespace Game_Raycaster
 			lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
 
 			const lwmf::FloatPointStruct TempRayDir{ RayDir.X * RayDir.X, RayDir.Y * RayDir.Y };
-			const lwmf::FloatPointStruct DeltaDist{ std::sqrtf(1 + TempRayDir.Y / TempRayDir.X), std::sqrtf(1 + TempRayDir.X / TempRayDir.Y) };
+			const lwmf::FloatPointStruct DeltaDist{ std::sqrtf(1.0F + TempRayDir.Y / TempRayDir.X), std::sqrtf(1.0F + TempRayDir.X / TempRayDir.Y) };
 
 			lwmf::FloatPointStruct SideDist{};
 			lwmf::FloatPointStruct Step{};
 			lwmf::FloatPointStruct MapPos{ std::floorf(Player.Pos.X), std::floorf(Player.Pos.Y) };
 
-			RayDir.X < 0.0F ? (Step.X = -1, SideDist.X = (Player.Pos.X - MapPos.X) * DeltaDist.X) : (Step.X = 1, SideDist.X = (MapPos.X + 1 - Player.Pos.X) * DeltaDist.X);
-			RayDir.Y < 0.0F ? (Step.Y = -1, SideDist.Y = (Player.Pos.Y - MapPos.Y) * DeltaDist.Y) : (Step.Y = 1, SideDist.Y = (MapPos.Y + 1 - Player.Pos.Y) * DeltaDist.Y);
+			RayDir.X < 0.0F ? (Step.X = -1.0F, SideDist.X = (Player.Pos.X - MapPos.X) * DeltaDist.X) : (Step.X = 1.0F, SideDist.X = (MapPos.X + 1.0F - Player.Pos.X) * DeltaDist.X);
+			RayDir.Y < 0.0F ? (Step.Y = -1.0F, SideDist.Y = (Player.Pos.Y - MapPos.Y) * DeltaDist.Y) : (Step.Y = 1.0F, SideDist.Y = (MapPos.Y + 1.0F - Player.Pos.Y) * DeltaDist.Y);
 
 			bool WallHit{};
 			bool WallSide{};
@@ -111,12 +111,12 @@ namespace Game_Raycaster
 
 						if (Player.Pos.X < MapPos2.X)
 						{
-							MapPos2.X -= 1;
+							MapPos2.X -= 1.0F;
 						}
 
 						if (Player.Pos.Y > MapPos2.Y)
 						{
-							MapPos2.Y += 1;
+							MapPos2.Y += 1.0F;
 						}
 
 						float Adjust{ 1.0F };
@@ -129,7 +129,7 @@ namespace Game_Raycaster
 						}
 						else
 						{
-							Adjust = (MapPos2.X - Player.Pos.X) + 1;
+							Adjust = (MapPos2.X - Player.Pos.X) + 1.0F;
 							RayMulti = Adjust / RayDir.X;
 						}
 
@@ -137,9 +137,9 @@ namespace Game_Raycaster
 
 						if (!WallSide)
 						{
-							const float StepY{ std::sqrtf(DeltaDist.X * DeltaDist.X - 1) };
+							const float StepY{ std::sqrtf(DeltaDist.X * DeltaDist.X - 1.0F) };
 
-							if (std::fabs(std::floorf(TempResult.Y + (Step.Y * StepY) / 2) - std::floorf(MapPos.Y)) < FLT_EPSILON && ((TempResult.Y + (Step.Y * StepY) / 2) - MapPos.Y > Door.OpenPercent / 100))
+							if (std::fabs(std::floorf(TempResult.Y + (Step.Y * StepY) * 0.5F) - std::floorf(MapPos.Y)) < FLT_EPSILON && ((TempResult.Y + (Step.Y * StepY) * 0.5F) - MapPos.Y > Door.OpenPercent / 100.0F))
 							{
 								WallHit = true;
 								DoorNumber = Door.Number;
@@ -147,9 +147,9 @@ namespace Game_Raycaster
 						}
 						else
 						{
-							const float StepX{ std::sqrtf(DeltaDist.Y * DeltaDist.Y - 1) };
+							const float StepX{ std::sqrtf(DeltaDist.Y * DeltaDist.Y - 1.0F) };
 
-							if (std::fabs(std::floorf(TempResult.X + (Step.X * StepX) / 2) - std::floorf(MapPos.X)) < FLT_EPSILON && ((TempResult.X + (Step.X * StepX) / 2) - MapPos.X > Door.OpenPercent / 100))
+							if (std::fabs(std::floorf(TempResult.X + (Step.X * StepX) * 0.5F) - std::floorf(MapPos.X)) < FLT_EPSILON && ((TempResult.X + (Step.X * StepX) * 0.5F) - MapPos.X > Door.OpenPercent / 100.0F))
 							{
 								WallHit = true;
 								DoorNumber = Door.Number;
@@ -158,7 +158,8 @@ namespace Game_Raycaster
 					}
 				}
 
-				if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(MapPos.X)][static_cast<std::int_fast32_t>(MapPos.Y)] > 0)
+				if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(MapPos.X)][static_cast<std::int_fast32_t>(MapPos.Y)] > 0
+					&& Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(MapPos.X)][static_cast<std::int_fast32_t>(MapPos.Y)] < INT_MAX)
 				{
 					WallHit = true;
 				}
@@ -170,19 +171,19 @@ namespace Game_Raycaster
 			{
 				if (DoorNumber > -1)
 				{
-					MapPos.X += Step.X / 2;
+					MapPos.X += Step.X * 0.5F;
 				}
 
-				WallDist = (MapPos.X - Player.Pos.X + (1 - Step.X) / 2) / RayDir.X;
+				WallDist = (MapPos.X - Player.Pos.X + (1.0F - Step.X) * 0.5F) / RayDir.X;
 			}
 			else
 			{
 				if (DoorNumber > -1)
 				{
-					MapPos.Y += Step.Y / 2;
+					MapPos.Y += Step.Y * 0.5F;
 				}
 
-				WallDist = (MapPos.Y - Player.Pos.Y + (1 - Step.Y) / 2) / RayDir.Y;
+				WallDist = (MapPos.Y - Player.Pos.Y + (1.0F - Step.Y) * 0.5F) / RayDir.Y;
 			}
 
 			// const float WallDist{ WallSide ? (MapPos.Y - Player.Pos.Y + (1 - Step.Y) * 0.5F) / RayDir.Y : (MapPos.X - Player.Pos.X + (1 - Step.X) * 0.5F) / RayDir.X };
@@ -203,19 +204,16 @@ namespace Game_Raycaster
 					WallY -= static_cast<std::int_fast32_t>(WallY);
 					const std::int_fast32_t TextureY{ ((y + y - VerticalLookTemp + LineHeight) * TextureSize / LineHeight) >> 1 };
 
-					// const std::int_fast32_t WallTexel = DoorNumber > -1 ? Doors[DoorNumber].AnimTexture.Pixels[TextureY * TextureSize + TextureX] :
-					//	Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPos.X][MapPos.Y] - 1].Pixels[TextureY * TextureSize + TextureX];
-
 					std::int_fast32_t WallTexel{};
 
 					if (DoorNumber > -1)
 					{
-						if (Doors[DoorNumber].OpenPercent > 0)
+						if (Doors[DoorNumber].OpenPercent > 0.0F)
 						{
 							TextureX += 1;
 						}
 
-						TextureX -= Doors[DoorNumber].OpenPercent / 100;
+						TextureX -= Doors[DoorNumber].OpenPercent / 100.0F;
 						WallTexel = Doors[DoorNumber].AnimTexture.Pixels[TextureY * TextureSize + TextureX];
 					}
 					else
