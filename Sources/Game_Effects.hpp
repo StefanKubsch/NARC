@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <string>
+#include <algorithm>
 
 #include "Tools_ErrorHandling.hpp"
 

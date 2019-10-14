@@ -31,7 +31,7 @@ namespace Game_PreGame
 
 	inline void ShowIntroHeader()
 	{
-		if (const std::string FileName{ "./DATA/GameConfig/IntroHeader.txt" }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
+		if (const std::string FileName{ "./DATA/GameConfig/IntroHeader.txt" }; Tools_ErrorHandling::CheckFileExistence(FileName, ContinueOnError))
 		{
 			std::ifstream Reader(FileName, std::ios::in);
 			std::string Line;
@@ -47,7 +47,7 @@ namespace Game_PreGame
 	{
 		std::cout << "***************\n* SET OPTIONS *\n***************\n\n";
 
-		NumberOfLevels > 0 ? SelectedLevel = Tools_Console::QuestionForValue("Please select Level (0 - " + std::to_string(NumberOfLevels) + "): ", 0, NumberOfLevels) : SelectedLevel = 0;
+		SelectedLevel = NumberOfLevels > 0 ? Tools_Console::QuestionForValue("Please select Level (0 - " + std::to_string(NumberOfLevels) + "): ", 0, NumberOfLevels) : 0;
 		VSync = Tools_Console::QuestionForYesNo("VSync (y/n, yes implies fullscreen mode!): ") == 'y' ? true : false;
 	}
 

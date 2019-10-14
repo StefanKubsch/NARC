@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <string>
+#include <map>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -30,55 +31,37 @@ namespace Game_Config
 	{
 		if (const std::string INIFile{ "./DATA/GameConfig/GameConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			TextureSize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "TextureSize");
-			EntitySize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
-			FrameLock = lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GENERAL", "FrameLock");
-
-			// Set factor for bitshifting from TextureSize
-			switch (TextureSize)
+			const std::map<std::int_fast32_t, std::int_fast32_t> TextureCompare
 			{
-				case 64:
-				{
-					TextureSizeShiftFactor = 6;
-					break;
-				}
-				case 128:
-				{
-					TextureSizeShiftFactor = 7;
-					break;
-				}
-				case 256:
-				{
-					TextureSizeShiftFactor = 8;
-					break;
-				}
-				case 512:
-				{
-					TextureSizeShiftFactor = 9;
-					break;
-				}
-				case 1024:
-				{
-					TextureSizeShiftFactor = 10;
-					break;
-				}
-				case 2048:
-				{
-					TextureSizeShiftFactor = 11;
-					break;
-				}
-				case 4096:
-				{
-					TextureSizeShiftFactor = 12;
-					break;
-				}
-				case 8192:
-				{
-					TextureSizeShiftFactor = 13;
-					break;
-				}
-				default:{}
+				{ 64, 6 },
+				{ 128, 7 },
+				{ 256, 8},
+				{ 512, 9},
+				{ 1024, 10},
+				{ 2048, 11},
+				{ 4096, 12},
+				{ 8192, 13}
+			};
+
+			TextureSize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "TextureSize");
+
+			if (const auto State{ TextureCompare.find(TextureSize) }; State != TextureCompare.end())
+			{
+				TextureSizeShiftFactor = State->second;
 			}
+			else
+			{
+				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "TextureSize has an incorrect value!");
+			}
+
+			EntitySize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
+
+			if (TextureCompare.find(EntitySize) == TextureCompare.end())
+			{
+				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "EntitySize has an incorrect value!");
+			}
+
+			FrameLock = lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GENERAL", "FrameLock");
 		}
 	}
 

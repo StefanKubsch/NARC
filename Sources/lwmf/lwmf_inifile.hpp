@@ -16,6 +16,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 #include "lwmf_logging.hpp"
 
@@ -125,10 +126,17 @@ namespace lwmf
 
 	inline std::int_fast32_t ReadINIValueRGBA(const std::string& INIFileName, const std::string& Section)
 	{
-		return RGBAtoINT(ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Red"),
-			ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Green"),
-			ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Blue"),
-			ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Alpha"));
+		std::int_fast32_t Red{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Red") };
+		std::int_fast32_t Green{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Green") };
+		std::int_fast32_t Blue{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Blue") };
+		std::int_fast32_t Alpha{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Alpha") };
+
+		Red = std::clamp(Red, 0, 255);
+		Green = std::clamp(Green, 0, 255);
+		Blue = std::clamp(Blue, 0, 255);
+		Alpha = std::clamp(Alpha, 0, 255);
+
+		return RGBAtoINT(Red, Green, Blue, Alpha);
 	}
 
 
