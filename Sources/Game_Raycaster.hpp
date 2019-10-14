@@ -11,6 +11,8 @@
 
 #include <cstdint>
 #include <string>
+#include <cmath>
+#include <algorithm>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -35,6 +37,13 @@ namespace Game_Raycaster
 	void CastGraphics(Renderpart Part);
 
 	//
+	// Variables and constants
+	//
+
+	static constexpr float VerticalLookLimitMin{ 0.0F };
+	static constexpr float VerticalLookLimitMax{ 0.4F };
+
+	//
 	// Functions
 	//
 
@@ -45,6 +54,10 @@ namespace Game_Raycaster
 			PlaneStartValue = { lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue"), lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue") };
 			VerticalLookUpLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookUpLimit");
 			VerticalLookDownLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookDownLimit");
+
+			Tools_ErrorHandling::CheckAndClampRange(VerticalLookUpLimit, VerticalLookLimitMin, VerticalLookLimitMax, __FILENAME__, "VerticalLookUpLimit");
+			Tools_ErrorHandling::CheckAndClampRange(VerticalLookDownLimit, VerticalLookLimitMin, VerticalLookLimitMax, __FILENAME__, "VerticalLookDownLimit");
+
 			VerticalLookStep = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookStep");
 			FogOfWarDistance = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "FogOfWarDistance");
 		}
@@ -119,27 +132,14 @@ namespace Game_Raycaster
 							MapPos2.Y += 1.0F;
 						}
 
-						float Adjust{ 1.0F };
-						float RayMulti{ 1.0F };
-
-						if (WallSide)
-						{
-							Adjust = MapPos2.Y - Player.Pos.Y;
-							RayMulti = Adjust / RayDir.Y;
-						}
-						else
-						{
-							Adjust = (MapPos2.X - Player.Pos.X) + 1.0F;
-							RayMulti = Adjust / RayDir.X;
-						}
-
+						const float RayMulti{ WallSide ? (MapPos2.Y - Player.Pos.Y) / RayDir.Y : ((MapPos2.X - Player.Pos.X) + 1.0F) / RayDir.X };
 						const lwmf::FloatPointStruct TempResult{ Player.Pos.X + RayDir.X * RayMulti, Player.Pos.Y + RayDir.Y * RayMulti };
 
 						if (!WallSide)
 						{
 							const float StepY{ std::sqrtf(DeltaDist.X * DeltaDist.X - 1.0F) };
 
-							if (std::fabs(std::floorf(TempResult.Y + (Step.Y * StepY) * 0.5F) - std::floorf(MapPos.Y)) < FLT_EPSILON && ((TempResult.Y + (Step.Y * StepY) * 0.5F) - MapPos.Y > Door.OpenPercent / 100.0F))
+							if (std::fabs(std::floorf(TempResult.Y + (Step.Y * StepY) * 0.5F) - std::floorf(MapPos.Y)) < FLT_EPSILON && ((TempResult.Y + (Step.Y * StepY) * 0.5F) - MapPos.Y > Door.CurrentOpenPercent / 100.0F))
 							{
 								WallHit = true;
 								DoorNumber = Door.Number;
@@ -149,7 +149,7 @@ namespace Game_Raycaster
 						{
 							const float StepX{ std::sqrtf(DeltaDist.Y * DeltaDist.Y - 1.0F) };
 
-							if (std::fabs(std::floorf(TempResult.X + (Step.X * StepX) * 0.5F) - std::floorf(MapPos.X)) < FLT_EPSILON && ((TempResult.X + (Step.X * StepX) * 0.5F) - MapPos.X > Door.OpenPercent / 100.0F))
+							if (std::fabs(std::floorf(TempResult.X + (Step.X * StepX) * 0.5F) - std::floorf(MapPos.X)) < FLT_EPSILON && ((TempResult.X + (Step.X * StepX) * 0.5F) - MapPos.X > Door.CurrentOpenPercent / 100.0F))
 							{
 								WallHit = true;
 								DoorNumber = Door.Number;
@@ -186,7 +186,6 @@ namespace Game_Raycaster
 				WallDist = (MapPos.Y - Player.Pos.Y + (1.0F - Step.Y) * 0.5F) / RayDir.Y;
 			}
 
-			// const float WallDist{ WallSide ? (MapPos.Y - Player.Pos.Y + (1 - Step.Y) * 0.5F) / RayDir.Y : (MapPos.X - Player.Pos.X + (1 - Step.X) * 0.5F) / RayDir.X };
 			const std::int_fast32_t LineHeight{ static_cast<std::int_fast32_t>(ScreenTexture.Height / WallDist) };
 			const std::int_fast32_t Temp{ VerticalLookTemp >> 1 };
 			const std::int_fast32_t LineStart{ (std::max)(-(LineHeight >> 1) + Temp, 0) };
@@ -198,28 +197,23 @@ namespace Game_Raycaster
 			{
 				std::int_fast32_t TextureX{ static_cast<std::int_fast32_t>(WallX * TextureSize) & (TextureSize - 1) };
 
+				if (DoorNumber > -1)
+				{
+					if (Doors[DoorNumber].CurrentOpenPercent > DoorTypes[Doors[DoorNumber].DoorType].MinimumOpenPercent)
+					{
+						TextureX += 1;
+					}
+
+					TextureX -= Doors[DoorNumber].CurrentOpenPercent / DoorTypes[Doors[DoorNumber].DoorType].MaximumOpenPercent;
+				}
+
 				for (std::int_fast32_t y{ LineStart }; y < LineEnd; ++y)
 				{
 					float WallY{ static_cast<std::int_fast32_t>((y + y - VerticalLookTemp + LineHeight) / LineHeight) * 0.5F };
 					WallY -= static_cast<std::int_fast32_t>(WallY);
 					const std::int_fast32_t TextureY{ ((y + y - VerticalLookTemp + LineHeight) * TextureSize / LineHeight) >> 1 };
-
-					std::int_fast32_t WallTexel{};
-
-					if (DoorNumber > -1)
-					{
-						if (Doors[DoorNumber].OpenPercent > 0.0F)
-						{
-							TextureX += 1;
-						}
-
-						TextureX -= Doors[DoorNumber].OpenPercent / 100.0F;
-						WallTexel = Doors[DoorNumber].AnimTexture.Pixels[TextureY * TextureSize + TextureX];
-					}
-					else
-					{
-						WallTexel = Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(MapPos.X)][static_cast<std::int_fast32_t>(MapPos.Y)] - 1].Pixels[TextureY * TextureSize + TextureX];
-					}
+					const std::int_fast32_t WallTexel{ DoorNumber > -1 ? Doors[DoorNumber].AnimTexture.Pixels[TextureY * TextureSize + TextureX] :
+						Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(MapPos.X)][static_cast<std::int_fast32_t>(MapPos.Y)] - 1].Pixels[TextureY * TextureSize + TextureX] };
 
 					if (Game_LevelHandling::LightingFlag)
 					{

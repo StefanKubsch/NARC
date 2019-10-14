@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <string>
 #include <fstream>
+#include <algorithm>
 #include <sys/stat.h>
 
 static constexpr bool ContinueOnError{ true };
@@ -24,6 +25,7 @@ namespace Tools_ErrorHandling
 	bool CheckFileExistence(const std::string& FileName, bool ActionFlag);
 	bool CheckFolderExistence(const std::string& FolderName, bool ActionFlag);
 	bool CheckTextureSize(std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Size, bool ActionFlag);
+	template<typename T>bool CheckAndClampRange(T& Value, T Min, T Max, const std::string& File, const std::string& VariableName);
 
 	//
 	// Functions
@@ -90,6 +92,20 @@ namespace Tools_ErrorHandling
 			{
 				Result = false;
 			}
+		}
+
+		return Result;
+	}
+
+	template<typename T>bool CheckAndClampRange(T& Value, const T Min, const T Max, const std::string& File, const std::string& VariableName)
+	{
+		bool Result{ true };
+
+		if (Value < Min || Value > Max)
+		{
+			Value = std::clamp(Value, Min, Max);
+			NARCLog.AddEntry(lwmf::LogLevel::Warn, File.c_str(), VariableName + " needs to be between " + std::to_string(Min) + " and " + std::to_string(Max) + ". Value was clamped to range.");
+			Result = false;
 		}
 
 		return Result;

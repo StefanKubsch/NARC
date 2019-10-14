@@ -11,7 +11,6 @@
 
 #include <cstdint>
 #include <string>
-#include <algorithm>
 
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -35,6 +34,15 @@ namespace Game_Doors
 	void OpenCloseDoors();
 	void PlayAudio(const DoorStruct& Door, DoorSounds Sound);
 	void CloseAudio();
+
+	//
+	// Variables and constants
+	//
+
+	static constexpr float MaximumOpenPercentMin{ 1.0F };
+	static constexpr float MaximumOpenPercentMax{ 100.0F };
+	static constexpr float MinimumOpenPercentMin{ 0.0F };
+	static constexpr float MinimumOpenPercentMax{ 99.0F };
 
 	//
 	// Functions
@@ -62,6 +70,11 @@ namespace Game_Doors
 
 				DoorTypes[Index].OpenCloseSpeed = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "OpenCloseSpeed");
 				DoorTypes[Index].StayOpenTime = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "StayOpenTime") * static_cast<std::int_fast32_t>(FrameLock);
+				DoorTypes[Index].MaximumOpenPercent = lwmf::ReadINIValue<float>(INIFile, "GENERAL", "MaximumOpenPercent");
+				DoorTypes[Index].MinimumOpenPercent = lwmf::ReadINIValue<float>(INIFile, "GENERAL", "MinimumOpenPercent");
+
+				Tools_ErrorHandling::CheckAndClampRange(DoorTypes[Index].MaximumOpenPercent, MaximumOpenPercentMin, MaximumOpenPercentMax, __FILENAME__, "MaximumOpenPercent");
+				Tools_ErrorHandling::CheckAndClampRange(DoorTypes[Index].MinimumOpenPercent, MinimumOpenPercentMin, MinimumOpenPercentMax, __FILENAME__, "MinimumOpenPercent");
 
 				++Index;
 			}
@@ -92,6 +105,7 @@ namespace Game_Doors
 					Doors[Index].AnimTexture = DoorTypes[FoundDoorType].OriginalTexture;
 					Doors[Index].Number = Index;
 					Doors[Index].Pos = { static_cast<float>(MapPosX), static_cast<float>(MapPosY) };
+
 					Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] = INT_MAX;
 
 					++Index;
@@ -107,7 +121,7 @@ namespace Game_Doors
 			if (!Door.IsOpenTriggered && !Door.IsOpen && (std::fabs(Door.Pos.X - Player.FuturePos.X) < FLT_EPSILON && std::fabs(Door.Pos.Y - Player.FuturePos.Y) < FLT_EPSILON))
 			{
 				Door.IsOpenTriggered = true;
-				Door.OpenPercent = 0.0F;
+				Door.CurrentOpenPercent = DoorTypes[Door.DoorType].MinimumOpenPercent;
 				PlayAudio(Door, DoorSounds::OpenCloseSound);
 				break;
 			}
@@ -120,7 +134,7 @@ namespace Game_Doors
 		{
 			const std::int_fast32_t TempY{ y * TextureSize };
 
-			for (std::int_fast32_t SourceTextureX{}, x{ static_cast<std::int_fast32_t>(Door.OpenPercent / 1.59F) }; x < TextureSize; ++x, ++SourceTextureX)
+			for (std::int_fast32_t SourceTextureX{}, x{ static_cast<std::int_fast32_t>(Door.CurrentOpenPercent / 1.59F) }; x < TextureSize; ++x, ++SourceTextureX)
 			{
 				Door.AnimTexture.Pixels[TempY + x] = DoorTypes[Door.DoorType].OriginalTexture.Pixels[TempY + SourceTextureX];
 			}
@@ -134,19 +148,19 @@ namespace Game_Doors
 			// Open door
 			if (Door.IsOpenTriggered)
 			{
-				if (Door.OpenPercent < 100.0F)
+				if (Door.CurrentOpenPercent < DoorTypes[Door.DoorType].MaximumOpenPercent)
 				{
-					Door.OpenPercent += DoorTypes[Door.DoorType].OpenCloseSpeed;
+					Door.CurrentOpenPercent += DoorTypes[Door.DoorType].OpenCloseSpeed;
 					ModifyDoorTexture(Door);
 				}
 
-				if (Door.OpenPercent >= 100.0F)
+				if (Door.CurrentOpenPercent >= DoorTypes[Door.DoorType].MaximumOpenPercent)
 				{
 					Door.IsOpen = true;
 					Door.IsOpenTriggered = false;
 					Door.IsCloseTriggered = true;
 					Door.StayOpenCounter = DoorTypes[Door.DoorType].StayOpenTime;
-					Door.OpenPercent = 100.0F;
+					Door.CurrentOpenPercent = DoorTypes[Door.DoorType].MaximumOpenPercent;
 					Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] = 0;
 				}
 			}
@@ -160,7 +174,7 @@ namespace Game_Doors
 				{
 					Door.IsOpen = false;
 
-					if (Door.OpenPercent >= DoorTypes[Door.DoorType].OpenCloseSpeed)
+					if (Door.CurrentOpenPercent >= DoorTypes[Door.DoorType].OpenCloseSpeed)
 					{
 						if (!Door.OpenCloseAudioFlag)
 						{
@@ -168,16 +182,16 @@ namespace Game_Doors
 							Door.OpenCloseAudioFlag = true;
 						}
 
-						Door.OpenPercent -= DoorTypes[Door.DoorType].OpenCloseSpeed;
+						Door.CurrentOpenPercent -= DoorTypes[Door.DoorType].OpenCloseSpeed;
 						ModifyDoorTexture(Door);
 					}
 				}
 
-				if (Door.OpenPercent <= 0.0F)
+				if (Door.CurrentOpenPercent <= DoorTypes[Door.DoorType].MinimumOpenPercent)
 				{
 					Door.IsCloseTriggered = false;
 					Door.OpenCloseAudioFlag = false;
-					Door.OpenPercent = 0.0F;
+					Door.CurrentOpenPercent = DoorTypes[Door.DoorType].MinimumOpenPercent;
 					Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] = INT_MAX;
 				}
 			}

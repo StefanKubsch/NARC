@@ -122,6 +122,8 @@ struct DoorTypeStruct final
 	std::vector<lwmf::MP3> Sounds{};
 	std::int_fast32_t OpenCloseSpeed{};
 	std::int_fast32_t StayOpenTime{};
+	float MaximumOpenPercent{};
+	float MinimumOpenPercent{};
 };
 
 struct DoorStruct final
@@ -131,7 +133,7 @@ struct DoorStruct final
 	std::int_fast32_t DoorType{};
 	std::int_fast32_t Number{};
 	std::int_fast32_t StayOpenCounter{};
-	float OpenPercent{};
+	float CurrentOpenPercent{};
 	bool IsOpen{};
 	bool IsOpenTriggered{};
 	bool IsCloseTriggered{};
