@@ -118,7 +118,7 @@ namespace Game_Raycaster
 
 				for (const auto& Door : Doors)
 				{
-					if (std::fabs(Door.Pos.X - MapPos.X) < FLT_EPSILON && std::fabs(Door.Pos.Y - MapPos.Y) < FLT_EPSILON)
+					if (std::abs(Door.Pos.X - MapPos.X) < FLT_EPSILON && std::abs(Door.Pos.Y - MapPos.Y) < FLT_EPSILON)
 					{
 						lwmf::FloatPointStruct MapPos2{ MapPos };
 
@@ -139,7 +139,7 @@ namespace Game_Raycaster
 						{
 							const float StepY{ std::sqrtf(DeltaDist.X * DeltaDist.X - 1.0F) };
 
-							if (std::fabs(std::floorf(TempResult.Y + (Step.Y * StepY) * 0.5F) - std::floorf(MapPos.Y)) < FLT_EPSILON && ((TempResult.Y + (Step.Y * StepY) * 0.5F) - MapPos.Y > Door.CurrentOpenPercent / 100.0F))
+							if (std::abs(std::floorf(TempResult.Y + (Step.Y * StepY) * 0.5F) - std::floorf(MapPos.Y)) < FLT_EPSILON && ((TempResult.Y + (Step.Y * StepY) * 0.5F) - MapPos.Y > Door.CurrentOpenPercent / 100.0F))
 							{
 								WallHit = true;
 								DoorNumber = Door.Number;
@@ -149,7 +149,7 @@ namespace Game_Raycaster
 						{
 							const float StepX{ std::sqrtf(DeltaDist.Y * DeltaDist.Y - 1.0F) };
 
-							if (std::fabs(std::floorf(TempResult.X + (Step.X * StepX) * 0.5F) - std::floorf(MapPos.X)) < FLT_EPSILON && ((TempResult.X + (Step.X * StepX) * 0.5F) - MapPos.X > Door.CurrentOpenPercent / 100.0F))
+							if (std::abs(std::floorf(TempResult.X + (Step.X * StepX) * 0.5F) - std::floorf(MapPos.X)) < FLT_EPSILON && ((TempResult.X + (Step.X * StepX) * 0.5F) - MapPos.X > Door.CurrentOpenPercent / 100.0F))
 							{
 								WallHit = true;
 								DoorNumber = Door.Number;
@@ -204,7 +204,7 @@ namespace Game_Raycaster
 						TextureX += 1;
 					}
 
-					TextureX -= Doors[DoorNumber].CurrentOpenPercent / DoorTypes[Doors[DoorNumber].DoorType].MaximumOpenPercent;
+					TextureX -= static_cast<std::int_fast32_t>(Doors[DoorNumber].CurrentOpenPercent / DoorTypes[Doors[DoorNumber].DoorType].MaximumOpenPercent);
 				}
 
 				for (std::int_fast32_t y{ LineStart }; y < LineEnd; ++y)

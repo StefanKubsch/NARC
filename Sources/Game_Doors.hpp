@@ -118,7 +118,7 @@ namespace Game_Doors
 	{
 		for (auto&& Door : Doors)
 		{
-			if (!Door.IsOpenTriggered && !Door.IsOpen && (std::fabs(Door.Pos.X - Player.FuturePos.X) < FLT_EPSILON && std::fabs(Door.Pos.Y - Player.FuturePos.Y) < FLT_EPSILON))
+			if (!Door.IsOpenTriggered && !Door.IsOpen && (std::abs(Door.Pos.X - Player.FuturePos.X) < FLT_EPSILON && std::abs(Door.Pos.Y - Player.FuturePos.Y) < FLT_EPSILON))
 			{
 				Door.IsOpenTriggered = true;
 				Door.CurrentOpenPercent = DoorTypes[Door.DoorType].MinimumOpenPercent;
@@ -168,7 +168,7 @@ namespace Game_Doors
 			// Close door - but first check if door is not blocked!
 			if (Door.IsCloseTriggered
 				&& Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] == Game_EntityHandling::EntityTypes::Clear
-				&& (std::fabs(Player.Pos.X - Door.Pos.X) > FLT_EPSILON || std::fabs(Player.Pos.Y - Door.Pos.Y) > FLT_EPSILON))
+				&& (std::abs(Player.Pos.X - Door.Pos.X) > FLT_EPSILON || std::abs(Player.Pos.Y - Door.Pos.Y) > FLT_EPSILON))
 			{
 				if (--Door.StayOpenCounter <= 0)
 				{
