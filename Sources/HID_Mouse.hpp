@@ -49,7 +49,7 @@ namespace HID_Mouse
 			MouseSensitivityStep = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityStep");
 
 			// Load MouseIcon
-			lwmf::TextureStruct TempMouseIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "MOUSE", "MouseIcon")) };
+			const lwmf::TextureStruct TempMouseIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "MOUSE", "MouseIcon")) };
 			MouseIconShader.LoadShader("Default", ScreenTexture);
 			MouseIconShader.LoadStaticTextureInGPU(TempMouseIconTexture, &MouseIconTexture, ScreenTexture.Width - 153, 0, TempMouseIconTexture.Width, TempMouseIconTexture.Height);
 

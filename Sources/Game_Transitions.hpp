@@ -81,14 +81,12 @@ namespace Game_Transitions
 		const std::int_fast32_t HalfMask{ static_cast<std::int_fast32_t>(std::pow(2, HalfBits)) - 1 };
 		std::int_fast32_t Frame{};
 		std::uint_fast32_t Lag{};
-		std::chrono::time_point<std::chrono::steady_clock> EndTime{ std::chrono::steady_clock::now() };
-
-		lwmf::SetVSync(-1);
+		auto EndTime{ std::chrono::steady_clock::now() };
 
 		while (Frame < LastFrame)
 		{
-			std::chrono::time_point<std::chrono::steady_clock> StartTime{ std::chrono::steady_clock::now() };
-			auto ElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(StartTime - EndTime));
+			const auto StartTime{ std::chrono::steady_clock::now() };
+			const auto ElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(StartTime - EndTime));
 			EndTime = StartTime;
 			Lag += static_cast<std::uint_fast32_t>(ElapsedTime.count());
 
@@ -108,12 +106,7 @@ namespace Game_Transitions
 					}
 
 					const std::int_fast32_t FnResult{ Right << HalfBits | (Left & (LastFrame - 1)) };
-					const lwmf::IntPointStruct Pixel{FnResult % ScreenTexture.Width, static_cast<std::int_fast32_t>(FnResult / ScreenTexture.Width) };
-
-					if (Pixel.X < ScreenTexture.Width && Pixel.Y < ScreenTexture.Height)
-					{
-						lwmf::SetPixel(ScreenTexture, Pixel.X, Pixel.Y, FadeColor);
-					}
+					lwmf::SetPixelSafe(ScreenTexture, FnResult % ScreenTexture.Width, static_cast<std::int_fast32_t>(FnResult / ScreenTexture.Width), FadeColor);
 				}
 
 				Lag -= LengthOfFrame;
@@ -123,8 +116,6 @@ namespace Game_Transitions
 			ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
 			lwmf::SwapBuffer();
 		}
-
-		VSync ? lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 	}
 
 	inline void DeathSequence()
@@ -132,7 +123,9 @@ namespace Game_Transitions
 		const std::int_fast32_t Red{ lwmf::RGBAtoINT(255, 0, 0, 255) };
 		const std::int_fast32_t Black{ lwmf::RGBAtoINT(0, 0, 0, 255) };
 
+		lwmf::SetVSync(-1);
 		FizzleFade(Red, 50);
+		VSync ? lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 
 		GameOverText.RenderTextCentered("You are dead. Game over...", ScreenTexture.HeightMid - (GameOverText.GetFontHeight() >> 1));
 		GameOverText1.RenderTextCentered("Press [SPACE] to continue", ScreenTexture.Height - GameOverText1.GetFontHeight() - 50);

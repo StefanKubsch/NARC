@@ -128,16 +128,21 @@ struct DoorTypeStruct final
 
 struct DoorStruct final
 {
+	enum class States
+	{
+		Closed,
+		Triggered,
+		Open
+	};
+
 	lwmf::TextureStruct AnimTexture{};
 	lwmf::FloatPointStruct Pos{};
+	States State{};
 	std::int_fast32_t DoorType{};
 	std::int_fast32_t Number{};
 	std::int_fast32_t StayOpenCounter{};
 	float CurrentOpenPercent{};
-	bool IsOpen{};
-	bool IsOpenTriggered{};
-	bool IsCloseTriggered{};
-	bool OpenCloseAudioFlag{};
+	bool CloseAudioFlag{};
 };
 
 //

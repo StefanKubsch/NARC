@@ -12,10 +12,8 @@
 #include <cstdint>
 #include <string>
 
-#include "Game_GlobalDefinitions.hpp"
 #include "Tools_ErrorHandling.hpp"
 #include "Game_PlayerClass.hpp"
-#include "Game_DataStructures.hpp"
 
 class Game_HealthBarClass final
 {
@@ -62,12 +60,9 @@ inline void Game_HealthBarClass::Init()
 
 inline void Game_HealthBarClass::Display()
 {
-	const lwmf::IntRectStruct RectHealthGreen{ Pos.X, Pos.Y, Player.Hitpoints * HealthBarFactor, HealthBarWidth };
-
 	lwmf::Rectangle(ScreenTexture, RectBlack2.X, RectBlack2.Y, RectBlack2.Width, RectBlack2.Height, Black);
 	lwmf::FilledRectangle(ScreenTexture, RectOrange.X, RectOrange.Y, RectOrange.Width, RectOrange.Height, Orange, Orange);
 	lwmf::Rectangle(ScreenTexture, RectBlack1.X, RectBlack1.Y, RectBlack1.Width, RectBlack1.Height, Black);
 	lwmf::FilledRectangle(ScreenTexture, RectRed.X, RectRed.Y, RectRed.Width, RectRed.Height, Red, Red);
-	lwmf::FilledRectangle(ScreenTexture, RectHealthGreen.X, RectHealthGreen.Y, RectHealthGreen.Width, RectHealthGreen.Height, Green, Green);
+	lwmf::FilledRectangle(ScreenTexture, Pos.X, Pos.Y, Player.Hitpoints * HealthBarFactor, HealthBarWidth, Green, Green);
 }
-

@@ -27,7 +27,6 @@ namespace lwmf
 	template<typename T>T CalcChebyshevDistance(std::int_fast32_t x1, std::int_fast32_t x2, std::int_fast32_t y1, std::int_fast32_t y2);
 	template<typename T>T CalcManhattanDistance(T x1, T x2, T y1, T y2);
 	template<typename T>T CalcManhattanDistance(std::int_fast32_t x1, std::int_fast32_t x2, std::int_fast32_t y1, std::int_fast32_t y2);
-	float Atan2Approx(float y, float x);
 
 	//
 	// Variables and constants
@@ -84,47 +83,6 @@ namespace lwmf
 	template<typename T>T CalcManhattanDistance(const std::int_fast32_t x1, const std::int_fast32_t x2, const std::int_fast32_t y1, const std::int_fast32_t y2)
 	{
 		return static_cast<T>(std::abs(x1 - x2) + std::abs(y1 - y2));
-	}
-
-	inline float Atan2Approx(const float y, const float x)
-	{
-		const float n1{ 0.97239411F };
-		const float n2{ -0.19194795F };
-		float Result{};
-
-		if (std::abs(x - 0.0F) > FLT_EPSILON)
-		{
-			const union { float flVal; std::uint_fast32_t nVal; } tYSign = { y };
-
-			if (std::abs(x) >= std::abs(y))
-			{
-				const union { float flVal; std::uint_fast32_t nVal; } tXSign = { x };
-				union { float flVal; std::uint_fast32_t nVal; } tOffset = { PI };
-				tOffset.nVal |= tYSign.nVal & 0x80000000U;
-				tOffset.nVal *= tXSign.nVal >> 31;
-				Result = tOffset.flVal;
-				const float z{ y / x };
-				Result += (n1 + n2 * z * z) * z;
-			}
-			else
-			{
-				union { float flVal; std::uint_fast32_t nVal; } tOffset = { HalfPI };
-				tOffset.nVal |= tYSign.nVal & 0x80000000U;
-				Result = tOffset.flVal;
-				const float z{ x / y };
-				Result -= (n1 + n2 * z * z) * z;
-			}
-		}
-		else if (y > 0.0F)
-		{
-			Result = HalfPI;
-		}
-		else if (y < 0.0F)
-		{
-			Result = -HalfPI;
-		}
-
-		return Result;
 	}
 
 

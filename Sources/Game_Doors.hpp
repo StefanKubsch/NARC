@@ -101,10 +101,14 @@ namespace Game_Doors
 				{
 					Doors.emplace_back();
 
-					Doors[Index].DoorType = FoundDoorType;
 					Doors[Index].AnimTexture = DoorTypes[FoundDoorType].OriginalTexture;
-					Doors[Index].Number = Index;
 					Doors[Index].Pos = { static_cast<float>(MapPosX), static_cast<float>(MapPosY) };
+					Doors[Index].State = DoorStruct::States::Closed;
+					Doors[Index].DoorType = FoundDoorType;
+					Doors[Index].Number = Index;
+					Doors[Index].CurrentOpenPercent = DoorTypes[Doors[Index].DoorType].MinimumOpenPercent;
+
+					ModifyDoorTexture(Doors[Index]);
 
 					Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] = INT_MAX;
 
@@ -118,10 +122,9 @@ namespace Game_Doors
 	{
 		for (auto&& Door : Doors)
 		{
-			if (!Door.IsOpenTriggered && !Door.IsOpen && (std::abs(Door.Pos.X - Player.FuturePos.X) < FLT_EPSILON && std::abs(Door.Pos.Y - Player.FuturePos.Y) < FLT_EPSILON))
+			if (Door.State == DoorStruct::States::Closed && (std::abs(Door.Pos.X - Player.FuturePos.X) < FLT_EPSILON && std::abs(Door.Pos.Y - Player.FuturePos.Y) < FLT_EPSILON))
 			{
-				Door.IsOpenTriggered = true;
-				Door.CurrentOpenPercent = DoorTypes[Door.DoorType].MinimumOpenPercent;
+				Door.State = DoorStruct::States::Triggered;
 				PlayAudio(Door, DoorSounds::OpenCloseSound);
 				break;
 			}
@@ -146,7 +149,7 @@ namespace Game_Doors
 		for (auto&& Door : Doors)
 		{
 			// Open door
-			if (Door.IsOpenTriggered)
+			if (Door.State == DoorStruct::States::Triggered)
 			{
 				if (Door.CurrentOpenPercent < DoorTypes[Door.DoorType].MaximumOpenPercent)
 				{
@@ -156,9 +159,7 @@ namespace Game_Doors
 
 				if (Door.CurrentOpenPercent >= DoorTypes[Door.DoorType].MaximumOpenPercent)
 				{
-					Door.IsOpen = true;
-					Door.IsOpenTriggered = false;
-					Door.IsCloseTriggered = true;
+					Door.State = DoorStruct::States::Open;
 					Door.StayOpenCounter = DoorTypes[Door.DoorType].StayOpenTime;
 					Door.CurrentOpenPercent = DoorTypes[Door.DoorType].MaximumOpenPercent;
 					Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] = 0;
@@ -166,20 +167,18 @@ namespace Game_Doors
 			}
 
 			// Close door - but first check if door is not blocked!
-			if (Door.IsCloseTriggered
+			if (Door.State == DoorStruct::States::Open
 				&& Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] == Game_EntityHandling::EntityTypes::Clear
 				&& (std::abs(Player.Pos.X - Door.Pos.X) > FLT_EPSILON || std::abs(Player.Pos.Y - Door.Pos.Y) > FLT_EPSILON))
 			{
 				if (--Door.StayOpenCounter <= 0)
 				{
-					Door.IsOpen = false;
-
 					if (Door.CurrentOpenPercent >= DoorTypes[Door.DoorType].OpenCloseSpeed)
 					{
-						if (!Door.OpenCloseAudioFlag)
+						if (!Door.CloseAudioFlag)
 						{
 							PlayAudio(Door, DoorSounds::OpenCloseSound);
-							Door.OpenCloseAudioFlag = true;
+							Door.CloseAudioFlag = true;
 						}
 
 						Door.CurrentOpenPercent -= DoorTypes[Door.DoorType].OpenCloseSpeed;
@@ -189,8 +188,8 @@ namespace Game_Doors
 
 				if (Door.CurrentOpenPercent <= DoorTypes[Door.DoorType].MinimumOpenPercent)
 				{
-					Door.IsCloseTriggered = false;
-					Door.OpenCloseAudioFlag = false;
+					Door.State = DoorStruct::States::Closed;
+					Door.CloseAudioFlag = false;
 					Door.CurrentOpenPercent = DoorTypes[Door.DoorType].MinimumOpenPercent;
 					Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] = INT_MAX;
 				}

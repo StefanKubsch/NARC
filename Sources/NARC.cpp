@@ -116,26 +116,26 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
 	const std::int_fast32_t White{ lwmf::RGBAtoINT(255, 255, 255, 255) };
 
+	lwmf::CatchMouse(lwmf::MainWindow);
+
 	// Main game loop
 	// fixed timestep method
 	// loop until ESC is pressed
 
 	LengthOfFrame = 1000 / FrameLock;
 	std::uint_fast32_t Lag{};
-	std::chrono::time_point<std::chrono::steady_clock> EndTime{ std::chrono::steady_clock::now() };
+	auto EndTime{ std::chrono::steady_clock::now() };
 
 	while (!QuitGameFlag)
 	{
-		lwmf::CatchMouse(lwmf::MainWindow);
-
-		std::chrono::time_point<std::chrono::steady_clock> StartTime{ std::chrono::steady_clock::now() };
-		auto ElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(StartTime - EndTime));
+		const auto StartTime{ std::chrono::steady_clock::now() };
+		const auto ElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(StartTime - EndTime));
 		EndTime = StartTime;
 		Lag += static_cast<std::uint_fast32_t>(ElapsedTime.count());
 
 		HID_Gamepad::GameController.Refresh();
 
-		static MSG Message{};
+		MSG Message{};
 
 		while (PeekMessage(&Message, nullptr, 0, 0, PM_REMOVE))
 		{

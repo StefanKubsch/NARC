@@ -111,7 +111,7 @@ namespace HID_Gamepad
 				GameController.AddKeyMapping(XINPUT_GAMEPAD_X, HID_Keyboard::ActionKey);
 
 				// Load XBoxControllerIcon
-				lwmf::TextureStruct TempXBoxControllerIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "GAMECONTROLLER", "XBoxControllerIcon")) };
+				const lwmf::TextureStruct TempXBoxControllerIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "GAMECONTROLLER", "XBoxControllerIcon")) };
 				XBoxControllerIconShader.LoadShader("Default", ScreenTexture);
 				XBoxControllerIconShader.LoadStaticTextureInGPU(TempXBoxControllerIconTexture, &XBoxControllerIconTexture, ScreenTexture.Width - 153, 0, TempXBoxControllerIconTexture.Width, TempXBoxControllerIconTexture.Height);
 			}
