@@ -104,7 +104,7 @@ namespace Game_WeaponHandling
 
 		while (true)
 		{
-			if (const std::string IniFile{ "./DATA/Assets_Weapons/Weapon_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(IniFile, ContinueOnError))
+			if (const std::string IniFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(IniFile, ContinueOnError))
 			{
 				Weapons.emplace_back();
 
@@ -177,7 +177,7 @@ namespace Game_WeaponHandling
 					Weapon.WeaponRect.Width = TempTextureWeapon.Width;
 					Weapon.WeaponRect.Height = TempTextureWeapon.Height;
 
-					Weapon.WeaponShader.LoadTextureInGPU(TempTextureWeapon, &Weapon.WeaponTexture);
+					Weapon.WeaponShader.LoadTextureInGPU(TempTextureWeapon, &Weapon.WeaponShader.OGLTextureID);
 				}
 			}
 
@@ -194,7 +194,7 @@ namespace Game_WeaponHandling
 					Weapon.MuzzleFlashRect.Width = TempTextureMuzzleFlash.Width;
 					Weapon.MuzzleFlashRect.Height = TempTextureMuzzleFlash.Height;
 
-					Weapon.MuzzleFlashShader.LoadTextureInGPU(TempTextureMuzzleFlash, &Weapon.MuzzleFlashTexture);
+					Weapon.MuzzleFlashShader.LoadTextureInGPU(TempTextureMuzzleFlash, &Weapon.MuzzleFlashShader.OGLTextureID);
 				}
 			}
 		}
@@ -528,10 +528,10 @@ namespace Game_WeaponHandling
 		// Draw muzzle flash if weapon is fired
 		if (WeaponMuzzleFlashFlag)
 		{
-			Weapons[Player.SelectedWeapon].MuzzleFlashShader.RenderTexture(&Weapons[Player.SelectedWeapon].MuzzleFlashTexture, Sway.X + Weapons[Player.SelectedWeapon].MuzzleFlashRect.X, Sway.Y - Weapons[Player.SelectedWeapon].MuzzleFlashRect.Y, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Width, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Height, true, 1.0F); //-V807
+			Weapons[Player.SelectedWeapon].MuzzleFlashShader.RenderTexture(&Weapons[Player.SelectedWeapon].MuzzleFlashShader.OGLTextureID, Sway.X + Weapons[Player.SelectedWeapon].MuzzleFlashRect.X, Sway.Y - Weapons[Player.SelectedWeapon].MuzzleFlashRect.Y, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Width, Weapons[Player.SelectedWeapon].MuzzleFlashRect.Height, true, 1.0F); //-V807
 		}
 		// Draw weapon
-		Weapons[Player.SelectedWeapon].WeaponShader.RenderTexture(&Weapons[Player.SelectedWeapon].WeaponTexture, Sway.X, Sway.Y + WeaponFadeInOutY, Weapons[Player.SelectedWeapon].WeaponRect.Width, Weapons[Player.SelectedWeapon].WeaponRect.Height, true, 1.0F);
+		Weapons[Player.SelectedWeapon].WeaponShader.RenderTexture(&Weapons[Player.SelectedWeapon].WeaponShader.OGLTextureID, Sway.X, Sway.Y + WeaponFadeInOutY, Weapons[Player.SelectedWeapon].WeaponRect.Width, Weapons[Player.SelectedWeapon].WeaponRect.Height, true, 1.0F);
 	}
 
 	inline void PlayAudio(const std::int_fast32_t SelectedPlayerWeapon, const WeaponsSounds WeaponSound)

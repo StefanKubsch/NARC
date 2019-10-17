@@ -29,7 +29,7 @@ namespace Game_Config
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/GameConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "GameConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			const std::map<std::int_fast32_t, std::int_fast32_t> TextureCompare
 			{
@@ -69,7 +69,7 @@ namespace Game_Config
 	{
 		NumberOfLevels = 1;
 
-		while (Tools_ErrorHandling::CheckFolderExistence("./DATA/Levels/" + std::to_string(NumberOfLevels), ContinueOnError))
+		while (Tools_ErrorHandling::CheckFolderExistence(LevelFolder + std::to_string(NumberOfLevels), ContinueOnError))
 		{
 			++NumberOfLevels;
 		}

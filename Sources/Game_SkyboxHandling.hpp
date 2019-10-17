@@ -31,7 +31,6 @@ namespace Game_SkyboxHandling
 	//
 
 	inline lwmf::ShaderClass SkyboxShader{};
-	inline GLuint SkyboxTexture{};
 	inline std::int_fast32_t SkyboxWidth{};
 	inline std::int_fast32_t SkyboxHeight{};
 	inline bool SkyBoxEnabled{};
@@ -47,7 +46,7 @@ namespace Game_SkyboxHandling
 
 	inline void LoadSkyboxImage()
 	{
-		if (const std::string INIFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/LevelData/SkyboxConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/SkyboxConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			SkyBoxEnabled = lwmf::ReadINIValue<bool>(INIFile, "SKYBOX", "SkyBoxEnabled");
 
@@ -58,7 +57,7 @@ namespace Game_SkyboxHandling
 				SkyboxWidth = TempTexture.Width;
 				SkyboxHeight = TempTexture.Height;
 
-				SkyboxShader.LoadTextureInGPU(TempTexture, &SkyboxTexture);
+				SkyboxShader.LoadTextureInGPU(TempTexture, &SkyboxShader.OGLTextureID);
 			}
 		}
 	}
@@ -70,11 +69,11 @@ namespace Game_SkyboxHandling
 			const std::int_fast32_t Left{ static_cast<std::int_fast32_t>(std::atan2f(Plane.X, Plane.Y) / lwmf::DoublePI * -SkyboxWidth) };
 			const std::int_fast32_t Top{ static_cast<std::int_fast32_t>(VerticalLookCamera * 360.0F - 180.0F) };
 
-			SkyboxShader.RenderTexture(&SkyboxTexture, Left, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
+			SkyboxShader.RenderTexture(&SkyboxShader.OGLTextureID, Left, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
 
 			if (Left < SkyboxWidth - ScreenTexture.Width)
 			{
-				SkyboxShader.RenderTexture(&SkyboxTexture, Left - SkyboxWidth, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
+				SkyboxShader.RenderTexture(&SkyboxShader.OGLTextureID, Left - SkyboxWidth, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
 			}
 		}
 	}
@@ -83,7 +82,7 @@ namespace Game_SkyboxHandling
 	{
 		if (SkyBoxEnabled)
 		{
-			glDeleteTextures(1, &SkyboxTexture);
+			glDeleteTextures(1, &SkyboxShader.OGLTextureID);
 		}
 	}
 

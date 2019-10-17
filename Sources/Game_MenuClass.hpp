@@ -54,14 +54,14 @@ private:
 
 inline void Game_MenuClass::Init()
 {
-	if (const std::string INIFile{ "./DATA/GameConfig/MenuConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ GameConfigFolder + "MenuConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosY") };
-		Text.InitFont("./DATA/GameConfig/MenuConfig.ini", "MENUFONT");
-		TextHighlight.InitFont("./DATA/GameConfig/MenuConfig.ini", "MENUFONTHIGHLIGHT");
+		Text.InitFont(GameConfigFolder + "MenuConfig.ini", "MENUFONT");
+		TextHighlight.InitFont(GameConfigFolder + "MenuConfig.ini", "MENUFONTHIGHLIGHT");
 	}
 
-	if (const std::string MenuDefinitionFileName{ "./DATA/GameConfig/MenuDefinition.txt" }; Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, StopOnError))
+	if (const std::string MenuDefinitionFileName{ GameConfigFolder + "MenuDefinition.txt" }; Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, StopOnError))
 	{
 		std::ifstream MenuDefinitionFile(MenuDefinitionFileName, std::ios::in);
 		std::string Line;

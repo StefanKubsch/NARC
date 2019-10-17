@@ -35,6 +35,8 @@ namespace lwmf
 		void PrepareLWMFTexture(const TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY);
 		void RenderLWMFTexture(const TextureStruct& Texture, bool Blend, float Opacity);
 
+		GLuint OGLTextureID{};
+
 	private:
 		enum class Components : std::int_fast32_t
 		{
@@ -53,7 +55,6 @@ namespace lwmf
 		GLuint ShaderProgram{};
 		GLuint VertexArrayObject{};
 		GLuint VertexBufferObject{};
-		GLuint LWMFTextureID{};
 	};
 
 	inline void ShaderClass::LoadShader(const std::string& ShaderName, const TextureStruct& Texture)
@@ -263,9 +264,9 @@ namespace lwmf
 	inline void ShaderClass::PrepareLWMFTexture(const lwmf::TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY)
 	{
 		UpdateVertices(PosX, PosY, Texture.Width, Texture.Height);
-		glGenTextures(1, &LWMFTextureID);
+		glGenTextures(1, &OGLTextureID);
 		glCheckError();
-		glBindTexture(GL_TEXTURE_2D, LWMFTextureID);
+		glBindTexture(GL_TEXTURE_2D, OGLTextureID);
 		glCheckError();
 
 		if (FullscreenFlag)
@@ -290,7 +291,7 @@ namespace lwmf
 		glUseProgram(ShaderProgram);
 		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
-		glBindTexture(GL_TEXTURE_2D, LWMFTextureID);
+		glBindTexture(GL_TEXTURE_2D, OGLTextureID);
 		FullscreenFlag ? glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data()) : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 

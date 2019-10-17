@@ -25,8 +25,6 @@ namespace HID_Mouse
 	//
 
 	inline lwmf::ShaderClass MouseIconShader{};
-	inline GLuint MouseIconTexture{};
-
 	inline lwmf::IntPointStruct MousePos{};
 	inline lwmf::IntPointStruct OldMousePos{};
 
@@ -41,17 +39,19 @@ namespace HID_Mouse
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			MouseSensitivity = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivity");
 			MouseSensitivityLowerLimit = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityLowerLimit");
 			MouseSensitivityUpperLimit = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityUpperLimit");
 			MouseSensitivityStep = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityStep");
 
+			MouseSensitivity = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivity");
+			Tools_ErrorHandling::CheckAndClampRange(MouseSensitivity, MouseSensitivityLowerLimit, MouseSensitivityUpperLimit, __FILENAME__, "MouseSensitivity");
+
 			// Load MouseIcon
 			const lwmf::TextureStruct TempMouseIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "MOUSE", "MouseIcon")) };
 			MouseIconShader.LoadShader("Default", ScreenTexture);
-			MouseIconShader.LoadStaticTextureInGPU(TempMouseIconTexture, &MouseIconTexture, ScreenTexture.Width - 153, 0, TempMouseIconTexture.Width, TempMouseIconTexture.Height);
+			MouseIconShader.LoadStaticTextureInGPU(TempMouseIconTexture, &MouseIconShader.OGLTextureID, ScreenTexture.Width - 153, 0, TempMouseIconTexture.Width, TempMouseIconTexture.Height);
 
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::DeviceIdentifier::HID_MOUSE);
 			ShowCursor(FALSE);
@@ -60,14 +60,16 @@ namespace HID_Mouse
 
 	inline void ChangeMouseSensitivity(const char Change)
 	{
-		if (Change == '+' && MouseSensitivity < MouseSensitivityUpperLimit)
+		if (Change == '+')
 		{
 			MouseSensitivity += MouseSensitivityStep;
 		}
-		else if (Change == '-' && MouseSensitivity > MouseSensitivityLowerLimit)
+		else if (Change == '-')
 		{
 			MouseSensitivity -= MouseSensitivityStep;
 		}
+
+		Tools_ErrorHandling::CheckAndClampRange(MouseSensitivity, MouseSensitivityLowerLimit, MouseSensitivityUpperLimit, __FILENAME__, "MouseSensitivity");
 	}
 
 

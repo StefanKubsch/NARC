@@ -66,7 +66,7 @@ namespace Game_LevelHandling
 
 	inline void InitConfig()
 	{
-		if (const std::string INIFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/LevelData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			LightingFlag = lwmf::ReadINIValue<bool>(INIFile, "GENERAL", "Lighting");
 		}
@@ -111,7 +111,7 @@ namespace Game_LevelHandling
 		LevelMap.shrink_to_fit();
 		LevelMap.resize(NumberOfLevelMapLayers);
 
-		const std::string LevelPath{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/LevelData/" };
+		const std::string LevelPath{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/" };
 
 		ReadMapDataFile(LevelPath + "MapFloorData.conf", LevelMap, LevelMapLayers::Floor);
 		ReadMapDataFile(LevelPath + "MapWallData.conf", LevelMap, LevelMapLayers::Wall);
@@ -130,7 +130,7 @@ namespace Game_LevelHandling
 
 		if (LightingFlag)
 		{
-			if (const std::string FileName{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/LevelData/StaticLightsData.conf" }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
+			if (const std::string FileName{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/StaticLightsData.conf" }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 			{
 				std::ifstream StaticLightsDataFile(FileName, std::ios::in);
 
@@ -152,7 +152,7 @@ namespace Game_LevelHandling
 		LevelTextures.clear();
 		LevelTextures.shrink_to_fit();
 
-		if (const std::string FileName{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/LevelData/TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
+		if (const std::string FileName{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
 			std::ifstream LevelTexturesDataFile(FileName, std::ios::in);
 			std::string Line;
@@ -166,7 +166,7 @@ namespace Game_LevelHandling
 
 	inline void InitBackgroundMusic()
 	{
-		if (const std::string INIFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/LevelData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			BackgroundMusicEnabled = lwmf::ReadINIValue<bool>(INIFile, "AUDIO", "BackgroundMusicEnabled");
 

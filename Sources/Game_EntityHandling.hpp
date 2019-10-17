@@ -102,7 +102,7 @@ namespace Game_EntityHandling
 		{
 			bool SkipAssetFlag{};
 
-			if (const std::string EntityDataFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(AssetFileIndex) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
+			if (const std::string EntityDataFile{ LevelFolder + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(AssetFileIndex) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
 			{
 				const std::string AssetTypeName{ lwmf::ReadINIValue<std::string>(EntityDataFile, "ENTITY", "EntityTypeName") };
 
@@ -116,7 +116,7 @@ namespace Game_EntityHandling
 					}
 				}
 
-				if (const std::string INIFile{ "./DATA/Assets_Entities/" + AssetTypeName + "/AssetData.ini" }; !SkipAssetFlag && Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+				if (const std::string INIFile{ AssetsEntitiesFolder + AssetTypeName + "/AssetData.ini" }; !SkipAssetFlag && Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 				{
 					EntityAssets.emplace_back();
 					EntityAssets[AssetIndex].Number = AssetIndex;
@@ -169,7 +169,7 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			if (const std::string Path{ "./GFX/Entities/" + std::to_string(EntitySize) + "/" + AssetTypeName + "/" + std::to_string(DirectionIndex) }; Tools_ErrorHandling::CheckFolderExistence(Path, ContinueOnError))
+			if (const std::string Path{ GFXEntitiesFolder + std::to_string(EntitySize) + "/" + AssetTypeName + "/" + std::to_string(DirectionIndex) }; Tools_ErrorHandling::CheckFolderExistence(Path, ContinueOnError))
 			{
 				EntityAssets[AssetIndex].WalkingTextures.emplace_back();
 
@@ -203,7 +203,7 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			std::string Texture{ "./GFX/Entities/" };
+			std::string Texture{ GFXEntitiesFolder };
 			Texture += std::to_string(EntitySize);
 			Texture += "/";
 			Texture += AssetTypeName;
@@ -245,7 +245,7 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			if (const std::string INIFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(Index) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
+			if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(Index) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				EntityOrder.emplace_back();
 				EntityDistance.emplace_back();

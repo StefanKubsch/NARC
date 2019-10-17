@@ -30,22 +30,19 @@ private:
 	GFX_TextClass WeaponText{};
 
 	lwmf::ShaderClass WeaponHUDShader{};
-	GLuint WeaponHUDTexture{};
 	lwmf::IntRectStruct WeaponHUDRect{};
-
 	lwmf::ShaderClass CrosshairShader{};
-	GLuint CrosshairTexture{};
 };
 
 inline void Game_WeaponDisplayClass::Init()
 {
-	if (const std::string INIFile{ "./DATA/GameConfig/HUDWeaponDisplayConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ GameConfigFolder + "HUDWeaponDisplayConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Crosshair settings
 		const lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };
 
 		CrosshairShader.LoadShader("Default", ScreenTexture);
-		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairTexture, ScreenTexture.WidthMid - (TempTextureCrosshair.Width >> 1), ScreenTexture.HeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
+		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairShader.OGLTextureID, ScreenTexture.WidthMid - (TempTextureCrosshair.Width >> 1), ScreenTexture.HeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
 
 		// Weapon HUD settings
 		const lwmf::TextureStruct TempTextureWeaponHUD{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "HUD", "WeaponHUDFileName")) };
@@ -56,18 +53,18 @@ inline void Game_WeaponDisplayClass::Init()
 		WeaponHUDRect.Height = TempTextureWeaponHUD.Height;
 
 		WeaponHUDShader.LoadShader("Default", ScreenTexture);
-		WeaponHUDShader.LoadStaticTextureInGPU(TempTextureWeaponHUD, &WeaponHUDTexture, WeaponHUDRect.X, WeaponHUDRect.Y, WeaponHUDRect.Width, WeaponHUDRect.Height);
+		WeaponHUDShader.LoadStaticTextureInGPU(TempTextureWeaponHUD, &WeaponHUDShader.OGLTextureID, WeaponHUDRect.X, WeaponHUDRect.Y, WeaponHUDRect.Width, WeaponHUDRect.Height);
 
-		AmmoText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDAMMOFONT");
-		CarriedAmmoText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDCARRIEDAMMOFONT");
-		WeaponText.InitFont("./DATA/GameConfig/HUDWeaponDisplayConfig.ini", "HUDWEAPONFONT");
+		AmmoText.InitFont(GameConfigFolder + "HUDWeaponDisplayConfig.ini", "HUDAMMOFONT");
+		CarriedAmmoText.InitFont(GameConfigFolder + "HUDWeaponDisplayConfig.ini", "HUDCARRIEDAMMOFONT");
+		WeaponText.InitFont(GameConfigFolder + "HUDWeaponDisplayConfig.ini", "HUDWEAPONFONT");
 	}
 }
 
 inline void Game_WeaponDisplayClass::Display()
 {
-	CrosshairShader.RenderStaticTexture(&CrosshairTexture, true, 1.0F);
-	WeaponHUDShader.RenderStaticTexture(&WeaponHUDTexture, true, 1.0F);
+	CrosshairShader.RenderStaticTexture(&CrosshairShader.OGLTextureID, true, 1.0F);
+	WeaponHUDShader.RenderStaticTexture(&WeaponHUDShader.OGLTextureID, true, 1.0F);
 
 	WeaponText.RenderText(Weapons[Player.SelectedWeapon].Name, WeaponHUDRect.X + WeaponText.GetOffset().X, WeaponHUDRect.Y + WeaponText.GetOffset().Y);
 	CarriedAmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo, WeaponHUDRect.X + CarriedAmmoText.GetOffset().X, WeaponHUDRect.Y + CarriedAmmoText.GetOffset().Y);

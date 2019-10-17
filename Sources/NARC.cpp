@@ -212,8 +212,8 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		{
 			HUDWeaponDisplay.Display();
 
-			(GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1) ? HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconTexture, true, 1.0F) :
-				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconTexture, true, 1.0F);
+			(GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1) ? HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconShader.OGLTextureID, true, 1.0F) :
+				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconShader.OGLTextureID, true, 1.0F);
 		}
 
 		Game_Effects::DrawBloodstain();

@@ -41,9 +41,9 @@ namespace Game_Transitions
 
 	inline void Init()
 	{
-		GeneralText.InitFont("./DATA/GameConfig/TransitionsConfig.ini", "GENERALFONT");
-		GameOverText.InitFont("./DATA/GameConfig/TransitionsConfig.ini", "GAMEOVERFONT");
-		GameOverText1.InitFont("./DATA/GameConfig/TransitionsConfig.ini", "GAMEOVERFONT1");
+		GeneralText.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GENERALFONT");
+		GameOverText.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GAMEOVERFONT");
+		GameOverText1.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GAMEOVERFONT1");
 	}
 
 	inline void LevelTransition()

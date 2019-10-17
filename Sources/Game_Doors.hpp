@@ -22,7 +22,7 @@ namespace Game_Doors
 {
 
 
-	enum class DoorSounds
+	enum class DoorSounds : std::int_fast32_t
 	{
 		OpenCloseSound
 	};
@@ -59,7 +59,7 @@ namespace Game_Doors
 
 		while (true)
 		{
-			if (const std::string INIFile{ "./DATA/Assets_Doors/Door_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
+			if (const std::string INIFile{ AssetsDoorsFolder + "Door_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				DoorTypes.emplace_back();
 

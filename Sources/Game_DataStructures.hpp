@@ -106,8 +106,6 @@ struct WeaponStruct final
 	std::int_fast32_t Damage{};
 	std::int_fast32_t Cadence{};
 	std::int_fast32_t CadenceCounter{};
-	GLuint WeaponTexture{};
-	GLuint MuzzleFlashTexture{};
 	float Weight{};
 	float PaceFactor{};
 };
@@ -128,7 +126,7 @@ struct DoorTypeStruct final
 
 struct DoorStruct final
 {
-	enum class States
+	enum class States : std::int_fast32_t
 	{
 		Closed,
 		Triggered,

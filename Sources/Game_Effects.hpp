@@ -29,7 +29,6 @@ namespace Game_Effects
 	//
 
 	inline lwmf::ShaderClass BloodstainShader{};
-	inline GLuint BloodstainTexture{};
 	inline std::int_fast32_t BloodstainDuration{};
 	inline std::int_fast32_t BloodstainCounter{};
 	inline bool BloodstainFlag{};
@@ -40,14 +39,14 @@ namespace Game_Effects
 
 	inline void InitEffects()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/EffectsConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "EffectsConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			// Init the "bloodstain" effect when player is hit by an enemy
 			BloodstainDuration = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "EFFECTS", "BloodstainDuration");
 			BloodstainShader.LoadShader("Default", ScreenTexture);
 
 			const lwmf::TextureStruct TempTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "TEXTURES", "Bloodstains")) };
-			BloodstainShader.LoadStaticTextureInGPU(TempTexture, &BloodstainTexture, 0, 0, TempTexture.Width, TempTexture.Height);
+			BloodstainShader.LoadStaticTextureInGPU(TempTexture, &BloodstainShader.OGLTextureID, 0, 0, TempTexture.Width, TempTexture.Height);
 		}
 	}
 
@@ -69,7 +68,7 @@ namespace Game_Effects
 	{
 		if (BloodstainFlag)
 		{
-			BloodstainShader.RenderStaticTexture(&BloodstainTexture, true, std::clamp(0.5F - (0.5F / static_cast<float>(BloodstainCounter)), 0.0F, 0.5F));
+			BloodstainShader.RenderStaticTexture(&BloodstainShader.OGLTextureID, true, std::clamp(0.5F - (0.5F / static_cast<float>(BloodstainCounter)), 0.0F, 0.5F));
 		}
 	}
 

@@ -43,7 +43,7 @@ private:
 
 inline void Game_MinimapClass::Init()
 {
-	if (const std::string INIFile{ "./DATA/GameConfig/HUDMinimapConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ GameConfigFolder + "HUDMinimapConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY") };
 		ShowWaypoints = lwmf::ReadINIValue<bool>(INIFile, "GENERAL", "ShowWaypoints");

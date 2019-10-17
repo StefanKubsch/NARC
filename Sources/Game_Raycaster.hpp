@@ -49,7 +49,7 @@ namespace Game_Raycaster
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/RaycasterConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "RaycasterConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			PlaneStartValue = { lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue"), lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue") };
 			VerticalLookUpLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookUpLimit");

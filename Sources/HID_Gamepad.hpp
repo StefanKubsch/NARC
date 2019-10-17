@@ -25,9 +25,7 @@ namespace HID_Gamepad
 	//
 
 	inline lwmf::Gamepad GameController{};
-
 	inline lwmf::ShaderClass XBoxControllerIconShader{};
-	inline GLuint XBoxControllerIconTexture{};
 
 	// for Microsoft virtual keycodes, have a look here:
 	// https://docs.microsoft.com/en-us/uwp/api/windows.system.virtualkey
@@ -63,7 +61,7 @@ namespace HID_Gamepad
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init XBOX controller...");
 
-			if (const std::string INIFile{ "./DATA/GameConfig/InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+			if (const std::string INIFile{ GameConfigFolder + "InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				const float DeadZone{ lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "DeadZone") };
 				GameController.Sensitivity = lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");
@@ -113,7 +111,7 @@ namespace HID_Gamepad
 				// Load XBoxControllerIcon
 				const lwmf::TextureStruct TempXBoxControllerIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "GAMECONTROLLER", "XBoxControllerIcon")) };
 				XBoxControllerIconShader.LoadShader("Default", ScreenTexture);
-				XBoxControllerIconShader.LoadStaticTextureInGPU(TempXBoxControllerIconTexture, &XBoxControllerIconTexture, ScreenTexture.Width - 153, 0, TempXBoxControllerIconTexture.Width, TempXBoxControllerIconTexture.Height);
+				XBoxControllerIconShader.LoadStaticTextureInGPU(TempXBoxControllerIconTexture, &XBoxControllerIconShader.OGLTextureID, ScreenTexture.Width - 153, 0, TempXBoxControllerIconTexture.Width, TempXBoxControllerIconTexture.Height);
 			}
 		}
 	}

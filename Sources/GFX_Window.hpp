@@ -26,7 +26,7 @@ namespace GFX_Window
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ "./DATA/GameConfig/WindowConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "WindowConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			// Create fullscreen if VSync = true, otherwise a window
 			lwmf::CreateOpenGLWindow(lwmf::WindowInstance,
