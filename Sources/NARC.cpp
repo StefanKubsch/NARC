@@ -510,7 +510,7 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 						{
 							if (NumberOfLevels > 1)
 							{
-								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = 1;
+								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = 0;
 
 								try
 								{

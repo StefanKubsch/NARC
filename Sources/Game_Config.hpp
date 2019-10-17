@@ -67,14 +67,14 @@ namespace Game_Config
 
 	inline void GatherNumberOfLevels()
 	{
-		NumberOfLevels = 1;
+		NumberOfLevels = 0;
 
 		while (Tools_ErrorHandling::CheckFolderExistence("./DATA/Level_" + std::to_string(NumberOfLevels), ContinueOnError))
 		{
 			++NumberOfLevels;
 		}
 
-		if (--NumberOfLevels == 0)
+		if (--NumberOfLevels == -1)
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "No Leveldata found.");
 		}
