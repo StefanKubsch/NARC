@@ -508,9 +508,9 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::SelectNextLevelKey)
 						{
-							if (NumberOfLevels > 0)
+							if (NumberOfLevels > 1)
 							{
-								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = 0;
+								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = 1;
 
 								try
 								{

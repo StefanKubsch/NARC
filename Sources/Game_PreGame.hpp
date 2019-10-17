@@ -47,7 +47,7 @@ namespace Game_PreGame
 	{
 		std::cout << "***************\n* SET OPTIONS *\n***************\n\n";
 
-		SelectedLevel = NumberOfLevels > 0 ? Tools_Console::QuestionForValue("Please select Level (0 - " + std::to_string(NumberOfLevels) + "): ", 0, NumberOfLevels) : 0;
+		SelectedLevel = NumberOfLevels > 1 ? Tools_Console::QuestionForValue("Please select Level (1 - " + std::to_string(NumberOfLevels) + "): ", 1, NumberOfLevels) : 1;
 		VSync = Tools_Console::QuestionForYesNo("VSync (y/n, yes implies fullscreen mode!): ") == 'y' ? true : false;
 	}
 

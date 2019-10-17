@@ -126,17 +126,10 @@ namespace lwmf
 
 	inline std::int_fast32_t ReadINIValueRGBA(const std::string& INIFileName, const std::string& Section)
 	{
-		std::int_fast32_t Red{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Red") };
-		std::int_fast32_t Green{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Green") };
-		std::int_fast32_t Blue{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Blue") };
-		std::int_fast32_t Alpha{ ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Alpha") };
-
-		Red = std::clamp(Red, 0, 255);
-		Green = std::clamp(Green, 0, 255);
-		Blue = std::clamp(Blue, 0, 255);
-		Alpha = std::clamp(Alpha, 0, 255);
-
-		return RGBAtoINT(Red, Green, Blue, Alpha);
+		return RGBAtoINT(std::clamp(ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Red"), 0, 255),
+							std::clamp(ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Green"), 0, 255),
+							std::clamp(ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Blue"), 0, 255),
+							std::clamp(ReadINIValue<std::int_fast32_t>(INIFileName, Section, "Alpha"), 0, 255));
 	}
 
 
