@@ -47,7 +47,7 @@ namespace Game_SkyboxHandling
 
 	inline void LoadSkyboxImage()
 	{
-		if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/LevelData/SkyboxConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/LevelData/SkyboxConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			SkyBoxEnabled = lwmf::ReadINIValue<bool>(INIFile, "SKYBOX", "SkyBoxEnabled");
 

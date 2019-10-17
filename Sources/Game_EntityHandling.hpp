@@ -102,7 +102,7 @@ namespace Game_EntityHandling
 		{
 			bool SkipAssetFlag{};
 
-			if (const std::string EntityDataFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(AssetFileIndex) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
+			if (const std::string EntityDataFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(AssetFileIndex) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
 			{
 				const std::string AssetTypeName{ lwmf::ReadINIValue<std::string>(EntityDataFile, "ENTITY", "EntityTypeName") };
 
@@ -245,7 +245,7 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			if (const std::string INIFile{ "./DATA/Level_" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(Index) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
+			if (const std::string INIFile{ "./DATA/Levels/" + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(Index) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				EntityOrder.emplace_back();
 				EntityDistance.emplace_back();
