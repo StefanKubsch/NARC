@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Game_Effects.hpp" />
+    <ClInclude Include="Sources\Game_Folder.hpp" />
     <ClInclude Include="Sources\HID_Gamepad.hpp" />
     <ClInclude Include="Sources\Game_PathFinding.hpp" />
     <ClInclude Include="Sources\Game_Raycaster.hpp" />

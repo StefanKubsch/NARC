@@ -35,12 +35,12 @@ namespace Game_Config
 			{
 				{ 64, 6 },
 				{ 128, 7 },
-				{ 256, 8},
-				{ 512, 9},
-				{ 1024, 10},
-				{ 2048, 11},
-				{ 4096, 12},
-				{ 8192, 13}
+				{ 256, 8 },
+				{ 512, 9 },
+				{ 1024, 10 },
+				{ 2048, 11 },
+				{ 4096, 12 },
+				{ 8192, 13 }
 			};
 
 			TextureSize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "TextureSize");
@@ -67,14 +67,14 @@ namespace Game_Config
 
 	inline void GatherNumberOfLevels()
 	{
-		NumberOfLevels = 1;
+		NumberOfLevels = StartLevel;
 
 		while (Tools_ErrorHandling::CheckFolderExistence(LevelFolder + std::to_string(NumberOfLevels), ContinueOnError))
 		{
 			++NumberOfLevels;
 		}
 
-		if (--NumberOfLevels == 0)
+		if (--NumberOfLevels == StartLevel - 1)
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "No Leveldata found.");
 		}

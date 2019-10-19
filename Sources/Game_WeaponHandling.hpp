@@ -165,7 +165,7 @@ namespace Game_WeaponHandling
 		for (auto&& Weapon : Weapons)
 		{
 			// Weapon textures
-			if (const std::string WeaponTextureDataConfFile{ "./DATA/Assets_Weapons/Weapon_" + std::to_string(Weapon.Number) + "_TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
+			if (const std::string WeaponTextureDataConfFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Weapon.Number) + "_TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
 			{
 				std::ifstream WeaponTexturesData(WeaponTextureDataConfFile, std::ios::in);
 				std::string Line;
@@ -182,7 +182,7 @@ namespace Game_WeaponHandling
 			}
 
 			// Muzzle flash
-			if (const std::string MuzzleFlashTextureDataConfFile{ "./DATA/Assets_Weapons/Weapon_" + std::to_string(Weapon.Number) + "_MuzzleFlashTexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
+			if (const std::string MuzzleFlashTextureDataConfFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Weapon.Number) + "_MuzzleFlashTexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
 			{
 				std::ifstream MuzzleFlashTextureData(MuzzleFlashTextureDataConfFile);
 				std::string Line;
@@ -207,7 +207,7 @@ namespace Game_WeaponHandling
 			Weapon.Sounds.clear();
 			Weapon.Sounds.shrink_to_fit();
 
-			if (const std::string INIFile{ "./DATA/Assets_Weapons/Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+			if (const std::string INIFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				Weapon.Sounds.emplace_back();
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"));

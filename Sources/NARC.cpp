@@ -46,6 +46,7 @@ lwmf::Logging NARCLog("NARC.log");
 inline lwmf::TextureStruct ScreenTexture{};
 inline lwmf::ShaderClass ScreenTextureShader{};
 
+#include "Game_Folder.hpp"
 #include "Game_GlobalDefinitions.hpp"
 #include "Tools_Console.hpp"
 #include "Tools_ErrorHandling.hpp"
@@ -508,9 +509,9 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 						if (RawDev.data.keyboard.VKey == HID_Keyboard::SelectNextLevelKey)
 						{
-							if (NumberOfLevels > 1)
+							if (NumberOfLevels > StartLevel)
 							{
-								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = 1;
+								SelectedLevel < NumberOfLevels ? ++SelectedLevel : SelectedLevel = StartLevel;
 
 								try
 								{

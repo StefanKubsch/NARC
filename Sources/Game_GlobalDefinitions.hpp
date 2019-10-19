@@ -10,16 +10,7 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
 #include <random>
-
-// Folder
-inline const std::string LevelFolder			{ "./DATA/Levels/" };
-inline const std::string GameConfigFolder		{ "./DATA/GameConfig/" };
-inline const std::string AssetsEntitiesFolder	{ "./DATA/Assets_Entities/" };
-inline const std::string AssetsDoorsFolder		{ "./DATA/Assets_Doors/" };
-inline const std::string AssetsWeaponsFolder	{ "./DATA/Assets_Weapons/" };
-inline const std::string GFXEntitiesFolder		{ "./GFX/Entities/" };
 
 // Setting planes/viewport for raycaster
 inline lwmf::FloatPointStruct Plane{};
@@ -34,6 +25,7 @@ inline float FogOfWarDistance{};
 inline std::int_fast32_t VerticalLook{};
 
 // Current Level + Number of Levels
+inline std::int_fast32_t StartLevel{ 1 };
 inline std::int_fast32_t SelectedLevel{};
 inline std::int_fast32_t NumberOfLevels{};
 
