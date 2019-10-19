@@ -58,6 +58,7 @@ namespace Game_EntityHandling
 	void RenderEntities();
 	std::int_fast32_t GetEntityTextureIndex(std::int_fast32_t EntityNumber);
 	void HandleEntityHit(EntityStruct& Entity);
+	void SwitchDirection(EntityStruct& Entity, char Direction);
 	void ChangeEntityDirection(EntityStruct& Entity, char NewDirection);
 	void TurnEntityBackwards(EntityStruct& Entity);
 	void CalculateEntityPath(EntityStruct& Entity);
@@ -73,7 +74,7 @@ namespace Game_EntityHandling
 	//
 
 	using DirectionTuple = std::tuple<float, float, char, std::int_fast32_t>;
-	inline std::vector<DirectionTuple> Direction
+	inline std::vector<DirectionTuple> Directions
 	{
 		// Possible directions (DirX / DirY)
 		//		-1.0 / 0.0		North		RotationFactor 0
@@ -484,14 +485,16 @@ namespace Game_EntityHandling
 		}
 	}
 
+	inline void SwitchDirection(EntityStruct& Entity, const char Direction)
+	{
+		auto it{ std::find_if(Directions.begin(), Directions.end(), [&](auto e) {return std::get<2>(e) == Direction; }) };
+		Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
+		Entity.Direction = std::get<2>(*it);
+		Entity.RotationFactor = std::get<3>(*it);
+	}
+
 	inline void ChangeEntityDirection(EntityStruct& Entity, const char NewDirection)
 	{
-		// Possible directions (DirX / DirY)
-		//		-1.0 / 0.0		North		RotationFactor 0
-		//		1.0 / 0.0		South		RotationFactor 4
-		//		0.0 / 1.0		East		RotationFactor 2
-		//		0.0 / -1.0		West		RotationFactor 6
-
 		switch (NewDirection)
 		{
 			case 'l':
@@ -499,34 +502,22 @@ namespace Game_EntityHandling
 				// Turn left (-> West) if moved North previously
 				if (Entity.Direction == 'N')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'W'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'W');
 				}
 				// Turn left (-> East) if moved South previously
 				else if (Entity.Direction == 'S')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'E'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'E');
 				}
 				// Turn left (-> North) if moved East previously
 				else if (Entity.Direction == 'E')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'N'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'N');
 				}
 				// Turn left (-> South) if moved West previously
 				else if (Entity.Direction == 'W')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'S'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'S');
 				}
 				break;
 			}
@@ -535,34 +526,22 @@ namespace Game_EntityHandling
 				// Turn right (-> East) if moved North previously
 				if (Entity.Direction == 'N')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'E'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'E');
 				}
 				// Turn right (-> West) if moved South previously
 				else if (Entity.Direction == 'S')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'W'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'W');
 				}
 				// Turn right (-> South) if moved East previously
 				else if (Entity.Direction == 'E')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'S'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'S');
 				}
 				// Turn right (-> North) if moved West previously
 				else if (Entity.Direction == 'W')
 				{
-					auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'N'; }) };
-					Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-					Entity.Direction = std::get<2>(*it);
-					Entity.RotationFactor = std::get<3>(*it);
+					SwitchDirection(Entity, 'N');
 				}
 				break;
 			}
@@ -577,34 +556,22 @@ namespace Game_EntityHandling
 		{
 			case 'N':
 			{
-				auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'S'; }) };
-				Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-				Entity.Direction = std::get<2>(*it);
-				Entity.RotationFactor = std::get<3>(*it);
+				SwitchDirection(Entity, 'S');
 				break;
 			}
 			case 'E':
 			{
-				auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'W'; }) };
-				Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-				Entity.Direction = std::get<2>(*it);
-				Entity.RotationFactor = std::get<3>(*it);
+				SwitchDirection(Entity, 'W');
 				break;
 			}
 			case 'S':
 			{
-				auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'N'; }) };
-				Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-				Entity.Direction = std::get<2>(*it);
-				Entity.RotationFactor = std::get<3>(*it);
+				SwitchDirection(Entity, 'N');
 				break;
 			}
 			case 'W':
 			{
-				auto it{ std::find_if(Direction.begin(), Direction.end(), [](auto e) {return std::get<2>(e) == 'E'; }) };
-				Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-				Entity.Direction = std::get<2>(*it);
-				Entity.RotationFactor = std::get<3>(*it);
+				SwitchDirection(Entity, 'E');
 				break;
 			}
 
