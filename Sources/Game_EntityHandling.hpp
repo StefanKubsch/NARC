@@ -34,8 +34,7 @@ namespace Game_EntityHandling
 		Enemy,
 		Player,
 		AmmoBox,
-		Turret,
-		Count
+		Turret
 	};
 
 	enum class EntitySounds : std::int_fast32_t
@@ -101,7 +100,7 @@ namespace Game_EntityHandling
 	inline std::vector<float> EntityDistance{};
 
 	// 1D Zbuffer
-	inline std::vector<float> ZBuffer;
+	inline std::vector<float> ZBuffer{};
 
 	//
 	// Functions
@@ -302,9 +301,10 @@ namespace Game_EntityHandling
 				Entities[Index].MovementBehaviour = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MOVEMENT", "MovementBehaviour");
 				Entities[Index].AttackMode = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MOVEMENT", "AttackMode");
 				Entities[Index].Pos = { lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosX"), lwmf::ReadINIValue<float>(INIFile, "POSITION", "StartPosY") };
-				Entities[Index].Dir = { lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirX"), lwmf::ReadINIValue<float>(INIFile, "DIRECTION", "DirY") };
-				Entities[Index].Direction = lwmf::ReadINIValue<char>(INIFile, "DIRECTION", "Direction");
-				Entities[Index].RotationFactor = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DIRECTION", "RotationFactor");
+
+				// Load/set direction data: Dir.X, Dir.Y, Direction, Rotationfactor
+				SwitchDirection(Entities[Index], lwmf::ReadINIValue<char>(INIFile, "DIRECTION", "Direction"));
+
 				Entities[Index].Hitpoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "STATUS", "Hitpoints");
 				Entities[Index].HitAnimDuration = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "STATUS", "HitAnimDuration");
 				Entities[Index].DamagePoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DAMAGE", "DamagePoints");
@@ -487,10 +487,19 @@ namespace Game_EntityHandling
 
 	inline void SwitchDirection(EntityStruct& Entity, const char Direction)
 	{
-		auto it{ std::find_if(Directions.begin(), Directions.end(), [&](auto e) {return std::get<2>(e) == Direction; }) };
-		Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
-		Entity.Direction = std::get<2>(*it);
-		Entity.RotationFactor = std::get<3>(*it);
+		const auto it{ std::find_if(Directions.begin(), Directions.end(), [&](const auto e) {return std::get<2>(e) == Direction; }) };
+
+		if (it != Directions.end())
+		{
+			Entity.Dir = { std::get<0>(*it), std::get<1>(*it) };
+			Entity.Direction = std::get<2>(*it);
+			Entity.RotationFactor = std::get<3>(*it);
+		}
+		else
+		{
+			// This check is only needed when the entities are initially loaded...
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "Entity direction error! Direction must be 'N', 'S', 'E' or 'W'!");
+		}
 	}
 
 	inline void ChangeEntityDirection(EntityStruct& Entity, const char NewDirection)
@@ -499,53 +508,68 @@ namespace Game_EntityHandling
 		{
 			case 'l':
 			{
-				// Turn left (-> West) if moved North previously
-				if (Entity.Direction == 'N')
+				switch (Entity.Direction)
 				{
-					SwitchDirection(Entity, 'W');
-				}
-				// Turn left (-> East) if moved South previously
-				else if (Entity.Direction == 'S')
-				{
-					SwitchDirection(Entity, 'E');
-				}
-				// Turn left (-> North) if moved East previously
-				else if (Entity.Direction == 'E')
-				{
-					SwitchDirection(Entity, 'N');
-				}
-				// Turn left (-> South) if moved West previously
-				else if (Entity.Direction == 'W')
-				{
-					SwitchDirection(Entity, 'S');
+					case 'N':
+					{
+						// Turn left (-> West) if moved North previously
+						SwitchDirection(Entity, 'W');
+						break;
+					}
+					case 'S':
+					{
+						// Turn left (-> East) if moved South previously
+						SwitchDirection(Entity, 'E');
+						break;
+					}
+					case 'E':
+					{
+						// Turn left (-> North) if moved East previously
+						SwitchDirection(Entity, 'N');
+						break;
+					}
+					case 'W':
+					{
+						// Turn left (-> South) if moved West previously
+						SwitchDirection(Entity, 'S');
+						break;
+					}
+					default: {};
 				}
 				break;
 			}
 			case 'r':
 			{
-				// Turn right (-> East) if moved North previously
-				if (Entity.Direction == 'N')
+				switch (Entity.Direction)
 				{
-					SwitchDirection(Entity, 'E');
-				}
-				// Turn right (-> West) if moved South previously
-				else if (Entity.Direction == 'S')
-				{
-					SwitchDirection(Entity, 'W');
-				}
-				// Turn right (-> South) if moved East previously
-				else if (Entity.Direction == 'E')
-				{
-					SwitchDirection(Entity, 'S');
-				}
-				// Turn right (-> North) if moved West previously
-				else if (Entity.Direction == 'W')
-				{
-					SwitchDirection(Entity, 'N');
+					case 'N':
+					{
+						// Turn right (-> East) if moved North previously
+						SwitchDirection(Entity, 'E');
+						break;
+					}
+					case 'S':
+					{
+						// Turn right (-> West) if moved South previously
+						SwitchDirection(Entity, 'W');
+						break;
+					}
+					case 'E':
+					{
+						// Turn right (-> South) if moved East previously
+						SwitchDirection(Entity, 'S');
+						break;
+					}
+					case 'W':
+					{
+						// Turn right (-> North) if moved West previously
+						SwitchDirection(Entity, 'N');
+						break;
+					}
+					default: {};
 				}
 				break;
 			}
-
 			default: {}
 		}
 	}
@@ -574,7 +598,6 @@ namespace Game_EntityHandling
 				SwitchDirection(Entity, 'E');
 				break;
 			}
-
 			default:{}
 		}
 	}

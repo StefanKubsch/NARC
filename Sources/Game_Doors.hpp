@@ -39,10 +39,10 @@ namespace Game_Doors
 	// Variables and constants
 	//
 
-	static constexpr float MaximumOpenPercentMin{ 1.0F };
-	static constexpr float MaximumOpenPercentMax{ 100.0F };
-	static constexpr float MinimumOpenPercentMin{ 0.0F };
-	static constexpr float MinimumOpenPercentMax{ 99.0F };
+	static constexpr float MaximumOpenPercentLowerLimit{ 0.0F };
+	static constexpr float MaximumOpenPercentUpperLimit{ 100.0F };
+	static constexpr float MinimumOpenPercentLowerLimit{ 0.0F };
+	static constexpr float MinimumOpenPercentUpperLimit{ 100.0F };
 
 	//
 	// Functions
@@ -73,8 +73,8 @@ namespace Game_Doors
 				DoorTypes[Index].MaximumOpenPercent = lwmf::ReadINIValue<float>(INIFile, "GENERAL", "MaximumOpenPercent");
 				DoorTypes[Index].MinimumOpenPercent = lwmf::ReadINIValue<float>(INIFile, "GENERAL", "MinimumOpenPercent");
 
-				Tools_ErrorHandling::CheckAndClampRange(DoorTypes[Index].MaximumOpenPercent, MaximumOpenPercentMin, MaximumOpenPercentMax, __FILENAME__, "MaximumOpenPercent");
-				Tools_ErrorHandling::CheckAndClampRange(DoorTypes[Index].MinimumOpenPercent, MinimumOpenPercentMin, MinimumOpenPercentMax, __FILENAME__, "MinimumOpenPercent");
+				Tools_ErrorHandling::CheckAndClampRange(DoorTypes[Index].MaximumOpenPercent, MaximumOpenPercentLowerLimit, MaximumOpenPercentUpperLimit, __FILENAME__, "MaximumOpenPercent");
+				Tools_ErrorHandling::CheckAndClampRange(DoorTypes[Index].MinimumOpenPercent, MinimumOpenPercentLowerLimit, MinimumOpenPercentUpperLimit, __FILENAME__, "MinimumOpenPercent");
 
 				++Index;
 			}
@@ -133,14 +133,14 @@ namespace Game_Doors
 
 	inline void ModifyDoorTexture(DoorStruct& Door)
 	{
+		// DoorFactor is not correct - works only when MaximumOpenPercent = 100% !
+		const float DoorFactor{ 100.0F / static_cast<float>(TextureSize) };
+		const std::int_fast32_t PercentTemp{ static_cast<std::int_fast32_t>(Door.CurrentOpenPercent / DoorFactor) };
+
 		for (std::int_fast32_t y{}; y < TextureSize; ++y)
 		{
 			const std::int_fast32_t TempY{ y * TextureSize };
-
-			for (std::int_fast32_t SourceTextureX{}, x{ static_cast<std::int_fast32_t>(Door.CurrentOpenPercent / 1.59F) }; x < TextureSize; ++x, ++SourceTextureX)
-			{
-				Door.AnimTexture.Pixels[TempY + x] = DoorTypes[Door.DoorType].OriginalTexture.Pixels[TempY + SourceTextureX];
-			}
+			std::copy(DoorTypes[Door.DoorType].OriginalTexture.Pixels.begin() + TempY, DoorTypes[Door.DoorType].OriginalTexture.Pixels.begin() + TempY + TextureSize - PercentTemp, Door.AnimTexture.Pixels.begin() + TempY + PercentTemp);
 		}
 	}
 

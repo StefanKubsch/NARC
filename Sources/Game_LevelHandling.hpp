@@ -29,7 +29,8 @@ namespace Game_LevelHandling
 		Floor,
 		Wall,
 		Ceiling,
-		Door
+		Door,
+		Counter
 	};
 
 	void InitConfig();
@@ -50,8 +51,6 @@ namespace Game_LevelHandling
 
 	inline std::vector<GFX_LightingClass> StaticLights{};
 	inline lwmf::MP3 BackgroundMusic{};
-
-	static constexpr std::int_fast32_t NumberOfLevelMapLayers{ 4 };
 
 	// Variables used for map dimensions (used for Level*Map and EntityMap)
 	inline std::int_fast32_t LevelMapWidth{};
@@ -109,7 +108,7 @@ namespace Game_LevelHandling
 	{
 		LevelMap.clear();
 		LevelMap.shrink_to_fit();
-		LevelMap.resize(NumberOfLevelMapLayers);
+		LevelMap.resize(static_cast<std::int_fast32_t>(LevelMapLayers::Counter));
 
 		const std::string LevelPath{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/" };
 

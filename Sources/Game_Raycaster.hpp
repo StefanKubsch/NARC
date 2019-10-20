@@ -263,11 +263,7 @@ namespace Game_Raycaster
 				// Needs only to be calculated once
 				Game_EntityHandling::ZBuffer[x] = WallDist;
 
-				if (LineEnd < 0)
-				{
-					LineEnd = ScreenTexture.Height;
-				}
-
+				LineEnd = std::clamp(LineEnd, 0, ScreenTexture.Height);
 				const std::int_fast32_t TotalHeight{ ScreenTexture.Height + std::abs(VerticalLook) };
 				const float WallDistTemp{ WallDist + WallDist * VerticalLookCamera };
 

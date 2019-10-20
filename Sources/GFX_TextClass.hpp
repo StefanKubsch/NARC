@@ -82,11 +82,11 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			stbtt_fontinfo FontInfo{};
 			stbtt_InitFont(FontInfo, FontBuffer, 0);
 
-			std::int_fast32_t Width{};
 			FontHeight = static_cast<std::int_fast32_t>(FontSize + 1.0F);
 			const std::int_fast32_t Height{ FontHeight + 5 };
 			constexpr std::int_fast32_t FirstASCIIChar{ 32 };
 			constexpr std::int_fast32_t LastASCIIChar{ 127 };
+			std::int_fast32_t Width{};
 
 			for (char Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
 			{
