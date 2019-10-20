@@ -133,14 +133,15 @@ namespace Game_Doors
 
 	inline void ModifyDoorTexture(DoorStruct& Door)
 	{
-		// DoorFactor is not correct - works only when MaximumOpenPercent = 100% !
-		const float DoorFactor{ 100.0F / static_cast<float>(TextureSize) };
-		const std::int_fast32_t PercentTemp{ static_cast<std::int_fast32_t>(Door.CurrentOpenPercent / DoorFactor) };
+		// TextureOffset is not correct - works only when MaximumOpenPercent = 100% !
+		const float TextureOffset{ 100.0F / static_cast<float>(TextureSize) };
+		const std::int_fast32_t OpenPercent{ static_cast<std::int_fast32_t>(Door.CurrentOpenPercent / TextureOffset) };
 
 		for (std::int_fast32_t y{}; y < TextureSize; ++y)
 		{
 			const std::int_fast32_t TempY{ y * TextureSize };
-			std::copy(DoorTypes[Door.DoorType].OriginalTexture.Pixels.begin() + TempY, DoorTypes[Door.DoorType].OriginalTexture.Pixels.begin() + TempY + TextureSize - PercentTemp, Door.AnimTexture.Pixels.begin() + TempY + PercentTemp);
+			const auto SourceY{ DoorTypes[Door.DoorType].OriginalTexture.Pixels.begin() + TempY };
+			std::copy(SourceY, SourceY + TextureSize - OpenPercent, Door.AnimTexture.Pixels.begin() + TempY + OpenPercent);
 		}
 	}
 
