@@ -72,7 +72,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			}
 
 			FontFile.seekg(0, std::ios::end);
-			std::vector<unsigned char> FontBuffer(FontFile.tellg());
+			std::vector<unsigned char> FontBuffer(static_cast<std::size_t>(FontFile.tellg()));
 			FontFile.seekg(0, std::ios::beg);
 			FontFile.read(reinterpret_cast<char*>(FontBuffer.data()), FontBuffer.size());
 

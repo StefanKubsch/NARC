@@ -1268,10 +1268,10 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 
 				if (num_vertices > 0 && !vertices.empty())
 				{
-					std::memcpy(tmp.data(), vertices.data(), static_cast<std::size_t>(num_vertices) * sizeof(stbtt_vertex));
+					std::copy(vertices.begin(), vertices.begin() + num_vertices, tmp.begin());
 				}
 
-				std::memcpy(tmp.data() + num_vertices, comp_verts.data(), static_cast<std::size_t>(comp_num_verts) * sizeof(stbtt_vertex));
+				std::copy(comp_verts.begin(), comp_verts.begin() + comp_num_verts, tmp.begin() + num_vertices);
 
 				vertices = std::move(tmp);
 				num_vertices += comp_num_verts;
@@ -2356,13 +2356,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 			for (std::int_fast32_t i{}; i < result.w; ++i)
 			{
 				sum += scanline2[i];
-				std::int_fast32_t m{ static_cast<std::int_fast32_t>(std::round(std::abs(scanline[i] + sum) * 255.0F)) };
-
-				if (m > 255)
-				{
-					m = 255;
-				}
-
+				const std::int_fast32_t m{ std::clamp(static_cast<std::int_fast32_t>(std::round(std::abs(scanline[i] + sum) * 255.0F)), 0, 255) };
 				result.pixels[j * result.stride + i] = static_cast<unsigned char>(m);
 			}
 		}
@@ -2428,9 +2422,7 @@ inline static void stbtt__sort_edges_quicksort(stbtt__edge* p, std::int_fast32_t
 
 			// 0>mid && mid<n:  0>n => n; 0<n => 0
 			// 0<mid && mid>n:  0>n => 0; 0<n => n
-			const std::int_fast32_t z{ (c == c12) ? 0 : n - 1 };
-
-			std::swap(p[z], p[m]);
+			std::swap(p[(c == c12) ? 0 : n - 1], p[m]);
 		}
 
 		// now p[m] is the median-of-three
