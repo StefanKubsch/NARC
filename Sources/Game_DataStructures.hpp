@@ -27,7 +27,7 @@ struct EntityAssetStruct final
 	std::vector<std::vector<lwmf::TextureStruct>> WalkingTextures{};
 	std::vector<lwmf::TextureStruct> AttackTextures{};
 	std::vector<lwmf::TextureStruct> KillTextures{};
-	std::vector<lwmf::MP3> Sounds{};
+	std::vector<lwmf::MP3Player> Sounds{};
 	std::string Name;
 	std::int_fast32_t Number{};
 };
@@ -87,7 +87,7 @@ struct WeaponStruct final
 {
 	lwmf::ShaderClass WeaponShader{};
 	lwmf::ShaderClass MuzzleFlashShader{};
-	std::vector<lwmf::MP3> Sounds{};
+	std::vector<lwmf::MP3Player> Sounds{};
 	lwmf::IntRectStruct WeaponRect{};
 	lwmf::IntRectStruct MuzzleFlashRect{};
 	std::string HUDAmmoInfo;
@@ -117,7 +117,7 @@ struct WeaponStruct final
 struct DoorTypeStruct final
 {
 	lwmf::TextureStruct OriginalTexture{};
-	std::vector<lwmf::MP3> Sounds{};
+	std::vector<lwmf::MP3Player> Sounds{};
 	std::int_fast32_t OpenCloseSpeed{};
 	std::int_fast32_t StayOpenTime{};
 	float MaximumOpenPercent{};

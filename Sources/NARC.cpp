@@ -129,6 +129,11 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 	while (!QuitGameFlag)
 	{
+		if (Game_LevelHandling::BackgroundMusicEnabled && !Game_LevelHandling::BackgroundMusic.IsPlaying())
+		{
+			Game_LevelHandling::PlayBackgroundMusic();
+		}
+
 		const auto StartTime{ std::chrono::steady_clock::now() };
 		const auto ElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(StartTime - EndTime));
 		EndTime = StartTime;
@@ -593,31 +598,6 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			PostQuitMessage(0);
 			break;
 		}
-		case MM_MCINOTIFY:
-		{
-			switch (wParam)
-			{
-				case MCI_NOTIFY_SUCCESSFUL:
-				{
-					// "rewind" player footsteps audio if played completely
-					if (lParam == static_cast<LPARAM>(Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].GetDeviceID()))
-					{
-						Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].RewindToStart();
-						break;
-					}
-
-					// "rewind" and restart background music
-					if (Game_LevelHandling::BackgroundMusicEnabled && lParam == static_cast<LPARAM>(Game_LevelHandling::BackgroundMusic.GetDeviceID()))
-					{
-						Game_LevelHandling::BackgroundMusic.RewindToStart();
-						Game_LevelHandling::BackgroundMusic.Play(lwmf::MP3::PlayModes::NOTIFY);
-					}
-					break;
-				}
-				default: {}
-			}
-			break;
-		}
 		default: {}
 	}
 
@@ -673,7 +653,6 @@ inline void InitAndLoadLevel()
 	Player.InitAudio();
 	Game_EntityHandling::InitEntityAssets();
 	Game_EntityHandling::InitEntities();
-	Game_LevelHandling::PlayBackgroundMusic();
 	Game_Raycaster::RefreshSettings();
 
 	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = Game_EntityHandling::EntityTypes::Player;
@@ -693,7 +672,11 @@ inline void MovePlayerAndCheckCollision()
 		Game_WeaponHandling::WeaponPaceFlag = !Game_WeaponHandling::WeaponPaceFlag;
 		Game_WeaponHandling::WeaponPaceFlag ? Game_WeaponHandling::WeaponPace += Weapons[Player.SelectedWeapon].PaceFactor : Game_WeaponHandling::WeaponPace;
 		Game_WeaponHandling::HandleAmmoBoxPickup();
-		Player.PlayAudio(Game_PlayerClass::PlayerSounds::FootSteps);
+
+		if (!Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].IsPlaying())
+		{
+			Player.PlayAudio(Game_PlayerClass::PlayerSounds::FootSteps);
+		}
 	}
 }
 

@@ -200,7 +200,7 @@ namespace Game_Doors
 
 	inline void PlayAudio(const DoorStruct& Door, const DoorSounds Sound)
 	{
-		DoorTypes[Door.DoorType].Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::FROMSTART);
+		DoorTypes[Door.DoorType].Sounds[static_cast<std::int_fast32_t>(Sound)].Play();
 	}
 
 	inline void CloseAudio()

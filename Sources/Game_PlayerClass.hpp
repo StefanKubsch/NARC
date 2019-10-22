@@ -33,7 +33,7 @@ public:
 	void PlayAudio(PlayerSounds Sound);
 	void CloseAudio();
 
-	std::vector<lwmf::MP3> Sounds{};
+	std::vector<lwmf::MP3Player> Sounds{};
 	lwmf::IntPointStruct FuturePos{};
 	lwmf::FloatPointStruct Pos{};
 	lwmf::FloatPointStruct Dir{};
@@ -100,18 +100,7 @@ inline void Game_PlayerClass::HurtPlayer(const std::int_fast32_t DamageDealt)
 
 inline void Game_PlayerClass::PlayAudio(const PlayerSounds Sound)
 {
-	switch (Sound)
-	{
-		case PlayerSounds::FootSteps:
-		{
-			Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::NOTIFY);
-			break;
-		}
-		default:
-		{
-			Sounds[static_cast<std::int_fast32_t>(Sound)].Play(lwmf::MP3::PlayModes::FROMSTART);
-		}
-	}
+	Sounds[static_cast<std::int_fast32_t>(Sound)].Play();
 }
 
 inline void Game_PlayerClass::CloseAudio()

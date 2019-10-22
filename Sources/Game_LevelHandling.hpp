@@ -50,7 +50,7 @@ namespace Game_LevelHandling
 	inline std::vector<lwmf::TextureStruct> LevelTextures{};
 
 	inline std::vector<GFX_LightingClass> StaticLights{};
-	inline lwmf::MP3 BackgroundMusic{};
+	inline lwmf::MP3Player BackgroundMusic{};
 
 	// Variables used for map dimensions (used for Level*Map and EntityMap)
 	inline std::int_fast32_t LevelMapWidth{};
@@ -183,7 +183,7 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			BackgroundMusic.Play(lwmf::MP3::PlayModes::NOTIFY);
+			BackgroundMusic.Play();
 		}
 	}
 

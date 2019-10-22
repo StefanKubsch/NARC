@@ -868,7 +868,7 @@ namespace Game_EntityHandling
 
 	inline void PlayAudio(const std::int_fast32_t TypeNumber, const EntitySounds EntitySound)
 	{
-		EntityAssets[TypeNumber].Sounds[static_cast<std::int_fast32_t>(EntitySound)].Play(lwmf::MP3::PlayModes::FROMSTART);
+		EntityAssets[TypeNumber].Sounds[static_cast<std::int_fast32_t>(EntitySound)].Play();
 	}
 
 	inline void CloseAudio()

@@ -38,7 +38,7 @@ inline lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 #include "lwmf_bmp.hpp"
 #include "lwmf_png.hpp"
 #include "lwmf_text.hpp"
-#include "lwmf_mp3.hpp"
+#include "lwmf_mp3player.hpp"
 #include "lwmf_gamepad.hpp"
 #include "lwmf_perlinnoise.hpp"
 #include "lwmf_fpscounter.hpp"

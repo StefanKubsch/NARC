@@ -536,7 +536,7 @@ namespace Game_WeaponHandling
 
 	inline void PlayAudio(const std::int_fast32_t SelectedPlayerWeapon, const WeaponsSounds WeaponSound)
 	{
-		Weapons[SelectedPlayerWeapon].Sounds[static_cast<std::int_fast32_t>(WeaponSound)].Play(lwmf::MP3::PlayModes::FROMSTART);
+		Weapons[SelectedPlayerWeapon].Sounds[static_cast<std::int_fast32_t>(WeaponSound)].Play();
 	}
 
 	inline void CloseAudio()
