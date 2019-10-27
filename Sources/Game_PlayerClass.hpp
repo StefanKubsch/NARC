@@ -69,14 +69,17 @@ inline void Game_PlayerClass::InitAudio()
 	{
 		// Get Footsteps audio
 		Sounds.emplace_back();
+		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::FootSteps)].Init(2, 44100, 128, 16);
 		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::FootSteps)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "FootStepsAudio"));
 
 		// Get Hurt audio
 		Sounds.emplace_back();
+		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::Hurt)].Init(2, 44100, 128, 16);
 		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::Hurt)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "HurtAudio"));
 
 		// Get DeathScream audio
 		Sounds.emplace_back();
+		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::DeathScream)].Init(2, 44100, 128, 16);
 		Sounds[static_cast<std::int_fast32_t>(PlayerSounds::DeathScream)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DeathScreamAudio"));
 	}
 }

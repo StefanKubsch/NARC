@@ -210,12 +210,15 @@ namespace Game_WeaponHandling
 			if (const std::string INIFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				Weapon.Sounds.emplace_back();
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Init(2, 44100, 128, 16);
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"));
 
 				Weapon.Sounds.emplace_back();
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Dryfire)].Init(2, 44100, 128, 16);
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Dryfire)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "DryFireAudio"));
 
 				Weapon.Sounds.emplace_back();
+				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Init(2, 44100, 128, 16);
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"));
 
 				Weapon.ReloadDuration = Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].GetDuration() / FrameLock;

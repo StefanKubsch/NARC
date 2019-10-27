@@ -20,6 +20,7 @@
 #include <msacm.h>
 #include <shlwapi.h>
 #include <wmsdk.h>
+#include <atlcomcli.h>
 
 #pragma comment(lib, "msacm32.lib")
 #pragma comment(lib, "wmvcore.lib")
@@ -35,6 +36,7 @@ namespace lwmf
 	class MP3Player
 	{
 	public:
+		void Init(WORD Channels, DWORD SamplesPerSecond, DWORD Bitrate, WORD BitsPerSample);
 		void Load(const std::string& Filename);
 		void Close();
 		void Play();
@@ -43,14 +45,50 @@ namespace lwmf
 		bool IsPlaying();
 
 	private:
+		void CheckHRESError(HRESULT Error, const std::string& Operation);
+		void CheckMMRESError(MMRESULT Error, const std::string& Operation);
+
 		std::vector<BYTE> WaveBuffer{};
-		WAVEFORMATEX PCMFormat{ WAVE_FORMAT_PCM, 2, 44100, 4 * 44100, 4, 16, 0 };
+		WAVEFORMATEX PCMFormat{};
+		MPEGLAYER3WAVEFORMAT MP3Format{};
 		WAVEHDR WaveHDR{};
 		HWAVEOUT WaveOut{};
 		DWORD WaveBufferLength{};
+		DWORD SamplesPerSec{};
+		const WORD MP3BlockSize{ 522 };
 		double Duration{};
 		bool PlayStarted{};
 	};
+
+	inline void MP3Player::Init(const WORD Channels, const DWORD SamplesPerSecond, const DWORD Bitrate, const WORD BitsPerSample)
+	{
+		// Check audio device capabilities
+		const UINT NumberOfDevices{ waveOutGetNumDevs() };
+
+		if (NumberOfDevices != 0)
+		{
+			for (UINT i{}; i < NumberOfDevices; ++i)
+			{
+				WAVEOUTCAPS Capabilities{};
+				const MMRESULT Error{ waveOutGetDevCaps(i, &Capabilities, sizeof(WAVEOUTCAPS)) };
+
+				if (Error == MMSYSERR_NOERROR)
+				{
+					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Found audio device #" + std::to_string(i) + ": " + std::string(Capabilities.szPname));
+					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Number of channels: " + std::to_string(Capabilities.wChannels));
+				}
+			}
+
+			PCMFormat = { WAVE_FORMAT_PCM, Channels, SamplesPerSecond, 4 * SamplesPerSecond, 4, BitsPerSample, 0 };
+			MP3Format = { { WAVE_FORMAT_MPEGLAYER3, Channels, SamplesPerSecond, Bitrate * (1024 / 8), 1, 0, MPEGLAYER3_WFX_EXTRA_BYTES }, MPEGLAYER3_ID_MPEG, MPEGLAYER3_FLAG_PADDING_OFF, MP3BlockSize, 1, 1393 };
+
+			SamplesPerSec = SamplesPerSecond;
+		}
+		else
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "No audio devices found!");
+		}
+	}
 
 	inline void MP3Player::Load(const std::string& Filename)
 	{
@@ -77,108 +115,90 @@ namespace lwmf
 			std::vector<BYTE> InputBuffer(static_cast<size_t>(InputBufferSize));
 			File.read(reinterpret_cast<char*>(InputBuffer.data()), InputBufferSize);
 
-			constexpr DWORD MP3BlockSize{ 522 };
-			MPEGLAYER3WAVEFORMAT MP3Format{ { WAVE_FORMAT_MPEGLAYER3, 2, 44100, 128 * (1024 / 8), 1, 0, MPEGLAYER3_WFX_EXTRA_BYTES }, MPEGLAYER3_ID_MPEG, MPEGLAYER3_FLAG_PADDING_OFF, MP3BlockSize, 1, 1393 };
-
-			CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-
-			IWMSyncReader* SyncReader{};
-			WMCreateSyncReader(nullptr, WMT_RIGHT_PLAYBACK, &SyncReader);
-
-			IStream* MP3Stream{ SHCreateMemStream(InputBuffer.data(), static_cast<UINT>(InputBufferSize)) };
-			SyncReader->OpenStream(MP3Stream);
-
-			IWMHeaderInfo* HeaderInfo{};
-			SyncReader->QueryInterface(&HeaderInfo);
+			CComPtr<IWMSyncReader> SyncReader{};
+			CheckHRESError(WMCreateSyncReader(nullptr, WMT_RIGHT_PLAYBACK, &SyncReader), "WMCreateSyncReader");
+			CComPtr<IStream> MP3Stream{ SHCreateMemStream(InputBuffer.data(), static_cast<UINT>(InputBufferSize)) };
+			CheckHRESError(SyncReader->OpenStream(MP3Stream), "OpenStream");
+			CComPtr<IWMHeaderInfo> HeaderInfo{};
+			CheckHRESError(SyncReader->QueryInterface(&HeaderInfo), "QueryInterface");
 
 			WORD DataTypeLength{ sizeof(QWORD) };
 			WORD StreamNum{};
 			WMT_ATTR_DATATYPE DataTypeAttribute{};
 			QWORD DurationInNano{};
-			HeaderInfo->GetAttributeByName(&StreamNum, L"Duration", &DataTypeAttribute, reinterpret_cast<BYTE*>(&DurationInNano), &DataTypeLength);
-			Duration = static_cast<double>(DurationInNano) / 10000000.0;
+			CheckHRESError(HeaderInfo->GetAttributeByName(&StreamNum, L"Duration", &DataTypeAttribute, reinterpret_cast<BYTE*>(&DurationInNano), &DataTypeLength), "GetAttributeByName");
+			Duration = static_cast<double>(DurationInNano * 100) / 1000000000.0;
 
-			IWMProfile* Profile{};
-			SyncReader->QueryInterface(&Profile);
-			IWMStreamConfig* StreamConfig{};
-			Profile->GetStream(0, &StreamConfig);
-			IWMMediaProps* MediaProperties;
-			StreamConfig->QueryInterface(&MediaProperties);
+			CComPtr<IWMProfile> Profile{};
+			CheckHRESError(SyncReader->QueryInterface(&Profile), "QueryInterface");
+			CComPtr<IWMStreamConfig> StreamConfig{};
+			CheckHRESError(Profile->GetStream(0, &StreamConfig), "GetStream");
+			CComPtr<IWMMediaProps> MediaProperties;
+			CheckHRESError(StreamConfig->QueryInterface(&MediaProperties), "QueryInterface");
 
 			DWORD MediaTypeSize{};
-			MediaProperties->GetMediaType(nullptr, &MediaTypeSize);
+			CheckHRESError(MediaProperties->GetMediaType(nullptr, &MediaTypeSize), "GetMediaType");
 			std::vector<WM_MEDIA_TYPE> MediaType(MediaTypeSize);
-			MediaProperties->GetMediaType(MediaType.data(), &MediaTypeSize);
-
-			MediaProperties->Release();
-			StreamConfig->Release();
-			Profile->Release();
-			HeaderInfo->Release();
-			SyncReader->Release();
+			CheckHRESError(MediaProperties->GetMediaType(MediaType.data(), &MediaTypeSize), "GetMediaType");
 
 			WaveBufferLength = Duration * PCMFormat.nAvgBytesPerSec;
 			WaveBuffer.resize(static_cast<std::size_t>(WaveBufferLength));
 
 			HACMSTREAM ACMStream{};
-			acmStreamOpen(&ACMStream, nullptr, reinterpret_cast<LPWAVEFORMATEX>(&MP3Format), &PCMFormat, nullptr, 0, 0, 0);
-			unsigned long RawBufferSize{};
-			acmStreamSize(ACMStream, MP3BlockSize, &RawBufferSize, ACM_STREAMSIZEF_SOURCE);
+			CheckMMRESError(acmStreamOpen(&ACMStream, nullptr, reinterpret_cast<LPWAVEFORMATEX>(&MP3Format), &PCMFormat, nullptr, 0, 0, 0), "acmStreamOpen");
+			DWORD RawBufferSize{};
+			CheckMMRESError(acmStreamSize(ACMStream, MP3BlockSize, &RawBufferSize, ACM_STREAMSIZEF_SOURCE), "acmStreamSize");
 
-			std::vector<BYTE> MP3BlockBuffer(MP3BlockSize);
-			LPBYTE RawBuffer{ static_cast<LPBYTE>(LocalAlloc(LPTR, static_cast<std::size_t>(RawBufferSize))) };
+			std::vector<BYTE> MP3BlockBuffer(static_cast<std::size_t>(MP3BlockSize));
+			std::vector<BYTE> RawBuffer(static_cast<std::size_t>(RawBufferSize));
 
 			ACMSTREAMHEADER StreamHead{};
 			StreamHead.cbStruct = sizeof(ACMSTREAMHEADER);
 			StreamHead.pbSrc = MP3BlockBuffer.data();
 			StreamHead.cbSrcLength = MP3BlockSize;
-			StreamHead.pbDst = RawBuffer;
+			StreamHead.pbDst = RawBuffer.data();
 			StreamHead.cbDstLength = RawBufferSize;
-			acmStreamPrepareHeader(ACMStream, &StreamHead, 0);
-
-			BYTE* CurrentOutput{ WaveBuffer.data() };
-			DWORD DecompressedSize{};
+			CheckMMRESError(acmStreamPrepareHeader(ACMStream, &StreamHead, 0), "acmStreamPrepareHeader");
 
 			ULARGE_INTEGER NewPosition{};
 			LARGE_INTEGER SeekValue{};
-			MP3Stream->Seek(SeekValue, STREAM_SEEK_SET, &NewPosition);
+			CheckHRESError(MP3Stream->Seek(SeekValue, STREAM_SEEK_SET, &NewPosition), "MP3StreamSeek");
+
+			BYTE* CurrentOutput{ WaveBuffer.data() };
 
 			while (true)
 			{
 				ULONG Counter{};
-				MP3Stream->Read(MP3BlockBuffer.data(), MP3BlockSize, &Counter);
+				CheckHRESError(MP3Stream->Read(MP3BlockBuffer.data(), MP3BlockSize, &Counter), "MP3StreamRead");
 
 				if (Counter != MP3BlockSize)
 				{
 					break;
 				}
 
-				acmStreamConvert(ACMStream, &StreamHead, ACM_STREAMCONVERTF_BLOCKALIGN);
-				std::memcpy(CurrentOutput, RawBuffer, static_cast<std::size_t>(StreamHead.cbDstLengthUsed));
-				DecompressedSize += StreamHead.cbDstLengthUsed;
+				CheckMMRESError(acmStreamConvert(ACMStream, &StreamHead, ACM_STREAMCONVERTF_BLOCKALIGN), "acmStreamConvert");
+				std::memcpy(CurrentOutput, RawBuffer.data(), static_cast<std::size_t>(StreamHead.cbDstLengthUsed));
 				CurrentOutput += StreamHead.cbDstLengthUsed;
 			}
 
-			acmStreamUnprepareHeader(ACMStream, &StreamHead, 0);
-			LocalFree(RawBuffer);
-			acmStreamClose(ACMStream, 0);
-
-			MP3Stream->Release();
+			CheckMMRESError(acmStreamUnprepareHeader(ACMStream, &StreamHead, 0), "acmStreamUnprepareHeader");
+			CheckMMRESError(acmStreamClose(ACMStream, 0), "acmStreamClose");
 		}
 	}
 
 	inline void MP3Player::Close()
 	{
-		PlayStarted = false;
 		waveOutReset(WaveOut);
 		waveOutClose(WaveOut);
+		PlayStarted = false;
 	}
 
 	inline void MP3Player::Play()
 	{
 		WaveHDR = { reinterpret_cast<LPSTR>(WaveBuffer.data()), WaveBufferLength };
 		waveOutOpen(&WaveOut, WAVE_MAPPER, &PCMFormat, NULL, 0, CALLBACK_NULL);
-		waveOutPrepareHeader(WaveOut, &WaveHDR, sizeof(WaveHDR));
-		waveOutWrite(WaveOut, &WaveHDR, sizeof(WaveHDR));
+		waveOutPrepareHeader(WaveOut, &WaveHDR, sizeof(WAVEHDR));
+		waveOutWrite(WaveOut, &WaveHDR, sizeof(WAVEHDR));
 		PlayStarted = true;
 	}
 
@@ -189,19 +209,36 @@ namespace lwmf
 
 	inline double MP3Player::GetPosition()
 	{
-		static MMTIME MMTime { TIME_MS, 0 };
+		static MMTIME MMTime { TIME_SAMPLES, 0 };
 		waveOutGetPosition(WaveOut, &MMTime, sizeof(MMTIME));
-		return static_cast<double>(MMTime.u.ms) / 100000.0;
+		return static_cast<double>(MMTime.u.sample) / static_cast<double>(SamplesPerSec);
 	}
 
 	inline bool MP3Player::IsPlaying()
 	{
-		if (PlayStarted & (GetPosition() < Duration))
+		if (PlayStarted & (GetPosition() + 0.0001 <= Duration))
 		{
 			return true;
 		}
 
+		PlayStarted = false;
 		return false;
+	}
+
+	inline void MP3Player::CheckHRESError(HRESULT Error, const std::string& Operation)
+	{
+		if (Error != S_OK)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, Operation + " error: " + std::to_string(Error));
+		}
+	}
+
+	inline void MP3Player::CheckMMRESError(MMRESULT Error, const std::string& Operation)
+	{
+		if (Error != MMSYSERR_NOERROR)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, Operation + " error: " + std::to_string(Error));
+		}
 	}
 
 
