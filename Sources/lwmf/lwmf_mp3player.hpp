@@ -36,7 +36,6 @@ namespace lwmf
 	class MP3Player
 	{
 	public:
-		void Init(WORD Channels, DWORD SamplesPerSecond, DWORD Bitrate, WORD BitsPerSample);
 		void Load(const std::string& Filename);
 		void Close();
 		void Play();
@@ -45,11 +44,20 @@ namespace lwmf
 		bool IsPlaying();
 
 	private:
+		struct MP3HeaderStruct
+		{
+			DWORD Bitrate{};
+			DWORD SampleRate{};
+			WORD NumberOfChannels{};
+		};
+
+		void ReadMP3Header(const std::string& Filename, MP3HeaderStruct& Header);
 		void CheckHRESError(HRESULT Error, const std::string& Operation);
 		void CheckMMRESError(MMRESULT Error, const std::string& Operation);
 
 		std::vector<BYTE> WaveBuffer{};
 		WAVEFORMATEX PCMFormat{};
+		MP3HeaderStruct MP3Header{};
 		MPEGLAYER3WAVEFORMAT MP3Format{};
 		WAVEHDR WaveHDR{};
 		HWAVEOUT WaveOut{};
@@ -60,38 +68,100 @@ namespace lwmf
 		bool PlayStarted{};
 	};
 
-	inline void MP3Player::Init(const WORD Channels, const DWORD SamplesPerSecond, const DWORD Bitrate, const WORD BitsPerSample)
+	inline void MP3Player::ReadMP3Header(const std::string& Filename, MP3HeaderStruct& Header)
 	{
-		// Check audio device capabilities
-		const UINT NumberOfDevices{ waveOutGetNumDevs() };
+		// For a description of the MP3 header, have a look here:
+		// https://www.mp3-tech.org/programmer/frame_header.html
 
-		if (NumberOfDevices != 0)
+		// This implementation only supports MPEG Version 1!
+
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Reading MP3 header of " + Filename);
+		std::ifstream File(Filename.c_str(), std::ios::in | std::ios::binary);
+
+		if (File.fail())
 		{
-			for (UINT i{}; i < NumberOfDevices; ++i)
-			{
-				WAVEOUTCAPS Capabilities{};
-				const MMRESULT Error{ waveOutGetDevCaps(i, &Capabilities, sizeof(WAVEOUTCAPS)) };
-
-				if (Error == MMSYSERR_NOERROR)
-				{
-					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Found audio device #" + std::to_string(i) + ": " + std::string(Capabilities.szPname));
-					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Number of channels: " + std::to_string(Capabilities.wChannels));
-				}
-			}
-
-			PCMFormat = { WAVE_FORMAT_PCM, Channels, SamplesPerSecond, 4 * SamplesPerSecond, 4, BitsPerSample, 0 };
-			MP3Format = { { WAVE_FORMAT_MPEGLAYER3, Channels, SamplesPerSecond, Bitrate * (1024 / 8), 1, 0, MPEGLAYER3_WFX_EXTRA_BYTES }, MPEGLAYER3_ID_MPEG, MPEGLAYER3_FLAG_PADDING_OFF, MP3BlockSize, 1, 1393 };
-
-			SamplesPerSec = SamplesPerSecond;
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + "!");
 		}
 		else
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "No audio devices found!");
+			std::int_fast32_t Offset{};
+
+			// Search for header informations
+			while (true)
+			{
+				Offset = File.get();
+
+				if (Offset == 255)
+				{
+					Offset = File.get();
+
+					if (std::tolower(Offset / 16) == 15)
+					{
+						break;
+					}
+				}
+			}
+
+			// Check if file is MPEG Version 1
+			if (std::tolower(((Offset % 16) / 4) / 2) != 1)
+			{
+				LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "This is not a MPEG Version 1 MP3!");
+			}
+
+			// Get Bitrate
+			Offset = File.get();
+			const std::vector<std::int_fast32_t> BitrateTable {	0x000, 0x020, 0x028, 0x030, 0x038, 0x040, 0x050, 0x060, 0x070, 0x080, 0x0A0, 0x0C0, 0x0E0, 0x100, 0x140, 0x000 };
+			Header.Bitrate = BitrateTable[std::tolower(Offset / 16)];
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Bitrate: " + std::to_string(MP3Header.Bitrate));
+
+			// Get Samplerate
+			const std::vector<std::int_fast32_t> SampleRateTable { 0x0AC44, 0x0BB80, 0x07D00, 0x00000 };
+			Header.SampleRate = SampleRateTable[std::tolower((Offset % 16) / 4)];
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Samplerate: " + std::to_string(MP3Header.SampleRate));
+
+			// Get number of channels
+			Offset = File.get();
+
+			switch (std::tolower((Offset / 16) / 4))
+			{
+				case 0:
+				{
+					// Stereo
+					Header.NumberOfChannels = 2;
+					break;
+				}
+				case 1:
+				{
+					// Joint Stereo
+					Header.NumberOfChannels = 2;
+					break;
+				}
+				case 2:
+				{
+					// Dual Channel
+					Header.NumberOfChannels = 2;
+					break;
+				}
+				case 3:
+				{
+					// Single Channel
+					Header.NumberOfChannels = 1;
+					break;
+				}
+				default: {}
+			}
+
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Number of channels: " + std::to_string(MP3Header.NumberOfChannels));
 		}
 	}
 
 	inline void MP3Player::Load(const std::string& Filename)
 	{
+		// Read MP3 header and set proper stream informations
+		ReadMP3Header(Filename, MP3Header);
+		MP3Format = { { WAVE_FORMAT_MPEGLAYER3, MP3Header.NumberOfChannels, MP3Header.SampleRate, MP3Header.Bitrate * (1024 / 8), 1, 0, MPEGLAYER3_WFX_EXTRA_BYTES }, MPEGLAYER3_ID_MPEG, MPEGLAYER3_FLAG_PADDING_OFF, MP3BlockSize, 1, 1393 };
+		PCMFormat = { WAVE_FORMAT_PCM, MP3Header.NumberOfChannels, MP3Header.SampleRate, 4 * MP3Header.SampleRate, 4, 16, 0 };
+
 		std::ifstream File(Filename.c_str(), std::ios::in | std::ios::binary);
 
 		if (File.fail())
@@ -127,6 +197,7 @@ namespace lwmf
 			WMT_ATTR_DATATYPE DataTypeAttribute{};
 			QWORD DurationInNano{};
 			CheckHRESError(HeaderInfo->GetAttributeByName(&StreamNum, L"Duration", &DataTypeAttribute, reinterpret_cast<BYTE*>(&DurationInNano), &DataTypeLength), "GetAttributeByName");
+			// Round Duration to 3 decimal places ( = precision of 1ms)
 			Duration = static_cast<double>(DurationInNano * 100) / 1000000000.0;
 
 			CComPtr<IWMProfile> Profile{};
@@ -211,12 +282,13 @@ namespace lwmf
 	{
 		static MMTIME MMTime { TIME_SAMPLES, 0 };
 		waveOutGetPosition(WaveOut, &MMTime, sizeof(MMTIME));
-		return static_cast<double>(MMTime.u.sample) / static_cast<double>(SamplesPerSec);
+		// Round Position to 3 decimal places ( = precision of 1ms)
+		return std::round(static_cast<double>(MMTime.u.sample) / static_cast<double>(MP3Header.SampleRate) * 1000.0) / 1000.0;
 	}
 
 	inline bool MP3Player::IsPlaying()
 	{
-		if (PlayStarted & (GetPosition() + 0.0001 <= Duration))
+		if (PlayStarted & (GetPosition() <= Duration))
 		{
 			return true;
 		}

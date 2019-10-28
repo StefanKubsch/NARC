@@ -154,19 +154,16 @@ namespace Game_EntityHandling
 					{
 						// Get Pickup audio
 						EntityAssets[AssetIndex].Sounds.emplace_back();
-						EntityAssets[AssetIndex].Sounds[0].Init(2, 44100, 128, 16);
 						EntityAssets[AssetIndex].Sounds[0].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AmmoPickup"));
 					}
 					else if (AssetType == "Enemy" || AssetType == "Turret")
 					{
 						// Get KillSound audio
 						EntityAssets[AssetIndex].Sounds.emplace_back();
-						EntityAssets[AssetIndex].Sounds[0].Init(2, 44100, 128, 16);
 						EntityAssets[AssetIndex].Sounds[0].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "KillSound"));
 
 						// Get AttackSound audio
 						EntityAssets[AssetIndex].Sounds.emplace_back();
-						EntityAssets[AssetIndex].Sounds[1].Init(2, 44100, 128, 16);
 						EntityAssets[AssetIndex].Sounds[1].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "AttackSound"));
 					}
 
