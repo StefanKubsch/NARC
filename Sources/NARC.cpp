@@ -129,7 +129,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 	while (!QuitGameFlag)
 	{
-		if (Game_LevelHandling::BackgroundMusicEnabled && !Game_LevelHandling::BackgroundMusic.IsPlaying())
+		if (Game_LevelHandling::BackgroundMusicEnabled && !Game_LevelHandling::BackgroundMusic[0].IsPlaying())
 		{
 			Game_LevelHandling::PlayBackgroundMusic();
 		}
@@ -634,7 +634,7 @@ inline void InitAndLoadGameConfig()
 inline void InitAndLoadLevel()
 {
 	Game_Transitions::LevelTransition();
-	Game_LevelHandling::CloseBackgroundMusic();
+	Game_LevelHandling::CloseAudio();
 	Game_EntityHandling::CloseAudio();
 	Player.CloseAudio();
 	Game_LevelHandling::InitConfig();

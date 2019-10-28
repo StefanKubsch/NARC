@@ -36,7 +36,7 @@ namespace Tools_Cleanup
 	{
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close all audio handles...");
 
-		Game_LevelHandling::CloseBackgroundMusic();
+		Game_LevelHandling::CloseAudio();
 		Game_EntityHandling::CloseAudio();
 		Game_Doors::CloseAudio();
 		Game_WeaponHandling::CloseAudio();

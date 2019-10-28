@@ -40,7 +40,7 @@ namespace Game_LevelHandling
 	void InitTextures();
 	void InitBackgroundMusic();
 	void PlayBackgroundMusic();
-	void CloseBackgroundMusic();
+	void CloseAudio();
 
 	//
 	// Variables and constants
@@ -50,7 +50,7 @@ namespace Game_LevelHandling
 	inline std::vector<lwmf::TextureStruct> LevelTextures{};
 
 	inline std::vector<GFX_LightingClass> StaticLights{};
-	inline lwmf::MP3Player BackgroundMusic{};
+	inline std::vector<lwmf::MP3Player> BackgroundMusic;
 
 	// Variables used for map dimensions (used for Level*Map and EntityMap)
 	inline std::int_fast32_t LevelMapWidth{};
@@ -165,6 +165,9 @@ namespace Game_LevelHandling
 
 	inline void InitBackgroundMusic()
 	{
+		BackgroundMusic.clear();
+		BackgroundMusic.shrink_to_fit();
+
 		if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/LevelData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			BackgroundMusicEnabled = lwmf::ReadINIValue<bool>(INIFile, "AUDIO", "BackgroundMusicEnabled");
@@ -173,7 +176,8 @@ namespace Game_LevelHandling
 			{
 				if (const std::string AudioFileName{ lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "BackgroundMusic") }; Tools_ErrorHandling::CheckFileExistence(AudioFileName, StopOnError))
 				{
-					BackgroundMusic.Load(AudioFileName);
+					BackgroundMusic.emplace_back();
+					BackgroundMusic[0].Load(AudioFileName);
 				}
 			}
 		}
@@ -183,15 +187,15 @@ namespace Game_LevelHandling
 	{
 		if (BackgroundMusicEnabled)
 		{
-			BackgroundMusic.Play();
+			BackgroundMusic[0].Play();
 		}
 	}
 
-	inline void CloseBackgroundMusic()
+	inline void CloseAudio()
 	{
-		if (BackgroundMusicEnabled)
+		for (auto&& Sound : BackgroundMusic)
 		{
-			BackgroundMusic.Close();
+			Sound.Close();
 		}
 	}
 
