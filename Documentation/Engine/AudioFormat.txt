@@ -1,10 +1,4 @@
 Supported audio formats:
 
 SFX & Music
-	Currently only MP3 CBR (Constand BitRate) is supported!
-
-	Currently only fixed settings:
-
-	- 128kBit
-	- 44100kHz
-	- Stereo
+	MPEG1 MP3 (Samplerate, Bitrate and Number of Channels will be detected)
