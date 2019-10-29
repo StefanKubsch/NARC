@@ -64,9 +64,9 @@ namespace lwmf
 
 		const float Weight{ (Limit - ShadeFactor) / Limit };
 
-		return static_cast<std::int_fast32_t>((Color & RMask) * Weight)
-			| (static_cast<std::int_fast32_t>((Color & GMask) * Weight) & GMask)
-			| (static_cast<std::int_fast32_t>((Color & BMask) * Weight) & BMask)
+		return static_cast<std::int_fast32_t>(static_cast<float>(Color & RMask) * Weight)
+			| (static_cast<std::int_fast32_t>(static_cast<float>(Color & GMask) * Weight) & GMask)
+			| (static_cast<std::int_fast32_t>(static_cast<float>(Color & BMask) * Weight) & BMask)
 			| (static_cast<std::int_fast32_t>(Color & AMask));
 	}
 

@@ -150,6 +150,9 @@ namespace Game_EntityHandling
 					// Get SFX
 					//
 
+					EntityAssets[AssetIndex].Sounds.clear();
+					EntityAssets[AssetIndex].Sounds.shrink_to_fit();
+
 					if (const std::string AssetType{ lwmf::ReadINIValue<std::string>(INIFile, "GENERAL", "AssetType") }; AssetType == "AmmoBox")
 					{
 						// Get Pickup audio
@@ -181,6 +184,9 @@ namespace Game_EntityHandling
 
 	inline void LoadWalkAnimTextures(const std::int_fast32_t AssetIndex, const std::string& AssetTypeName)
 	{
+		EntityAssets[AssetIndex].WalkingTextures.clear();
+		EntityAssets[AssetIndex].WalkingTextures.shrink_to_fit();
+
 		std::int_fast32_t DirectionIndex{};
 
 		while (true)
@@ -222,6 +228,9 @@ namespace Game_EntityHandling
 
 	inline void LoadAdditionalAnimTextures(const std::string& AnimType, const std::string& AssetTypeName, std::vector<lwmf::TextureStruct>& AnimVector)
 	{
+		AnimVector.clear();
+		AnimVector.shrink_to_fit();
+
 		std::int_fast32_t TextureIndex{};
 
 		while (true)
