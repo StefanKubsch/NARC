@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <array>
 #include <fstream>
 
 #include "lwmf_logging.hpp"
@@ -42,8 +43,8 @@ namespace lwmf
 		}
 		else
 		{
-			std::vector<unsigned char> FileHeaderBuffer(sizeof(BITMAPFILEHEADER));
-			std::vector<unsigned char> InfoHeaderBuffer(sizeof(BITMAPINFOHEADER));
+			std::array<unsigned char, sizeof(BITMAPFILEHEADER)> FileHeaderBuffer{};
+			std::array<unsigned char, sizeof(BITMAPINFOHEADER)> InfoHeaderBuffer{};
 
 			File.read(reinterpret_cast<char*>(FileHeaderBuffer.data()), sizeof(BITMAPFILEHEADER));
 			File.read(reinterpret_cast<char*>(InfoHeaderBuffer.data()), sizeof(BITMAPINFOHEADER));

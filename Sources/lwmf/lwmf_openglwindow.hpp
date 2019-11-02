@@ -12,7 +12,6 @@
 
 #include <Windows.h>
 #include <cstdint>
-#include <vector>
 
 #include "lwmf_logging.hpp"
 #include "lwmf_texture.hpp"

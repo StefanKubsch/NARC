@@ -15,7 +15,7 @@
 
 #include <cstring>
 #include <string>
-#include <vector>
+#include <array>
 #include <exception>
 #include <stdexcept>
 #include <fstream>
@@ -149,7 +149,7 @@ namespace lwmf
 	inline std::string Logging::GetTimeStamp()
 	{
 		const auto CurrentTime{ std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) };
-		std::vector<char> TimeString(26);
+		std::array<char, 26> TimeString{};
 		ctime_s(TimeString.data(), TimeString.size(), &CurrentTime);
 		const std::string ReturnString(TimeString.begin(), TimeString.end());
 		return ReturnString;

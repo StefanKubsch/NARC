@@ -14,7 +14,7 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
+#include <array>
 #include <fstream>
 
 #include "lwmf_logging.hpp"
@@ -44,13 +44,13 @@ namespace lwmf
 			Program
 		};
 
-		void Ortho2D(std::vector<GLfloat>& Matrix, GLfloat Left, GLfloat Right, GLfloat Bottom, GLfloat Top);
+		void Ortho2D(std::array<GLfloat, 16>& Matrix, GLfloat Left, GLfloat Right, GLfloat Bottom, GLfloat Top);
 		void UpdateVertices(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
 		std::string LoadShaderSource(const std::string& FileName, const std::string& ShaderName);
 		void CheckError(std::int_fast32_t Line);
 		void CheckCompileError(GLuint Task, Components Component);
 
-		std::vector<GLfloat> Vertices{};
+		std::array<GLfloat, 16> Vertices{};
 		GLint OpacityLocation{};
 		GLuint ShaderProgram{};
 		GLuint VertexArrayObject{};
@@ -64,8 +64,6 @@ namespace lwmf
 		const std::string VertexShaderFileSuffix{ ".vert" };
 		const std::string FragmentShaderFileSuffix{ ".frag" };
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
-
-		Vertices.resize(16);
 
 		// Set texture coordinates
 		// Top-Left
@@ -84,7 +82,7 @@ namespace lwmf
 		Vertices[14] = 0.0F;
 		Vertices[15] = 1.0F;
 
-		std::vector<GLint> Elements
+		std::array<GLint, 6> Elements
 		{
 			0, 1, 2,
 			2, 3, 0
@@ -173,7 +171,7 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create projection matrix...");
-		std::vector<GLfloat> ProjectionMatrix(16);
+		std::array<GLfloat, 16> ProjectionMatrix{};
 		Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(Texture.Width), static_cast<GLfloat>(Texture.Height), 0.0F);
 		glCheckError();
 		const GLint Projection{ glGetUniformLocation(ShaderProgram, "MVP") };
@@ -301,7 +299,7 @@ namespace lwmf
 		}
 	}
 
-	inline void ShaderClass::Ortho2D(std::vector<GLfloat>& Matrix, const GLfloat Left, const GLfloat Right, const GLfloat Bottom, const GLfloat Top)
+	inline void ShaderClass::Ortho2D(std::array<GLfloat, 16>& Matrix, const GLfloat Left, const GLfloat Right, const GLfloat Bottom, const GLfloat Top)
 	{
 		const GLfloat InvY{ 1.0F / (Top - Bottom) };
 		const GLfloat InvX{ 1.0F / (Right - Left) };
@@ -437,7 +435,7 @@ namespace lwmf
 	inline void ShaderClass::CheckCompileError(const GLuint Task, const Components Component)
 	{
 		GLint ErrorResult{};
-		std::vector<GLchar> ErrorLog(512);
+		std::array<GLchar, 512> ErrorLog{};
 
 		switch (Component)
 		{

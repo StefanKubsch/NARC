@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <array>
 #include <fstream>
 #include <charconv>
 
@@ -133,11 +134,11 @@ namespace Game_WeaponHandling
 				Weapons[Index].LoadedRounds = Weapons[Index].Capacity;
 
 				// Initial built of ammo info HUD strings
-				std::vector<char> CapacityString(MaximumAmmoCapacityDigits);
+				std::array<char, MaximumAmmoCapacityDigits> CapacityString{};
 				std::to_chars(CapacityString.data(), CapacityString.data() + CapacityString.size(), Weapons[Index].Capacity);
 				Weapons[Index].HUDAmmoInfo = std::string(CapacityString.data()) + "/" + std::string(CapacityString.data());
 
-				std::vector<char> CarriedAmmoString(MaximumCarriedAmmoDigits);
+				std::array<char, MaximumCarriedAmmoDigits> CarriedAmmoString{};
 				std::to_chars(CarriedAmmoString.data(), CarriedAmmoString.data() + CarriedAmmoString.size(), Weapons[Index].CarriedAmmo);
 				Weapons[Index].HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
 
@@ -319,7 +320,7 @@ namespace Game_WeaponHandling
 						if (const auto WP{ Entity.ContainedItem.find(Weapon.Name) }; Weapon.Name == WP->first)
 						{
 							Weapon.CarriedAmmo += WP->second;
-							std::vector<char> CarriedAmmoString(MaximumCarriedAmmoDigits);
+							std::array<char, MaximumCarriedAmmoDigits> CarriedAmmoString{};
 							std::to_chars(CarriedAmmoString.data(), CarriedAmmoString.data() + CarriedAmmoString.size(), Weapon.CarriedAmmo);
 							Weapon.HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
 
@@ -447,13 +448,13 @@ namespace Game_WeaponHandling
 				}
 
 				// Update HUD informations
-				std::vector<char> LoadedRoundsString(MaximumLoadedRoundsDigits);
+				std::array<char, MaximumLoadedRoundsDigits> LoadedRoundsString{};
 				std::to_chars(LoadedRoundsString.data(), LoadedRoundsString.data() + LoadedRoundsString.size(), Weapons[Player.SelectedWeapon].LoadedRounds);
-				std::vector<char> CapacityString(MaximumAmmoCapacityDigits);
+				std::array<char, MaximumAmmoCapacityDigits> CapacityString{};
 				std::to_chars(CapacityString.data(), CapacityString.data() + CapacityString.size(), Weapons[Player.SelectedWeapon].Capacity);
 				Weapons[Player.SelectedWeapon].HUDAmmoInfo = std::string(LoadedRoundsString.data()) + "/" + std::string(CapacityString.data());
 
-				std::vector<char> CarriedAmmoString(MaximumCarriedAmmoDigits);
+				std::array<char, MaximumCarriedAmmoDigits> CarriedAmmoString{};
 				std::to_chars(CarriedAmmoString.data(), CarriedAmmoString.data() + CarriedAmmoString.size(), Weapons[Player.SelectedWeapon].CarriedAmmo);
 				Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
 
