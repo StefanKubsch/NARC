@@ -62,6 +62,7 @@ inline void Game_PlayerClass::InitConfig()
 
 inline void Game_PlayerClass::InitAudio()
 {
+	CloseAudio();
 	Sounds.clear();
 	Sounds.shrink_to_fit();
 

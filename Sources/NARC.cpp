@@ -634,9 +634,6 @@ inline void InitAndLoadGameConfig()
 inline void InitAndLoadLevel()
 {
 	Game_Transitions::LevelTransition();
-	Game_LevelHandling::CloseAudio();
-	Game_EntityHandling::CloseAudio();
-	Player.CloseAudio();
 	Game_LevelHandling::InitConfig();
 	Game_LevelHandling::InitMapData();
 	Game_LevelHandling::InitLights();

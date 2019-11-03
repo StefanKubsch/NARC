@@ -203,6 +203,8 @@ namespace Game_WeaponHandling
 
 	inline void InitAudio()
 	{
+		CloseAudio();
+
 		for (auto&& Weapon : Weapons)
 		{
 			Weapon.Sounds.clear();

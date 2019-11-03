@@ -108,6 +108,7 @@ namespace Game_EntityHandling
 
 	inline void InitEntityAssets()
 	{
+		CloseAudio();
 		EntityAssets.clear();
 		EntityAssets.shrink_to_fit();
 

@@ -117,6 +117,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdint>
+#include <array>
 #include <vector>
 #include <algorithm>
 
@@ -1179,7 +1180,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 
 		while (more != 0)
 		{
-			std::vector<float> mtx{ 1, 0, 0, 1, 0, 0 };
+			std::array<float, 6> mtx{ 1, 0, 0, 1, 0, 0 };
 
 			const std::int_fast32_t flags{ static_cast<std::int_fast32_t>(ttSHORT(comp)) };
 			comp += 2;
@@ -1459,8 +1460,8 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 	std::int_fast32_t subr_stack_height{};
 	std::int_fast32_t sp{};
 	std::int_fast32_t has_subrs{};
-	std::vector<float> s(48);
-	std::vector<stbtt__buf> subr_stack(10);
+	std::array<float, 48> s{};
+	std::array<stbtt__buf, 10> subr_stack{};
 	stbtt__buf subrs{ info.subrs };
 
 	#define STBTT__CSERR(s) (0)

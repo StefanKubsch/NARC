@@ -63,8 +63,8 @@ namespace lwmf
 
 	inline void MP3Player::Load(const std::string& Filename)
 	{
-		// This MP3 Player uses the Windows Waveform Audio functions:
-		// https://docs.microsoft.com/de-de/windows/win32/multimedia/waveform-functions
+		// This MP3 Player uses the Windows Waveform Audio Interface:
+		// https://docs.microsoft.com/en-us/windows/win32/multimedia/waveform-audio-interface
 
 		// For a description of the MP3 header, have a look here:
 		// https://www.mp3-tech.org/programmer/frame_header.html
@@ -230,9 +230,17 @@ namespace lwmf
 	inline void MP3Player::Close()
 	{
 		waveOutReset(WaveOut);
-		waveOutClose(WaveOut);
+
+		while (waveOutUnprepareHeader(WaveOut, &WaveHDR, sizeof(WAVEHDR)) == WAVERR_STILLPLAYING)
+		{
+			Sleep(100);
+		}
+
 		WaveBuffer.clear();
 		WaveBuffer.shrink_to_fit();
+
+		waveOutClose(WaveOut);
+
 		PlayStarted = false;
 	}
 

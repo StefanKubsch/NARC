@@ -165,6 +165,7 @@ namespace Game_LevelHandling
 
 	inline void InitBackgroundMusic()
 	{
+		CloseAudio();
 		BackgroundMusic.clear();
 		BackgroundMusic.shrink_to_fit();
 

@@ -50,6 +50,7 @@ namespace Game_Doors
 
 	inline void InitDoorAssets()
 	{
+		CloseAudio();
 		DoorTypes.clear();
 		DoorTypes.shrink_to_fit();
 		DoorTypes.resize(1);
