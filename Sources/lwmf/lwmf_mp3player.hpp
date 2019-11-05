@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <vector>
 #include <array>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <mmsystem.h>
@@ -40,25 +41,37 @@ namespace lwmf
 		void Load(const std::string& Filename);
 		void Close();
 		void Play();
+		void Pause();
+		void Restart();
 		double GetDuration();
 		double GetPosition();
-		bool IsPlaying();
+		void SetVolume(std::int_fast32_t LeftPercent, std::int_fast32_t RightPercent);
+		bool IsFinished();
 
 	private:
 		void CheckHRESError(HRESULT Error, const std::string& Operation);
 		void CheckMMRESError(MMRESULT Error, const std::string& Operation);
+
+		enum class State : std::int_fast32_t
+		{
+			Finished,
+			Playing,
+			Paused,
+			Stopped
+		};
 
 		std::vector<BYTE> WaveBuffer{};
 		WAVEFORMATEX PCMFormat{};
 		MPEGLAYER3WAVEFORMAT MP3Format{};
 		WAVEHDR WaveHDR{};
 		HWAVEOUT WaveOut{};
+		State Playstate{};
+		std::string AudioName;
 		DWORD WaveBufferLength{};
 		DWORD Bitrate{};
 		DWORD SampleRate{};
 		WORD NumberOfChannels{ 2 };
 		double Duration{};
-		bool PlayStarted{};
 	};
 
 	inline void MP3Player::Load(const std::string& Filename)
@@ -84,6 +97,8 @@ namespace lwmf
 		}
 		else
 		{
+			AudioName = Filename;
+
 			std::int_fast32_t StreamChar{};
 
 			// Search for header informations
@@ -110,7 +125,7 @@ namespace lwmf
 
 			// Get Bitrate
 			StreamChar = File.get();
-			const std::array<std::int_fast32_t, 16> BitrateTable { 0x000, 0x020, 0x028, 0x030, 0x038, 0x040, 0x050, 0x060, 0x070, 0x080, 0x0A0, 0x0C0, 0x0E0, 0x100, 0x140, 0x000 };
+			const std::array<std::int_fast32_t, 16> BitrateTable{ 0x000, 0x020, 0x028, 0x030, 0x038, 0x040, 0x050, 0x060, 0x070, 0x080, 0x0A0, 0x0C0, 0x0E0, 0x100, 0x140, 0x000 };
 			Bitrate = BitrateTable[StreamChar >> 4];
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Bitrate: " + std::to_string(Bitrate));
 
@@ -137,8 +152,14 @@ namespace lwmf
 
 			constexpr WORD MP3BlockSize{ 522 };
 
-			MP3Format = { { WAVE_FORMAT_MPEGLAYER3, NumberOfChannels, SampleRate, Bitrate << 7, 1, 0, MPEGLAYER3_WFX_EXTRA_BYTES }, MPEGLAYER3_ID_MPEG, MPEGLAYER3_FLAG_PADDING_OFF, MP3BlockSize, 1, 1393 };
-			PCMFormat = { WAVE_FORMAT_PCM, NumberOfChannels, SampleRate, SampleRate << 2, 4, 16, 0 };
+			// Description of MPEGLAYER3WAVEFORMAT structure
+			// https://docs.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-mpeglayer3waveformat
+			MP3Format = { { WAVE_FORMAT_MPEGLAYER3, NumberOfChannels, SampleRate, Bitrate * (1024 / 8), 1, 0, MPEGLAYER3_WFX_EXTRA_BYTES }, MPEGLAYER3_ID_MPEG, MPEGLAYER3_FLAG_PADDING_OFF, MP3BlockSize, 1, 0 };
+
+			// Description of WAVEFORMATEX structure
+			// https://docs.microsoft.com/en-us/previous-versions/dd757713(v%3dvs.85)?redirectedfrom=MSDN
+			const WORD nBlockAlign{ static_cast<WORD>((NumberOfChannels * 16) / 8) };
+			PCMFormat = { WAVE_FORMAT_PCM, NumberOfChannels, SampleRate, SampleRate * nBlockAlign, nBlockAlign, 16, 0 };
 
 			std::size_t FileSize{};
 
@@ -224,12 +245,23 @@ namespace lwmf
 
 			CheckMMRESError(acmStreamUnprepareHeader(ACMStream, &StreamHead, 0), "acmStreamUnprepareHeader");
 			CheckMMRESError(acmStreamClose(ACMStream, 0), "acmStreamClose");
+
+			Playstate = State::Stopped;
 		}
 	}
 
 	inline void MP3Player::Close()
 	{
-		waveOutReset(WaveOut);
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Stopping audio: " + AudioName);
+
+		MMRESULT Error{};
+
+		if (Error = waveOutReset(WaveOut); Error != MMSYSERR_NOERROR)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "waveOutReset error: " + std::to_string(Error));
+		}
+
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Closing audio: " + AudioName);
 
 		while (waveOutUnprepareHeader(WaveOut, &WaveHDR, sizeof(WAVEHDR)) == WAVERR_STILLPLAYING)
 		{
@@ -239,9 +271,12 @@ namespace lwmf
 		WaveBuffer.clear();
 		WaveBuffer.shrink_to_fit();
 
-		waveOutClose(WaveOut);
+		if (Error = waveOutClose(WaveOut); Error != MMSYSERR_NOERROR)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "waveOutClose error: " + std::to_string(Error));
+		}
 
-		PlayStarted = false;
+		Playstate = State::Stopped;
 	}
 
 	inline void MP3Player::Play()
@@ -250,7 +285,19 @@ namespace lwmf
 		waveOutOpen(&WaveOut, WAVE_MAPPER, &PCMFormat, NULL, 0, CALLBACK_NULL);
 		waveOutPrepareHeader(WaveOut, &WaveHDR, sizeof(WAVEHDR));
 		waveOutWrite(WaveOut, &WaveHDR, sizeof(WAVEHDR));
-		PlayStarted = true;
+		Playstate = State::Playing;
+	}
+
+	inline void MP3Player::Pause()
+	{
+		waveOutPause(WaveOut);
+		Playstate = State::Paused;
+	}
+
+	inline void MP3Player::Restart()
+	{
+		waveOutRestart(WaveOut);
+		Playstate = State::Playing;
 	}
 
 	inline double MP3Player::GetDuration()
@@ -266,9 +313,9 @@ namespace lwmf
 		return std::round(static_cast<double>(MMTime.u.sample) / static_cast<double>(SampleRate) * 1000.0) / 1000.0;
 	}
 
-	inline bool MP3Player::IsPlaying()
+	inline bool MP3Player::IsFinished()
 	{
-		if (PlayStarted)
+		if (Playstate == State::Playing || Playstate == State::Paused)
 		{
 			if (GetPosition() + 0.0001 <= Duration)
 			{
@@ -276,8 +323,17 @@ namespace lwmf
 			}
 		}
 
-		PlayStarted = false;
+		Playstate = State::Finished;
 		return false;
+	}
+
+	inline void MP3Player::SetVolume(const std::int_fast32_t LeftPercent, const std::int_fast32_t RightPercent)
+	{
+		// 0xFFFF represents full volume, and a value of 0x0000 is silence
+		const DWORD LeftVolume{ static_cast<DWORD>(0xFFFF * std::clamp(LeftPercent, 0, 100) / 100) };
+		const DWORD RightVolume{ static_cast<DWORD>(0xFFFF * std::clamp(RightPercent, 0, 100) / 100) };
+
+		waveOutSetVolume(WaveOut, LeftVolume + (RightVolume << 16));
 	}
 
 	inline void MP3Player::CheckHRESError(HRESULT Error, const std::string& Operation)

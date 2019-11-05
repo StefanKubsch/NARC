@@ -39,7 +39,9 @@ namespace Game_LevelHandling
 	void InitLights();
 	void InitTextures();
 	void InitBackgroundMusic();
-	void PlayBackgroundMusic();
+	void PlayBackgroundMusic(std::int_fast32_t Tracknumber);
+	void PauseBackgroundMusic(std::int_fast32_t Tracknumber);
+	void RestartBackgroundMusic(std::int_fast32_t Tracknumber);
 	void CloseAudio();
 
 	//
@@ -184,11 +186,27 @@ namespace Game_LevelHandling
 		}
 	}
 
-	inline void PlayBackgroundMusic()
+	inline void PlayBackgroundMusic(const std::int_fast32_t Tracknumber)
 	{
 		if (BackgroundMusicEnabled)
 		{
-			BackgroundMusic[0].Play();
+			BackgroundMusic[Tracknumber].Play();
+		}
+	}
+
+	inline void PauseBackgroundMusic(const std::int_fast32_t Tracknumber)
+	{
+		if (BackgroundMusicEnabled)
+		{
+			BackgroundMusic[Tracknumber].Pause();
+		}
+	}
+
+	inline void RestartBackgroundMusic(const std::int_fast32_t Tracknumber)
+	{
+		if (BackgroundMusicEnabled)
+		{
+			BackgroundMusic[Tracknumber].Restart();
 		}
 	}
 

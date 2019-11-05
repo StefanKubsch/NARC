@@ -129,9 +129,9 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 	while (!QuitGameFlag)
 	{
-		if (Game_LevelHandling::BackgroundMusicEnabled && !Game_LevelHandling::BackgroundMusic[0].IsPlaying())
+		if (Game_LevelHandling::BackgroundMusicEnabled && !Game_LevelHandling::BackgroundMusic[0].IsFinished())
 		{
-			Game_LevelHandling::PlayBackgroundMusic();
+			Game_LevelHandling::PlayBackgroundMusic(0);
 		}
 
 		const auto StartTime{ std::chrono::steady_clock::now() };
@@ -670,7 +670,7 @@ inline void MovePlayerAndCheckCollision()
 		Game_WeaponHandling::WeaponPaceFlag ? Game_WeaponHandling::WeaponPace += Weapons[Player.SelectedWeapon].PaceFactor : Game_WeaponHandling::WeaponPace;
 		Game_WeaponHandling::HandleAmmoBoxPickup();
 
-		if (!Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].IsPlaying())
+		if (!Player.Sounds[static_cast<std::int_fast32_t>(Game_PlayerClass::PlayerSounds::FootSteps)].IsFinished())
 		{
 			Player.PlayAudio(Game_PlayerClass::PlayerSounds::FootSteps);
 		}

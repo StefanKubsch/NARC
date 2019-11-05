@@ -100,6 +100,8 @@ inline void Game_MenuClass::DrawItem(const std::int_fast32_t ItemNumber, const s
 
 inline void Game_MenuClass::Show()
 {
+	Game_LevelHandling::PauseBackgroundMusic(0);
+
 	const std::int_fast32_t Length{ static_cast<std::int_fast32_t>(MenuItems.size()) };
 
 	for (std::int_fast32_t TempMenuPosY{ Pos.Y }, ItemNumber{}; ItemNumber < Length; ++ItemNumber)
@@ -187,6 +189,7 @@ inline void Game_MenuClass::LevelUp()
 	if (SelectedLevel == 0)
 	{
 		GamePausedFlag = !GamePausedFlag;
+		Game_LevelHandling::RestartBackgroundMusic(0);
 	}
 	else if (SelectedLevel == 1)
 	{
