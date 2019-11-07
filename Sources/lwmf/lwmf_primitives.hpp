@@ -63,7 +63,7 @@ namespace lwmf
 			return Texture.Pixels[y * Texture.Width + x];
 		}
 
-		// If out of boundaries, return 0 (=black)
+		// If out of boundaries, return black
 		return 0x00000000;
 	}
 

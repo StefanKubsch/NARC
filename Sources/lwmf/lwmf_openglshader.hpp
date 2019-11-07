@@ -82,7 +82,7 @@ namespace lwmf
 		Vertices[14] = 0.0F;
 		Vertices[15] = 1.0F;
 
-		std::array<GLint, 6> Elements
+		constexpr std::array<GLint, 6> Elements
 		{
 			0, 1, 2,
 			2, 3, 0
@@ -425,7 +425,11 @@ namespace lwmf
 					Error = "GL_CONTEXT_LOST";
 					break;
 				}
-				default: {}
+				default:
+				{
+					Error = "Unknown error code: " + std::to_string(ErrorCode);
+					break;
+				}
 			}
 
 			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "OpenGL error " + Error + " in line " + std::to_string(Line) + "!");
