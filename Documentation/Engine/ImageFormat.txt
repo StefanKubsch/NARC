@@ -1,5 +1,6 @@
-Accepted image format:
+Accepted image formats:
 
 PNG, 32bit
+BMP, 24bit
 
-Alpha is needed.
+Alpha is needed when using PNG

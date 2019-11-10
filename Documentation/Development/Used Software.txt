@@ -6,6 +6,9 @@ Development:
 	PVS Studio (Static Code Analyzer)
 		https://www.viva64.com/en/pvs-studio/
 
+	LLVM
+		https://llvm.org/
+	
 	CLANG Power Tools (-> Tidy, Static Code Analyzer)
 		https://marketplace.visualstudio.com/items?itemName=caphyon.ClangPowerTools
 

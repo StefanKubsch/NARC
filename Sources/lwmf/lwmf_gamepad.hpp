@@ -65,13 +65,11 @@ namespace lwmf
 		void SetInterval(WORD Button, std::uint_fast32_t Time);
 		void SetAnalogInterval(const AnalogButtons& Button, std::uint_fast32_t Time);
 
-		std::map<WORD, std::string> Buttons;
-		lwmf::IntPointStruct RightStickPos;
+		std::map<WORD, std::string> Buttons{};
+		lwmf::IntPointStruct RightStickPos{};
 		lwmf::FloatPointStruct LeftStick{};
 		lwmf::FloatPointStruct RightStick{};
 		std::int_fast32_t ControllerID{ -1 };
-		float TriggerLeft{};
-		float TriggerRight{};
 		float RotationXLimit{ 0.01F };
 		float Sensitivity{ 0.3F };
 
@@ -81,18 +79,20 @@ namespace lwmf
 		XINPUT_STATE State{};
 		XINPUT_STATE Previous{};
 
-		std::map<WORD, std::int_fast32_t> KeyMap;
-		std::map<AnalogButtons, AnalogMapping> AnalogMap;
-		std::map<WORD, std::uint32_t> Repeat;
-		std::map<AnalogButtons, std::uint32_t> AnalogRepeat;
-		std::map<WORD, DWORD> LastPress;
-		std::map<AnalogButtons, DWORD> AnalogLastPress;
+		std::map<WORD, std::int_fast32_t> KeyMap{};
+		std::map<AnalogButtons, AnalogMapping> AnalogMap{};
+		std::map<WORD, std::uint32_t> Repeat{};
+		std::map<AnalogButtons, std::uint32_t> AnalogRepeat{};
+		std::map<WORD, DWORD> LastPress{};
+		std::map<AnalogButtons, DWORD> AnalogLastPress{};
 
 		lwmf::FloatPointStruct DeadZone{ 0.3F, 0.3F };
 		lwmf::FloatPointStruct PreviousLeftStick{};
 		lwmf::FloatPointStruct PreviousRightStick{};
 		float PreviousLeftTrigger{};
 		float PreviousRightTrigger{};
+		float TriggerLeft{};
+		float TriggerRight{};
 	};
 
 	inline Gamepad::Gamepad()
@@ -154,7 +154,7 @@ namespace lwmf
 		SecureZeroMemory(&State, sizeof(XINPUT_STATE));
 		XInputGetState(ControllerID, &State);
 
-		const FloatPointStruct NormalizedL{ max(-1, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX), max(-1, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
+		const FloatPointStruct NormalizedL{ (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX), (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
 
 		LeftStick.X = (std::abs(NormalizedL.X) < DeadZone.X ? 0.0F : (std::abs(NormalizedL.X) - DeadZone.X) * (NormalizedL.X / std::abs(NormalizedL.X)));
 		LeftStick.Y = (std::abs(NormalizedL.Y) < DeadZone.Y ? 0.0F : (std::abs(NormalizedL.Y) - DeadZone.Y) * (NormalizedL.Y / std::abs(NormalizedL.Y)));
@@ -169,7 +169,7 @@ namespace lwmf
 			LeftStick.Y *= 1.0F / (1.0F - DeadZone.Y);
 		}
 
-		const FloatPointStruct NormalizedR{ max(-1, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX), max(-1, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
+		const FloatPointStruct NormalizedR{ (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX), (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
 
 		RightStick.X = (std::abs(NormalizedR.X) < DeadZone.X ? 0.0F : (std::abs(NormalizedR.X) - DeadZone.X) * (NormalizedR.X / std::abs(NormalizedR.X)));
 		RightStick.Y = (std::abs(NormalizedR.Y) < DeadZone.Y ? 0.0F : (std::abs(NormalizedR.Y) - DeadZone.Y) * (NormalizedR.Y / std::abs(NormalizedR.Y)));
@@ -184,8 +184,8 @@ namespace lwmf
 			RightStick.Y *= 1.0F / (1.0F - DeadZone.Y);
 		}
 
-		TriggerLeft = static_cast<float>(State.Gamepad.bLeftTrigger) / 255;
-		TriggerRight = static_cast<float>(State.Gamepad.bRightTrigger) / 255;
+		TriggerLeft = static_cast<float>(State.Gamepad.bLeftTrigger) / 255.0F;
+		TriggerRight = static_cast<float>(State.Gamepad.bRightTrigger) / 255.0F;
 
 		for (const auto& Button : Buttons)
 		{

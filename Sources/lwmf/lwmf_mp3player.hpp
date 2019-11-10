@@ -17,6 +17,7 @@
 #include <array>
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <fstream>
 #include <mmsystem.h>
 #include <mmreg.h>
@@ -50,8 +51,8 @@ namespace lwmf
 		bool IsFinished();
 
 	private:
-		void CheckHRESError(HRESULT Error, const std::string& Operation, enum LogLevel Level);
-		void CheckMMRESError(MMRESULT Error, const std::string& Operation, enum LogLevel Level);
+		static void CheckHRESError(HRESULT Error, const std::string& Operation, enum LogLevel Level);
+		static void CheckMMRESError(MMRESULT Error, const std::string& Operation, enum LogLevel Level);
 
 		enum class State : std::int_fast32_t
 		{
@@ -198,74 +199,81 @@ namespace lwmf
 			std::vector<BYTE> InputBuffer(FileSize);
 			File.read(reinterpret_cast<char*>(InputBuffer.data()), FileSize);
 
-			CComPtr<IWMSyncReader> SyncReader{};
-			CheckHRESError(WMCreateSyncReader(nullptr, WMT_RIGHT_PLAYBACK, &SyncReader), "WMCreateSyncReader", LogLevel::Error);
-			CComPtr<IStream> MP3Stream{ SHCreateMemStream(InputBuffer.data(), static_cast<UINT>(FileSize)) };
-			CheckHRESError(SyncReader->OpenStream(MP3Stream), "OpenStream", LogLevel::Error);
+			CheckHRESError(CoInitializeEx(nullptr, COINIT_MULTITHREADED), "CoInitializeEx", LogLevel::Critical);
 
-			CComPtr<IWMHeaderInfo> HeaderInfo{};
-			CheckHRESError(SyncReader->QueryInterface(&HeaderInfo), "QueryInterface", LogLevel::Error);
-			WORD DataTypeLength{ sizeof(QWORD) };
-			WORD StreamNum{};
-			WMT_ATTR_DATATYPE DataTypeAttribute{};
-			QWORD DurationInNano{};
-			CheckHRESError(HeaderInfo->GetAttributeByName(&StreamNum, L"Duration", &DataTypeAttribute, reinterpret_cast<BYTE*>(&DurationInNano), &DataTypeLength), "GetAttributeByName", LogLevel::Error); //-V206
-			// Round Duration to 3 decimal places ( = precision of 1ms)
-			Duration = static_cast<double>(DurationInNano * 100) / 1000000000.0;
-
-			CComPtr<IWMProfile> Profile{};
-			CheckHRESError(SyncReader->QueryInterface(&Profile), "QueryInterface", LogLevel::Error);
-			CComPtr<IWMStreamConfig> StreamConfig{};
-			CheckHRESError(Profile->GetStream(0, &StreamConfig), "GetStream", LogLevel::Error);
-			CComPtr<IWMMediaProps> MediaProperties;
-			CheckHRESError(StreamConfig->QueryInterface(&MediaProperties), "QueryInterface", LogLevel::Error);
-
-			DWORD MediaTypeSize{};
-			CheckHRESError(MediaProperties->GetMediaType(nullptr, &MediaTypeSize), "GetMediaType", LogLevel::Error);
-			std::vector<WM_MEDIA_TYPE> MediaType(MediaTypeSize);
-			CheckHRESError(MediaProperties->GetMediaType(MediaType.data(), &MediaTypeSize), "GetMediaType", LogLevel::Error);
-
-			WaveBuffer.resize(static_cast<std::size_t>(Duration * PCMFormat.nAvgBytesPerSec));
-
-			HACMSTREAM ACMStream{};
-			CheckMMRESError(acmStreamOpen(&ACMStream, nullptr, reinterpret_cast<LPWAVEFORMATEX>(&MP3Format), &PCMFormat, nullptr, 0, 0, 0), "acmStreamOpen", LogLevel::Error);
-			DWORD RawBufferSize{};
-			CheckMMRESError(acmStreamSize(ACMStream, MP3BlockSize, &RawBufferSize, ACM_STREAMSIZEF_SOURCE), "acmStreamSize", LogLevel::Error);
-
-			std::vector<BYTE> MP3BlockBuffer(static_cast<std::size_t>(MP3BlockSize));
-			std::vector<BYTE> RawBuffer(static_cast<std::size_t>(RawBufferSize));
-
-			ACMSTREAMHEADER StreamHead{};
-			StreamHead.cbStruct = sizeof(ACMSTREAMHEADER);
-			StreamHead.pbSrc = MP3BlockBuffer.data();
-			StreamHead.cbSrcLength = MP3BlockSize;
-			StreamHead.pbDst = RawBuffer.data();
-			StreamHead.cbDstLength = RawBufferSize;
-			CheckMMRESError(acmStreamPrepareHeader(ACMStream, &StreamHead, 0), "acmStreamPrepareHeader", LogLevel::Error);
-
-			ULARGE_INTEGER NewPosition{};
-			LARGE_INTEGER SeekValue{};
-			CheckHRESError(MP3Stream->Seek(SeekValue, STREAM_SEEK_SET, &NewPosition), "MP3StreamSeek", LogLevel::Error);
-
-			std::size_t Offset{};
-
-			while (true)
+			// Create a local scope for working with the CComPtrs...
 			{
-				ULONG Counter{};
-				CheckHRESError(MP3Stream->Read(MP3BlockBuffer.data(), MP3BlockSize, &Counter), "MP3StreamRead", LogLevel::Error);
+				CComPtr<IWMSyncReader> SyncReader{};
+				CheckHRESError(WMCreateSyncReader(nullptr, WMT_RIGHT_PLAYBACK, &SyncReader), "WMCreateSyncReader", LogLevel::Error);
+				const CComPtr<IStream> MP3Stream{ SHCreateMemStream(InputBuffer.data(), static_cast<UINT>(FileSize)) };
+				CheckHRESError(SyncReader->OpenStream(MP3Stream), "OpenStream", LogLevel::Error);
 
-				if (Counter != MP3BlockSize)
+				CComPtr<IWMHeaderInfo> HeaderInfo{};
+				CheckHRESError(SyncReader->QueryInterface(&HeaderInfo), "QueryInterface", LogLevel::Error);
+				WORD DataTypeLength{ sizeof(QWORD) };
+				WORD StreamNum{};
+				WMT_ATTR_DATATYPE DataTypeAttribute{};
+				QWORD DurationInNano{};
+				CheckHRESError(HeaderInfo->GetAttributeByName(&StreamNum, L"Duration", &DataTypeAttribute, reinterpret_cast<BYTE*>(&DurationInNano), &DataTypeLength), "GetAttributeByName", LogLevel::Error); //-V206
+				// Round Duration to 3 decimal places ( = precision of 1ms)
+				Duration = static_cast<double>(DurationInNano * 100) / 1000000000.0;
+
+				CComPtr<IWMProfile> Profile{};
+				CheckHRESError(SyncReader->QueryInterface(&Profile), "QueryInterface", LogLevel::Error);
+				CComPtr<IWMStreamConfig> StreamConfig{};
+				CheckHRESError(Profile->GetStream(0, &StreamConfig), "GetStream", LogLevel::Error);
+				CComPtr<IWMMediaProps> MediaProperties;
+				CheckHRESError(StreamConfig->QueryInterface(&MediaProperties), "QueryInterface", LogLevel::Error);
+
+				DWORD MediaTypeSize{};
+				CheckHRESError(MediaProperties->GetMediaType(nullptr, &MediaTypeSize), "GetMediaType", LogLevel::Error);
+				std::vector<WM_MEDIA_TYPE> MediaType(MediaTypeSize);
+				CheckHRESError(MediaProperties->GetMediaType(MediaType.data(), &MediaTypeSize), "GetMediaType", LogLevel::Error);
+
+				WaveBuffer.resize(static_cast<std::size_t>(Duration* PCMFormat.nAvgBytesPerSec));
+
+				HACMSTREAM ACMStream{};
+				CheckMMRESError(acmStreamOpen(&ACMStream, nullptr, reinterpret_cast<LPWAVEFORMATEX>(&MP3Format), &PCMFormat, nullptr, 0, 0, 0), "acmStreamOpen", LogLevel::Error);
+				DWORD RawBufferSize{};
+				CheckMMRESError(acmStreamSize(ACMStream, MP3BlockSize, &RawBufferSize, ACM_STREAMSIZEF_SOURCE), "acmStreamSize", LogLevel::Error);
+
+				std::array<BYTE, MP3BlockSize> MP3BlockBuffer{};
+				std::vector<BYTE> RawBuffer(static_cast<std::size_t>(RawBufferSize));
+
+				ACMSTREAMHEADER StreamHead{};
+				StreamHead.cbStruct = sizeof(ACMSTREAMHEADER);
+				StreamHead.pbSrc = MP3BlockBuffer.data();
+				StreamHead.cbSrcLength = MP3BlockSize;
+				StreamHead.pbDst = RawBuffer.data();
+				StreamHead.cbDstLength = RawBufferSize;
+				CheckMMRESError(acmStreamPrepareHeader(ACMStream, &StreamHead, 0), "acmStreamPrepareHeader", LogLevel::Error);
+
+				ULARGE_INTEGER NewPosition{};
+				LARGE_INTEGER SeekValue{};
+				CheckHRESError(MP3Stream->Seek(SeekValue, STREAM_SEEK_SET, &NewPosition), "MP3StreamSeek", LogLevel::Error);
+
+				std::size_t Offset{};
+
+				while (true)
 				{
-					break;
+					ULONG Counter{};
+					CheckHRESError(MP3Stream->Read(MP3BlockBuffer.data(), MP3BlockSize, &Counter), "MP3StreamRead", LogLevel::Error);
+
+					if (Counter != MP3BlockSize)
+					{
+						break;
+					}
+
+					CheckMMRESError(acmStreamConvert(ACMStream, &StreamHead, ACM_STREAMCONVERTF_BLOCKALIGN), "acmStreamConvert", LogLevel::Error);
+					std::copy(RawBuffer.begin(), RawBuffer.begin() + static_cast<std::size_t>(StreamHead.cbDstLengthUsed), WaveBuffer.begin() + Offset);
+					Offset += static_cast<std::size_t>(StreamHead.cbDstLengthUsed);
 				}
 
-				CheckMMRESError(acmStreamConvert(ACMStream, &StreamHead, ACM_STREAMCONVERTF_BLOCKALIGN), "acmStreamConvert", LogLevel::Error);
-				std::copy(RawBuffer.begin(), RawBuffer.begin() + static_cast<std::size_t>(StreamHead.cbDstLengthUsed), WaveBuffer.begin() + Offset);
-				Offset += static_cast<std::size_t>(StreamHead.cbDstLengthUsed);
+				CheckMMRESError(acmStreamUnprepareHeader(ACMStream, &StreamHead, 0), "acmStreamUnprepareHeader", LogLevel::Error);
+				CheckMMRESError(acmStreamClose(ACMStream, 0), "acmStreamClose", LogLevel::Error);
 			}
 
-			CheckMMRESError(acmStreamUnprepareHeader(ACMStream, &StreamHead, 0), "acmStreamUnprepareHeader", LogLevel::Error);
-			CheckMMRESError(acmStreamClose(ACMStream, 0), "acmStreamClose", LogLevel::Error);
+			CoUninitialize();
 
 			Playstate = State::Stopped;
 		}
@@ -384,68 +392,30 @@ namespace lwmf
 	{
 		if (Error != S_OK)
 		{
-			std::string ErrorString;
-
-			switch (Error)
+			static std::map<HRESULT, std::string> ErrorTable
 			{
-				case E_ABORT:
-				{
-					ErrorString = "Operation aborted";
-					break;
-				}
-				case E_ACCESSDENIED:
-				{
-					ErrorString = "General access denied error";
-					break;
-				}
-				case E_FAIL:
-				{
-					ErrorString = "Unspecified failure";
-					break;
-				}
-				case E_HANDLE:
-				{
-					ErrorString = "Handle that is not valid";
-					break;
-				}
-				case E_INVALIDARG:
-				{
-					ErrorString = "One or more arguments are not valid";
-					break;
-				}
-				case E_NOINTERFACE:
-				{
-					ErrorString = "No such interface supported";
-					break;
-				}
-				case E_NOTIMPL:
-				{
-					ErrorString = "Not implemented";
-					break;
-				}
-				case E_OUTOFMEMORY:
-				{
-					ErrorString = "Failed to allocate necessary memory";
-					break;
-				}
-				case E_POINTER:
-				{
-					ErrorString = "Pointer that is not valid";
-					break;
-				}
-				case E_UNEXPECTED:
-				{
-					ErrorString = "Unexpected failure";
-					break;
-				}
-				default:
-				{
-					ErrorString = "Unknown error code: " + std::to_string(Error);
-					break;
-				}
-			}
+				{ E_ABORT, "Operation aborted" },
+				{ E_ACCESSDENIED, "General access denied error" },
+				{ E_FAIL, "Unspecified failure" },
+				{ E_HANDLE, "Handle that is not valid" },
+				{ E_INVALIDARG, "One or more arguments are not valid" },
+				{ E_NOINTERFACE, "No such interface supported" },
+				{ E_NOTIMPL, "Not implemented" },
+				{ E_OUTOFMEMORY, "Failed to allocate necessary memory" },
+				{ E_POINTER, "Pointer that is not valid" },
+				{ E_UNEXPECTED, "Unexpected failure" }
+			};
 
-			LWMFSystemLog.AddEntry(Level, __FILENAME__, Operation + " HRESULT error: " + ErrorString);
+			const std::map<HRESULT, std::string>::iterator ItErrorTable{ ErrorTable.find(Error) };
+
+			if (ItErrorTable == ErrorTable.end())
+			{
+				LWMFSystemLog.AddEntry(Level, __FILENAME__, Operation + " HRESULT error: Unknown error - " + std::to_string(Error));
+			}
+			else
+			{
+				LWMFSystemLog.AddEntry(Level, __FILENAME__, Operation + " HRESULT error: " + ItErrorTable->second);
+			}
 		}
 	}
 

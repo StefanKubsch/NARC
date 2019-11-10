@@ -57,7 +57,7 @@ namespace lwmf
 		void AddEntry(LogLevel Level, const char* Filename, const std::string& Message);
 
 	private:
-		std::string GetTimeStamp();
+		static std::string GetTimeStamp();
 
 		std::ofstream Logfile;
 	};

@@ -43,7 +43,7 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_DEVNOTIFY;
 		RawInputDevice.hwndTarget = hWnd;
 
-		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) == 0)
+		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
 		{
 			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error registering raw input device " + std::to_string(static_cast<USHORT>(Device)) + "!");
 		}
@@ -59,7 +59,7 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_REMOVE;
 		RawInputDevice.hwndTarget = nullptr;
 
-		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RawInputDevice)) == 0)
+		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
 		{
 			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error unregistering raw input device " + std::to_string(static_cast<USHORT>(Device)) + "!");
 		}

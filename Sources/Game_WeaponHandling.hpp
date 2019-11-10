@@ -221,7 +221,7 @@ namespace Game_WeaponHandling
 				Weapon.Sounds.emplace_back();
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "ReloadAudio"));
 
-				Weapon.ReloadDuration = Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].GetDuration() / FrameLock;
+				Weapon.ReloadDuration = static_cast<std::int_fast32_t>(Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Reload)].GetDuration() / static_cast<double>(FrameLock));
 			}
 		}
 	}
@@ -239,13 +239,13 @@ namespace Game_WeaponHandling
 
 			const float Camera{ (ScreenTexture.WidthMid << 1) / static_cast<float>(ScreenTexture.Width) - 1 };
 			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera , Player.Dir.Y + Plane.Y * Camera };
-			lwmf::IntPointStruct MapPos{ static_cast<std::int_fast32_t>(Player.Pos.X), static_cast<std::int_fast32_t>(Player.Pos.Y) };
+			lwmf::FloatPointStruct MapPos{ std::floorf(Player.Pos.X), std::floorf(Player.Pos.Y) };
 			const lwmf::FloatPointStruct DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
-			lwmf::FloatPointStruct SideDist;
-			lwmf::IntPointStruct Step;
+			lwmf::FloatPointStruct SideDist{};
+			lwmf::FloatPointStruct Step{};
 
-			RayDir.X < 0.0F ? (Step.X = -1, SideDist.X = (Player.Pos.X - MapPos.X) * DeltaDist.X) : (Step.X = 1, SideDist.X = (MapPos.X + 1 - Player.Pos.X) * DeltaDist.X);
-			RayDir.Y < 0.0F ? (Step.Y = -1, SideDist.Y = (Player.Pos.Y - MapPos.Y) * DeltaDist.Y) : (Step.Y = 1, SideDist.Y = (MapPos.Y + 1 - Player.Pos.Y) * DeltaDist.Y);
+			RayDir.X < 0.0F ? (Step.X = -1.0F, SideDist.X = (Player.Pos.X - MapPos.X) * DeltaDist.X) : (Step.X = 1.0F, SideDist.X = (MapPos.X + 1.0F - Player.Pos.X) * DeltaDist.X);
+			RayDir.Y < 0.0F ? (Step.Y = -1.0F, SideDist.Y = (Player.Pos.Y - MapPos.Y) * DeltaDist.Y) : (Step.Y = 1.0F, SideDist.Y = (MapPos.Y + 1.0F - Player.Pos.Y) * DeltaDist.Y);
 
 			bool Endloop{};
 
@@ -254,7 +254,7 @@ namespace Game_WeaponHandling
 				SideDist.X < SideDist.Y ? (SideDist.X += DeltaDist.X, MapPos.X += Step.X) : (SideDist.Y += DeltaDist.Y, MapPos.Y += Step.Y);
 
 				// If wall was hit and no entity -> end while loop
-				if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPos.X][MapPos.Y] > 0)
+				if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(MapPos.X)][static_cast<std::int_fast32_t>(MapPos.Y)] > 0)
 				{
 					Endloop = true;
 				}

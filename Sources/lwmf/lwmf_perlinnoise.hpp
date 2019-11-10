@@ -45,8 +45,8 @@ namespace lwmf
 			138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 		};
 
-		float Fade(float t);
-		float Gradient(std::int_fast32_t Hash, float x, float y, float z);
+		static float Fade(float t);
+		static float Gradient(std::int_fast32_t Hash, float x, float y, float z);
 	};
 
 	PerlinNoise::PerlinNoise()

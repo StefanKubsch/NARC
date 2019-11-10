@@ -170,7 +170,7 @@ namespace lwmf
 				}
 			}
 
-			inline void GenerateFixedTrees(HuffmanTree& Tree, HuffmanTree& TreeD)
+			static inline void GenerateFixedTrees(HuffmanTree& Tree, HuffmanTree& TreeD)
 			{
 				std::vector<std::int_fast32_t> BitLength(288, 8);
 				std::vector<std::int_fast32_t> BitLengthD(32, 5);
@@ -227,9 +227,9 @@ namespace lwmf
 					return;
 				}
 
-				const std::int_fast32_t HLit{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 5) + 257) };
-				const std::int_fast32_t HDist{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 5) + 1) };
-				const std::int_fast32_t HCLength{ static_cast<std::int_fast32_t>(ReadBitsFromStream(BP, In, 4) + 4) };
+				const std::int_fast32_t HLit{ ReadBitsFromStream(BP, In, 5) + 257 };
+				const std::int_fast32_t HDist{ ReadBitsFromStream(BP, In, 5) + 1 };
+				const std::int_fast32_t HCLength{ ReadBitsFromStream(BP, In, 4) + 4 };
 				std::vector<std::int_fast32_t> CodeLengthCode(19);
 
 				for (std::int_fast32_t i{}; i < 19; ++i)
@@ -374,12 +374,7 @@ namespace lwmf
 				{
 					const std::int_fast32_t Code{ HuffmanDecodeSymbol(In, BP, CodeTree, InLength) };
 
-					if (Error != 0)
-					{
-						return;
-					}
-
-					if (Code == 256)
+					if (Error != 0 || Code == 256)
 					{
 						return;
 					}
@@ -523,7 +518,7 @@ namespace lwmf
 	{
 		struct Info
 		{
-			std::vector<unsigned char> Palette;
+			std::vector<unsigned char> Palette{};
 			std::int_fast32_t Width{};
 			std::int_fast32_t Height{};
 			std::int_fast32_t ColorType{};
@@ -539,17 +534,17 @@ namespace lwmf
 
 		std::int_fast32_t Error{};
 
-		inline void Decode(std::vector<unsigned char>& Out, const unsigned char* In, const std::int_fast32_t Size, const bool ConvertToRGBA)
+		inline void Decode(std::vector<unsigned char>& Out, const std::vector<unsigned char>& In, const std::int_fast32_t Size, const bool ConvertToRGBA)
 		{
 			Error = 0;
 
-			if (Size == 0 || In == nullptr)
+			if (Size == 0 || In.empty())
 			{
 				Error = 48;
 				return;
 			}
 
-			ReadPNGHeader(&In[0], Size);
+			ReadPNGHeader(In, Size);
 
 			if (Error != 0)
 			{
@@ -557,7 +552,7 @@ namespace lwmf
 			}
 
 			std::int_fast32_t Pos{ 33 };
-			std::vector<unsigned char> ImageData;
+			std::vector<unsigned char> ImageData{};
 			bool ImageEnd{};
 			PNGInfo.KeyDefined = false;
 
@@ -680,8 +675,8 @@ namespace lwmf
 
 			const std::int_fast32_t BitsPerPixel{ GetBpp(PNGInfo) };
 			std::vector<unsigned char> ScanLines(((PNGInfo.Width * (PNGInfo.Height * BitsPerPixel + 7)) >> 3) + PNGInfo.Height);
-			Zlib zlib;
 
+			Zlib zlib{};
 			Error = zlib.DeCompress(ScanLines, ImageData);
 
 			if (Error != 0)
@@ -690,11 +685,8 @@ namespace lwmf
 			}
 
 			const std::int_fast32_t ByteWidth{ (BitsPerPixel + 7) >> 3 };
-			const std::int_fast32_t OutLength{ (PNGInfo.Height * PNGInfo.Width * BitsPerPixel + 7) >> 3 };
 
-			Out.resize(static_cast<size_t>(OutLength));
-
-			unsigned char* NewOut{ OutLength != 0 ? Out.data() : nullptr };
+			Out.resize(static_cast<size_t>((PNGInfo.Height * PNGInfo.Width * BitsPerPixel + 7) >> 3));
 
 			if (PNGInfo.InterlaceMethod == 0)
 			{
@@ -704,9 +696,9 @@ namespace lwmf
 				{
 					for (std::int_fast32_t y{}; y < PNGInfo.Height; ++y)
 					{
-						const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * PNGInfo.Width * ByteWidth] };
+						const unsigned char* PreviousLine{ y == 0 ? nullptr : &Out[(y - 1) * PNGInfo.Width * ByteWidth] };
 
-						UnFilterScanline(&NewOut[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
+						UnFilterScanline(&Out[LineStart - y], &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
 
 						if (Error != 0)
 						{
@@ -722,7 +714,7 @@ namespace lwmf
 
 					for (std::int_fast32_t y{}, OBP{}; y < PNGInfo.Height; ++y)
 					{
-						const unsigned char* PreviousLine{ y == 0 ? nullptr : &NewOut[(y - 1) * PNGInfo.Width * ByteWidth] };
+						const unsigned char* PreviousLine{ y == 0 ? nullptr : &Out[(y - 1) * PNGInfo.Width * ByteWidth] };
 
 						UnFilterScanline(TempLine.data(), &ScanLines[LineStart + 1], PreviousLine, ByteWidth, ScanLines[LineStart], LineLength);
 
@@ -733,7 +725,7 @@ namespace lwmf
 
 						for (std::int_fast32_t BP{}; BP < PNGInfo.Width * BitsPerPixel;)
 						{
-							SetBitOfReversedStream(OBP, NewOut, ReadBitFromReversedStream(BP, TempLine.data()));
+							SetBitOfReversedStream(OBP, Out, ReadBitFromReversedStream(BP, TempLine.data()));
 						}
 
 						LineStart += (1 + LineLength);
@@ -742,10 +734,10 @@ namespace lwmf
 			}
 			else
 			{
-				const std::vector<std::int_fast32_t> PassWidth{ (PNGInfo.Width + 7) >> 3, (PNGInfo.Width + 3) >> 3, (PNGInfo.Width + 3) >> 2, (PNGInfo.Width + 1) >> 2, (PNGInfo.Width + 1) >> 1, (PNGInfo.Width + 0) >> 1, (PNGInfo.Width + 0) / 1 };
-				const std::vector<std::int_fast32_t> PassHeight{ (PNGInfo.Height + 7) >> 3, (PNGInfo.Height + 7) >> 3, (PNGInfo.Height + 3) >> 3, (PNGInfo.Height + 3) >> 2, (PNGInfo.Height + 1) >> 2, (PNGInfo.Height + 1) >> 1, (PNGInfo.Height + 0) >> 1 };
-				const std::vector<std::int_fast32_t> Pattern{ 0,4,0,2,0,1,0,0,0,4,0,2,0,1,8,8,4,4,2,2,1,8,8,8,4,4,2,2 };
-				std::vector<std::int_fast32_t> PassStart(7);
+				const std::array<std::int_fast32_t, 7> PassWidth{ (PNGInfo.Width + 7) >> 3, (PNGInfo.Width + 3) >> 3, (PNGInfo.Width + 3) >> 2, (PNGInfo.Width + 1) >> 2, (PNGInfo.Width + 1) >> 1, (PNGInfo.Width + 0) >> 1, (PNGInfo.Width + 0) / 1 };
+				const std::array<std::int_fast32_t, 7> PassHeight{ (PNGInfo.Height + 7) >> 3, (PNGInfo.Height + 7) >> 3, (PNGInfo.Height + 3) >> 3, (PNGInfo.Height + 3) >> 2, (PNGInfo.Height + 1) >> 2, (PNGInfo.Height + 1) >> 1, (PNGInfo.Height + 0) >> 1 };
+				static constexpr std::array<std::int_fast32_t, 28> Pattern{ 0,4,0,2,0,1,0,0,0,4,0,2,0,1,8,8,4,4,2,2,1,8,8,8,4,4,2,2 };
+				std::array<std::int_fast32_t, 7> PassStart{};
 
 				for (std::int_fast32_t i{}; i < 6; ++i)
 				{
@@ -757,7 +749,7 @@ namespace lwmf
 
 				for (std::int_fast32_t i{}; i < 7; ++i)
 				{
-					Adam7(&NewOut[0], ScanLineN.data(), ScanLineO.data(), &ScanLines[PassStart[i]], PNGInfo.Width, Pattern[i], Pattern[i + 7], Pattern[i + 14], Pattern[i + 21], PassWidth[i], PassHeight[i], BitsPerPixel); //-V522
+					Adam7(Out, ScanLineN.data(), ScanLineO.data(), &ScanLines[PassStart[i]], PNGInfo.Width, Pattern[i], Pattern[i + 7], Pattern[i + 14], Pattern[i + 21], PassWidth[i], PassHeight[i], BitsPerPixel); //-V522
 				}
 			}
 
@@ -768,7 +760,7 @@ namespace lwmf
 			}
 		}
 
-		inline void ReadPNGHeader(const unsigned char* In, const std::int_fast32_t InLength)
+		inline void ReadPNGHeader(const std::vector<unsigned char>& In, const std::int_fast32_t InLength)
 		{
 			if (InLength < 29)
 			{
@@ -823,63 +815,16 @@ namespace lwmf
 		{
 			switch (FilterType)
 			{
-			case 0:
-			{
-				for (std::int_fast32_t i{}; i < Length; ++i)
-				{
-					Recon[i] = ScanLine[i];
-				}
-
-				break;
-			}
-			case 1:
-			{
-				for (std::int_fast32_t i{}; i < ByteWidth; ++i)
-				{
-					Recon[i] = ScanLine[i];
-				}
-
-				for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
-				{
-					Recon[i] = ScanLine[i] + Recon[i - ByteWidth];
-				}
-
-				break;
-			}
-			case 2:
-			{
-				if (PreCon != nullptr)
-				{
-					for (std::int_fast32_t i{}; i < Length; ++i)
-					{
-						Recon[i] = ScanLine[i] + PreCon[i];
-					}
-				}
-				else
+				case 0:
 				{
 					for (std::int_fast32_t i{}; i < Length; ++i)
 					{
 						Recon[i] = ScanLine[i];
 					}
-				}
 
-				break;
-			}
-			case 3:
-			{
-				if (PreCon != nullptr)
-				{
-					for (std::int_fast32_t i{}; i < ByteWidth; ++i)
-					{
-						Recon[i] = ScanLine[i] + PreCon[i] / 2;
-					}
-
-					for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
-					{
-						Recon[i] = ScanLine[i] + ((Recon[i - ByteWidth] + PreCon[i]) / 2);
-					}
+					break;
 				}
-				else
+				case 1:
 				{
 					for (std::int_fast32_t i{}; i < ByteWidth; ++i)
 					{
@@ -888,48 +833,95 @@ namespace lwmf
 
 					for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
 					{
-						Recon[i] = ScanLine[i] + Recon[i - ByteWidth] / 2;
-					}
-				}
-				break;
-			}
-			case 4:
-			{
-				if (PreCon != nullptr)
-				{
-					for (std::int_fast32_t i{}; i < ByteWidth; ++i)
-					{
-						Recon[i] = ScanLine[i] + PathPredictor(0, PreCon[i], 0);
+						Recon[i] = ScanLine[i] + Recon[i - ByteWidth];
 					}
 
-					for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
-					{
-						Recon[i] = ScanLine[i] + PathPredictor(Recon[i - ByteWidth], PreCon[i], PreCon[i - ByteWidth]);
-					}
+					break;
 				}
-				else
+				case 2:
 				{
-					for (std::int_fast32_t i{}; i < ByteWidth; ++i)
+					if (PreCon != nullptr)
 					{
-						Recon[i] = ScanLine[i];
+						for (std::int_fast32_t i{}; i < Length; ++i)
+						{
+							Recon[i] = ScanLine[i] + PreCon[i];
+						}
+					}
+					else
+					{
+						for (std::int_fast32_t i{}; i < Length; ++i)
+						{
+							Recon[i] = ScanLine[i];
+						}
 					}
 
-					for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
-					{
-						Recon[i] = ScanLine[i] + PathPredictor(Recon[i - ByteWidth], 0, 0);
-					}
+					break;
 				}
-				break;
-			}
-			default:
-			{
-				Error = 36;
-				return;
-			}
+				case 3:
+				{
+					if (PreCon != nullptr)
+					{
+						for (std::int_fast32_t i{}; i < ByteWidth; ++i)
+						{
+							Recon[i] = ScanLine[i] + PreCon[i] / 2;
+						}
+
+						for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
+						{
+							Recon[i] = ScanLine[i] + ((Recon[i - ByteWidth] + PreCon[i]) / 2);
+						}
+					}
+					else
+					{
+						for (std::int_fast32_t i{}; i < ByteWidth; ++i)
+						{
+							Recon[i] = ScanLine[i];
+						}
+
+						for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
+						{
+							Recon[i] = ScanLine[i] + Recon[i - ByteWidth] / 2;
+						}
+					}
+					break;
+				}
+				case 4:
+				{
+					if (PreCon != nullptr)
+					{
+						for (std::int_fast32_t i{}; i < ByteWidth; ++i)
+						{
+							Recon[i] = ScanLine[i] + PathPredictor(0, PreCon[i], 0);
+						}
+
+						for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
+						{
+							Recon[i] = ScanLine[i] + PathPredictor(Recon[i - ByteWidth], PreCon[i], PreCon[i - ByteWidth]);
+						}
+					}
+					else
+					{
+						for (std::int_fast32_t i{}; i < ByteWidth; ++i)
+						{
+							Recon[i] = ScanLine[i];
+						}
+
+						for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
+						{
+							Recon[i] = ScanLine[i] + PathPredictor(Recon[i - ByteWidth], 0, 0);
+						}
+					}
+					break;
+				}
+				default:
+				{
+					Error = 36;
+					return;
+				}
 			}
 		}
 
-		inline void Adam7(unsigned char* Out, unsigned char* LineN, unsigned char* LineO, const unsigned char* In, const std::int_fast32_t Width, const std::int_fast32_t PassLeft, const std::int_fast32_t PassTop, const std::int_fast32_t SpaceX, const std::int_fast32_t SpaceY, const std::int_fast32_t PassWidth, const std::int_fast32_t PassHeight, const std::int_fast32_t Bpp)
+		inline void Adam7(std::vector<unsigned char>& Out, unsigned char* LineN, unsigned char* LineO, const unsigned char* In, const std::int_fast32_t Width, const std::int_fast32_t PassLeft, const std::int_fast32_t PassTop, const std::int_fast32_t SpaceX, const std::int_fast32_t SpaceY, const std::int_fast32_t PassWidth, const std::int_fast32_t PassHeight, const std::int_fast32_t Bpp)
 		{
 			if (PassWidth == 0)
 			{
@@ -995,18 +987,18 @@ namespace lwmf
 			return Result;
 		}
 
-		inline void SetBitOfReversedStream(std::int_fast32_t& BitP, unsigned char* Bits, const std::int_fast32_t Bit)
+		static inline void SetBitOfReversedStream(std::int_fast32_t& BitP, std::vector<unsigned char>& Bits, const std::int_fast32_t Bit)
 		{
 			Bits[BitP >> 3] |= (Bit << (7 - (BitP & 0x7)));
 			++BitP;
 		}
 
-		inline std::int_fast32_t Read32bitInt(const unsigned char* Buffer)
+		static inline std::int_fast32_t Read32bitInt(const unsigned char* Buffer)
 		{
 			return (Buffer[0] << 24) | (Buffer[1] << 16) | (Buffer[2] << 8) | Buffer[3];
 		}
 
-		inline std::int_fast32_t CheckColorValidity(const std::int_fast32_t ColorType, const std::int_fast32_t Depth)
+		static inline std::int_fast32_t CheckColorValidity(const std::int_fast32_t ColorType, const std::int_fast32_t Depth)
 		{
 			if ((ColorType == 2 || ColorType == 4 || ColorType == 6))
 			{
@@ -1041,7 +1033,7 @@ namespace lwmf
 			return 31;
 		}
 
-		inline std::int_fast32_t GetBpp(const Info& BPPInfo)
+		static inline std::int_fast32_t GetBpp(const Info& BPPInfo)
 		{
 			if (BPPInfo.ColorType == 2)
 			{
@@ -1056,11 +1048,10 @@ namespace lwmf
 			return BPPInfo.BitDepth;
 		}
 
-		inline std::int_fast32_t Convert(std::vector<unsigned char>& Out, const unsigned char* In, Info& InfoIn, const std::int_fast32_t Width, const std::int_fast32_t Height)
+		static inline std::int_fast32_t Convert(std::vector<unsigned char>& Out, const unsigned char* In, const Info& InfoIn, const std::int_fast32_t Width, const std::int_fast32_t Height)
 		{
 			const std::int_fast32_t NumberOfPixels{ Width * Height };
 			Out.resize(static_cast<size_t>(NumberOfPixels) << 2);
-			unsigned char* NewOut{ Out.empty() ? nullptr : Out.data() };
 
 			if (std::int_fast32_t BP{}; InfoIn.BitDepth == 8 && InfoIn.ColorType == 0)
 			{
@@ -1068,10 +1059,10 @@ namespace lwmf
 				{
 					const std::int_fast32_t Offset{ i << 2 };
 
-					NewOut[Offset] = In[i];
-					NewOut[Offset + 1] = In[i];
-					NewOut[Offset + 2] = In[i];
-					NewOut[Offset + 3] = (InfoIn.KeyDefined && In[i] == InfoIn.KeyR) ? 0 : 255;
+					Out[Offset] = In[i];
+					Out[Offset + 1] = In[i];
+					Out[Offset + 2] = In[i];
+					Out[Offset + 3] = (InfoIn.KeyDefined && In[i] == InfoIn.KeyR) ? 0 : 255;
 				}
 			}
 			else if (InfoIn.BitDepth == 8 && InfoIn.ColorType == 2)
@@ -1083,10 +1074,10 @@ namespace lwmf
 
 					for (std::int_fast32_t c{}; c < 3; ++c)
 					{
-						NewOut[Offset + c] = In[SrcOffset + c];
+						Out[Offset + c] = In[SrcOffset + c];
 					}
 
-					NewOut[Offset + 3] = (static_cast<std::int_fast32_t>(InfoIn.KeyDefined) == 1 && In[SrcOffset] == InfoIn.KeyR && In[SrcOffset + 1] == InfoIn.KeyG && In[SrcOffset + 2] == InfoIn.KeyB) ? 0 : 255;
+					Out[Offset + 3] = (static_cast<std::int_fast32_t>(InfoIn.KeyDefined) == 1 && In[SrcOffset] == InfoIn.KeyR && In[SrcOffset + 1] == InfoIn.KeyG && In[SrcOffset + 2] == InfoIn.KeyB) ? 0 : 255;
 				}
 			}
 			else if (InfoIn.BitDepth == 8 && InfoIn.ColorType == 3)
@@ -1100,7 +1091,7 @@ namespace lwmf
 
 					for (std::int_fast32_t c{}; c < 4; ++c)
 					{
-						NewOut[(i << 2) + c] = InfoIn.Palette[(In[i] << 2) + c];
+						Out[(i << 2) + c] = InfoIn.Palette[(In[i] << 2) + c];
 					}
 				}
 			}
@@ -1111,10 +1102,10 @@ namespace lwmf
 					const std::int_fast32_t Offset{ i << 2 };
 					const std::int_fast32_t SrcOffset{ i << 1 };
 
-					NewOut[Offset] = In[SrcOffset];
-					NewOut[Offset + 1] = In[SrcOffset];
-					NewOut[Offset + 2] = In[SrcOffset];
-					NewOut[Offset + 3] = In[SrcOffset + 1];
+					Out[Offset] = In[SrcOffset];
+					Out[Offset + 1] = In[SrcOffset];
+					Out[Offset + 2] = In[SrcOffset];
+					Out[Offset + 3] = In[SrcOffset + 1];
 				}
 			}
 			else if (InfoIn.BitDepth == 8 && InfoIn.ColorType == 6)
@@ -1125,7 +1116,7 @@ namespace lwmf
 
 					for (std::int_fast32_t c{}; c < 4; ++c)
 					{
-						NewOut[Offset + c] = In[Offset + c];
+						Out[Offset + c] = In[Offset + c];
 					}
 				}
 			}
@@ -1136,10 +1127,10 @@ namespace lwmf
 					const std::int_fast32_t Offset{ i << 2 };
 					const std::int_fast32_t SrcOffset{ i << 1 };
 
-					NewOut[Offset] = In[SrcOffset];
-					NewOut[Offset + 1] = In[SrcOffset];
-					NewOut[Offset + 2] = In[SrcOffset];
-					NewOut[Offset + 3] = (InfoIn.KeyDefined && (In[i] << 8) + In[i + 1] == InfoIn.KeyR) ? 0 : 255;
+					Out[Offset] = In[SrcOffset];
+					Out[Offset + 1] = In[SrcOffset];
+					Out[Offset + 2] = In[SrcOffset];
+					Out[Offset + 3] = (InfoIn.KeyDefined && (In[i] << 8) + In[i + 1] == InfoIn.KeyR) ? 0 : 255;
 				}
 			}
 			else if (InfoIn.BitDepth == 16 && InfoIn.ColorType == 2)
@@ -1151,10 +1142,10 @@ namespace lwmf
 
 					for (std::int_fast32_t c{}; c < 3; ++c)
 					{
-						NewOut[Offset + c] = In[SrcOffset + 2 * c];
+						Out[Offset + c] = In[SrcOffset + 2 * c];
 					}
 
-					NewOut[Offset + 3] = (InfoIn.KeyDefined && (In[SrcOffset] << 8) + In[SrcOffset + 1] == InfoIn.KeyR && (In[SrcOffset + 2] << 8) + In[SrcOffset + 3] == InfoIn.KeyG && (In[SrcOffset + 4] << 8) + In[SrcOffset + 5] == InfoIn.KeyB) ? 0 : 255;
+					Out[Offset + 3] = (InfoIn.KeyDefined && (In[SrcOffset] << 8) + In[SrcOffset + 1] == InfoIn.KeyR && (In[SrcOffset + 2] << 8) + In[SrcOffset + 3] == InfoIn.KeyG && (In[SrcOffset + 4] << 8) + In[SrcOffset + 5] == InfoIn.KeyB) ? 0 : 255;
 				}
 			}
 			else if (InfoIn.BitDepth == 16 && InfoIn.ColorType == 4)
@@ -1163,10 +1154,10 @@ namespace lwmf
 				{
 					const std::int_fast32_t Offset{ i << 2 };
 
-					NewOut[Offset] = In[Offset];
-					NewOut[Offset + 1] = In[Offset];
-					NewOut[Offset + 2] = In[Offset];
-					NewOut[Offset + 3] = In[Offset + 2];
+					Out[Offset] = In[Offset];
+					Out[Offset + 1] = In[Offset];
+					Out[Offset + 2] = In[Offset];
+					Out[Offset + 3] = In[Offset + 2];
 				}
 			}
 			else if (InfoIn.BitDepth == 16 && InfoIn.ColorType == 6)
@@ -1175,7 +1166,7 @@ namespace lwmf
 				{
 					for (std::int_fast32_t c{}; c < 4; ++c)
 					{
-						NewOut[(i << 2) + c] = In[(i << 3) + 2 * c];
+						Out[(i << 2) + c] = In[(i << 3) + 2 * c];
 					}
 				}
 			}
@@ -1186,10 +1177,10 @@ namespace lwmf
 					const std::int_fast32_t Value{ (ReadBitsFromReversedStream(BP, In, InfoIn.BitDepth) * 255) / ((1 << InfoIn.BitDepth) - 1) };
 					const std::int_fast32_t Offset{ i << 2 };
 
-					NewOut[Offset] = static_cast<unsigned char>(Value);
-					NewOut[Offset + 1] = static_cast<unsigned char>(Value);
-					NewOut[Offset + 2] = static_cast<unsigned char>(Value);
-					NewOut[Offset + 3] = (InfoIn.KeyDefined && (Value != 0) && (((1 << InfoIn.BitDepth) - 1) != 0) == (InfoIn.KeyR != 0) && (((1 << InfoIn.BitDepth) - 1)) != 0) ? 0 : 255;
+					Out[Offset] = static_cast<unsigned char>(Value);
+					Out[Offset + 1] = static_cast<unsigned char>(Value);
+					Out[Offset + 2] = static_cast<unsigned char>(Value);
+					Out[Offset + 3] = (InfoIn.KeyDefined && (Value != 0) && (((1 << InfoIn.BitDepth) - 1) != 0) == (InfoIn.KeyR != 0) && (((1 << InfoIn.BitDepth) - 1)) != 0) ? 0 : 255;
 				}
 			}
 			else if (InfoIn.BitDepth < 8 && InfoIn.ColorType == 3)
@@ -1205,7 +1196,7 @@ namespace lwmf
 
 					for (std::int_fast32_t c{}; c < 4; ++c)
 					{
-						NewOut[(i << 2) + c] = InfoIn.Palette[(Value << 2) + c];
+						Out[(i << 2) + c] = InfoIn.Palette[(Value << 2) + c];
 					}
 				}
 			}
@@ -1213,7 +1204,7 @@ namespace lwmf
 			return 0;
 		}
 
-		inline unsigned char PathPredictor(const std::int_fast32_t a, const std::int_fast32_t b, const std::int_fast32_t c)
+		static inline unsigned char PathPredictor(const std::int_fast32_t a, const std::int_fast32_t b, const std::int_fast32_t c)
 		{
 			const std::int_fast32_t p{ a + b - c };
 			const std::int_fast32_t pa{ p > a ? (p - a) : (a - p) };
@@ -1254,7 +1245,7 @@ namespace lwmf
 			File.read(reinterpret_cast<char*>(Buffer.data()), Size);
 
 			PNG Decoder;
-			Decoder.Decode(ImageData, Buffer.data(), static_cast<std::int_fast32_t>(Buffer.size()), true);
+			Decoder.Decode(ImageData, Buffer, static_cast<std::int_fast32_t>(Buffer.size()), true);
 			SetTextureMetrics(Texture, Decoder.PNGInfo.Width, Decoder.PNGInfo.Height);
 			Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
 

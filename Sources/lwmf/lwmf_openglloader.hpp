@@ -102,7 +102,7 @@ namespace lwmf
 			using wglGetProcAddressproc = PROC WINAPI(LPCSTR);
 			wglGetProcAddressproc* wglGetProcAddress{ reinterpret_cast<wglGetProcAddressproc*>(GetProcAddress(OGL32, "wglGetProcAddress")) };
 
-			#define OG(Return, Name, ...) Name = (Name##proc *)wglGetProcAddress(#Name);
+			#define OG(Return, Name, ...) Name = reinterpret_cast<Name##proc *>(wglGetProcAddress(#Name));
 				OGL
 			#undef OG
 
