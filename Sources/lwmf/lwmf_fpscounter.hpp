@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <Windows.h>
 #include <cstdint>
 #include <string>
 #include <charconv>
@@ -30,8 +31,6 @@ namespace lwmf
 	// Variables and constants
 	//
 
-	inline std::int_fast32_t FPSUpdate{};
-	inline std::int_fast32_t FPSFrames{};
 	inline std::int_fast32_t FPS{};
 
 	//
@@ -40,7 +39,10 @@ namespace lwmf
 
 	inline void FPSCounter()
 	{
-		if (const std::int_fast32_t SystemTime{ static_cast<std::int_fast32_t>(GetTickCount()) }; SystemTime - FPSUpdate >= 1000)
+		static ULONGLONG FPSUpdate{};
+		static std::int_fast32_t FPSFrames{};
+
+		if (const ULONGLONG SystemTime{ GetTickCount64() }; SystemTime - FPSUpdate >= 1000)
 		{
 			FPS = FPSFrames;
 			FPSUpdate = SystemTime;

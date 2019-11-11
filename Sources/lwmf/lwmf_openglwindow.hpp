@@ -78,7 +78,7 @@ namespace lwmf
 			if (Fullscreen)
 			{
 				DEVMODE ScreenSettings{};
-				ScreenSettings.dmSize = sizeof(ScreenSettings);
+				ScreenSettings.dmSize = sizeof(DEVMODE);
 				ScreenSettings.dmPelsWidth = static_cast<DWORD>(Width);
 				ScreenSettings.dmPelsHeight = static_cast<DWORD>(Height);
 				ScreenSettings.dmBitsPerPel = 32;

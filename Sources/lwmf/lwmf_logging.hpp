@@ -13,9 +13,11 @@
 // This macro will return the current filename without any path information
 #define __FILENAME__ (std::strrchr(__FILE__, '\\') ? std::strrchr(__FILE__, '\\') + 1 : __FILE__)
 
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <array>
+#include <map>
 #include <exception>
 #include <stdexcept>
 #include <fstream>
@@ -72,7 +74,7 @@ namespace lwmf
 
 			if (Logfile.fail())
 			{
-				std::_Exit(EXIT_FAILURE);
+				std::exit(EXIT_FAILURE);
 			}
 
 			Logfile << "lwmf logging\nlogging started at: " << GetTimeStamp() << std::string(150,'-') << "\n";
@@ -92,55 +94,31 @@ namespace lwmf
 
 	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::string& Message)
 	{
-		if (LoggingEnabled)
+		if (LoggingEnabled && Logfile.is_open())
 		{
-			std::string LogLevelString;
-			bool IsError{};
-
-			switch (Level)
+			static std::map<LogLevel, std::string> ErrorTable
 			{
-				case LogLevel::Info:
-				{
-					LogLevelString = "** INFO ** ";
-					break;
-				}
-				case LogLevel::Debug:
-				{
-					LogLevelString = "** DEBUG ** ";
-					break;
-				}
-				case LogLevel::Warn:
-				{
-					LogLevelString = "** WARNING ** ";
-					break;
-				}
-				case LogLevel::Error:
-				{
-					LogLevelString = "** ERROR ** ";
-					IsError = true;
-					break;
-				}
-				case LogLevel::Critical:
-				{
-					LogLevelString = "** CRITICAL ERROR ** ";
-					IsError = true;
-					break;
-				}
-				default: {}
-			}
+				{ LogLevel::Info, "** INFO ** " },
+				{ LogLevel::Debug, "** DEBUG ** " },
+				{ LogLevel::Warn, "** WARNING ** " },
+				{ LogLevel::Error, "** ERROR ** " },
+				{ LogLevel::Critical, "** CRITICAL ERROR ** " },
+			};
 
-			if (Logfile.is_open())
+			const std::map<LogLevel, std::string>::iterator ItErrorTable{ ErrorTable.find(Level) };
+
+			if (ItErrorTable != ErrorTable.end())
 			{
-				if (!IsError)
+				if (Level == LogLevel::Error || Level == LogLevel::Critical)
 				{
-					Logfile << LogLevelString << Filename << ": " << Message << "\n";
+					Logfile << "\n" << GetTimeStamp() << ItErrorTable->second << Filename << ": " << Message << "\n";
+					Logfile.close();
+
+					ThrowExceptions ? throw std::runtime_error(Message) : std::exit(EXIT_FAILURE);
 				}
 				else
 				{
-					Logfile << "\n" << GetTimeStamp() << LogLevelString << Filename << ": " << Message << "\n";
-					Logfile.close();
-
-					ThrowExceptions ? throw std::runtime_error(Message) : exit(EXIT_FAILURE);
+					Logfile << ItErrorTable->second << Filename << ": " << Message << "\n";
 				}
 			}
 		}

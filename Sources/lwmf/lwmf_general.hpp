@@ -41,7 +41,7 @@ namespace lwmf
 		std::int_fast32_t Height{};
 	};
 
-	inline HINSTANCE WindowInstance;
+	inline HINSTANCE WindowInstance{};
 	inline bool FullscreenFlag{};
 
 
