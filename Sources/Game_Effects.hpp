@@ -28,10 +28,10 @@ namespace Game_Effects
 	// Variables and constants
 	//
 
-	inline lwmf::ShaderClass BloodstainShader{};
-	inline std::int_fast32_t BloodstainDuration{};
-	inline std::int_fast32_t BloodstainCounter{};
-	inline bool BloodstainFlag{};
+	inline static lwmf::ShaderClass BloodstainShader{};
+	inline static std::int_fast32_t BloodstainDuration{};
+	inline static std::int_fast32_t BloodstainCounter{};
+	inline static bool BloodstainFlag{};
 
 	//
 	// Functions

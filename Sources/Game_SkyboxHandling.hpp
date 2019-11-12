@@ -30,9 +30,9 @@ namespace Game_SkyboxHandling
 	// Variables and constants
 	//
 
-	inline lwmf::ShaderClass SkyboxShader{};
-	inline std::int_fast32_t SkyboxWidth{};
-	inline std::int_fast32_t SkyboxHeight{};
+	static inline lwmf::ShaderClass SkyboxShader{};
+	static inline std::int_fast32_t SkyboxWidth{};
+	static inline std::int_fast32_t SkyboxHeight{};
 	inline bool SkyBoxEnabled{};
 
 	//

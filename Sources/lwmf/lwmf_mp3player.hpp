@@ -148,12 +148,12 @@ namespace lwmf
 
 			// Get Bitrate
 			StreamChar = File.get();
-			static constexpr std::array<std::int_fast32_t, 16> BitrateTable{ 0x000, 0x020, 0x028, 0x030, 0x038, 0x040, 0x050, 0x060, 0x070, 0x080, 0x0A0, 0x0C0, 0x0E0, 0x100, 0x140, 0x000 };
+			constexpr std::array<std::int_fast32_t, 16> BitrateTable{ 0x000, 0x020, 0x028, 0x030, 0x038, 0x040, 0x050, 0x060, 0x070, 0x080, 0x0A0, 0x0C0, 0x0E0, 0x100, 0x140, 0x000 };
 			Bitrate = BitrateTable[StreamChar >> 4];
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Bitrate: " + std::to_string(Bitrate));
 
 			// Get Samplerate
-			static constexpr std::array<std::int_fast32_t, 4> SampleRateTable{ 0x0AC44, 0x0BB80, 0x07D00, 0x00000 };
+			constexpr std::array<std::int_fast32_t, 4> SampleRateTable{ 0x0AC44, 0x0BB80, 0x07D00, 0x00000 };
 			SampleRate = SampleRateTable[(StreamChar & 15) >> 2];
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Samplerate: " + std::to_string(SampleRate));
 

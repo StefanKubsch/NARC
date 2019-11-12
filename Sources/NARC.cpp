@@ -399,9 +399,9 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		// Mouse and keyboard handling
 		case WM_INPUT:
 		{
-			static RAWINPUT RawDev;
-			static UINT DataSize{ sizeof(RawDev) };
-			static UINT HeaderSize{ sizeof(RAWINPUTHEADER) };
+			RAWINPUT RawDev{};
+			UINT DataSize{ sizeof(RAWINPUT) };
+			UINT HeaderSize{ sizeof(RAWINPUTHEADER) };
 			HRAWINPUT Handle{ reinterpret_cast<HRAWINPUT>(lParam) };
 			GetRawInputData(Handle, RID_INPUT, &RawDev, &DataSize, HeaderSize);
 

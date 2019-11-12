@@ -15,8 +15,8 @@
 #include <algorithm>
 #include <sys/stat.h>
 
-static constexpr bool ContinueOnError{ true };
-static constexpr bool StopOnError{};
+constexpr bool ContinueOnError{ true };
+constexpr bool StopOnError{};
 
 namespace Tools_ErrorHandling
 {

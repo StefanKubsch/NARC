@@ -73,7 +73,7 @@ namespace Game_EntityHandling
 	//
 
 	using DirectionTuple = std::tuple<float, float, char, std::int_fast32_t>;
-	inline std::vector<DirectionTuple> Directions
+	inline static std::vector<DirectionTuple> Directions
 	{
 		// Possible directions (DirX / DirY)
 		//		-1.0 / 0.0		North		RotationFactor 0

@@ -29,9 +29,9 @@ namespace HID_Mouse
 	inline lwmf::IntPointStruct OldMousePos{};
 
 	inline float MouseSensitivity{};
-	inline float MouseSensitivityLowerLimit{};
-	inline float MouseSensitivityUpperLimit{};
-	inline float MouseSensitivityStep{};
+	inline static float MouseSensitivityLowerLimit{};
+	inline static float MouseSensitivityUpperLimit{};
+	inline static float MouseSensitivityStep{};
 
 	//
 	// Functions

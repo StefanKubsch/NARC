@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <array>
 #include <list>
 #include <queue>
 
@@ -37,7 +38,7 @@ namespace Game_PathFinding
 		NodeStruct(std::int_fast32_t i, float c) : Index(i), Cost(c) {}
 	};
 
-	inline std::vector<float> FlattenedMap;
+	inline std::vector<float> FlattenedMap{};
 
 	//
 	// Functions
@@ -91,7 +92,7 @@ namespace Game_PathFinding
 		const std::int_fast32_t TargetCalc1{ Target / Width };
 		const std::int_fast32_t TargetCalc2{ Target % Width };
 		std::vector<std::int_fast32_t> Paths(MapSize);
-		std::vector<std::int_fast32_t> Neighbours(8);
+		std::array<std::int_fast32_t, 8> Neighbours{};
 		std::vector<float> Costs(MapSize, FLT_MAX);
 		std::priority_queue<NodeStruct> NodesToVisit{};
 		bool PathFound{};
