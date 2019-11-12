@@ -353,7 +353,7 @@ namespace lwmf
 	{
 		if (!WaveBuffer.empty())
 		{
-			static MMTIME MMTime{ TIME_SAMPLES, {} };
+			MMTIME MMTime{ TIME_SAMPLES, {} };
 			waveOutGetPosition(WaveOut, &MMTime, sizeof(MMTIME));
 			// Round Position to 3 decimal places ( = precision of 1ms)
 			return std::round(static_cast<double>(MMTime.u.sample) / static_cast<double>(SampleRate) * 1000.0) / 1000.0;
@@ -392,7 +392,7 @@ namespace lwmf
 	{
 		if (Error != S_OK)
 		{
-			static std::map<HRESULT, std::string> ErrorTable
+			std::map<HRESULT, std::string> ErrorTable
 			{
 				{ E_ABORT, "Operation aborted" },
 				{ E_ACCESSDENIED, "General access denied error" },

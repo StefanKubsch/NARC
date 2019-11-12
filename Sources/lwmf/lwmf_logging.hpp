@@ -96,7 +96,7 @@ namespace lwmf
 	{
 		if (LoggingEnabled && Logfile.is_open())
 		{
-			static std::map<LogLevel, std::string> ErrorTable
+			std::map<LogLevel, std::string> ErrorTable
 			{
 				{ LogLevel::Info, "** INFO ** " },
 				{ LogLevel::Debug, "** DEBUG ** " },

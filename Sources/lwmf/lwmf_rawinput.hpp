@@ -67,7 +67,7 @@ namespace lwmf
 
 	inline void CatchMouse(const HWND hWnd)
 	{
-		static RECT WindowRect{};
+		RECT WindowRect{};
 		GetClientRect(hWnd, &WindowRect);
 		MapWindowPoints(hWnd, nullptr, reinterpret_cast<LPPOINT>(&WindowRect), 2);
 		ClipCursor(&WindowRect);
