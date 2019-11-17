@@ -29,9 +29,12 @@ namespace Game_Config
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ GameConfigFolder + "GameConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		std::string INIFile{ GameConfigFolder };
+		INIFile += "GameConfig.ini";
+
+		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			const std::map<std::int_fast32_t, std::int_fast32_t> TextureCompare
+			const std::map<std::int_fast32_t, std::int_fast32_t> TextureCompare //-V808
 			{
 				{ 64, 6 },
 				{ 128, 7 },

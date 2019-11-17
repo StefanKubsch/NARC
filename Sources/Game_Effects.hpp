@@ -39,7 +39,10 @@ namespace Game_Effects
 
 	inline void InitEffects()
 	{
-		if (const std::string INIFile{ GameConfigFolder + "EffectsConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		std::string INIFile{ GameConfigFolder };
+		INIFile += "EffectsConfig.ini";
+
+		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			// Init the "bloodstain" effect when player is hit by an enemy
 			BloodstainDuration = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "EFFECTS", "BloodstainDuration");

@@ -80,17 +80,12 @@ namespace lwmf
 		std::vector<std::int_fast32_t>TempBuffer(Width * Height);
 		std::int_fast32_t SourceVerticalOffset{ y * Texture.Width };
 		std::int_fast32_t DestVerticalOffset{};
-		std::int_fast32_t DestTotalOffset{};
-		std::int_fast32_t SourceTotalOffset{};
 
 		for (std::int_fast32_t i{}; i < Height; ++i)
 		{
 			for (std::int_fast32_t DestHorizontalOffset{}, SourceHorizontalOffset{ x }, j{}; j < Width; ++j)
 			{
-				DestTotalOffset = DestVerticalOffset + DestHorizontalOffset;
-				SourceTotalOffset = SourceVerticalOffset + SourceHorizontalOffset;
-
-				TempBuffer[static_cast<size_t>(DestTotalOffset)] = Texture.Pixels[static_cast<size_t>(SourceTotalOffset)];
+				TempBuffer[static_cast<size_t>(DestVerticalOffset) + static_cast<size_t>(DestHorizontalOffset)] = Texture.Pixels[static_cast<size_t>(SourceVerticalOffset) + static_cast<size_t>(SourceHorizontalOffset)];
 
 				++DestHorizontalOffset;
 				++SourceHorizontalOffset;

@@ -48,7 +48,11 @@ public:
 
 inline void Game_PlayerClass::InitConfig()
 {
-	if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	std::string INIFile{ LevelFolder };
+	INIFile += std::to_string(SelectedLevel);
+	INIFile += "/PlayerData/Config.ini";
+
+	if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		MoveSpeed = lwmf::ReadINIValue<float>(INIFile, "GENERAL", "MoveSpeed");
 		Hitpoints = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "Hitpoints");
@@ -66,7 +70,11 @@ inline void Game_PlayerClass::InitAudio()
 	Sounds.clear();
 	Sounds.shrink_to_fit();
 
-	if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/PlayerData/Config.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	std::string INIFile{ LevelFolder };
+	INIFile += std::to_string(SelectedLevel);
+	INIFile += "/PlayerData/Config.ini";
+
+	if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		// Get Footsteps audio
 		Sounds.emplace_back();

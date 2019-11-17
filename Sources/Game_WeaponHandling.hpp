@@ -105,30 +105,35 @@ namespace Game_WeaponHandling
 
 		while (true)
 		{
-			if (const std::string IniFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(IniFile, ContinueOnError))
+			std::string INIFile{ AssetsWeaponsFolder };
+			INIFile += "Weapon_";
+			INIFile += std::to_string(Index);
+			INIFile += "_Data.ini";
+
+			if (Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				Weapons.emplace_back();
 
 				Weapons[Index].Number = Index;
-				Weapons[Index].Name = lwmf::ReadINIValue<std::string>(IniFile, "DATA", "Name");
-				Weapons[Index].Weight = lwmf::ReadINIValue<float>(IniFile, "DATA", "Weight");
-				Weapons[Index].Capacity = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "Capacity");
-				Weapons[Index].PaceFactor = lwmf::ReadINIValue<float>(IniFile, "DATA", "PaceFactor");
-				Weapons[Index].Damage = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "Damage");
+				Weapons[Index].Name = lwmf::ReadINIValue<std::string>(INIFile, "DATA", "Name");
+				Weapons[Index].Weight = lwmf::ReadINIValue<float>(INIFile, "DATA", "Weight");
+				Weapons[Index].Capacity = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DATA", "Capacity");
+				Weapons[Index].PaceFactor = lwmf::ReadINIValue<float>(INIFile, "DATA", "PaceFactor");
+				Weapons[Index].Damage = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DATA", "Damage");
 
-				if (const std::string WeaponTypeString{ lwmf::ReadINIValue<std::string>(IniFile, "DATA", "WeaponType") }; WeaponTypeString == "DirectHit")
+				if (const std::string WeaponTypeString{ lwmf::ReadINIValue<std::string>(INIFile, "DATA", "WeaponType") }; WeaponTypeString == "DirectHit")
 				{
 					Weapons[Index].Type = static_cast<std::int_fast32_t>(WeaponType::DirectHit);
 				}
 
-				Weapons[Index].CarriedAmmo = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "CarriedAmmo");
-				Weapons[Index].Cadence = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "DATA", "Cadence");
-				Weapons[Index].WeaponRect.X = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "POSITION", "PosX");
-				Weapons[Index].WeaponRect.Y = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "POSITION", "PosY");
-				Weapons[Index].FadeInOutSpeed = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "POSITION", "FadeInOutSpeed");
-				Weapons[Index].MuzzleFlashDuration = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashDuration");
-				Weapons[Index].MuzzleFlashRect.X = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosX");
-				Weapons[Index].MuzzleFlashRect.Y = lwmf::ReadINIValue<std::int_fast32_t>(IniFile, "MUZZLEFLASH", "MuzzleFlashPosY");
+				Weapons[Index].CarriedAmmo = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DATA", "CarriedAmmo");
+				Weapons[Index].Cadence = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "DATA", "Cadence");
+				Weapons[Index].WeaponRect.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "POSITION", "PosX");
+				Weapons[Index].WeaponRect.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "POSITION", "PosY");
+				Weapons[Index].FadeInOutSpeed = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "POSITION", "FadeInOutSpeed");
+				Weapons[Index].MuzzleFlashDuration = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MUZZLEFLASH", "MuzzleFlashDuration");
+				Weapons[Index].MuzzleFlashRect.X = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MUZZLEFLASH", "MuzzleFlashPosX");
+				Weapons[Index].MuzzleFlashRect.Y = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MUZZLEFLASH", "MuzzleFlashPosY");
 
 				// pre-load weapon
 				Weapons[Index].LoadedRounds = Weapons[Index].Capacity;
@@ -166,7 +171,12 @@ namespace Game_WeaponHandling
 		for (auto&& Weapon : Weapons)
 		{
 			// Weapon textures
-			if (const std::string WeaponTextureDataConfFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Weapon.Number) + "_TexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
+			std::string WeaponTextureDataConfFile{ AssetsWeaponsFolder };
+			WeaponTextureDataConfFile += "Weapon_";
+			WeaponTextureDataConfFile += std::to_string(Weapon.Number);
+			WeaponTextureDataConfFile += "_TexturesData.conf";
+
+			if (Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
 			{
 				std::ifstream WeaponTexturesData(WeaponTextureDataConfFile, std::ios::in);
 				std::string Line;
@@ -183,7 +193,12 @@ namespace Game_WeaponHandling
 			}
 
 			// Muzzle flash
-			if (const std::string MuzzleFlashTextureDataConfFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Weapon.Number) + "_MuzzleFlashTexturesData.conf" }; Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
+			std::string MuzzleFlashTextureDataConfFile{ AssetsWeaponsFolder };
+			MuzzleFlashTextureDataConfFile += "Weapon_";
+			MuzzleFlashTextureDataConfFile += std::to_string(Weapon.Number);
+			MuzzleFlashTextureDataConfFile += "_MuzzleFlashTexturesData.conf";
+
+			if (Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
 			{
 				std::ifstream MuzzleFlashTextureData(MuzzleFlashTextureDataConfFile);
 				std::string Line;
@@ -210,7 +225,12 @@ namespace Game_WeaponHandling
 			Weapon.Sounds.clear();
 			Weapon.Sounds.shrink_to_fit();
 
-			if (const std::string INIFile{ AssetsWeaponsFolder + "Weapon_" + std::to_string(Weapon.Number) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+			std::string INIFile{ AssetsWeaponsFolder };
+			INIFile += "Weapon_";
+			INIFile += std::to_string(Weapon.Number);
+			INIFile += "_Data.ini";
+
+			if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				Weapon.Sounds.emplace_back();
 				Weapon.Sounds[static_cast<std::int_fast32_t>(WeaponsSounds::Shot)].Load(lwmf::ReadINIValue<std::string>(INIFile, "AUDIO", "SingleShotAudio"));

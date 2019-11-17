@@ -61,7 +61,10 @@ namespace HID_Gamepad
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init XBOX controller...");
 
-			if (const std::string INIFile{ GameConfigFolder + "InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+			std::string INIFile{ GameConfigFolder };
+			INIFile += "InputConfig.ini";
+
+			if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				const float DeadZone{ lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "DeadZone") };
 				GameController.Sensitivity = lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");

@@ -17,6 +17,7 @@
 #include <array>
 #include <map>
 #include <fstream>
+#include <cstring>
 
 #include "lwmf_logging.hpp"
 #include "lwmf_texture.hpp"
@@ -361,7 +362,10 @@ namespace lwmf
 
 		if (ShaderFile.fail())
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "(Shadername " + ShaderName + ") - Loading of shaderfile " + FileName + " failed!");
+			std::array<char, 100> ErrorMessage{};
+			strerror_s(ErrorMessage.data(), 100, errno);
+
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "(Shadername " + ShaderName + ") - Loading of shaderfile " + FileName + " failed: " + std::string(ErrorMessage.data()));
 		}
 		else
 		{

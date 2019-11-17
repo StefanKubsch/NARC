@@ -25,6 +25,7 @@
 #include <shlwapi.h>
 #include <wmsdk.h>
 #include <atlcomcli.h>
+#include <cstring>
 
 #pragma comment(lib, "msacm32.lib")
 #pragma comment(lib, "wmvcore.lib")
@@ -116,7 +117,10 @@ namespace lwmf
 
 		if (File.fail())
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + "!");
+			std::array<char, 100> ErrorMessage{};
+			strerror_s(ErrorMessage.data(), 100, errno);
+
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
 		}
 		else
 		{

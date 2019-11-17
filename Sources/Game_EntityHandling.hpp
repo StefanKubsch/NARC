@@ -73,6 +73,7 @@ namespace Game_EntityHandling
 	//
 
 	using DirectionTuple = std::tuple<float, float, char, std::int_fast32_t>;
+
 	inline static std::vector<DirectionTuple> Directions
 	{
 		// Possible directions (DirX / DirY)
@@ -119,7 +120,13 @@ namespace Game_EntityHandling
 		{
 			bool SkipAssetFlag{};
 
-			if (const std::string EntityDataFile{ LevelFolder + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(AssetFileIndex) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
+			std::string EntityDataFile{ LevelFolder };
+			EntityDataFile += std::to_string(SelectedLevel);
+			EntityDataFile += "/EntityData/";
+			EntityDataFile += std::to_string(AssetFileIndex);
+			EntityDataFile += ".ini";
+
+			if (Tools_ErrorHandling::CheckFileExistence(EntityDataFile, ContinueOnError))
 			{
 				const std::string AssetTypeName{ lwmf::ReadINIValue<std::string>(EntityDataFile, "ENTITY", "EntityTypeName") };
 
@@ -133,7 +140,11 @@ namespace Game_EntityHandling
 					}
 				}
 
-				if (const std::string INIFile{ AssetsEntitiesFolder + AssetTypeName + "/AssetData.ini" }; !SkipAssetFlag && Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+				std::string INIFile{ AssetsEntitiesFolder };
+				INIFile += AssetTypeName;
+				INIFile += "/AssetData.ini";
+
+				if (!SkipAssetFlag && Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 				{
 					EntityAssets.emplace_back();
 					EntityAssets[AssetIndex].Number = AssetIndex;
@@ -185,7 +196,7 @@ namespace Game_EntityHandling
 
 	inline void LoadWalkAnimTextures(const std::int_fast32_t AssetIndex, const std::string& AssetTypeName)
 	{
-		EntityAssets[AssetIndex].WalkingTextures.clear();
+		EntityAssets[AssetIndex].WalkingTextures.clear(); //-V807
 		EntityAssets[AssetIndex].WalkingTextures.shrink_to_fit();
 
 		std::int_fast32_t DirectionIndex{};
@@ -207,7 +218,12 @@ namespace Game_EntityHandling
 
 				while (true)
 				{
-					if (const std::string Texture{ Path + "/" + std::to_string(TextureIndex) + ".png" }; Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
+					std::string Texture{ Path };
+					Texture += "/";
+					Texture += std::to_string(TextureIndex);
+					Texture += ".png";
+
+					if (Tools_ErrorHandling::CheckFileExistence(Texture, ContinueOnError))
 					{
 						EntityAssets[AssetIndex].WalkingTextures[DirectionIndex].emplace_back(GFX_ImageHandling::ImportTexture(Texture, EntitySize));
 						++TextureIndex;
@@ -278,7 +294,13 @@ namespace Game_EntityHandling
 
 		while (true)
 		{
-			if (const std::string INIFile{ LevelFolder + std::to_string(SelectedLevel) + "/EntityData/" + std::to_string(Index) + ".ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
+			std::string INIFile{ LevelFolder };
+			INIFile += std::to_string(SelectedLevel);
+			INIFile += "/EntityData/";
+			INIFile += std::to_string(Index);
+			INIFile += ".ini";
+
+			if (Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				EntityOrder.emplace_back();
 				EntityDistance.emplace_back();

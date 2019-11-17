@@ -60,7 +60,12 @@ namespace Game_Doors
 
 		while (true)
 		{
-			if (const std::string INIFile{ AssetsDoorsFolder + "Door_" + std::to_string(Index) + "_Data.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
+			std::string INIFile{ AssetsDoorsFolder };
+			INIFile += "Door_";
+			INIFile += std::to_string(Index);
+			INIFile += "_Data.ini";
+
+			if (Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				DoorTypes.emplace_back();
 

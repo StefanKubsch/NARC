@@ -31,7 +31,10 @@ namespace Game_PreGame
 
 	inline void ShowIntroHeader()
 	{
-		if (const std::string FileName{ GameConfigFolder + "IntroHeader.txt" }; Tools_ErrorHandling::CheckFileExistence(FileName, ContinueOnError))
+		std::string FileName{ GameConfigFolder };
+		FileName += "IntroHeader.txt";
+
+		if (Tools_ErrorHandling::CheckFileExistence(FileName, ContinueOnError))
 		{
 			std::ifstream Reader(FileName, std::ios::in);
 			std::string Line;

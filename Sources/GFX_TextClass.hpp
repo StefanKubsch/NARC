@@ -51,7 +51,9 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 {
 	if (Tools_ErrorHandling::CheckFileExistence(INIFileName, StopOnError))
 	{
-		if (const std::string FontName{ lwmf::ReadINIValue<std::string>(INIFileName, Section, "FontName") }; Tools_ErrorHandling::CheckFileExistence(FontName, StopOnError))
+		const std::string FontName{ lwmf::ReadINIValue<std::string>(INIFileName, Section, "FontName") };
+
+		if (Tools_ErrorHandling::CheckFileExistence(FontName, StopOnError))
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Loading font " + FontName);
 
@@ -127,7 +129,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 
 				// Blit single glyphs to individual textures
 				lwmf::TextureStruct TempGlyphTexture{};
-				TempGlyphTexture.Pixels.resize(Glyphs[Char].Width * Glyphs[Char].Height);
+				TempGlyphTexture.Pixels.resize(static_cast<std::size_t>(Glyphs[Char].Width) * static_cast<std::size_t>(Glyphs[Char].Height));
 				TempGlyphTexture.Width = Glyphs[Char].Width;
 				TempGlyphTexture.Height = Glyphs[Char].Height;
 

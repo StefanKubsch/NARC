@@ -16,6 +16,7 @@
 #include <array>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 #include "lwmf_logging.hpp"
 #include "lwmf_texture.hpp"
@@ -1223,7 +1224,10 @@ namespace lwmf
 
 		if (File.fail())
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + "!");
+			std::array<char, 100> ErrorMessage{};
+			strerror_s(ErrorMessage.data(), 100, errno);
+
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
 		}
 		else
 		{

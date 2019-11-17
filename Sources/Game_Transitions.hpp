@@ -48,7 +48,7 @@ namespace Game_Transitions
 
 	inline void LevelTransition()
 	{
-		static const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
+		const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
 		const std::string NextLevelText{ "...loading level number " + std::to_string(SelectedLevel) + "..." };
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "\n\n" + NextLevelText + "\n\n");
 
@@ -120,8 +120,8 @@ namespace Game_Transitions
 
 	inline void DeathSequence()
 	{
-		static const std::int_fast32_t Red{ lwmf::RGBAtoINT(255, 0, 0, 255) };
-		static const std::int_fast32_t Black{ lwmf::RGBAtoINT(0, 0, 0, 255) };
+		const std::int_fast32_t Red{ lwmf::RGBAtoINT(255, 0, 0, 255) };
+		const std::int_fast32_t Black{ lwmf::RGBAtoINT(0, 0, 0, 255) };
 
 		lwmf::SetVSync(-1);
 		FizzleFade(Red, 50);

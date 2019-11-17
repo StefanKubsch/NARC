@@ -77,7 +77,10 @@ namespace HID_Keyboard
 
 	inline void Init()
 	{
-		if (const std::string INIFile{ GameConfigFolder + "InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		std::string INIFile{ GameConfigFolder };
+		INIFile += "InputConfig.ini";
+
+		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			MovePlayerForwardKey = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "KEYBOARD", "MoveForwardKey");
 			MovePlayerBackwardKey = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "KEYBOARD", "MoveBackwardKey");
