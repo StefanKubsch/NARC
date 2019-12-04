@@ -131,7 +131,7 @@
 // private structure
 struct stbtt__buf
 {
-	std::vector<unsigned char> data;
+	std::vector<unsigned char> data{};
 	std::int_fast32_t cursor{};
 	std::int_fast32_t size{};
 };
@@ -205,7 +205,7 @@ void stbtt_GetBakedQuad(const std::vector<stbtt_bakedchar>& chardata, std::int_f
 struct stbtt_fontinfo
 {
 	std::shared_ptr<void> userdata;
-	std::vector<unsigned char> data;					// pointer to .ttf file
+	std::vector<unsigned char> data{};		// pointer to .ttf file
 	std::int_fast32_t fontstart{};			// offset of start of font
 	std::int_fast32_t numGlyphs{};			// number of glyphs, needed for range checking
 	// table locations as offset from start of .ttf
@@ -603,7 +603,7 @@ inline static stbtt__buf stbtt__get_subrs(stbtt__buf cff, stbtt__buf fontdict)
 
 	stbtt__buf pdict{ stbtt__buf_range(cff, private_loc[1], private_loc[0]) };
 
-	std::vector<std::int_fast32_t> subrsoff;
+	std::vector<std::int_fast32_t> subrsoff{};
 
 	stbtt__dict_get_ints(pdict, 19, 1, subrsoff);
 
@@ -998,7 +998,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 	std::vector<unsigned char> data{ info.data };
 	std::int_fast32_t num_vertices{};
 	const short numberOfContours{ ttSHORT(data.data() + g) };
-	std::vector<stbtt_vertex> vertices;
+	std::vector<stbtt_vertex> vertices{};
 
 	if (numberOfContours > 0)
 	{
@@ -1239,7 +1239,7 @@ inline static std::int_fast32_t stbtt__GetGlyphShapeTT(const stbtt_fontinfo& inf
 			const float n{ std::sqrtf(mtx[2] * mtx[2] + mtx[3] * mtx[3]) };
 
 			// Get indexed glyph.
-			std::vector<stbtt_vertex> comp_verts;
+			std::vector<stbtt_vertex> comp_verts{};
 
 			if (const std::int_fast32_t comp_num_verts{ stbtt_GetGlyphShape(info, gidx, comp_verts) }; comp_num_verts > 0)
 			{
@@ -1300,7 +1300,7 @@ struct stbtt__csctx final
 	std::int_fast32_t max_x{};
 	std::int_fast32_t min_y{};
 	std::int_fast32_t max_y{};
-	std::vector<stbtt_vertex> pvertices;
+	std::vector<stbtt_vertex> pvertices{};
 	std::int_fast32_t num_vertices{};
 };
 
@@ -2666,7 +2666,7 @@ inline static std::vector<stbtt__point> stbtt_FlattenCurves(stbtt_vertex* vertic
 
 	num_contours = n;
 	const float objspace_flatness_squared{ objspace_flatness * objspace_flatness };
-	std::vector<stbtt__point> points;
+	std::vector<stbtt__point> points{};
 	std::int_fast32_t num_points{};
 	std::int_fast32_t start{};
 
@@ -2744,7 +2744,7 @@ inline void stbtt_Rasterize(stbtt__bitmap& result, const float flatness_in_pixel
 {
 	const float scale{ scale_x > scale_y ? scale_y : scale_x };
 	std::int_fast32_t winding_count{};
-	std::vector<std::int_fast32_t> winding_lengths;
+	std::vector<std::int_fast32_t> winding_lengths{};
 
 	std::vector<stbtt__point> windings{ stbtt_FlattenCurves(vertices.data(), num_verts, flatness_in_pixels / scale, winding_lengths, winding_count) };
 
@@ -2756,7 +2756,7 @@ inline void stbtt_Rasterize(stbtt__bitmap& result, const float flatness_in_pixel
 
 inline void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo& info, unsigned char* output, std::int_fast32_t out_w, std::int_fast32_t out_h, std::int_fast32_t out_stride, float scale_x, float scale_y, float shift_x, float shift_y, std::int_fast32_t glyph)
 {
-	std::vector<stbtt_vertex> vertices;
+	std::vector<stbtt_vertex> vertices{};
 	const std::int_fast32_t num_verts{ stbtt_GetGlyphShape(info, glyph, vertices) };
 	std::int_fast32_t ix0{};
 	std::int_fast32_t iy0{};
