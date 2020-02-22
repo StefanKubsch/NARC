@@ -26,7 +26,7 @@ The whole engine is public domain - you can do what you want with the code. It w
 
 **Current features :**
 
-  - hardware accelerated by native OpenGL 4.5 Core (Shader, not immediate/direct mode!)
+  - hardware accelerated by native OpenGL 4.3 Core (Shader, not immediate/direct mode!)
   - own OpenGL wrapper - no need for glew, glad & Co. !
   - windowed or fullscreen
   - vsync by option (vsync implies fullscreen mode!)
