@@ -3,7 +3,7 @@
 *                                        *
 * Game_Raycaster.hpp                     *
 *                                        *
-* (c) 2017, 2018, 2019 Stefan Kubsch     *
+* (c) 2017 - 202 Stefan Kubsch           *
 ******************************************
 */
 

@@ -3,7 +3,7 @@
 *                                        *
 * Game_MenuClass.hpp                     *
 *                                        *
-* (c) 2017, 2018, 2019 Stefan Kubsch     *
+* (c) 2017 - 2020 Stefan Kubsch          *
 ******************************************
 */
 
@@ -170,7 +170,7 @@ inline void Game_MenuClass::ItemDown()
 
 inline void Game_MenuClass::ItemUp()
 {
-	if ((MenuItems[HighLightedItem].Level == 0 && HighLightedItem > 0) || HighLightedItem > MenuItems[SelectedItem].ChildItems.front())
+	if ((MenuItems[HighLightedItem].Level == 0 && HighLightedItem > 0) || HighLightedItem > MenuItems[SelectedItem].ChildItems.front()) //-V781
 	{
 		--HighLightedItem;
 	}
