@@ -219,21 +219,12 @@ namespace lwmf
 
 	inline void ShaderClass::RenderTexture(const GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const bool Blend, const float Opacity)
 	{
-		if (Blend)
-		{
-			glEnable(GL_BLEND);
-		}
-
+		Blend ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
 		glUseProgram(ShaderProgram);
 		glUniform1f(OpacityLocation, Opacity);
 		UpdateVertices(PosX, PosY, Width, Height);
 		glBindTexture(GL_TEXTURE_2D, *TextureID);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-		if (Blend)
-		{
-			glDisable(GL_BLEND);
-		}
 	}
 
 	inline void ShaderClass::LoadStaticTextureInGPU(const lwmf::TextureStruct& Texture, GLuint* TextureID, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
@@ -244,21 +235,12 @@ namespace lwmf
 
 	inline void ShaderClass::RenderStaticTexture(const GLuint* TextureID, const bool Blend, const float Opacity)
 	{
-		if (Blend)
-		{
-			glEnable(GL_BLEND);
-		}
-
+		Blend ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
 		glUseProgram(ShaderProgram);
 		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
 		glBindTexture(GL_TEXTURE_2D, *TextureID);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-		if (Blend)
-		{
-			glDisable(GL_BLEND);
-		}
 	}
 
 	inline void ShaderClass::PrepareLWMFTexture(const lwmf::TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY)
@@ -283,22 +265,13 @@ namespace lwmf
 
 	inline void ShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture, const bool Blend, const float Opacity)
 	{
-		if (Blend)
-		{
-			glEnable(GL_BLEND);
-		}
-
+		Blend ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
 		glUseProgram(ShaderProgram);
 		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
 		glBindTexture(GL_TEXTURE_2D, OGLTextureID);
 		FullscreenFlag ? glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data()) : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-		if (Blend)
-		{
-			glDisable(GL_BLEND);
-		}
 	}
 
 	inline void ShaderClass::Ortho2D(std::array<GLfloat, 16>& Matrix, const GLfloat Left, const GLfloat Right, const GLfloat Bottom, const GLfloat Top)

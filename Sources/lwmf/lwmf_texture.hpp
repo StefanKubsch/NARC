@@ -131,13 +131,15 @@ namespace lwmf
 
 				for (std::int_fast32_t Offset{}, i{}; i < TargetHeight; ++i)
 				{
-					const std::int_fast32_t PosY{ static_cast<std::int_fast32_t>(Ratio.Y * i) };
+					const float TempRatioY{ Ratio.Y * i };
+					const std::int_fast32_t PosY{ static_cast<std::int_fast32_t>(TempRatioY) };
 					const std::int_fast32_t TempY{ PosY * Texture.Width };
-					const float Height{ Ratio.Y * i - PosY };
+					const float Height{ TempRatioY - PosY };
 
 					for (std::int_fast32_t j{}; j < TargetWidth; ++j)
 					{
-						const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(Ratio.X * j) };
+						const float TempRatioX{ Ratio.X * j };
+						const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(TempRatioX) };
 						const std::int_fast32_t Index{ TempY + PosX };
 
 						const std::int_fast32_t P1{ Texture.Pixels[static_cast<size_t>(Index)] };
@@ -145,7 +147,7 @@ namespace lwmf
 						const std::int_fast32_t P3{ Texture.Pixels[static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width)] };
 						const std::int_fast32_t P4{ Texture.Pixels[static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width) + 1] };
 
-						const float Width{ Ratio.X * j - PosX };
+						const float Width{ TempRatioX - PosX };
 						const float t1{ (1.0F - Width) * (1.0F - Height) };
 						const float t2{ Width * (1.0F - Height) };
 						const float t3{ Height * (1.0F - Width) };

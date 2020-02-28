@@ -51,15 +51,12 @@ namespace lwmf
 
 	template<typename T>T CalcEuclidianDistance(const T x1, const T x2, const T y1, const T y2)
 	{
-		const T dx{ x1 - x2 };
-		const T dy{ y1 - y2 };
-		return std::sqrt(dx * dx + dy * dy);
+		return std::hypot(x1 - x2, y1 - y2);
 	}
 
 	template<>inline float CalcEuclidianDistance(const float x1, const float x2, const float y1, const float y2)
 	{
-		const FloatPointStruct Distance{ x1 - x2, y1 - y2 };
-		return std::sqrtf(Distance.X * Distance.X + Distance.Y * Distance.Y);
+		return std::hypotf(x1 - x2, y1 - y2);
 	}
 
 	template<typename T>T CalcChebyshevDistance(T x1, T x2, T y1, T y2)

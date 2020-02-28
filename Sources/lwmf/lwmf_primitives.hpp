@@ -138,7 +138,7 @@ namespace lwmf
 		}
 
 		// Case 1: Straight horizontal line within screen boundaries
-		if ((y1 == y2) && (x2 > x1) && (x1 >= 0 && x2 < Texture.Width && y1 >= 0 && y1 < Texture.Height))
+		if ((x1 >= 0 && y1 >= 0) && (x2 < Texture.Width && y1 < Texture.Height) && (y1 == y2) && (x2 > x1))
 		{
 			std::fill(Texture.Pixels.begin() + y1 * Texture.Width + x1, Texture.Pixels.begin() + y1 * Texture.Width + x2 + 1, Color);
 			return;
