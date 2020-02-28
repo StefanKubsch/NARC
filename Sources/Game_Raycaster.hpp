@@ -99,7 +99,7 @@ namespace Game_Raycaster
 		for (std::int_fast32_t x{ Start }; x < End; ++x)
 		{
 			const float Camera{ static_cast<float>(x + x) / static_cast<float>(ScreenTexture.Width) - 1.0F };
-			lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
+			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
 
 			const lwmf::FloatPointStruct TempRayDir{ RayDir.X * RayDir.X, RayDir.Y * RayDir.Y };
 			const lwmf::FloatPointStruct DeltaDist{ std::sqrtf(1.0F + TempRayDir.Y / TempRayDir.X), std::sqrtf(1.0F + TempRayDir.X / TempRayDir.Y) };
