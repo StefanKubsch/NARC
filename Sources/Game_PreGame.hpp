@@ -11,6 +11,8 @@
 
 
 #include <string>
+#include <cstring>
+#include <array>
 #include <fstream>
 #include <iostream>
 
@@ -36,10 +38,11 @@ namespace Game_PreGame
 
 		if (Tools_ErrorHandling::CheckFileExistence(FileName, ContinueOnError))
 		{
-			std::ifstream Reader(FileName, std::ios::in);
+			std::ifstream IntroHeaderFile(FileName, std::ios::in);
+
 			std::string Line;
 
-			while (std::getline(Reader, Line))
+			while (std::getline(IntroHeaderFile, Line))
 			{
 				std::cout << Line << "\n";
 			}

@@ -82,6 +82,7 @@ namespace Game_LevelHandling
 		if (Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
 			std::ifstream LevelMapDataFile(FileName, std::ios::in);
+
 			std::vector<std::int_fast32_t> TempVectorCeiling{};
 			std::string Line;
 
@@ -170,6 +171,7 @@ namespace Game_LevelHandling
 		if (Tools_ErrorHandling::CheckFileExistence(FileName, StopOnError))
 		{
 			std::ifstream LevelTexturesDataFile(FileName, std::ios::in);
+
 			std::string Line;
 
 			while (std::getline(LevelTexturesDataFile, Line))

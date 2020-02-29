@@ -53,25 +53,18 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 	{
 		const std::string FontName{ lwmf::ReadINIValue<std::string>(INIFileName, Section, "FontName") };
 
+		GlyphShader.LoadShader("Default", ScreenTexture);
+
+		const float FontSize{ lwmf::ReadINIValue<float>(INIFileName, Section, "FontSize") };
+		const unsigned char FontColorRed{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorRED")) };
+		const unsigned char FontColorGreen{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorGREEN")) };
+		const unsigned char FontColorBlue{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorBLUE")) };
+		Offset = { lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetY") };
+
+		// Get raw (binary) font data
 		if (Tools_ErrorHandling::CheckFileExistence(FontName, StopOnError))
 		{
-			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Loading font " + FontName);
-
-			GlyphShader.LoadShader("Default", ScreenTexture);
-
-			const float FontSize{ lwmf::ReadINIValue<float>(INIFileName, Section, "FontSize") };
-			const unsigned char FontColorRed{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorRED")) };
-			const unsigned char FontColorGreen{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorGREEN")) };
-			const unsigned char FontColorBlue{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorBLUE")) };
-			Offset = { lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "OffsetY") };
-
-			// Get raw (binary) font data
 			std::ifstream FontFile(FontName.c_str(), std::ifstream::binary);
-
-			if (FontFile.fail())
-			{
-				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "Loading of font failed!");
-			}
 
 			FontFile.seekg(0, std::ios::end);
 			std::vector<unsigned char> FontBuffer(static_cast<std::size_t>(FontFile.tellg()));
@@ -129,13 +122,13 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 
 				// Blit single glyphs to individual textures
 				lwmf::TextureStruct TempGlyphTexture{};
-				TempGlyphTexture.Pixels.resize(static_cast<std::size_t>(Glyphs[Char].Width) * static_cast<std::size_t>(Glyphs[Char].Height));
+				TempGlyphTexture.Pixels.resize(static_cast<std::size_t>(Glyphs[Char].Width)* static_cast<std::size_t>(Glyphs[Char].Height));
 				TempGlyphTexture.Width = Glyphs[Char].Width;
 				TempGlyphTexture.Height = Glyphs[Char].Height;
 
 				for (std::int_fast32_t TargetY{}, y{ Pos.Y }; y < Pos.Y + Glyphs[Char].Height; ++y, ++TargetY)
 				{
-					for (std::int_fast32_t TargetX{}, x{ Pos.X }; x < Pos.X + Glyphs[Char].Width; ++x, ++ TargetX)
+					for (std::int_fast32_t TargetX{}, x{ Pos.X }; x < Pos.X + Glyphs[Char].Width; ++x, ++TargetX)
 					{
 						TempGlyphTexture.Pixels[TargetY * TempGlyphTexture.Width + TargetX] = FontColor[y * Width + x];
 					}

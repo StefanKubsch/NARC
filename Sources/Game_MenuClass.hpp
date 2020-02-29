@@ -70,6 +70,7 @@ inline void Game_MenuClass::Init()
 	if (Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, StopOnError))
 	{
 		std::ifstream MenuDefinitionFile(MenuDefinitionFileName, std::ios::in);
+
 		std::string Line;
 
 		while (std::getline(MenuDefinitionFile, Line))

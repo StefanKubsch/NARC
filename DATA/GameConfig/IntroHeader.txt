@@ -9,7 +9,7 @@
 *                                                  *
 * Not Another RayCaster                            *
 *                                                  *
-* (C)opyright 2017, 2018, 2019 by Stefan Kubsch    *
+* (C)opyright 2017 - 2020 by Stefan Kubsch         *
 *                                                  *
 ****************************************************
 

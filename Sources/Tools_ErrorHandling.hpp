@@ -11,6 +11,8 @@
 
 #include <cstdint>
 #include <string>
+#include <array>
+#include <cstring>
 #include <fstream>
 #include <algorithm>
 #include <sys/stat.h>
@@ -37,14 +39,20 @@ namespace Tools_ErrorHandling
 
 		bool Result{ true };
 
-		if (std::ifstream File{ FileName }; File.fail())
+		std::ifstream File(FileName, std::ios::in);
+
+		if (File.fail())
 		{
+			std::array<char, 100> ErrorMessage{};
+			strerror_s(ErrorMessage.data(), 100, errno);
+
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "File not found!");
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "Error loading " + FileName + ": " + std::string(ErrorMessage.data()));
 			}
 			else
 			{
+				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, "Error loading " + FileName + ": " + std::string(ErrorMessage.data()));
 				Result = false;
 			}
 		}
@@ -69,6 +77,7 @@ namespace Tools_ErrorHandling
 			}
 			else
 			{
+				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, "Folder not found!");
 				Result = false;
 			}
 		}
@@ -90,6 +99,7 @@ namespace Tools_ErrorHandling
 			}
 			else
 			{
+				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, "TextureSize is " + std::to_string(Width) + " * " + std::to_string(Height) + " pixel!");
 				Result = false;
 			}
 		}

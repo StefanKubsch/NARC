@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <array>
 #include <fstream>
@@ -179,6 +180,7 @@ namespace Game_WeaponHandling
 			if (Tools_ErrorHandling::CheckFileExistence(WeaponTextureDataConfFile, StopOnError))
 			{
 				std::ifstream WeaponTexturesData(WeaponTextureDataConfFile, std::ios::in);
+
 				std::string Line;
 
 				while (std::getline(WeaponTexturesData, Line))
@@ -200,7 +202,8 @@ namespace Game_WeaponHandling
 
 			if (Tools_ErrorHandling::CheckFileExistence(MuzzleFlashTextureDataConfFile, StopOnError))
 			{
-				std::ifstream MuzzleFlashTextureData(MuzzleFlashTextureDataConfFile);
+				std::ifstream MuzzleFlashTextureData(MuzzleFlashTextureDataConfFile, std::ios::in);
+
 				std::string Line;
 
 				while (std::getline(MuzzleFlashTextureData, Line))

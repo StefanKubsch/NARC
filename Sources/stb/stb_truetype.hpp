@@ -1,6 +1,6 @@
 // stb_truetype.hpp - under development - public domain
 //
-// authored/modified in 2019 by Stefan Kubsch
+// authored/modified in 2019/2020 by Stefan Kubsch
 //
 // a stripped down version of stb_truetype.h
 //
