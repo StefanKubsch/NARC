@@ -26,6 +26,42 @@ namespace lwmf
 {
 
 
+	//
+	// Shader source codes
+	//
+
+	inline const std::string DefaultFragmentShaderSource =
+	{
+		"#version 430 core\n"
+		"in vec2 Texcoord;\n"
+		"out vec4 outColor;\n"
+		"uniform float Opacity;\n"
+		"uniform sampler2D Texture;\n"
+		"void main()\n"
+		"{\n"
+		"outColor = texture(Texture, Texcoord);\n"
+		"outColor.a *= Opacity;\n"
+		"}"
+	};
+
+	inline const std::string DefaultVertexShaderSource =
+	{
+		"#version 430 core\n"
+		"in vec2 position;\n"
+		"in vec2 texcoord;\n"
+		"out vec2 Texcoord;\n"
+		"uniform mat4 MVP;\n"
+		"void main()\n"
+		"{\n"
+		"Texcoord = texcoord;\n"
+		"gl_Position = MVP * vec4(position, 0.0f, 1.0f);\n"
+		"}"
+	};
+
+	//
+	// OpenGL class
+	//
+
 	class ShaderClass final
 	{
 	public:
@@ -48,7 +84,7 @@ namespace lwmf
 
 		static void Ortho2D(std::array<GLfloat, 16>& Matrix, GLfloat Left, GLfloat Right, GLfloat Bottom, GLfloat Top);
 		void UpdateVertices(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-		static std::string LoadShaderSource(const std::string& FileName, const std::string& ShaderName);
+		static std::string LoadShaderSource(const std::string& SourceName);
 		static void CheckError(std::int_fast32_t Line);
 		static void CheckCompileError(GLuint Task, Components Component);
 
@@ -61,10 +97,8 @@ namespace lwmf
 
 	inline void ShaderClass::LoadShader(const std::string& ShaderName, const TextureStruct& Texture)
 	{
-		const std::string VertexShaderPath{ "./Shader/" };
-		const std::string FragmentShaderPath{ "./Shader/" };
-		const std::string VertexShaderFileSuffix{ ".vert" };
-		const std::string FragmentShaderFileSuffix{ ".frag" };
+		const std::string VertexShaderFileSuffix{ "Vert" };
+		const std::string FragmentShaderFileSuffix{ "Frag" };
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
 
 		// Set texture coordinates
@@ -116,7 +150,7 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the vertex shader...");
-		const std::string VertexShaderString{ LoadShaderSource(VertexShaderPath + ShaderName + VertexShaderFileSuffix, ShaderName) };
+		const std::string VertexShaderString{ LoadShaderSource(ShaderName + VertexShaderFileSuffix) };
 		const GLchar* VertexShaderSource{ VertexShaderString.c_str() };
 		const GLint VertexShaderSourceLength{ static_cast<GLint>(VertexShaderString.size()) };
 		const GLuint VertexShader{ static_cast<GLuint>(glCreateShader(GL_VERTEX_SHADER)) };
@@ -128,7 +162,7 @@ namespace lwmf
 		CheckCompileError(VertexShader, Components::Shader);
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the fragment shader...");
-		const std::string FragmentShaderString{ LoadShaderSource(FragmentShaderPath + ShaderName + FragmentShaderFileSuffix, ShaderName) };
+		const std::string FragmentShaderString{ LoadShaderSource(ShaderName + FragmentShaderFileSuffix) };
 		const GLchar* FragmentShaderSource{ FragmentShaderString.c_str() };
 		const GLint FragmentShaderSourceLength{ static_cast<GLint>(FragmentShaderString.size()) };
 		const GLuint FragmentShader{ static_cast<GLuint>(glCreateShader(GL_FRAGMENT_SHADER)) };
@@ -326,28 +360,20 @@ namespace lwmf
 		glBufferSubData(GL_ARRAY_BUFFER, 0, Size, Vertices.data());
 	}
 
-	inline std::string ShaderClass::LoadShaderSource(const std::string& FileName, const std::string& ShaderName)
+	inline std::string ShaderClass::LoadShaderSource(const std::string& SourceName)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "(Shadername " + ShaderName + ") - Loading shaderfile " + FileName);
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Loading shader source: " + SourceName);
 
-		std::ifstream ShaderFile(FileName, std::ios::in);
 		std::string Result;
 
-		if (ShaderFile.fail())
+		if (SourceName == "DefaultFrag")
 		{
-			std::array<char, 100> ErrorMessage{};
-			strerror_s(ErrorMessage.data(), 100, errno);
-
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "(Shadername " + ShaderName + ") - Loading of shaderfile " + FileName + " failed: " + std::string(ErrorMessage.data()));
+			Result = DefaultFragmentShaderSource;
 		}
-		else
-		{
-			std::string Line;
 
-			while (std::getline(ShaderFile, Line))
-			{
-				Result += Line + "\n";
-			}
+		if (SourceName == "DefaultVert")
+		{
+			Result = DefaultVertexShaderSource;
 		}
 
 		return Result;
