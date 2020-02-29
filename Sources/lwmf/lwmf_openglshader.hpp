@@ -16,7 +16,6 @@
 #include <string>
 #include <array>
 #include <map>
-#include <fstream>
 #include <cstring>
 
 #include "lwmf_logging.hpp"
@@ -30,7 +29,7 @@ namespace lwmf
 	// Shader source codes
 	//
 
-	inline const std::string DefaultFragmentShaderSource =
+	inline const std::string DefaultFragmentShaderSource
 	{
 		"#version 430 core\n"
 		"in vec2 Texcoord;\n"
@@ -44,7 +43,7 @@ namespace lwmf
 		"}"
 	};
 
-	inline const std::string DefaultVertexShaderSource =
+	inline const std::string DefaultVertexShaderSource
 	{
 		"#version 430 core\n"
 		"in vec2 position;\n"

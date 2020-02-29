@@ -44,10 +44,9 @@ namespace lwmf
 	{
 		SetTextureMetrics(Texture, Width, Height);
 		glViewport(0, 0, Texture.Width, Texture.Height);
-
 		Texture.Pixels.clear();
 		Texture.Pixels.shrink_to_fit();
-		Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
+		Texture.Pixels.resize(static_cast<size_t>(Texture.Size), 0);
 	}
 
 	inline void CreateOpenGLWindow(const HINSTANCE hInstance, TextureStruct& RenderTarget, const std::int_fast32_t Width, const std::int_fast32_t Height, const LPCSTR WindowName, const bool Fullscreen)
