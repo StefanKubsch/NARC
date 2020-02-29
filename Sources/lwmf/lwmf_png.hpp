@@ -20,6 +20,7 @@
 
 #include "lwmf_logging.hpp"
 #include "lwmf_texture.hpp"
+#include "lwmf_color.hpp"
 
 namespace lwmf
 {

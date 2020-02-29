@@ -396,7 +396,7 @@ namespace lwmf
 	{
 		if (Error != S_OK)
 		{
-			std::map<HRESULT, std::string> ErrorTable
+			static std::map<HRESULT, std::string> ErrorTable
 			{
 				{ E_ABORT, "Operation aborted" },
 				{ E_ACCESSDENIED, "General access denied error" },

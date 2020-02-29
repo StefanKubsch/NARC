@@ -96,8 +96,6 @@ namespace lwmf
 
 	inline void ShaderClass::LoadShader(const std::string& ShaderName, const TextureStruct& Texture)
 	{
-		const std::string VertexShaderFileSuffix{ "Vert" };
-		const std::string FragmentShaderFileSuffix{ "Frag" };
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
 
 		// Set texture coordinates
@@ -149,7 +147,7 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the vertex shader...");
-		const std::string VertexShaderString{ LoadShaderSource(ShaderName + VertexShaderFileSuffix) };
+		const std::string VertexShaderString{ LoadShaderSource(ShaderName + "Vert") };
 		const GLchar* VertexShaderSource{ VertexShaderString.c_str() };
 		const GLint VertexShaderSourceLength{ static_cast<GLint>(VertexShaderString.size()) };
 		const GLuint VertexShader{ static_cast<GLuint>(glCreateShader(GL_VERTEX_SHADER)) };
@@ -161,7 +159,7 @@ namespace lwmf
 		CheckCompileError(VertexShader, Components::Shader);
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the fragment shader...");
-		const std::string FragmentShaderString{ LoadShaderSource(ShaderName + FragmentShaderFileSuffix) };
+		const std::string FragmentShaderString{ LoadShaderSource(ShaderName + "Frag") };
 		const GLchar* FragmentShaderSource{ FragmentShaderString.c_str() };
 		const GLint FragmentShaderSourceLength{ static_cast<GLint>(FragmentShaderString.size()) };
 		const GLuint FragmentShader{ static_cast<GLuint>(glCreateShader(GL_FRAGMENT_SHADER)) };
@@ -214,6 +212,7 @@ namespace lwmf
 		glUniformMatrix4fv(Projection, 1, GL_FALSE, ProjectionMatrix.data());
 		glCheckError();
 
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Get opacity uniform location...");
 		OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
 		glCheckError();
 
@@ -386,7 +385,7 @@ namespace lwmf
 
 		while ((ErrorCode = glGetError()) != GL_NO_ERROR)
 		{
-			std::map<GLenum, std::string> ErrorTable
+			static std::map<GLenum, std::string> ErrorTable
 			{
 				{ GL_INVALID_ENUM, "An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag." },
 				{ GL_INVALID_VALUE, "A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag." },

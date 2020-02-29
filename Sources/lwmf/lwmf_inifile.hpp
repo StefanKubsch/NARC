@@ -36,8 +36,8 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Reading value from INI file " + INIFileName + ": [" + Section + "] / " + Key + "...");
 
-		const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
-		const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
+		static const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
+		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
 
 		T OutputVar{};
 		std::ifstream INIFile(INIFileName, std::ios::in);
@@ -97,8 +97,8 @@ namespace lwmf
 
 		// Modify proper line and write back INI file
 
-		const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
-		const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
+		static const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
+		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
 
 		std::string CurrentSection;
 		std::ofstream OutputINIFile(INIFileName, std::ios::in);
