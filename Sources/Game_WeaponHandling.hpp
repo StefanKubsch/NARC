@@ -330,11 +330,11 @@ namespace Game_WeaponHandling
 
 	inline void HandleAmmoBoxPickup()
 	{
-		if (Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] == Game_EntityHandling::EntityTypes::AmmoBox)
+		if (Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] == EntityTypes::AmmoBox)
 		{
 			for (auto&& Entity : Entities)
 			{
-				if (Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::AmmoBox) && static_cast<std::int_fast32_t>(Player.Pos.X) == static_cast<std::int_fast32_t>(Entity.Pos.X) && static_cast<std::int_fast32_t>(Player.Pos.Y) == static_cast<std::int_fast32_t>(Entity.Pos.Y))
+				if (Entity.Type == EntityTypes::AmmoBox && static_cast<std::int_fast32_t>(Player.Pos.X) == static_cast<std::int_fast32_t>(Entity.Pos.X) && static_cast<std::int_fast32_t>(Player.Pos.Y) == static_cast<std::int_fast32_t>(Entity.Pos.Y))
 				{
 					Game_EntityHandling::PlayAudio(Entity.TypeNumber, Game_EntityHandling::EntitySounds::AmmoBoxPickup);
 					Entity.IsDead = true;

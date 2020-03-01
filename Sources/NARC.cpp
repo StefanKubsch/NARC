@@ -208,7 +208,8 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 		if (HUDMinimap.Enabled)
 		{
-			HUDMinimap.Display();
+			// Display realtime data (entities, waypoints etc.)
+			HUDMinimap.DisplayRealtimeMap();
 		}
 
 		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
@@ -220,6 +221,13 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 			(GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1) ? HID_Gamepad::XBoxControllerIconShader.RenderStaticTexture(&HID_Gamepad::XBoxControllerIconShader.OGLTextureID, true, 1.0F) :
 				HID_Mouse::MouseIconShader.RenderStaticTexture(&HID_Mouse::MouseIconShader.OGLTextureID, true, 1.0F);
+		}
+
+		if (HUDMinimap.Enabled)
+		{
+			// Display pre-rendered overlay (Walls, Doors etc.)
+			// This is a static texture
+			HUDMinimap.DisplayPreRenderedMap();
 		}
 
 		Game_Effects::DrawBloodstain();
@@ -645,6 +653,7 @@ inline void InitAndLoadLevel()
 	Game_Doors::InitDoors();
 	Game_SkyboxHandling::ClearSkyBox();
 	Game_SkyboxHandling::LoadSkyboxImage();
+	HUDMinimap.Clear();
 	HUDMinimap.PreRender();
 	Player.InitConfig();
 	Player.InitAudio();
@@ -652,16 +661,16 @@ inline void InitAndLoadLevel()
 	Game_EntityHandling::InitEntities();
 	Game_Raycaster::RefreshSettings();
 
-	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = Game_EntityHandling::EntityTypes::Player;
+	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = EntityTypes::Player;
 }
 
 inline void MovePlayerAndCheckCollision()
 {
 	if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][Player.FuturePos.X][static_cast<std::int_fast32_t>(Player.Pos.Y)] == 0
 		&& Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][static_cast<std::int_fast32_t>(Player.Pos.X)][Player.FuturePos.Y] == 0
-		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != Game_EntityHandling::EntityTypes::Enemy
-		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != Game_EntityHandling::EntityTypes::Neutral
-		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != Game_EntityHandling::EntityTypes::Turret)
+		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != EntityTypes::Enemy
+		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != EntityTypes::Neutral
+		&& Game_EntityHandling::EntityMap[Player.FuturePos.X][Player.FuturePos.Y] != EntityTypes::Turret)
 	{
 		Player.Pos.X += Player.StepWidth.X;
 		Player.Pos.Y += Player.StepWidth.Y;
@@ -679,7 +688,7 @@ inline void MovePlayerAndCheckCollision()
 
 inline void ControlPlayerMovement()
 {
-	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = Game_EntityHandling::EntityTypes::Clear;
+	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = EntityTypes::Clear;
 	Game_WeaponHandling::WeaponPaceFlag = false;
 
 	if (GameControllerFlag && HID_Gamepad::GameController.ControllerID != -1)
@@ -781,5 +790,5 @@ inline void ControlPlayerMovement()
 		MovePlayerAndCheckCollision();
 	}
 
-	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = Game_EntityHandling::EntityTypes::Player;
+	Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Player.Pos.X)][static_cast<std::int_fast32_t>(Player.Pos.Y)] = EntityTypes::Player;
 }

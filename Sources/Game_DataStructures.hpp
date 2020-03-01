@@ -36,15 +36,25 @@ struct EntityAssetStruct final
 // Structure for entities
 //
 
+enum class EntityTypes : std::int_fast32_t
+{
+	Clear,
+	Neutral,
+	Enemy,
+	Player,
+	AmmoBox,
+	Turret
+};
+
 struct EntityStruct final
 {
 	std::list<lwmf::IntPointStruct> PathFindingWayPoints{};
 	std::map<std::string, std::int_fast32_t> ContainedItem{};
+	EntityTypes Type{};
 	lwmf::FloatPointStruct Pos{};
 	lwmf::FloatPointStruct Dir{};
 	std::string TypeName;
 	std::int_fast32_t Number{};
-	std::int_fast32_t Type{};
 	std::int_fast32_t TypeNumber{};
 	std::int_fast32_t WaitTimer{};
 	std::int_fast32_t Hitpoints{};

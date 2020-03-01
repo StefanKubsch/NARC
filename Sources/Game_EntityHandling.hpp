@@ -26,17 +26,7 @@
 namespace Game_EntityHandling
 {
 
-
-	enum class EntityTypes : std::int_fast32_t
-	{
-		Clear,
-		Neutral,
-		Enemy,
-		Player,
-		AmmoBox,
-		Turret
-	};
-
+	
 	enum class EntitySounds : std::int_fast32_t
 	{
 		Kill			= 0,
@@ -310,19 +300,19 @@ namespace Game_EntityHandling
 
 				if (const std::string EntityTypeString{ lwmf::ReadINIValue<std::string>(INIFile, "ENTITY", "EntityType") }; EntityTypeString == "Neutral")
 				{
-					Entities[Index].Type = static_cast<std::int_fast32_t>(EntityTypes::Neutral);
+					Entities[Index].Type = EntityTypes::Neutral;
 				}
 				else if (EntityTypeString == "Enemy")
 				{
-					Entities[Index].Type = static_cast<std::int_fast32_t>(EntityTypes::Enemy);
+					Entities[Index].Type = EntityTypes::Enemy;
 				}
 				else if (EntityTypeString == "AmmoBox")
 				{
-					Entities[Index].Type = static_cast<std::int_fast32_t>(EntityTypes::AmmoBox);
+					Entities[Index].Type = EntityTypes::AmmoBox;
 				}
 				else if (EntityTypeString == "Turret")
 				{
-					Entities[Index].Type = static_cast<std::int_fast32_t>(EntityTypes::Turret);
+					Entities[Index].Type = EntityTypes::Turret;
 				}
 
 				Entities[Index].WalkAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "WalkAnimStepWidth");
@@ -491,11 +481,11 @@ namespace Game_EntityHandling
 
 	inline void HandleEntityHit(EntityStruct& Entity)
 	{
-		if (Entity.Type != static_cast<std::int_fast32_t>(EntityTypes::AmmoBox))
+		if (Entity.Type != EntityTypes::AmmoBox)
 		{
 			Entity.IsHit = true;
 			Entity.AttackMode = 1;
-			Entity.Type = static_cast<std::int_fast32_t>(EntityTypes::Enemy);
+			Entity.Type = EntityTypes::Enemy;
 
 			// Is entity still alive?
 			if (Entity.Hitpoints > 0)
@@ -636,7 +626,7 @@ namespace Game_EntityHandling
 
 	inline void CalculateEntityPath(EntityStruct& Entity)
 	{
-		if (Entity.Type == static_cast<std::int_fast32_t>(EntityTypes::Enemy) || Entity.Type == static_cast<std::int_fast32_t>(EntityTypes::Neutral))
+		if (Entity.Type == EntityTypes::Enemy || Entity.Type == EntityTypes::Neutral)
 		{
 			Entity.PathFindingWayPoints.clear();
 
@@ -688,7 +678,7 @@ namespace Game_EntityHandling
 						//
 
 						// Refresh ammo position on map once another entity moved over this position
-						if (Entity.Type == static_cast<std::int_fast32_t>(EntityTypes::AmmoBox) && EntityMap[static_cast<std::int_fast32_t>(Entity.Pos.X)][static_cast<std::int_fast32_t>(Entity.Pos.Y)] == EntityTypes::Clear)
+						if (Entity.Type == EntityTypes::AmmoBox && EntityMap[static_cast<std::int_fast32_t>(Entity.Pos.X)][static_cast<std::int_fast32_t>(Entity.Pos.Y)] == EntityTypes::Clear)
 						{
 							MarkEntityPositionOnMap(Entity);
 						}
@@ -778,7 +768,7 @@ namespace Game_EntityHandling
 						else if (EntityMap[EntityPosXTemp][EntityPosYTemp] == EntityTypes::Player)
 						{
 							// Deal damage to player
-							if (Entity.Type == static_cast<std::int_fast32_t>(EntityTypes::Enemy))
+							if (Entity.Type == EntityTypes::Enemy)
 							{
 								Entity.Pos.X -= Entity.Dir.X * Entity.MoveSpeed;
 								Entity.Pos.Y -= Entity.Dir.Y * Entity.MoveSpeed;
@@ -793,7 +783,7 @@ namespace Game_EntityHandling
 									Entity.AttackMode = 1;
 								}
 							}
-							else if (Entity.Type == static_cast<std::int_fast32_t>(EntityTypes::Neutral))
+							else if (Entity.Type == EntityTypes::Neutral)
 							{
 								TurnEntityBackwards(Entity);
 							}
@@ -869,33 +859,7 @@ namespace Game_EntityHandling
 
 	inline void MarkEntityPositionOnMap(const EntityStruct& Entity)
 	{
-		const lwmf::IntPointStruct EntityPos{ static_cast<std::int_fast32_t>(Entity.Pos.X), static_cast<std::int_fast32_t>(Entity.Pos.Y) };
-
-		switch (Entity.Type)
-		{
-			case static_cast<std::int_fast32_t>(EntityTypes::Neutral) :
-			{
-				EntityMap[EntityPos.X][EntityPos.Y] = EntityTypes::Neutral;
-				break;
-			}
-			case static_cast<std::int_fast32_t>(EntityTypes::Enemy):
-			{
-				EntityMap[EntityPos.X][EntityPos.Y] = EntityTypes::Enemy;
-				break;
-			}
-			case static_cast<std::int_fast32_t>(EntityTypes::AmmoBox):
-			{
-				EntityMap[EntityPos.X][EntityPos.Y] = EntityTypes::AmmoBox;
-				break;
-			}
-			case static_cast<std::int_fast32_t>(EntityTypes::Turret):
-			{
-				EntityMap[EntityPos.X][EntityPos.Y] = EntityTypes::Turret;
-				break;
-			}
-
-			default: {}
-		}
+		EntityMap[static_cast<std::int_fast32_t>(Entity.Pos.X)][static_cast<std::int_fast32_t>(Entity.Pos.Y)] = Entity.Type;
 	}
 
 	inline void PlayAudio(const std::int_fast32_t TypeNumber, const EntitySounds EntitySound)

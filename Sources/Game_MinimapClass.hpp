@@ -22,11 +22,15 @@ class Game_MinimapClass final
 public:
 	void Init();
 	void PreRender();
-	void Display();
+	void DisplayRealtimeMap();
+	void DisplayPreRenderedMap();
+	void Clear();
 
 	bool Enabled{ true };
 
 private:
+	static inline lwmf::ShaderClass MiniMapShader{};
+
 	lwmf::IntPointStruct Pos{};
 	std::int_fast32_t TileSize{ 6 };
 	std::int_fast32_t StartPosY{};
@@ -39,6 +43,7 @@ private:
 	std::int_fast32_t WayPointColor{};
 	std::int_fast32_t WaypointOffset{};
 	bool ShowWaypoints{};
+	bool IsPreRendered{};
 };
 
 inline void Game_MinimapClass::Init()
@@ -57,6 +62,8 @@ inline void Game_MinimapClass::Init()
 		WallColor = lwmf::ReadINIValueRGBA(INIFile, "WALLS");
 		DoorColor = lwmf::ReadINIValueRGBA(INIFile, "DOORS");
 		WayPointColor = lwmf::ReadINIValueRGBA(INIFile, "WAYPOINT");
+
+		MiniMapShader.LoadShader("Default", ScreenTexture);
 	}
 }
 
@@ -81,49 +88,62 @@ inline void Game_MinimapClass::PreRender()
 
 	WaypointOffset = TileSize >> 1;
 
+	// PreRender MiniMap
+	lwmf::TextureStruct MiniMapTexture;
+	lwmf::CreateTexture(MiniMapTexture, Game_LevelHandling::LevelMapHeight * TileSize, Game_LevelHandling::LevelMapWidth * TileSize, 0x000000FF);
+
+	for (std::int_fast32_t x{}, MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY, x += TileSize)
+	{
+		for (std::int_fast32_t y{}, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX, y += TileSize)
+		{
+			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] != 0)
+			{
+				lwmf::FilledRectangle(MiniMapTexture, x, y, TileSize, TileSize, WallColor, WallColor);
+			}
+
+			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] != 0)
+			{
+				lwmf::FilledRectangle(MiniMapTexture, x, y, TileSize, TileSize, DoorColor, DoorColor);
+			}
+		}
+	}
+
 	// Set map position
 	StartPosY = ScreenTexture.Height - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
+
+	MiniMapShader.LoadStaticTextureInGPU(MiniMapTexture, &MiniMapShader.OGLTextureID, Pos.X, StartPosY, MiniMapTexture.Width, MiniMapTexture.Height);
+	IsPreRendered = true;
 }
 
-inline void Game_MinimapClass::Display()
+inline void Game_MinimapClass::DisplayRealtimeMap()
 {
 	for (std::int_fast32_t x{ Pos.X }, MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY, x += TileSize)
 	{
 		for (std::int_fast32_t y{ StartPosY }, MapPosX{}; MapPosX < Game_LevelHandling::LevelMapWidth; ++MapPosX, y += TileSize)
 		{
-			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Wall)][MapPosX][MapPosY] != 0)
-			{
-				lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, WallColor, WallColor);
-			}
-
-			if (Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Door)][MapPosX][MapPosY] != 0)
-			{
-				lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, DoorColor, DoorColor);
-			}
-
 			switch (Game_EntityHandling::EntityMap[MapPosX][MapPosY])
 			{
-				case Game_EntityHandling::EntityTypes::Player:
+				case EntityTypes::Player:
 				{
 					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, PlayerColor, PlayerColor);
 					break;
 				}
-				case Game_EntityHandling::EntityTypes::Enemy:
+				case EntityTypes::Enemy:
 				{
 					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, EnemyColor, EnemyColor); //-V1037
 					break;
 				}
-				case Game_EntityHandling::EntityTypes::Turret:
+				case EntityTypes::Turret:
 				{
 					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, EnemyColor, EnemyColor);
 					break;
 				}
-				case Game_EntityHandling::EntityTypes::Neutral:
+				case EntityTypes::Neutral:
 				{
 					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, NeutralColor, NeutralColor);
 					break;
 				}
-				case Game_EntityHandling::EntityTypes::AmmoBox:
+				case EntityTypes::AmmoBox:
 				{
 					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, AmmoBoxColor, AmmoBoxColor);
 					break;
@@ -135,7 +155,7 @@ inline void Game_MinimapClass::Display()
 			{
 				for (auto& Entity : Entities)
 				{
-					if (!Entity.IsDead && (Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Neutral) || Entity.Type == static_cast<std::int_fast32_t>(Game_EntityHandling::EntityTypes::Enemy)))
+					if (!Entity.IsDead && (Entity.Type == EntityTypes::Neutral || Entity.Type == EntityTypes::Enemy))
 					{
 						for (auto& WayPoint : Entity.PathFindingWayPoints)
 						{
@@ -149,5 +169,18 @@ inline void Game_MinimapClass::Display()
 				}
 			}
 		}
+	}
+}
+
+inline void Game_MinimapClass::DisplayPreRenderedMap()
+{
+	MiniMapShader.RenderStaticTexture(&MiniMapShader.OGLTextureID, true, 1.0F);
+}
+
+inline void Game_MinimapClass::Clear()
+{
+	if (IsPreRendered)
+	{
+		glDeleteTextures(1, &MiniMapShader.OGLTextureID);
 	}
 }

@@ -266,8 +266,11 @@ namespace lwmf
 	// Rectangles
 	//
 
-	inline void Rectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
+	inline void Rectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
+		--Width;
+		--Height;
+
 		// Exit early if coords are out of visual boundaries
 		if (PosX > Texture.Width || PosX + Width < 0 || PosY > Texture.Height || PosY + Height < 0)
 		{
@@ -283,14 +286,14 @@ namespace lwmf
 	inline void FilledRectangle(TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
 		// Exit early if coords are out of visual boundaries
-		if (PosX > Texture.Width || PosX + Width < 0 || PosY > Texture.Height || PosY + Height < 0)
+		if (PosX > Texture.Width || PosX + Width - 1 < 0 || PosY > Texture.Height || PosY + Height - 1 < 0)
 		{
 			return;
 		}
 
-		for (std::int_fast32_t y{ PosY }; y <= PosY + Height; ++y)
+		for (std::int_fast32_t y{ PosY }; y < PosY + Height; ++y)
 		{
-			Line(Texture, PosX, y, PosX + Width, y, FillColor);
+			Line(Texture, PosX, y, PosX + Width - 1, y, FillColor);
 		}
 
 		if (BorderColor != FillColor)

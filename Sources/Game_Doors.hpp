@@ -174,7 +174,7 @@ namespace Game_Doors
 
 			// Close door - but first check if door is not blocked!
 			if (Door.State == DoorStruct::States::Open
-				&& Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] == Game_EntityHandling::EntityTypes::Clear
+				&& Game_EntityHandling::EntityMap[static_cast<std::int_fast32_t>(Door.Pos.X)][static_cast<std::int_fast32_t>(Door.Pos.Y)] == EntityTypes::Clear
 				&& (std::abs(Player.Pos.X - Door.Pos.X) > FLT_EPSILON || std::abs(Player.Pos.Y - Door.Pos.Y) > FLT_EPSILON))
 			{
 				if (--Door.StayOpenCounter <= 0)
