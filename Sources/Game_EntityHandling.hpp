@@ -26,7 +26,7 @@
 namespace Game_EntityHandling
 {
 
-	
+
 	enum class EntitySounds : std::int_fast32_t
 	{
 		Kill			= 0,
@@ -100,6 +100,9 @@ namespace Game_EntityHandling
 	inline void InitEntityAssets()
 	{
 		CloseAudio();
+
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init entity assets...");
+
 		EntityAssets.clear();
 		EntityAssets.shrink_to_fit();
 
@@ -144,6 +147,8 @@ namespace Game_EntityHandling
 					// Get GFX
 					//
 
+					NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load entity textures...");
+
 					LoadWalkAnimTextures(AssetIndex, AssetTypeName);
 					LoadAdditionalAnimTextures("Attack", AssetTypeName, EntityAssets[AssetIndex].AttackTextures);
 					LoadAdditionalAnimTextures("Kill", AssetTypeName, EntityAssets[AssetIndex].KillTextures);
@@ -151,6 +156,8 @@ namespace Game_EntityHandling
 					//
 					// Get SFX
 					//
+
+					NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load entity audio...");
 
 					EntityAssets[AssetIndex].Sounds.clear();
 					EntityAssets[AssetIndex].Sounds.shrink_to_fit();
@@ -266,6 +273,8 @@ namespace Game_EntityHandling
 
 	inline void InitEntities()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init entities...");
+
 		Entities.clear();
 		Entities.shrink_to_fit();
 		EntityMap.clear();
@@ -869,6 +878,8 @@ namespace Game_EntityHandling
 
 	inline void CloseAudio()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close entity audio...");
+
 		for (auto&& Asset : EntityAssets)
 		{
 			for (auto&& Sound : Asset.Sounds)

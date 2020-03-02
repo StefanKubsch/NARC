@@ -49,6 +49,8 @@ namespace Game_Raycaster
 
 	inline void Init()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init raycaster config...");
+
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "RaycasterConfig.ini";
 
@@ -68,6 +70,8 @@ namespace Game_Raycaster
 
 	inline void RefreshSettings()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Refresh raycaster settings...");
+
 		Plane = PlaneStartValue;
 		VerticalLook = 0;
 		VerticalLookCamera = 0.0F;

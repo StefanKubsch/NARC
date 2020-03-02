@@ -39,6 +39,8 @@ namespace Game_Effects
 
 	inline void InitEffects()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init effects...");
+
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "EffectsConfig.ini";
 

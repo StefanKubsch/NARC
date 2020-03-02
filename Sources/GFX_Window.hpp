@@ -26,6 +26,8 @@ namespace GFX_Window
 
 	inline void Init()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init window...");
+
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "WindowConfig.ini";
 
@@ -46,6 +48,11 @@ namespace GFX_Window
 
 			ScreenTextureShader.LoadShader("Default", ScreenTexture);
 			ScreenTextureShader.PrepareLWMFTexture(ScreenTexture, 0, 0);
+
+			// Inital clearance of window. Looks better while loading the rest of the game...
+			lwmf::ClearTexture(ScreenTexture, 0x00000000);
+			lwmf::ClearBuffer();
+			lwmf::SwapBuffer();
 		}
 	}
 

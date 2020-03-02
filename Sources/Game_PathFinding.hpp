@@ -56,6 +56,8 @@ namespace Game_PathFinding
 
 	inline void GenerateFlattenedMap(std::vector<float>& Map, const std::int_fast32_t Width, const std::int_fast32_t Height)
 	{
+		Map.clear();
+		Map.shrink_to_fit();
 		Map.resize(static_cast<size_t>(Width) * static_cast<size_t>(Height), FLT_MAX);
 
 		for (std::int_fast32_t y{}; y < Height; ++y)

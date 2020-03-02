@@ -33,6 +33,8 @@ namespace Game_PreGame
 
 	inline void ShowIntroHeader()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Show intro header...");
+
 		std::string FileName{ GameConfigFolder };
 		FileName += "IntroHeader.txt";
 

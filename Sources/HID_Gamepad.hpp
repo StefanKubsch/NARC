@@ -57,10 +57,10 @@ namespace HID_Gamepad
 
 	inline void Init()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init XBOX controller...");
+
 		if (GameController.CheckConnection())
 		{
-			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init XBOX controller...");
-
 			std::string INIFile{ GameConfigFolder };
 			INIFile += "InputConfig.ini";
 

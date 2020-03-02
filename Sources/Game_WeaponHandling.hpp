@@ -99,6 +99,8 @@ namespace Game_WeaponHandling
 
 	inline void InitConfig()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init weapons...");
+
 		Weapons.clear();
 		Weapons.shrink_to_fit();
 
@@ -169,6 +171,8 @@ namespace Game_WeaponHandling
 
 	inline void InitTextures()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load weapon textures...");
+
 		for (auto&& Weapon : Weapons)
 		{
 			// Weapon textures
@@ -222,6 +226,8 @@ namespace Game_WeaponHandling
 	inline void InitAudio()
 	{
 		CloseAudio();
+
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load weapon audio...");
 
 		for (auto&& Weapon : Weapons)
 		{
@@ -567,6 +573,8 @@ namespace Game_WeaponHandling
 
 	inline void CloseAudio()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close weapon audio...");
+
 		for (auto&& Weapon : Weapons)
 		{
 			for (auto&& Sound : Weapon.Sounds)

@@ -41,6 +41,8 @@ namespace Game_Transitions
 
 	inline void Init()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init level transitions...");
+
 		GeneralText.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GENERALFONT");
 		GameOverText.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GAMEOVERFONT");
 		GameOverText1.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GAMEOVERFONT1");

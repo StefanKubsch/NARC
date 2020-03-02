@@ -29,11 +29,15 @@ namespace Game_Config
 
 	inline void Init()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init general game config...");
+
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "GameConfig.ini";
 
 		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
+			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Check used texture sizes...");
+
 			const std::map<std::int_fast32_t, std::int_fast32_t> TextureCompare //-V808
 			{
 				{ 64, 6 },
@@ -70,6 +74,8 @@ namespace Game_Config
 
 	inline void GatherNumberOfLevels()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Gathering number of levels...");
+
 		NumberOfLevels = StartLevel;
 
 		while (Tools_ErrorHandling::CheckFolderExistence(LevelFolder + std::to_string(NumberOfLevels), ContinueOnError))
@@ -80,6 +86,10 @@ namespace Game_Config
 		if (--NumberOfLevels == StartLevel - 1)
 		{
 			NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "No Leveldata found.");
+		}
+		else
+		{
+			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Data of " + std::to_string(NumberOfLevels) + " level(s) was found!");
 		}
 	}
 

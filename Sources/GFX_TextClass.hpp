@@ -49,6 +49,8 @@ private:
 
 inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::string& Section)
 {
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init font...");
+
 	if (Tools_ErrorHandling::CheckFileExistence(INIFileName, StopOnError))
 	{
 		const std::string FontName{ lwmf::ReadINIValue<std::string>(INIFileName, Section, "FontName") };

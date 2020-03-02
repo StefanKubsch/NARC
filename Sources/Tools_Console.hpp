@@ -33,6 +33,8 @@ namespace Tools_Console
 
 	inline void CreateConsole()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Create console...");
+
 		AllocConsole();
 		SetConsoleTitle("NARC Console");
 
@@ -47,6 +49,8 @@ namespace Tools_Console
 
 	inline void CloseConsole()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close console...");
+
 		fclose(stdout);
 		fclose(stdin);
 		fclose(stderr);

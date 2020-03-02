@@ -112,6 +112,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		return EXIT_FAILURE;
 	}
 
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init multithreading threadpool...");
 	lwmf::Multithreading ThreadPool;
 
 	const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
@@ -237,8 +238,11 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			MainMenu.Show();
 		}
 
+		// Render everything to screen!
 		lwmf::SwapBuffer();
 	}
+
+	// Cleanup everything and exit the program...
 
 	Tools_Cleanup::CloseAllAudio();
 	Tools_Cleanup::DestroySubsystems();
@@ -614,14 +618,23 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 inline void InitAndLoadGameConfig()
 {
-	Tools_Console::CreateConsole();
-	Game_Config::GatherNumberOfLevels();
-	Game_PreGame::ShowIntroHeader();
-	Game_PreGame::SetOptions();
 	lwmf::CheckForSSESupport();
 	Game_Config::Init();
-	Game_Raycaster::Init();
+	Game_Config::GatherNumberOfLevels();
+
+	Tools_Console::CreateConsole();
+	Game_PreGame::ShowIntroHeader();
+	Game_PreGame::SetOptions();
+	Tools_Console::CloseConsole();
+
 	GFX_Window::Init();
+	HID_Keyboard::Init();
+	HID_Mouse::Init();
+	HID_Gamepad::Init();
+	MainMenu.Init();
+	Game_Transitions::Init();
+
+	Game_Raycaster::Init();
 	Game_WeaponHandling::InitConfig();
 	Game_WeaponHandling::InitTextures();
 	Game_WeaponHandling::InitAudio();
@@ -631,12 +644,6 @@ inline void InitAndLoadGameConfig()
 	HUDMinimap.Init();
 	Game_SkyboxHandling::Init();
 	Game_Doors::InitDoorAssets();
-	HID_Keyboard::Init();
-	HID_Mouse::Init();
-	HID_Gamepad::Init();
-	Game_Transitions::Init();
-	MainMenu.Init();
-	Tools_Console::CloseConsole();
 }
 
 inline void InitAndLoadLevel()
@@ -651,9 +658,7 @@ inline void InitAndLoadLevel()
 	Game_PathFinding::GenerateFlattenedMap(Game_PathFinding::FlattenedMap, Game_LevelHandling::LevelMapWidth, Game_LevelHandling::LevelMapHeight);
 
 	Game_Doors::InitDoors();
-	Game_SkyboxHandling::ClearSkyBox();
 	Game_SkyboxHandling::LoadSkyboxImage();
-	HUDMinimap.Clear();
 	HUDMinimap.PreRender();
 	Player.InitConfig();
 	Player.InitAudio();

@@ -46,6 +46,10 @@ namespace Game_SkyboxHandling
 
 	inline void LoadSkyboxImage()
 	{
+		ClearSkyBox();
+
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init skybox...");
+
 		std::string INIFile{ LevelFolder };
 		INIFile += std::to_string(SelectedLevel);
 		INIFile += "/LevelData/SkyboxConfig.ini";
@@ -56,11 +60,14 @@ namespace Game_SkyboxHandling
 
 			if (SkyBoxEnabled)
 			{
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load skybox image...");
+
 				const lwmf::TextureStruct TempTexture { GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "SKYBOX", "SkyBoxImageName"))	};
 
 				SkyboxWidth = TempTexture.Width;
 				SkyboxHeight = TempTexture.Height;
 
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load skybox texture into GPU RAM...");
 				SkyboxShader.LoadTextureInGPU(TempTexture, &SkyboxShader.OGLTextureID);
 			}
 		}
@@ -86,6 +93,7 @@ namespace Game_SkyboxHandling
 	{
 		if (SkyBoxEnabled)
 		{
+			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Delete skybox texture from GPU...");
 			glDeleteTextures(1, &SkyboxShader.OGLTextureID);
 		}
 	}

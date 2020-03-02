@@ -51,6 +51,9 @@ namespace Game_Doors
 	inline void InitDoorAssets()
 	{
 		CloseAudio();
+
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init door assets...");
+
 		DoorTypes.clear();
 		DoorTypes.shrink_to_fit();
 		DoorTypes.resize(1);
@@ -93,6 +96,8 @@ namespace Game_Doors
 
 	inline void InitDoors()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init doors...");
+
 		Doors.clear();
 		Doors.shrink_to_fit();
 
@@ -210,6 +215,8 @@ namespace Game_Doors
 
 	inline void CloseAudio()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close door audio...");
+
 		for (auto&& DoorType : DoorTypes)
 		{
 			for (auto&& Sound : DoorType.Sounds)

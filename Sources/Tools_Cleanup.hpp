@@ -27,6 +27,8 @@ namespace Tools_Cleanup
 
 	inline void DestroySubsystems()
 	{
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Destroy subsystems...");
+
 		lwmf::UnregisterRawInputDevice(lwmf::DeviceIdentifier::HID_MOUSE);
 		lwmf::UnregisterRawInputDevice(lwmf::DeviceIdentifier::HID_KEYBOARD);
 		lwmf::DeleteOpenGLContext();
