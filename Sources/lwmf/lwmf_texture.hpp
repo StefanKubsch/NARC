@@ -64,8 +64,8 @@ namespace lwmf
 
 	inline void CreateTexture(TextureStruct& Texture, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
-		Texture.Pixels.resize(static_cast<std::size_t>(Width) * static_cast<std::size_t>(Height));
 		SetTextureMetrics(Texture, Width, Height);
+		Texture.Pixels.resize(static_cast<std::size_t>(Texture.Size));
 		ClearTexture(Texture, Color);
 	}
 

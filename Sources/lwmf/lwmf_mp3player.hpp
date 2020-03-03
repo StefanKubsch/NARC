@@ -90,6 +90,8 @@ namespace lwmf
 		// Get device informations
 		//
 
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Gather audio device...");
+
 		const UINT NumberOfDevices{ waveOutGetNumDevs() };
 
 		if (NumberOfDevices != 0)

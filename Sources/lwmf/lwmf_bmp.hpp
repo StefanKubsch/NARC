@@ -60,8 +60,7 @@ namespace lwmf
 			File.seekg(BMPHeader->bfOffBits);
 			File.read(InputBuffer.data(), BMPInfo->biSizeImage);
 
-			SetTextureMetrics(Texture, BMPInfo->biWidth, BMPInfo->biHeight);
-			Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
+			CreateTexture(Texture, BMPInfo->biWidth, BMPInfo->biHeight, 0x00000000);
 
 			for (std::int_fast32_t Offset{}, y{ Texture.Height - 1 }; y >= 0; --y)
 			{

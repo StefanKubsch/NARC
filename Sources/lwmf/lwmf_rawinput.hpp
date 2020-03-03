@@ -11,6 +11,8 @@
 #pragma once
 
 #include <Windows.h>
+#include <cstring>
+#include <map>
 
 #include "lwmf_logging.hpp"
 
@@ -25,6 +27,7 @@ namespace lwmf
 		HID_KEYBOARD	= 6
 	};
 
+	std::string DeviceString(DeviceIdentifier Device);
 	void RegisterRawInputDevice(HWND hWnd, DeviceIdentifier Device);
 	void UnregisterRawInputDevice(DeviceIdentifier Device);
 	void CatchMouse(HWND hWnd);
@@ -33,9 +36,32 @@ namespace lwmf
 	// Functions
 	//
 
+	inline std::string DeviceString(const DeviceIdentifier Device)
+	{
+		static std::map<DeviceIdentifier, std::string> DeviceTable
+		{
+			{ DeviceIdentifier::HID_MOUSE, "HID_MOUSE (DeviceIdentifier 2)" },
+			{ DeviceIdentifier::HID_KEYBOARD, "HID_KEYBOARD (DeviceIdentifier 6)" },
+		};
+
+		const std::map<DeviceIdentifier, std::string>::iterator ItDeviceTable{ DeviceTable.find(Device) };
+		std::string DevString;
+
+		if (ItDeviceTable == DeviceTable.end())
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Unknown HID device identifier!");
+		}
+		else
+		{
+			DevString = ItDeviceTable->second;
+		}
+
+		return DevString;
+	}
+
 	inline void RegisterRawInputDevice(const HWND hWnd, const DeviceIdentifier Device)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Register device " + std::to_string(static_cast<USHORT>(Device)) + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Register device " + DeviceString(Device) + "...");
 
 		RAWINPUTDEVICE RawInputDevice{};
 		RawInputDevice.usUsagePage = 1;
@@ -45,13 +71,17 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error registering raw input device " + std::to_string(static_cast<USHORT>(Device)) + "!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error registering raw input device " + DeviceString(Device) + "!");
+		}
+		else
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Successfully registered device " + DeviceString(Device));
 		}
 	}
 
 	inline void UnregisterRawInputDevice(const DeviceIdentifier Device)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Unregister device " + std::to_string(static_cast<USHORT>(Device)) + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Unregister device " + DeviceString(Device) + "...");
 
 		RAWINPUTDEVICE RawInputDevice{};
 		RawInputDevice.usUsagePage = 1;
@@ -61,7 +91,11 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error unregistering raw input device " + std::to_string(static_cast<USHORT>(Device)) + "!");
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error unregistering raw input device " + DeviceString(Device) + "!");
+		}
+		else
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Successfully unregistered device " + DeviceString(Device));
 		}
 	}
 

@@ -37,6 +37,10 @@ namespace lwmf
 		{
 			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "SSE 4.2 is not supported on this computer!");
 		}
+		else
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "SSE 4.2 extension found!");
+		}
 	}
 
 
