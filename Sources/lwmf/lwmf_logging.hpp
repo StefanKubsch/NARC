@@ -68,8 +68,6 @@ namespace lwmf
 	{
 		if (LoggingEnabled)
 		{
-			std::ios_base::sync_with_stdio(false);
-
 			Logfile.open(Logfilename, std::ios::out | std::ios::trunc);
 
 			if (Logfile.fail())
@@ -77,7 +75,12 @@ namespace lwmf
 				std::exit(EXIT_FAILURE);
 			}
 
-			Logfile << "lwmf logging\nlogging started at: " << GetTimeStamp() << std::string(150,'-') << "\n";
+			std::string TempString{ "lwmf logging\nlogging started at: " };
+			TempString += GetTimeStamp();
+			TempString += std::string(150, '-');
+			TempString += "\n";
+
+			Logfile << TempString;
 		}
 	}
 
@@ -87,7 +90,12 @@ namespace lwmf
 		{
 			if (Logfile.is_open())
 			{
-				Logfile << std::string(150, '-') << "\nlogging ended at: " << GetTimeStamp() << "\n";
+				std::string TempString{ std::string(150, '-') };
+				TempString += "\nlogging ended at: ";
+				TempString += GetTimeStamp();
+				TempString += "\n";
+
+				Logfile << TempString;
 			}
 		}
 	}
@@ -111,14 +119,28 @@ namespace lwmf
 			{
 				if (Level == LogLevel::Error || Level == LogLevel::Critical)
 				{
-					Logfile << "\n" << GetTimeStamp() << ItErrorTable->second << Filename << ": " << Message << "\n";
+					std::string TempString{ "\n" };
+					TempString += GetTimeStamp();
+					TempString += ItErrorTable->second;
+					TempString += Filename;
+					TempString += ": ";
+					TempString += Message;
+					TempString += "\n";
+
+					Logfile << TempString;
 					Logfile.close();
 
 					ThrowExceptions ? throw std::runtime_error(Message) : std::exit(EXIT_FAILURE);
 				}
 				else
 				{
-					Logfile << ItErrorTable->second << Filename << ": " << Message << "\n";
+					std::string TempString{ ItErrorTable->second };
+					TempString += Filename;
+					TempString += ": ";
+					TempString += Message;
+					TempString += "\n";
+
+					Logfile << TempString;
 				}
 			}
 		}

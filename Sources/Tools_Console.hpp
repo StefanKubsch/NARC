@@ -41,10 +41,6 @@ namespace Tools_Console
 		freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 		freopen_s(reinterpret_cast<FILE**>(stdin), "CONIN$", "r", stdin);
 		freopen_s(reinterpret_cast<FILE**>(stderr), "CONOUT$", "w", stderr);
-
-		// Don´t sync C and C++ standard streams since we only use C++ streams
-		std::ios::sync_with_stdio(false);
-		std::cin.tie(nullptr);
 	}
 
 	inline void CloseConsole()
