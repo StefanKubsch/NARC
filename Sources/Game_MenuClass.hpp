@@ -54,7 +54,7 @@ private:
 
 inline void Game_MenuClass::Init()
 {
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init menu...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init menu...");
 
 	std::string INIFile{ GameConfigFolder };
 	INIFile += "MenuConfig.ini";

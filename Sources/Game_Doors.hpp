@@ -52,7 +52,7 @@ namespace Game_Doors
 	{
 		CloseAudio();
 
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init door assets...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init door assets...");
 
 		DoorTypes.clear();
 		DoorTypes.shrink_to_fit();
@@ -88,7 +88,7 @@ namespace Game_Doors
 			}
 			else
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "No more doortype data found.");
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "No more doortype data found.");
 				break;
 			}
 		}
@@ -96,7 +96,7 @@ namespace Game_Doors
 
 	inline void InitDoors()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init doors...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init doors...");
 
 		Doors.clear();
 		Doors.shrink_to_fit();
@@ -215,7 +215,7 @@ namespace Game_Doors
 
 	inline void CloseAudio()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close door audio...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Close door audio...");
 
 		for (auto&& DoorType : DoorTypes)
 		{

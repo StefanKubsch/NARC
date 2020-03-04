@@ -101,7 +101,7 @@ namespace Game_EntityHandling
 	{
 		CloseAudio();
 
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init entity assets...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init entity assets...");
 
 		EntityAssets.clear();
 		EntityAssets.shrink_to_fit();
@@ -147,7 +147,7 @@ namespace Game_EntityHandling
 					// Get GFX
 					//
 
-					NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load entity textures...");
+					NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load entity textures...");
 
 					LoadWalkAnimTextures(AssetIndex, AssetTypeName);
 					LoadAdditionalAnimTextures("Attack", AssetTypeName, EntityAssets[AssetIndex].AttackTextures);
@@ -157,7 +157,7 @@ namespace Game_EntityHandling
 					// Get SFX
 					//
 
-					NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load entity audio...");
+					NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load entity audio...");
 
 					EntityAssets[AssetIndex].Sounds.clear();
 					EntityAssets[AssetIndex].Sounds.shrink_to_fit();
@@ -273,7 +273,7 @@ namespace Game_EntityHandling
 
 	inline void InitEntities()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init entities...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init entities...");
 
 		Entities.clear();
 		Entities.shrink_to_fit();
@@ -529,7 +529,7 @@ namespace Game_EntityHandling
 		else
 		{
 			// This check is only needed when the entities are initially loaded...
-			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "Entity direction error! Direction must be 'N', 'S', 'E' or 'W'!");
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "Entity direction error! Direction must be 'N', 'S', 'E' or 'W'!");
 		}
 	}
 
@@ -878,7 +878,7 @@ namespace Game_EntityHandling
 
 	inline void CloseAudio()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close entity audio...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Close entity audio...");
 
 		for (auto&& Asset : EntityAssets)
 		{

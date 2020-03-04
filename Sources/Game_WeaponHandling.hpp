@@ -99,7 +99,7 @@ namespace Game_WeaponHandling
 
 	inline void InitConfig()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init weapons...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init weapons...");
 
 		Weapons.clear();
 		Weapons.shrink_to_fit();
@@ -158,20 +158,20 @@ namespace Game_WeaponHandling
 			}
 			else
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "No more weapon data found.");
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "No more weapon data found.");
 				break;
 			}
 		}
 
 		if (Weapons.empty())
 		{
-			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, "No weapon data found!");
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "No weapon data found!");
 		}
 	}
 
 	inline void InitTextures()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load weapon textures...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load weapon textures...");
 
 		for (auto&& Weapon : Weapons)
 		{
@@ -227,7 +227,7 @@ namespace Game_WeaponHandling
 	{
 		CloseAudio();
 
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load weapon audio...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load weapon audio...");
 
 		for (auto&& Weapon : Weapons)
 		{
@@ -573,7 +573,7 @@ namespace Game_WeaponHandling
 
 	inline void CloseAudio()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close weapon audio...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Close weapon audio...");
 
 		for (auto&& Weapon : Weapons)
 		{

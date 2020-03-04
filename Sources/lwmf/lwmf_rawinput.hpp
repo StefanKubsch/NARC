@@ -49,7 +49,7 @@ namespace lwmf
 
 		if (ItDeviceTable == DeviceTable.end())
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Unknown HID device identifier!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Unknown HID device identifier!");
 		}
 		else
 		{
@@ -61,7 +61,7 @@ namespace lwmf
 
 	inline void RegisterRawInputDevice(const HWND hWnd, const DeviceIdentifier Device)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Register device " + DeviceString(Device) + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Register device " + DeviceString(Device) + "...");
 
 		RAWINPUTDEVICE RawInputDevice{};
 		RawInputDevice.usUsagePage = 1;
@@ -71,17 +71,17 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error registering raw input device " + DeviceString(Device) + "!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error registering raw input device " + DeviceString(Device) + "!");
 		}
 		else
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Successfully registered device " + DeviceString(Device));
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Successfully registered device " + DeviceString(Device));
 		}
 	}
 
 	inline void UnregisterRawInputDevice(const DeviceIdentifier Device)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Unregister device " + DeviceString(Device) + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Unregister device " + DeviceString(Device) + "...");
 
 		RAWINPUTDEVICE RawInputDevice{};
 		RawInputDevice.usUsagePage = 1;
@@ -91,11 +91,11 @@ namespace lwmf
 
 		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error unregistering raw input device " + DeviceString(Device) + "!");
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error unregistering raw input device " + DeviceString(Device) + "!");
 		}
 		else
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Successfully unregistered device " + DeviceString(Device));
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Successfully unregistered device " + DeviceString(Device));
 		}
 	}
 

@@ -53,7 +53,7 @@ namespace lwmf
 	{
 		if (Width <= 0 || Height <= 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::SetTextureMetrics()!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::SetTextureMetrics()!");
 		}
 
 		Texture.Width = Width;
@@ -74,7 +74,7 @@ namespace lwmf
 	{
 		if (x < 0 || y < 0 || x > Texture.Width || y > Texture.Height)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Value for texture x or y is out of range! Check your parameters used with lwmf::CropTexture()!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture x or y is out of range! Check your parameters used with lwmf::CropTexture()!");
 		}
 
 		// Make sure that Width and Height are within texture size limits!
@@ -83,7 +83,7 @@ namespace lwmf
 
 		if (x + Width > Texture.Width || y + Height > Texture.Height)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Value for width or height is out of range! Check your parameters used with lwmf::CropTexture()!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for width or height is out of range! Check your parameters used with lwmf::CropTexture()!");
 		}
 
 		std::vector<std::int_fast32_t>TempBuffer(Width * Height);
@@ -112,7 +112,7 @@ namespace lwmf
 	{
 		if (TargetWidth <= 0 || TargetHeight <= 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::ResizeTexture()!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::ResizeTexture()!");
 		}
 
 		std::vector<std::int_fast32_t> TempBuffer(TargetWidth * TargetHeight);

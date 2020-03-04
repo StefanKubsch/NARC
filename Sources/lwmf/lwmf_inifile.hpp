@@ -34,7 +34,7 @@ namespace lwmf
 
 	template<typename T>T ReadINIValue(const std::string& INIFileName, const std::string& Section, const std::string& Key)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Reading value from INI file " + INIFileName + ": [" + Section + "] / " + Key + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Reading value from INI file " + INIFileName + ": [" + Section + "] / " + Key + "...");
 
 		static const std::regex SectionTest(R"(\[(.*?)\])", std::regex::optimize | std::regex::icase);
 		static const std::regex ValueTest(R"((\w+)=([^\#]+(?!\+{3})))", std::regex::optimize | std::regex::icase);
@@ -59,7 +59,7 @@ namespace lwmf
 				}
 				else if (std::regex_search(Line, Match, ValueTest) && (CurrentSection == Section && Match[1] == Key))
 				{
-					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "   Value : " + std::string(Match[2]));
+					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "   Value : " + std::string(Match[2]));
 
 					// Convert Value to proper type
 					std::istringstream Stream(Match[2]);
@@ -72,7 +72,7 @@ namespace lwmf
 
 		if (!ValueFound)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Value [" + Section + "] / " + Key + " not found!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value [" + Section + "] / " + Key + " not found!");
 		}
 
 		return OutputVar;
@@ -80,7 +80,7 @@ namespace lwmf
 
 	template<typename T>void WriteINIValue(const std::string& Section, const std::string& Key, const T Value, const std::string& INIFileName)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Writing value to INI file " + INIFileName + " [" + Section + "] / " + Key);
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Writing value to INI file " + INIFileName + " [" + Section + "] / " + Key);
 
 		// Read INI file into vector of strings
 

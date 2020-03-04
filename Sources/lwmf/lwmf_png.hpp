@@ -1219,7 +1219,7 @@ namespace lwmf
 
 	inline void LoadPNG(TextureStruct& Texture, const std::string& Filename)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Load file " + Filename + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Load file " + Filename + "...");
 
 		std::ifstream File(Filename.c_str(), std::ios::in | std::ios::binary);
 
@@ -1228,7 +1228,7 @@ namespace lwmf
 			std::array<char, 100> ErrorMessage{};
 			strerror_s(ErrorMessage.data(), 100, errno);
 
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
 		}
 		else
 		{

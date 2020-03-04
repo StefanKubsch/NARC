@@ -27,7 +27,7 @@ namespace Tools_Cleanup
 
 	inline void DestroySubsystems()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Destroy subsystems...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Destroy subsystems...");
 
 		lwmf::UnregisterRawInputDevice(lwmf::DeviceIdentifier::HID_MOUSE);
 		lwmf::UnregisterRawInputDevice(lwmf::DeviceIdentifier::HID_KEYBOARD);
@@ -36,7 +36,7 @@ namespace Tools_Cleanup
 
 	inline void CloseAllAudio()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close all audio handles...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Close all audio handles...");
 
 		Game_LevelHandling::CloseAudio();
 		Game_EntityHandling::CloseAudio();

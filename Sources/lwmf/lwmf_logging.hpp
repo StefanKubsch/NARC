@@ -56,7 +56,7 @@ namespace lwmf
 	public:
 		Logging(const std::string& Logfilename);
 		~Logging();
-		void AddEntry(LogLevel Level, const char* Filename, const std::string& Message);
+		void AddEntry(LogLevel Level, const char* Filename, std::int_fast32_t LineNumber, const std::string& Message);
 
 	private:
 		static std::string GetTimeStamp();
@@ -108,7 +108,7 @@ namespace lwmf
 		}
 	}
 
-	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::string& Message)
+	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::int_fast32_t LineNumber, const std::string& Message)
 	{
 		if (LoggingEnabled && Logfile.is_open())
 		{
@@ -131,6 +131,9 @@ namespace lwmf
 					TempString += GetTimeStamp();
 					TempString += ItErrorTable->second;
 					TempString += Filename;
+					TempString += "(";
+					TempString += std::to_string(LineNumber);
+					TempString += ")";
 					TempString += ": ";
 					TempString += Message;
 					TempString += "\n";
@@ -144,6 +147,9 @@ namespace lwmf
 				{
 					std::string TempString{ ItErrorTable->second };
 					TempString += Filename;
+					TempString += "(";
+					TempString += std::to_string(LineNumber);
+					TempString += ")";
 					TempString += ": ";
 					TempString += Message;
 					TempString += "\n";

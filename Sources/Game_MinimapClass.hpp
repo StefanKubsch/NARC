@@ -49,7 +49,7 @@ private:
 
 inline void Game_MinimapClass::Init()
 {
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init minimap...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init minimap...");
 
 	std::string INIFile{ GameConfigFolder };
 	INIFile += "HUDMinimapConfig.ini";
@@ -74,7 +74,7 @@ inline void Game_MinimapClass::PreRender()
 {
 	Clear();
 
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Prerender minimap...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Prerender minimap...");
 
 	// The bigger the level, the smaller the tiles of the minimap...
 	if (Game_LevelHandling::LevelMapWidth + Game_LevelHandling::LevelMapHeight <= 50)
@@ -118,7 +118,7 @@ inline void Game_MinimapClass::PreRender()
 	// Set map position
 	StartPosY = ScreenTexture.Height - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
 
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load minimap texture into GPU RAM...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load minimap texture into GPU RAM...");
 
 	MiniMapShader.LoadStaticTextureInGPU(MiniMapTexture, &MiniMapShader.OGLTextureID, Pos.X, StartPosY, MiniMapTexture.Width, MiniMapTexture.Height);
 	IsPreRendered = true;
@@ -190,7 +190,7 @@ inline void Game_MinimapClass::Clear()
 {
 	if (IsPreRendered)
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Delete minimap texture from GPU...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Delete minimap texture from GPU...");
 		glDeleteTextures(1, &MiniMapShader.OGLTextureID);
 	}
 }

@@ -77,7 +77,7 @@ namespace HID_Keyboard
 
 	inline void Init()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init keyboard config...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init keyboard config...");
 
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "InputConfig.ini";

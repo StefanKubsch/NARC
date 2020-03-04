@@ -50,11 +50,11 @@ namespace lwmf
 	{
 		// Create window
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Create window...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Create window...");
 
 		if (Width <= 0 || Height <= 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Value for window width or height is zero or negative! Check your parameters in lwmf::CreateOpenGLWindow()!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Value for window width or height is zero or negative! Check your parameters in lwmf::CreateOpenGLWindow()!");
 		}
 
 		WNDCLASS WindowClass{};
@@ -64,7 +64,7 @@ namespace lwmf
 
 		if (RegisterClass(&WindowClass) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error registering windowclass (RegisterClass)!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error registering windowclass (RegisterClass)!");
 		}
 		else
 		{
@@ -96,13 +96,13 @@ namespace lwmf
 
 			if (MainWindow == nullptr)
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error creating window (CreateWindowEx)!");
+				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error creating window (CreateWindowEx)!");
 			}
 
 			// Create OpenGL context
 			// https://www.khronos.org/opengl/wiki/Creating_an_OpenGL_Context_(WGL)
 
-			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Create OpenGL context...");
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Create OpenGL context...");
 
 			const PIXELFORMATDESCRIPTOR PFD
 			{
@@ -128,19 +128,19 @@ namespace lwmf
 
 			if (WindowHandle == nullptr)
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error creating WindowHandle (GetDC)!");
+				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error creating WindowHandle (GetDC)!");
 			}
 			else
 			{
 				if (SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD) == 0)
 				{
-					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error setting pixel format (SetPixelFormat)!");
+					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error setting pixel format (SetPixelFormat)!");
 				}
 				else
 				{
 					if (wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) == 0)
 					{
-						LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Error creating OpenGL context (wglMakeCurrent)!");
+						LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error creating OpenGL context (wglMakeCurrent)!");
 					}
 					else
 					{
@@ -153,7 +153,7 @@ namespace lwmf
 
 				// Get OpenGL system information
 
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Gather OpenGL system information...");
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Gather OpenGL system information...");
 
 				GLint MajorVersion{};
 				GLint MinorVersion{};
@@ -161,10 +161,10 @@ namespace lwmf
 				glGetIntegerv(GL_MAJOR_VERSION, &MajorVersion);
 				glGetIntegerv(GL_MINOR_VERSION, &MinorVersion);
 
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL version: " + std::to_string(MajorVersion) + "." + std::to_string(MinorVersion));
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL vendor: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL renderer: " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Primary OpenGL shading language version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "OpenGL version: " + std::to_string(MajorVersion) + "." + std::to_string(MinorVersion));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "OpenGL vendor: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "OpenGL renderer: " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Primary OpenGL shading language version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))));
 			}
 		}
 	}
@@ -189,7 +189,7 @@ namespace lwmf
 
 	inline void DeleteOpenGLContext()
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Delete OpenGL context...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Delete OpenGL context...");
 
 		const HGLRC OpenGLContext{ wglGetCurrentContext() };
 
@@ -201,16 +201,16 @@ namespace lwmf
 			{
 				if (wglDeleteContext(OpenGLContext) != FALSE)
 				{
-					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL context successfully deleted!");
+					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "OpenGL context successfully deleted!");
 				}
 				else
 				{
-					LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error deleting OpenGL context (wglDeleteContext)!");
+					LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error deleting OpenGL context (wglDeleteContext)!");
 				}
 			}
 			else
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error deleting OpenGL context (ReleaseDC)!");
+				LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error deleting OpenGL context (ReleaseDC)!");
 			}
 		}
 	}

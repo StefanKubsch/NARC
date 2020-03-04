@@ -121,7 +121,7 @@ namespace lwmf
 			2, 3, 0
 		};
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create vertex buffer object...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create vertex buffer object...");
 		glGenBuffers(1, &VertexBufferObject);
 		glCheckError();
 		glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
@@ -131,13 +131,13 @@ namespace lwmf
 		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create vertex array object...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create vertex array object...");
 		glGenVertexArrays(1, &VertexArrayObject);
 		glCheckError();
 		glBindVertexArray(VertexArrayObject);
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create element buffer object...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create element buffer object...");
 		GLuint ElementBufferObject{};
 		glGenBuffers(1, &ElementBufferObject);
 		glCheckError();
@@ -146,7 +146,7 @@ namespace lwmf
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Elements.size() * sizeof(GLint), Elements.data(), GL_STATIC_DRAW);
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the vertex shader...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create and compile the vertex shader...");
 		const std::string VertexShaderString{ LoadShaderSource(ShaderName + "Vert") };
 		const GLchar* VertexShaderSource{ VertexShaderString.c_str() };
 		const GLint VertexShaderSourceLength{ static_cast<GLint>(VertexShaderString.size()) };
@@ -158,7 +158,7 @@ namespace lwmf
 		glCheckError();
 		CheckCompileError(VertexShader, Components::Shader);
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create and compile the fragment shader...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create and compile the fragment shader...");
 		const std::string FragmentShaderString{ LoadShaderSource(ShaderName + "Frag") };
 		const GLchar* FragmentShaderSource{ FragmentShaderString.c_str() };
 		const GLint FragmentShaderSourceLength{ static_cast<GLint>(FragmentShaderString.size()) };
@@ -170,7 +170,7 @@ namespace lwmf
 		glCheckError();
 		CheckCompileError(FragmentShader, Components::Shader);
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Link the vertex and fragment shader into a shader program...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Link the vertex and fragment shader into a shader program...");
 		ShaderProgram = static_cast<GLuint>(glCreateProgram());
 		glCheckError();
 		glAttachShader(ShaderProgram, VertexShader);
@@ -184,11 +184,11 @@ namespace lwmf
 
 		CheckCompileError(ShaderProgram, Components::Program);
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Use shader program...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Use shader program...");
 		glUseProgram(ShaderProgram);
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Specify the layout of the vertex data...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Specify the layout of the vertex data...");
 		const GLuint PositionAttrib{ static_cast<GLuint>(glGetAttribLocation(ShaderProgram, "position")) };
 		glCheckError();
 		glEnableVertexAttribArray(PositionAttrib);
@@ -203,7 +203,7 @@ namespace lwmf
 		glVertexAttribPointer(TextureAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), reinterpret_cast<char*>(0 + (2 * sizeof(GLfloat))));
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Create projection matrix...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create projection matrix...");
 		std::array<GLfloat, 16> ProjectionMatrix{};
 		Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(Texture.Width), static_cast<GLfloat>(Texture.Height), 0.0F);
 		glCheckError();
@@ -212,11 +212,11 @@ namespace lwmf
 		glUniformMatrix4fv(Projection, 1, GL_FALSE, ProjectionMatrix.data());
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Get opacity uniform location...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Get opacity uniform location...");
 		OpacityLocation = glGetUniformLocation(ShaderProgram, "Opacity");
 		glCheckError();
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, ShaderNameString + "Since the shader program is now loaded into GPU, we can delete the shaders...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Since the shader program is now loaded into GPU, we can delete the shaders...");
 		glDetachShader(ShaderProgram, FragmentShader);
 		glCheckError();
 		glDetachShader(ShaderProgram, VertexShader);
@@ -360,7 +360,7 @@ namespace lwmf
 
 	inline std::string ShaderClass::LoadShaderSource(const std::string& SourceName)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Loading shader source: " + SourceName);
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Loading shader source: " + SourceName);
 
 		std::string Result;
 
@@ -401,11 +401,11 @@ namespace lwmf
 
 			if (ItErrorTable == ErrorTable.end())
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "Unknown OpenGL error in line " + std::to_string(Line) + "!");
+				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Unknown OpenGL error in line " + std::to_string(Line) + "!");
 			}
 			else
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "OpenGL error " + ItErrorTable->second + " in line " + std::to_string(Line) + "!");
+				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "OpenGL error " + ItErrorTable->second + " in line " + std::to_string(Line) + "!");
 			}
 		}
 	}
@@ -426,7 +426,7 @@ namespace lwmf
 				{
 					glGetShaderInfoLog(Task, 512, nullptr, ErrorLog.data());
 					glCheckError();
-					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog.data()));
+					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, std::string(ErrorLog.data()));
 				}
 
 				break;
@@ -440,7 +440,7 @@ namespace lwmf
 				{
 					glGetProgramInfoLog(Task, 512, nullptr, ErrorLog.data());
 					glCheckError();
-					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, std::string(ErrorLog.data()));
+					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, std::string(ErrorLog.data()));
 				}
 
 				break;

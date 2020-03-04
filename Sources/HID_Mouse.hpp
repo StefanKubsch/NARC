@@ -39,7 +39,7 @@ namespace HID_Mouse
 
 	inline void Init()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init mouse config...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init mouse config...");
 
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "InputConfig.ini";

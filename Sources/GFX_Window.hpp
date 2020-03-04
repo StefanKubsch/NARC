@@ -26,7 +26,7 @@ namespace GFX_Window
 
 	inline void Init()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init window...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init window...");
 
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "WindowConfig.ini";

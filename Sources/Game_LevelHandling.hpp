@@ -67,7 +67,7 @@ namespace Game_LevelHandling
 
 	inline void InitConfig()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init level config...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init level config...");
 
 		std::string INIFile{ LevelFolder };
 		INIFile += std::to_string(SelectedLevel);
@@ -115,7 +115,7 @@ namespace Game_LevelHandling
 
 	inline void InitMapData()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init map data...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init map data...");
 
 		LevelMap.clear();
 		LevelMap.shrink_to_fit();
@@ -137,7 +137,7 @@ namespace Game_LevelHandling
 
 	inline void InitLights()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init lights...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init lights...");
 
 		StaticLights.clear();
 		StaticLights.shrink_to_fit();
@@ -167,7 +167,7 @@ namespace Game_LevelHandling
 
 	inline void InitTextures()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load level textures...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load level textures...");
 
 		LevelTextures.clear();
 		LevelTextures.shrink_to_fit();
@@ -193,7 +193,7 @@ namespace Game_LevelHandling
 	{
 		CloseAudio();
 
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load background music...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load background music...");
 
 		BackgroundMusic.clear();
 		BackgroundMusic.shrink_to_fit();
@@ -243,7 +243,7 @@ namespace Game_LevelHandling
 
 	inline void CloseAudio()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close background audio...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Close background audio...");
 
 		for (auto&& Sound : BackgroundMusic)
 		{

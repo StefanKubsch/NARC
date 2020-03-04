@@ -112,7 +112,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		return EXIT_FAILURE;
 	}
 
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init multithreading threadpool...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init multithreading threadpool...");
 	lwmf::Multithreading ThreadPool;
 
 	const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
@@ -148,7 +148,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		{
 			if (Message.message == WM_QUIT)
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "MESSAGE: WM_QUIT received...");
+				NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "MESSAGE: WM_QUIT received...");
 				break;
 			}
 
@@ -246,7 +246,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 	Tools_Cleanup::CloseAllAudio();
 	Tools_Cleanup::DestroySubsystems();
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Exit program...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Exit program...");
 
 	// Uncomment to find memory leaks in debug mode
 	//

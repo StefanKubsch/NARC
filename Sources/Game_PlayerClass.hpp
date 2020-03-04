@@ -48,7 +48,7 @@ public:
 
 inline void Game_PlayerClass::InitConfig()
 {
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init player config...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init player config...");
 
 	std::string INIFile{ LevelFolder };
 	INIFile += std::to_string(SelectedLevel);
@@ -70,7 +70,7 @@ inline void Game_PlayerClass::InitAudio()
 {
 	CloseAudio();
 
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Load player audio...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load player audio...");
 
 	Sounds.clear();
 	Sounds.shrink_to_fit();
@@ -119,7 +119,7 @@ inline void Game_PlayerClass::PlayAudio(const PlayerSounds Sound)
 
 inline void Game_PlayerClass::CloseAudio()
 {
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Close player audio...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Close player audio...");
 
 	for (auto&& Sound : Sounds)
 	{

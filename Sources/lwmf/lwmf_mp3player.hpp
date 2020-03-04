@@ -90,7 +90,7 @@ namespace lwmf
 		// Get device informations
 		//
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Gather audio device...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Gather audio device...");
 
 		const UINT NumberOfDevices{ waveOutGetNumDevs() };
 
@@ -101,20 +101,20 @@ namespace lwmf
 				WAVEOUTCAPS WaveOutCaps{};
 				CheckMMRESError(waveOutGetDevCaps(i, &WaveOutCaps, sizeof(WAVEOUTCAPS)), "waveOutGetDevCaps", LogLevel::Info); //-V106
 
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Found audio device: " + std::string(WaveOutCaps.szPname));
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Number of channels: " + std::to_string(WaveOutCaps.wChannels));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Found audio device: " + std::string(WaveOutCaps.szPname));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Number of channels: " + std::to_string(WaveOutCaps.wChannels));
 			}
 		}
 		else
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, "No audio device found!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "No audio device found!");
 		}
 
 		//
 		// Read MP3 Header
 		//
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Reading MP3 header of " + Filename);
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Reading MP3 header of " + Filename);
 		std::ifstream File(Filename.c_str(), std::ios::in | std::ios::binary);
 
 		if (File.fail())
@@ -122,7 +122,7 @@ namespace lwmf
 			std::array<char, 100> ErrorMessage{};
 			strerror_s(ErrorMessage.data(), 100, errno);
 
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
 		}
 		else
 		{
@@ -149,19 +149,19 @@ namespace lwmf
 			// Check if file is MPEG Version 1
 			if (((StreamChar & 15) >> 2) >> 1 != 1)
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, "This is not a MPEG Version 1 MP3!");
+				LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "This is not a MPEG Version 1 MP3!");
 			}
 
 			// Get Bitrate
 			StreamChar = File.get();
 			constexpr std::array<std::int_fast32_t, 16> BitrateTable{ 0x000, 0x020, 0x028, 0x030, 0x038, 0x040, 0x050, 0x060, 0x070, 0x080, 0x0A0, 0x0C0, 0x0E0, 0x100, 0x140, 0x000 };
 			Bitrate = BitrateTable[StreamChar >> 4];
-			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Bitrate: " + std::to_string(Bitrate));
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Bitrate: " + std::to_string(Bitrate));
 
 			// Get Samplerate
 			constexpr std::array<std::int_fast32_t, 4> SampleRateTable{ 0x0AC44, 0x0BB80, 0x07D00, 0x00000 };
 			SampleRate = SampleRateTable[(StreamChar & 15) >> 2];
-			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Samplerate: " + std::to_string(SampleRate));
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Samplerate: " + std::to_string(SampleRate));
 
 			// Get number of channels
 			StreamChar = File.get();
@@ -173,7 +173,7 @@ namespace lwmf
 				NumberOfChannels = 1;
 			}
 
-			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Number of channels: " + std::to_string(NumberOfChannels));
+			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Number of channels: " + std::to_string(NumberOfChannels));
 
 			//
 			// Transcode MP3 to PCM stream
@@ -287,7 +287,7 @@ namespace lwmf
 
 	inline void MP3Player::Close()
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Closing audio: " + AudioName);
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Closing audio: " + AudioName);
 
 		if (!WaveBuffer.empty())
 		{
@@ -307,7 +307,7 @@ namespace lwmf
 		}
 		else
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "No audio file was loaded!");
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "No audio file was loaded!");
 		}
 	}
 
@@ -323,7 +323,7 @@ namespace lwmf
 		}
 		else
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "No audio file was loaded!");
+			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "No audio file was loaded!");
 		}
 	}
 
@@ -416,11 +416,11 @@ namespace lwmf
 
 			if (ItErrorTable == ErrorTable.end())
 			{
-				LWMFSystemLog.AddEntry(Level, __FILENAME__, Operation + " HRESULT error: Unknown error - " + std::to_string(Error));
+				LWMFSystemLog.AddEntry(Level, __FILENAME__, __LINE__, Operation + " HRESULT error: Unknown error - " + std::to_string(Error));
 			}
 			else
 			{
-				LWMFSystemLog.AddEntry(Level, __FILENAME__, Operation + " HRESULT error: " + ItErrorTable->second);
+				LWMFSystemLog.AddEntry(Level, __FILENAME__, __LINE__, Operation + " HRESULT error: " + ItErrorTable->second);
 			}
 		}
 	}
@@ -431,7 +431,7 @@ namespace lwmf
 		{
 			std::array<char, 200> ErrorText{};
 			waveOutGetErrorText(Error, ErrorText.data(), static_cast<UINT>(ErrorText.size()));
-			LWMFSystemLog.AddEntry(Level, __FILENAME__, Operation + " MMRESULT error: " + std::string(ErrorText.data()));
+			LWMFSystemLog.AddEntry(Level, __FILENAME__, __LINE__, Operation + " MMRESULT error: " + std::string(ErrorText.data()));
 		}
 	}
 

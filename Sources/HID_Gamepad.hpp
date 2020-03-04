@@ -57,7 +57,7 @@ namespace HID_Gamepad
 
 	inline void Init()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init XBOX controller...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init XBOX controller...");
 
 		if (GameController.CheckConnection())
 		{

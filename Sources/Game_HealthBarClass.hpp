@@ -39,7 +39,7 @@ private:
 
 inline void Game_HealthBarClass::Init()
 {
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init health bar...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init health bar...");
 
 	std::string INIFile{ GameConfigFolder };
 	INIFile += "HUDHealthBarConfig.ini";

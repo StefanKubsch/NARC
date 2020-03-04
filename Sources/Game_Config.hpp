@@ -29,14 +29,14 @@ namespace Game_Config
 
 	inline void Init()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init general game config...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init general game config...");
 
 		std::string INIFile{ GameConfigFolder };
 		INIFile += "GameConfig.ini";
 
 		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Check used texture sizes...");
+			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Check used texture sizes...");
 
 			const std::map<std::int_fast32_t, std::int_fast32_t> TextureCompare //-V808
 			{
@@ -58,14 +58,14 @@ namespace Game_Config
 			}
 			else
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "TextureSize has an incorrect value!");
+				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "TextureSize has an incorrect value!");
 			}
 
 			EntitySize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
 
 			if (TextureCompare.find(EntitySize) == TextureCompare.end())
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "EntitySize has an incorrect value!");
+				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "EntitySize has an incorrect value!");
 			}
 
 			FrameLock = lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GENERAL", "FrameLock");
@@ -74,7 +74,7 @@ namespace Game_Config
 
 	inline void GatherNumberOfLevels()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Gathering number of levels...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Gathering number of levels...");
 
 		NumberOfLevels = StartLevel;
 
@@ -85,11 +85,11 @@ namespace Game_Config
 
 		if (--NumberOfLevels == StartLevel - 1)
 		{
-			NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, "No Leveldata found.");
+			NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "No Leveldata found.");
 		}
 		else
 		{
-			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Data of " + std::to_string(NumberOfLevels) + " level(s) was found!");
+			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Data of " + std::to_string(NumberOfLevels) + " level(s) was found!");
 		}
 	}
 

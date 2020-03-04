@@ -36,7 +36,7 @@ private:
 
 inline void Game_WeaponDisplayClass::Init()
 {
-	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init weapon hud...");
+	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init weapon hud...");
 
 	std::string INIFile{ GameConfigFolder };
 	INIFile += "HUDWeaponDisplayConfig.ini";

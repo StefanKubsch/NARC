@@ -127,7 +127,7 @@ namespace lwmf
 
 	inline bool Gamepad::CheckConnection()
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Searching for XBOX controller...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Searching for XBOX controller...");
 
 		for (std::int_fast32_t i{}; i < XUSER_MAX_COUNT && ControllerID == -1; ++i)
 		{
@@ -136,11 +136,11 @@ namespace lwmf
 			if (XInputGetState(i, &XInputState) == ERROR_SUCCESS)
 			{
 				ControllerID = i;
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "XBOX controller found...");
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "XBOX controller found...");
 			}
 			else
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "No XBOX controller found...");
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "No XBOX controller found...");
 			}
 		}
 

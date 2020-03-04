@@ -41,7 +41,7 @@ namespace Game_Transitions
 
 	inline void Init()
 	{
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "Init level transitions...");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init level transitions...");
 
 		GeneralText.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GENERALFONT");
 		GameOverText.InitFont(GameConfigFolder + "TransitionsConfig.ini", "GAMEOVERFONT");
@@ -52,7 +52,7 @@ namespace Game_Transitions
 	{
 		const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
 		const std::string NextLevelText{ "...loading level number " + std::to_string(SelectedLevel) + "..." };
-		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, "\n\n" + NextLevelText + "\n\n");
+		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "\n\n" + NextLevelText + "\n\n");
 
 		lwmf::ClearBuffer();
 		lwmf::ClearTexture(ScreenTexture, BlackNoAlpha);
