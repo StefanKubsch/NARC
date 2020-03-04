@@ -1251,8 +1251,7 @@ namespace lwmf
 
 			PNG Decoder;
 			Decoder.Decode(ImageData, Buffer, static_cast<std::int_fast32_t>(Buffer.size()), true);
-			SetTextureMetrics(Texture, Decoder.PNGInfo.Width, Decoder.PNGInfo.Height);
-			Texture.Pixels.resize(static_cast<size_t>(Texture.Size));
+			CreateTexture(Texture, Decoder.PNGInfo.Width, Decoder.PNGInfo.Height, 0x00000000);
 
 			for (std::int_fast32_t Offset{}; Offset < Texture.Size; ++Offset)
 			{

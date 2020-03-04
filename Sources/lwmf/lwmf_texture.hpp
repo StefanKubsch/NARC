@@ -16,6 +16,7 @@
 #include <algorithm>
 
 #include "lwmf_general.hpp"
+#include "lwmf_logging.hpp"
 
 namespace lwmf
 {

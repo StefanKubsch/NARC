@@ -46,8 +46,7 @@ namespace lwmf
 
 	inline std::int_fast32_t RGBAtoINT(const std::int_fast32_t Red, const std::int_fast32_t Green, const std::int_fast32_t Blue, const std::int_fast32_t Alpha)
 	{
-		const std::uint_fast32_t Temp{ static_cast<std::uint_fast32_t>(Red) + (static_cast<std::uint_fast32_t>(Green) << 8) + (static_cast<std::uint_fast32_t>(Blue) << 16) + (static_cast<std::uint_fast32_t>(Alpha) << 24) };
-		return static_cast<std::int_fast32_t>(Temp);
+		return static_cast<std::int_fast32_t>(static_cast<std::uint_fast32_t>(Red) + (static_cast<std::uint_fast32_t>(Green) << 8) + (static_cast<std::uint_fast32_t>(Blue) << 16) + (static_cast<std::uint_fast32_t>(Alpha) << 24));
 	}
 
 	inline ColorStruct INTtoRGBA(const std::int_fast32_t Color)

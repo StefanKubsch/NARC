@@ -54,8 +54,8 @@ namespace lwmf
 	class Logging final
 	{
 	public:
-		Logging(const std::string& Logfilename) noexcept;
-		~Logging() noexcept;
+		Logging(const std::string& Logfilename);
+		~Logging();
 		void AddEntry(LogLevel Level, const char* Filename, const std::string& Message);
 
 	private:
@@ -64,7 +64,7 @@ namespace lwmf
 		std::ofstream Logfile;
 	};
 
-	Logging::Logging(const std::string& Logfilename) noexcept
+	Logging::Logging(const std::string& Logfilename)
 	{
 		if (LoggingEnabled)
 		{
@@ -84,19 +84,27 @@ namespace lwmf
 		}
 	}
 
-	Logging::~Logging() noexcept
+	Logging::~Logging()
 	{
-		if (LoggingEnabled)
+		try
 		{
-			if (Logfile.is_open())
+			if (LoggingEnabled)
 			{
-				std::string TempString{ std::string(150, '-') };
-				TempString += "\nlogging ended at: ";
-				TempString += GetTimeStamp();
-				TempString += "\n";
+				if (Logfile.is_open())
+				{
+					std::string TempString{ std::string(150, '-') };
+					TempString += "\nlogging ended at: ";
+					TempString += GetTimeStamp();
+					TempString += "\n";
 
-				Logfile << TempString;
+					Logfile << TempString;
+					Logfile.close();
+				}
 			}
+		}
+		catch (...)
+		{
+			// Dummy, just catch a possible exception in case something goes wrong.
 		}
 	}
 

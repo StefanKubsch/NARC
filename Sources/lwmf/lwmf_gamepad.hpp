@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "lwmf_general.hpp"
+#include "lwmf_logging.hpp"
 
 #pragma comment(lib, "xinput")
 
@@ -126,6 +127,8 @@ namespace lwmf
 
 	inline bool Gamepad::CheckConnection()
 	{
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "Searching for XBOX controller...");
+
 		for (std::int_fast32_t i{}; i < XUSER_MAX_COUNT && ControllerID == -1; ++i)
 		{
 			XINPUT_STATE XInputState{};

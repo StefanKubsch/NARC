@@ -199,7 +199,14 @@ namespace lwmf
 
 			if (ReleaseDC(MainWindow, WindowHandle) == 1)
 			{
-				wglDeleteContext(OpenGLContext);
+				if (wglDeleteContext(OpenGLContext) != FALSE)
+				{
+					LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, "OpenGL context successfully deleted!");
+				}
+				else
+				{
+					LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, "Error deleting OpenGL context (wglDeleteContext)!");
+				}
 			}
 			else
 			{

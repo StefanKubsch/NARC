@@ -38,7 +38,7 @@ namespace lwmf
 {
 
 
-	class MP3Player
+	class MP3Player final
 	{
 	public:
 		void Load(const std::string& Filename);
