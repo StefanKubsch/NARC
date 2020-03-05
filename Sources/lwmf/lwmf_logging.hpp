@@ -75,12 +75,7 @@ namespace lwmf
 				std::exit(EXIT_FAILURE);
 			}
 
-			std::string TempString{ "lwmf logging\nlogging started at: " };
-			TempString += GetTimeStamp();
-			TempString += std::string(150, '-');
-			TempString += "\n";
-
-			Logfile << TempString;
+			Logfile << "lwmf logging\nlogging started at: " << GetTimeStamp() << std::string(150, '-') << std::endl;
 		}
 	}
 
@@ -88,18 +83,10 @@ namespace lwmf
 	{
 		try
 		{
-			if (LoggingEnabled)
+			if (LoggingEnabled && Logfile.is_open())
 			{
-				if (Logfile.is_open())
-				{
-					std::string TempString{ std::string(150, '-') };
-					TempString += "\nlogging ended at: ";
-					TempString += GetTimeStamp();
-					TempString += "\n";
-
-					Logfile << TempString;
-					Logfile.close();
-				}
+				Logfile << std::string(150, '-') << "\nlogging ended at: " << GetTimeStamp() << std::endl;
+				Logfile.close();
 			}
 		}
 		catch (...)
@@ -125,36 +112,23 @@ namespace lwmf
 
 			if (ItErrorTable != ErrorTable.end())
 			{
+				std::string MessageString{ ItErrorTable->second };
+				MessageString += Filename;
+				MessageString += "(";
+				MessageString += std::to_string(LineNumber);
+				MessageString += "): ";
+				MessageString += Message;
+
 				if (Level == LogLevel::Error || Level == LogLevel::Critical)
 				{
-					std::string TempString{ "\n" };
-					TempString += GetTimeStamp();
-					TempString += ItErrorTable->second;
-					TempString += Filename;
-					TempString += "(";
-					TempString += std::to_string(LineNumber);
-					TempString += ")";
-					TempString += ": ";
-					TempString += Message;
-					TempString += "\n";
-
-					Logfile << TempString;
+					Logfile << "\n" << GetTimeStamp() << MessageString << std::endl;
 					Logfile.close();
 
 					ThrowExceptions ? throw std::runtime_error(Message) : std::exit(EXIT_FAILURE);
 				}
 				else
 				{
-					std::string TempString{ ItErrorTable->second };
-					TempString += Filename;
-					TempString += "(";
-					TempString += std::to_string(LineNumber);
-					TempString += ")";
-					TempString += ": ";
-					TempString += Message;
-					TempString += "\n";
-
-					Logfile << TempString;
+					Logfile << MessageString << std::endl;
 				}
 			}
 		}
