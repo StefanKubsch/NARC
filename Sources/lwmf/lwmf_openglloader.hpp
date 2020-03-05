@@ -1,4 +1,4 @@
-/*
+﻿/*
 ****************************************************
 *                                                  *
 * lwmf_openglloader - lightweight media framework  *
