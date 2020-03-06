@@ -119,7 +119,6 @@ inline void Game_MinimapClass::PreRender()
 	StartPosY = ScreenTexture.Height - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
 
 	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load minimap texture into GPU RAM...");
-
 	MiniMapShader.LoadStaticTextureInGPU(MiniMapTexture, &MiniMapShader.OGLTextureID, Pos.X, StartPosY, MiniMapTexture.Width, MiniMapTexture.Height);
 	IsPreRendered = true;
 }
@@ -137,12 +136,7 @@ inline void Game_MinimapClass::DisplayRealtimeMap()
 					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, PlayerColor, PlayerColor);
 					break;
 				}
-				case EntityTypes::Enemy:
-				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, EnemyColor, EnemyColor); //-V1037
-					break;
-				}
-				case EntityTypes::Turret:
+				case EntityTypes::Enemy: case EntityTypes::Turret:
 				{
 					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, EnemyColor, EnemyColor);
 					break;

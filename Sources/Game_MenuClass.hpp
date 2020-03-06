@@ -195,20 +195,25 @@ inline void Game_MenuClass::ItemSelect()
 
 inline void Game_MenuClass::LevelUp()
 {
-	if (SelectedLevel == 0)
+	switch (SelectedLevel)
 	{
-		GamePausedFlag = !GamePausedFlag;
-		Game_LevelHandling::RestartBackgroundMusic(0);
-	}
-	else if (SelectedLevel == 1)
-	{
-		SelectedLevel = 0;
-		HighLightedItem = SelectedItem;
-	}
-	else
-	{
-		SelectedItem = MenuItems[MenuItems[HighLightedItem].ParentItem].ParentItem;
-		HighLightedItem = MenuItems[SelectedItem].ChildItems.front();
-		--SelectedLevel;
+		case 0:
+		{
+			GamePausedFlag = !GamePausedFlag;
+			Game_LevelHandling::RestartBackgroundMusic(0);
+			break;
+		}
+		case 1:
+		{
+			SelectedLevel = 0;
+			HighLightedItem = SelectedItem;
+			break;
+		}
+		default:
+		{
+			SelectedItem = MenuItems[MenuItems[HighLightedItem].ParentItem].ParentItem;
+			HighLightedItem = MenuItems[SelectedItem].ChildItems.front();
+			--SelectedLevel;
+		}
 	}
 }

@@ -114,15 +114,17 @@ namespace Game_PathFinding
 
 			const std::int_fast32_t Row{ Current.Index / Width };
 			const std::int_fast32_t Column{ Current.Index % Width };
+			const std::int_fast32_t IndexPlusWidth{ Current.Index + Width };
+			const std::int_fast32_t IndexMinusWidth{ Current.Index - Width };
 
-			Neighbours[0] = (Diagonal && Row > 0 && Column > 0) ? Current.Index - Width - 1 : -1;
-			Neighbours[1] = (Row > 0) ? Current.Index - Width : -1;
-			Neighbours[2] = (Diagonal && Row > 0 && Column + 1 < Width) ? Current.Index - Width + 1 : -1;
+			Neighbours[0] = (Diagonal && Row > 0 && Column > 0) ? IndexMinusWidth - 1 : -1;
+			Neighbours[1] = (Row > 0) ? IndexMinusWidth : -1;
+			Neighbours[2] = (Diagonal && Row > 0 && Column + 1 < Width) ? IndexMinusWidth + 1 : -1;
 			Neighbours[3] = (Column > 0) ? Current.Index - 1 : -1;
 			Neighbours[4] = (Column + 1 < Width) ? Current.Index + 1 : -1;
-			Neighbours[5] = (Diagonal && Row + 1 < Height && Column > 0) ? Current.Index + Width - 1 : -1;
-			Neighbours[6] = (Row + 1 < Height) ? Current.Index + Width : -1;
-			Neighbours[7] = (Diagonal && Row + 1 < Height && Column + 1 < Width) ? Current.Index + Width + 1 : -1;
+			Neighbours[5] = (Diagonal && Row + 1 < Height && Column > 0) ? IndexPlusWidth - 1 : -1;
+			Neighbours[6] = (Row + 1 < Height) ? IndexPlusWidth : -1;
+			Neighbours[7] = (Diagonal && Row + 1 < Height && Column + 1 < Width) ? IndexPlusWidth + 1 : -1;
 
 			for (std::int_fast32_t i{}; i < 8; ++i)
 			{

@@ -94,7 +94,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				Width += 1 + (i1.X * static_cast<std::int_fast32_t>(FontSize) / 1000) + 1 - (i0.X * static_cast<std::int_fast32_t>(FontSize) / 1000);
 			}
 
-			const std::size_t Size{ static_cast<std::size_t>(Width)* static_cast<std::size_t>(Height) };
+			const std::size_t Size{ static_cast<std::size_t>(Width) * static_cast<std::size_t>(Height) };
 			std::vector<unsigned char> BakedFontGreyscale(Size);
 			constexpr std::int_fast32_t NumberOfASCIIChars{ LastASCIIChar - FirstASCIIChar };
 			std::vector<stbtt_bakedchar> CharData(NumberOfASCIIChars);
@@ -103,12 +103,12 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			// Since the glyphs were rendered in greyscale, they need to be colored...
 			std::vector<std::int_fast32_t> FontColor(Size);
 
-			for (std::size_t i{}; i < BakedFontGreyscale.size(); ++i)
+			for (std::size_t i{}; i < Size; ++i)
 			{
 				FontColor[i] = lwmf::RGBAtoINT(FontColorRed, FontColorGreen, FontColorBlue, BakedFontGreyscale[i]);
 			}
 
-			Glyphs.resize(127);
+			Glyphs.resize(static_cast<std::size_t>(NumberOfASCIIChars));
 
 			for (std::int_fast32_t Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
 			{
@@ -116,27 +116,26 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				stbtt_aligned_quad Quad{};
 				stbtt_GetBakedQuad(CharData, Width, Height, Char - FirstASCIIChar, QuadPos.X, QuadPos.Y, Quad, 1);
 
+				const std::int_fast32_t TargetChar{ Char - FirstASCIIChar };
 				const lwmf::IntPointStruct Pos{ static_cast<std::int_fast32_t>(Quad.s0 * Width), static_cast<std::int_fast32_t>(Quad.t0 * Height) };
-				Glyphs[Char].Width = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.s1 - Quad.s0) * Width) + 1.0F));
-				Glyphs[Char].Height = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.t1 - Quad.t0) * Height) + 1.0F));
-				Glyphs[Char].Advance = static_cast<std::int_fast32_t>(std::round(QuadPos.X));
-				Glyphs[Char].Baseline = static_cast<std::int_fast32_t>(-Quad.y0);
+				Glyphs[TargetChar].Width = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.s1 - Quad.s0) * Width) + 1.0F));
+				Glyphs[TargetChar].Height = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.t1 - Quad.t0) * Height) + 1.0F));
+				Glyphs[TargetChar].Advance = static_cast<std::int_fast32_t>(std::round(QuadPos.X));
+				Glyphs[TargetChar].Baseline = static_cast<std::int_fast32_t>(-Quad.y0);
 
 				// Blit single glyphs to individual textures
 				lwmf::TextureStruct TempGlyphTexture{};
-				TempGlyphTexture.Pixels.resize(static_cast<std::size_t>(Glyphs[Char].Width)* static_cast<std::size_t>(Glyphs[Char].Height));
-				TempGlyphTexture.Width = Glyphs[Char].Width;
-				TempGlyphTexture.Height = Glyphs[Char].Height;
+				lwmf::CreateTexture(TempGlyphTexture, Glyphs[TargetChar].Width, Glyphs[TargetChar].Height, 0x00000000);
 
-				for (std::int_fast32_t TargetY{}, y{ Pos.Y }; y < Pos.Y + Glyphs[Char].Height; ++y, ++TargetY)
+				for (std::int_fast32_t TargetY{}, y{ Pos.Y }; y < Pos.Y + Glyphs[TargetChar].Height; ++y, ++TargetY)
 				{
-					for (std::int_fast32_t TargetX{}, x{ Pos.X }; x < Pos.X + Glyphs[Char].Width; ++x, ++TargetX)
+					for (std::int_fast32_t TargetX{}, x{ Pos.X }; x < Pos.X + Glyphs[TargetChar].Width; ++x, ++TargetX)
 					{
 						TempGlyphTexture.Pixels[TargetY * TempGlyphTexture.Width + TargetX] = FontColor[y * Width + x];
 					}
 				}
 
-				GlyphShader.LoadTextureInGPU(TempGlyphTexture, &Glyphs[Char].Texture);
+				GlyphShader.LoadTextureInGPU(TempGlyphTexture, &Glyphs[Char - FirstASCIIChar].Texture);
 			}
 		}
 	}
@@ -146,8 +145,8 @@ inline void GFX_TextClass::RenderText(const std::string& Text, std::int_fast32_t
 {
 	for (const char& Char : Text)
 	{
-		GlyphShader.RenderTexture(&Glyphs[Char].Texture, x, y - Glyphs[Char].Baseline + FontHeight, Glyphs[Char].Width, Glyphs[Char].Height, true, 1.0F);
-		x += Glyphs[Char].Advance;
+		GlyphShader.RenderTexture(&Glyphs[Char - 32].Texture, x, y - Glyphs[Char - 32].Baseline + FontHeight, Glyphs[Char - 32].Width, Glyphs[Char - 32].Height, true, 1.0F);
+		x += Glyphs[Char - 32].Advance;
 	}
 }
 
@@ -157,7 +156,7 @@ inline void GFX_TextClass::RenderTextCentered(const std::string& Text, const std
 
 	for (const char& Char : Text)
 	{
-		TextLengthInPixels += Glyphs[Char].Advance;
+		TextLengthInPixels += Glyphs[Char - 32].Advance;
 	}
 
 	RenderText(Text, ScreenTexture.WidthMid - (TextLengthInPixels >> 1), y);
