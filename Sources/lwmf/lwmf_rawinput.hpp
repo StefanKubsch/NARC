@@ -38,7 +38,7 @@ namespace lwmf
 
 	inline std::string DeviceString(const DeviceIdentifier Device)
 	{
-		static std::map<DeviceIdentifier, std::string> DeviceTable
+		std::map<DeviceIdentifier, std::string> DeviceTable
 		{
 			{ DeviceIdentifier::HID_MOUSE, "HID_MOUSE (DeviceIdentifier 2)" },
 			{ DeviceIdentifier::HID_KEYBOARD, "HID_KEYBOARD (DeviceIdentifier 6)" },

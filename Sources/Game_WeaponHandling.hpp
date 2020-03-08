@@ -79,19 +79,19 @@ namespace Game_WeaponHandling
 	// Variables and constants
 	//
 
-	static constexpr std::int_fast32_t MaximumCarriedAmmoDigits{ 3 };
-	static constexpr std::int_fast32_t MaximumAmmoCapacityDigits{ 3 };
-	static constexpr std::int_fast32_t MaximumLoadedRoundsDigits{ 3 };
+	constexpr std::int_fast32_t MaximumCarriedAmmoDigits{ 3 };
+	constexpr std::int_fast32_t MaximumAmmoCapacityDigits{ 3 };
+	constexpr std::int_fast32_t MaximumLoadedRoundsDigits{ 3 };
 
-	inline static WeaponState CurrentWeaponState{};
-	inline static FiringState CurrentFiringState{};
+	inline WeaponState CurrentWeaponState{};
+	inline FiringState CurrentFiringState{};
 
-	inline static std::int_fast32_t WeaponHeightFadeInOut{};
-	inline static std::int_fast32_t WeaponFadeInOutY{};
+	inline std::int_fast32_t WeaponHeightFadeInOut{};
+	inline std::int_fast32_t WeaponFadeInOutY{};
 
 	inline float WeaponPace{};
 	inline bool WeaponPaceFlag{};
-	inline static bool WeaponMuzzleFlashFlag{};
+	inline bool WeaponMuzzleFlashFlag{};
 
 	//
 	// Functions

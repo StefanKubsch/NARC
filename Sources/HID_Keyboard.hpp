@@ -29,7 +29,7 @@ namespace HID_Keyboard
 	// Variables and constants
 	//
 
-	inline static std::map<std::int_fast32_t, bool> KeyMap{};
+	inline std::map<std::int_fast32_t, bool> KeyMap{};
 
 	// for Microsoft virtual keycodes, have a look here:
 	// https://docs.microsoft.com/en-us/uwp/api/windows.system.virtualkey

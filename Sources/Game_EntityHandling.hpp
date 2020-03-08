@@ -64,7 +64,7 @@ namespace Game_EntityHandling
 
 	using DirectionTuple = std::tuple<float, float, char, std::int_fast32_t>;
 
-	inline static std::vector<DirectionTuple> Directions
+	inline std::vector<DirectionTuple> Directions
 	{
 		// Possible directions (DirX / DirY)
 		//		-1.0 / 0.0		North		RotationFactor 0
@@ -79,10 +79,10 @@ namespace Game_EntityHandling
 	};
 
 	// Populate the Mersenne-Twister-Random Engine with proper distributions
-	inline static const std::uniform_int_distribution<std::int_fast32_t> Distribution200(1, 200);
-	inline static const std::uniform_int_distribution<std::int_fast32_t> Distribution666(1, 666);
+	inline const std::uniform_int_distribution<std::int_fast32_t> Distribution200(1, 200);
+	inline const std::uniform_int_distribution<std::int_fast32_t> Distribution666(1, 666);
 
-	static constexpr float EntityCollisionDetectionWallDist{ 0.5F };
+	constexpr float EntityCollisionDetectionWallDist{ 0.5F };
 
 	inline std::vector<std::vector<EntityTypes>> EntityMap{};
 

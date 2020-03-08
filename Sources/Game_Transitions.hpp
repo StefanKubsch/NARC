@@ -31,9 +31,9 @@ namespace Game_Transitions
 	// Variables and constants
 	//
 
-	inline static GFX_TextClass GeneralText{};
-	inline static GFX_TextClass GameOverText{};
-	inline static GFX_TextClass GameOverText1{};
+	inline GFX_TextClass GeneralText{};
+	inline GFX_TextClass GameOverText{};
+	inline GFX_TextClass GameOverText1{};
 
 	//
 	// Functions
