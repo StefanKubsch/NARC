@@ -44,7 +44,7 @@ namespace lwmf
 
 	inline Multithreading::Multithreading()
 	{
-		for (size_t i{}; i < std::thread::hardware_concurrency(); ++i)
+		for (std::size_t i{}; i < std::thread::hardware_concurrency(); ++i)
 		{
 			Workers.emplace_back([this]
 			{

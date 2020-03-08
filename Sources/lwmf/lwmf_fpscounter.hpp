@@ -31,7 +31,7 @@ namespace lwmf
 	// Variables and constants
 	//
 
-	inline static std::int_fast32_t FPS{};
+	inline std::int_fast32_t FPS{};
 
 	//
 	// Functions

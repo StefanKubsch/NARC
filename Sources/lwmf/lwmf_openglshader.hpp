@@ -385,7 +385,7 @@ namespace lwmf
 
 		while ((ErrorCode = glGetError()) != GL_NO_ERROR)
 		{
-			static std::map<GLenum, std::string> ErrorTable
+			std::map<GLenum, std::string> ErrorTable
 			{
 				{ GL_INVALID_ENUM, "An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag." },
 				{ GL_INVALID_VALUE, "A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag." },

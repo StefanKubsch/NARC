@@ -94,7 +94,7 @@ namespace lwmf
 		{
 			for (std::int_fast32_t DestHorizontalOffset{}, SourceHorizontalOffset{ x }, j{}; j < Width; ++j)
 			{
-				TempBuffer[static_cast<size_t>(DestVerticalOffset) + static_cast<size_t>(DestHorizontalOffset)] = Texture.Pixels[static_cast<size_t>(SourceVerticalOffset) + static_cast<size_t>(SourceHorizontalOffset)];
+				TempBuffer[static_cast<std::size_t>(DestVerticalOffset) + static_cast<std::size_t>(DestHorizontalOffset)] = Texture.Pixels[static_cast<std::size_t>(SourceVerticalOffset) + static_cast<std::size_t>(SourceHorizontalOffset)];
 
 				++DestHorizontalOffset;
 				++SourceHorizontalOffset;
@@ -129,7 +129,7 @@ namespace lwmf
 
 					for (std::int_fast32_t j{}; j < TargetWidth; ++j)
 					{
-						TempBuffer[static_cast<size_t>(Offset++)] = Texture.Pixels[static_cast<size_t>(TempY) + static_cast<size_t>(((j * Ratio.X) >> 16))];
+						TempBuffer[static_cast<std::size_t>(Offset++)] = Texture.Pixels[static_cast<std::size_t>(TempY) + static_cast<std::size_t>(((j * Ratio.X) >> 16))];
 					}
 				}
 				break;
@@ -151,10 +151,10 @@ namespace lwmf
 						const std::int_fast32_t PosX{ static_cast<std::int_fast32_t>(TempRatioX) };
 						const std::int_fast32_t Index{ TempY + PosX };
 
-						const std::int_fast32_t P1{ Texture.Pixels[static_cast<size_t>(Index)] };
-						const std::int_fast32_t P2{ Texture.Pixels[static_cast<size_t>(Index) + 1] };
-						const std::int_fast32_t P3{ Texture.Pixels[static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width)] };
-						const std::int_fast32_t P4{ Texture.Pixels[static_cast<size_t>(Index) + static_cast<size_t>(Texture.Width) + 1] };
+						const std::int_fast32_t P1{ Texture.Pixels[static_cast<std::size_t>(Index)] };
+						const std::int_fast32_t P2{ Texture.Pixels[static_cast<std::size_t>(Index) + 1] };
+						const std::int_fast32_t P3{ Texture.Pixels[static_cast<std::size_t>(Index) + static_cast<std::size_t>(Texture.Width)] };
+						const std::int_fast32_t P4{ Texture.Pixels[static_cast<std::size_t>(Index) + static_cast<std::size_t>(Texture.Width) + 1] };
 
 						const float Width{ TempRatioX - PosX };
 						const float t1{ (1.0F - Width) * (1.0F - Height) };
@@ -162,7 +162,7 @@ namespace lwmf
 						const float t3{ Height * (1.0F - Width) };
 						const float t4{ Width * Height };
 
-						TempBuffer[static_cast<size_t>(Offset++)] = RGBAtoINT(
+						TempBuffer[static_cast<std::size_t>(Offset++)] = RGBAtoINT(
 							static_cast<std::int_fast32_t>((P1 & 255) * t1 + (P2 & 255) * t2 + (P3 & 255) * t3 + (P4 & 255) * t4),
 							static_cast<std::int_fast32_t>(((P1 >> 8) & 255) * t1 + ((P2 >> 8) & 255) * t2 + ((P3 >> 8) & 255) * t3 + ((P4 >> 8) & 255) * t4),
 							static_cast<std::int_fast32_t>(((P1 >> 16) & 255) * t1 + ((P2 >> 16) & 255) * t2 + ((P3 >> 16) & 255) * t3 + ((P4 >> 16) & 255) * t4)

@@ -70,7 +70,7 @@ namespace lwmf
 				{
 					const std::int_fast32_t TempPos{ 3 * (TempY + x) };
 
-					Texture.Pixels[static_cast<size_t>(Offset++)] = RGBAtoINT(InputBuffer[static_cast<size_t>(TempPos) + 2] & 255, InputBuffer[static_cast<size_t>(TempPos) + 1] & 255, InputBuffer[static_cast<size_t>(TempPos)] & 255, 255);
+					Texture.Pixels[static_cast<std::size_t>(Offset++)] = RGBAtoINT(InputBuffer[static_cast<std::size_t>(TempPos) + 2] & 255, InputBuffer[static_cast<std::size_t>(TempPos) + 1] & 255, InputBuffer[static_cast<std::size_t>(TempPos)] & 255, 255);
 				}
 			}
 		}

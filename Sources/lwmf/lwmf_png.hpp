@@ -95,7 +95,7 @@ namespace lwmf
 
 				Tree2D.clear();
 				Tree2D.shrink_to_fit();
-				Tree2D.resize((static_cast<size_t>(NumCodes) << 1), 32767);
+				Tree2D.resize((static_cast<std::size_t>(NumCodes) << 1), 32767);
 
 				for (std::int_fast32_t n{}; n < NumCodes; ++n)
 				{
@@ -168,7 +168,7 @@ namespace lwmf
 
 				if (Error == 0)
 				{
-					Out.resize(static_cast<size_t>(Pos));
+					Out.resize(static_cast<std::size_t>(Pos));
 				}
 			}
 
@@ -385,7 +385,7 @@ namespace lwmf
 					{
 						if (Pos >= static_cast<std::int_fast32_t>(Out.size()))
 						{
-							Out.resize((static_cast<size_t>(Pos) + 1) << 1);
+							Out.resize((static_cast<std::size_t>(Pos) + 1) << 1);
 						}
 
 						Out[Pos++] = static_cast<unsigned char>(Code);
@@ -426,7 +426,7 @@ namespace lwmf
 
 						if (Pos + Length >= static_cast<std::int_fast32_t>(Out.size()))
 						{
-							Out.resize((static_cast<size_t>(Pos) + static_cast<size_t>(Length)) << 1);
+							Out.resize((static_cast<std::size_t>(Pos) + static_cast<std::size_t>(Length)) << 1);
 						}
 
 						for (std::int_fast32_t Back{ Pos - Distance }, i{}; i < Length; ++i)
@@ -470,7 +470,7 @@ namespace lwmf
 
 				if (Pos + Len >= static_cast<std::int_fast32_t>(Out.size()))
 				{
-					Out.resize(static_cast<size_t>(Pos) + static_cast<size_t>(Len));
+					Out.resize(static_cast<std::size_t>(Pos) + static_cast<std::size_t>(Len));
 				}
 
 				if (p + Len > InLength)
@@ -588,7 +588,7 @@ namespace lwmf
 				else if (In[Pos + 0] == 'P' && In[Pos + 1] == 'L' && In[Pos + 2] == 'T' && In[Pos + 3] == 'E')
 				{
 					Pos += 4;
-					PNGInfo.Palette.resize(static_cast<size_t>((ChunkLength / 3)) << 2);
+					PNGInfo.Palette.resize(static_cast<std::size_t>((ChunkLength / 3)) << 2);
 
 					if (PNGInfo.Palette.size() > 1024)
 					{
@@ -688,7 +688,7 @@ namespace lwmf
 
 			const std::int_fast32_t ByteWidth{ (BitsPerPixel + 7) >> 3 };
 
-			Out.resize(static_cast<size_t>((PNGInfo.Height * PNGInfo.Width * BitsPerPixel + 7) >> 3));
+			Out.resize(static_cast<std::size_t>((PNGInfo.Height * PNGInfo.Width * BitsPerPixel + 7) >> 3));
 
 			if (PNGInfo.InterlaceMethod == 0)
 			{
@@ -1053,7 +1053,7 @@ namespace lwmf
 		static inline std::int_fast32_t Convert(std::vector<unsigned char>& Out, const unsigned char* In, const Info& InfoIn, const std::int_fast32_t Width, const std::int_fast32_t Height)
 		{
 			const std::int_fast32_t NumberOfPixels{ Width * Height };
-			Out.resize(static_cast<size_t>(NumberOfPixels) << 2);
+			Out.resize(static_cast<std::size_t>(NumberOfPixels) << 2);
 
 			if (std::int_fast32_t BP{}; InfoIn.BitDepth == 8 && InfoIn.ColorType == 0)
 			{
@@ -1244,7 +1244,7 @@ namespace lwmf
 				Size -= File.tellg();
 			}
 
-			std::vector<unsigned char> Buffer(static_cast<size_t>(Size));
+			std::vector<unsigned char> Buffer(static_cast<std::size_t>(Size));
 			std::vector<unsigned char> ImageData;
 
 			File.read(reinterpret_cast<char*>(Buffer.data()), Size);

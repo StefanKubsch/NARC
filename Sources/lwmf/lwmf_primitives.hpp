@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 #include "lwmf_general.hpp"
 #include "lwmf_math.hpp"
@@ -24,7 +25,7 @@ namespace lwmf
 	void SetPixel(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
 	void SetPixelSafe(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color);
 	std::int_fast32_t GetPixel(const TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y);
-	void BoundaryFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
+	void ScanlineFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, std::int_fast32_t FillColor);
 	void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
 	void Rectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
 	void FilledRectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
@@ -68,10 +69,10 @@ namespace lwmf
 	}
 
 	//
-	// Flood Fill
+	// Fill
 	//
 
-	inline void BoundaryFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
+	inline void ScanlineFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, const std::int_fast32_t FillColor)
 	{
 		IntPointStruct Points{ CenterPoint };
 		std::vector<IntPointStruct> Stack{};
@@ -84,7 +85,7 @@ namespace lwmf
 
 			std::int_fast32_t x1{ Points.X };
 
-			while (x1 >= 0 && Texture.Pixels[Points.Y * Texture.Width + x1] != BorderColor)
+			while (x1 >= 0 && Texture.Pixels[Points.Y * Texture.Width + x1] != FillColor)
 			{
 				--x1;
 			}
@@ -96,26 +97,26 @@ namespace lwmf
 
 			const std::int_fast32_t TempY{ Points.Y * Texture.Width };
 
-			while (x1 < Texture.Width && Texture.Pixels[TempY + x1] != BorderColor)
+			while (x1 < Texture.Width && Texture.Pixels[TempY + x1] != FillColor)
 			{
 				Texture.Pixels[TempY + x1] = FillColor;
 
-				if (!Above && Points.Y > 0 && Texture.Pixels[(Points.Y - 1) * Texture.Width + x1] != BorderColor)
+				if (!Above && Points.Y > 0 && Texture.Pixels[(Points.Y - 1) * Texture.Width + x1] != FillColor)
 				{
 					Stack.push_back({ x1, Points.Y - 1 });
 					Above = true;
 				}
-				else if (Above && Points.Y > 0 && Texture.Pixels[(Points.Y - 1) * Texture.Width + x1] != BorderColor)
+				else if (Above && Points.Y > 0 && Texture.Pixels[(Points.Y - 1) * Texture.Width + x1] != FillColor)
 				{
 					Above = false;
 				}
 
-				if (!Below && Points.Y < Texture.Height - 1 && Texture.Pixels[(Points.Y + 1) * Texture.Width + x1] != BorderColor)
+				if (!Below && Points.Y < Texture.Height - 1 && Texture.Pixels[(Points.Y + 1) * Texture.Width + x1] != FillColor)
 				{
 					Stack.push_back({ x1, Points.Y + 1 });
 					Below = true;
 				}
-				else if (Below && Points.Y < Texture.Height - 1 && Texture.Pixels[(Points.Y + 1) * Texture.Width + x1] != BorderColor)
+				else if (Below && Points.Y < Texture.Height - 1 && Texture.Pixels[(Points.Y + 1) * Texture.Width + x1] != FillColor)
 				{
 					Below = false;
 				}
@@ -405,9 +406,9 @@ namespace lwmf
 		float SignedArea{};
 		FloatPointStruct Centroid{};
 
-		const std::int_fast32_t NumberOfPoints{ static_cast<std::int_fast32_t>(Points.size()) };
+		const std::size_t NumberOfPoints{ Points.size() };
 
-		for (std::int_fast32_t i{}; i < NumberOfPoints; ++i)
+		for (std::size_t i{}; i < NumberOfPoints; ++i)
 		{
 			const FloatPointStruct AreaPoint{ static_cast<float>(Points[(i + 1) & (NumberOfPoints - 1)].X), static_cast<float>(Points[(i + 1) & (NumberOfPoints - 1)].Y) };
 			const float Area{ Points[i].X * AreaPoint.Y - AreaPoint.X * Points[i].Y };
@@ -423,26 +424,21 @@ namespace lwmf
 
 	inline bool PointInsidePolygon(const std::vector<IntPointStruct>& Points, const IntPointStruct& Point)
 	{
-		std::int_fast32_t Counter{};
-		IntPointStruct Point1{ Points[0] };
-		const std::int_fast32_t NumberOfPoints{ static_cast<std::int_fast32_t>(Points.size()) };
+		const std::size_t NumberOfPoints{ Points.size() };
+		bool Result{};
 
-		for (std::int_fast32_t i{ 1 }; i <= NumberOfPoints; ++i)
+		for (std::size_t i{}; i < NumberOfPoints; ++i)
 		{
-			IntPointStruct Point2{ Points[i & (NumberOfPoints - 1)] };
+			const std::size_t j{ (i + 1) % NumberOfPoints };
 
-			if ((Point.Y > (std::min)(Point1.Y, Point2.Y)) && (Point.Y <= (std::max)(Point1.Y, Point2.Y)) && (Point.X <= (std::max)(Point1.X, Point2.X)))
+			if (((Points[j].Y <= Point.Y && Point.Y < Points[i].Y) || (Points[i].Y <= Point.Y && Point.Y < Points[j].Y))
+				&& (Point.X < Points[j].X + (Points[i].X - Points[j].X) * (Point.Y - Points[j].Y) / (Points[i].Y - Points[j].Y)))
 			{
-				if ((Point1.Y != Point2.Y) && (Point1.X == Point2.X || Point.X <= (Point.Y - Point1.Y) * (Point2.X - Point1.X) / (Point2.Y - Point1.Y) + Point1.X))
-				{
-					++Counter;
-				}
+				Result = !Result;
 			}
-
-			Point1 = Point2;
 		}
 
-		return (Counter & 1) == 0 ? false : true;
+		return Result;
 	}
 
 	inline void Polygon(TextureStruct& Texture, const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor)
@@ -459,11 +455,16 @@ namespace lwmf
 
 	inline void FilledPolygon(TextureStruct& Texture, const std::vector<IntPointStruct>& Points, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)
 	{
-		Polygon(Texture, Points, BorderColor);
+		Polygon(Texture, Points, FillColor);
 
 		if (const IntPointStruct CentroidPoint{ GetPolygonCentroid(Points) }; PointInsidePolygon(Points, CentroidPoint))
 		{
-			BoundaryFill(Texture, CentroidPoint, BorderColor, FillColor);
+			ScanlineFill(Texture, CentroidPoint, FillColor);
+		}
+
+		if (BorderColor != FillColor)
+		{
+			Polygon(Texture, Points, BorderColor);
 		}
 	}
 
