@@ -64,7 +64,7 @@ namespace Game_EntityHandling
 
 	using DirectionTuple = std::tuple<float, float, char, std::int_fast32_t>;
 
-	inline std::vector<DirectionTuple> Directions
+	inline const std::vector<DirectionTuple> Directions
 	{
 		// Possible directions (DirX / DirY)
 		//		-1.0 / 0.0		North		RotationFactor 0
@@ -389,7 +389,7 @@ namespace Game_EntityHandling
 
 				for (std::int_fast32_t x{ (-EntitySizeTemp >> 1) + EntitySX }; x < LineEndX; ++x)
 				{
-					if (TransY > 0.0F && x > 0 && x < ScreenTexture.Width && TransY < ZBuffer[x])
+					if (TransY > 0.0F && (static_cast<std::uint_fast32_t>(x) < static_cast<std::uint_fast32_t>(ScreenTexture.Width)) && TransY < ZBuffer[x])
 					{
 						const std::int_fast32_t TextureX{ (x - Temp1) * EntitySize / EntitySizeTemp };
 

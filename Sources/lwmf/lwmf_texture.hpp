@@ -72,7 +72,7 @@ namespace lwmf
 
 	inline void CropTexture(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, std::int_fast32_t Width, std::int_fast32_t Height)
 	{
-		if (x < 0 || y < 0 || x > Texture.Width || y > Texture.Height)
+		if ((static_cast<std::uint_fast32_t>(x) > static_cast<std::uint_fast32_t>(Texture.Width) || static_cast<std::uint_fast32_t>(y) > static_cast<std::uint_fast32_t>(Texture.Height)))
 		{
 			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture x or y is out of range! Check your parameters used with lwmf::CropTexture()!");
 		}
