@@ -87,7 +87,18 @@ namespace lwmf
 		static void CheckError(std::int_fast32_t Line);
 		static void CheckCompileError(GLuint Task, Components Component);
 
-		std::array<GLfloat, 16> Vertices{};
+		std::array<GLfloat, 16> Vertices
+		{
+			0.0F, 0.0F,
+			0.0F, 0.0F, // Top-Left
+			0.0F, 0.0F,
+			1.0F, 0.0F, // Top-Right
+			0.0F, 0.0F,
+			1.0F, 1.0F, // Bottom-Right
+			0.0F, 0.0F,
+			0.0F, 1.0F  // Bottom-Left
+		};
+
 		GLint OpacityLocation{};
 		GLuint ShaderProgram{};
 		GLuint VertexArrayObject{};
@@ -97,23 +108,6 @@ namespace lwmf
 	inline void ShaderClass::LoadShader(const std::string& ShaderName, const TextureStruct& Texture)
 	{
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
-
-		// Set texture coordinates
-		// Top-Left
-		Vertices[2] = 0.0F;
-		Vertices[3] = 0.0F;
-
-		// Top-Right
-		Vertices[6] = 1.0F;
-		Vertices[7] = 0.0F;
-
-		// Bottom-Right
-		Vertices[10] = 1.0F;
-		Vertices[11] = 1.0F;
-
-		// Bottom-Left
-		Vertices[14] = 0.0F;
-		Vertices[15] = 1.0F;
 
 		constexpr std::array<GLint, 6> Elements
 		{
@@ -313,26 +307,16 @@ namespace lwmf
 
 		// First column
 		Matrix[0] = 2.0F * InvX;
-		Matrix[1] = 0.0F;
-		Matrix[2] = 0.0F;
-		Matrix[3] = 0.0F;
 
 		// Second
-		Matrix[4] = 0.0F;
 		Matrix[5] = 2.0F * InvY;
-		Matrix[6] = 0.0F;
-		Matrix[7] = 0.0F;
 
 		// Third
-		Matrix[8] = 0.0F;
-		Matrix[9] = 0.0F;
 		Matrix[10] = -1.0F;
-		Matrix[11] = 0.0F;
 
 		// Fourth
 		Matrix[12] = -(Right + Left) * InvX;
 		Matrix[13] = -(Top + Bottom) * InvY;
-		Matrix[14] = 0.0F;
 		Matrix[15] = 1.0F;
 	}
 
@@ -399,14 +383,8 @@ namespace lwmf
 
 			const std::map<GLenum, std::string>::iterator ItErrorTable{ ErrorTable.find(ErrorCode) };
 
-			if (ItErrorTable == ErrorTable.end())
-			{
-				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Unknown OpenGL error in line " + std::to_string(Line) + "!");
-			}
-			else
-			{
+			ItErrorTable == ErrorTable.end() ? LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Unknown OpenGL error in line " + std::to_string(Line) + "!") :
 				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "OpenGL error " + ItErrorTable->second + " in line " + std::to_string(Line) + "!");
-			}
 		}
 	}
 

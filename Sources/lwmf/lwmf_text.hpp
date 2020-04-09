@@ -139,9 +139,9 @@ namespace lwmf
 
 	inline void RenderText(TextureStruct& Texture, const std::string& Text, std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
 	{
-		for (const std::int_fast32_t& Char : Text)
+		for (const std::_String_const_iterator<std::_String_val<std::_Simple_types<char>>>::value_type& Char: Text)
 		{
-			if (Char > 31 && Char < 128)
+			if (Char > 31)
 			{
 				for (std::int_fast32_t y{}; y < 8; ++y)
 				{

@@ -137,7 +137,7 @@ namespace lwmf
 	// Lines
 	//
 
-	inline void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, const std::int_fast32_t x2, const std::int_fast32_t y2, const std::int_fast32_t Color)
+	inline void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, const std::int_fast32_t Color)
 	{
 		// Exit early if coords are out of visual boundaries
 		if ((x1 < 0 && x2 < 0) || (x1 > Texture.Width && x2 > Texture.Width) || (y1 < 0 && y2 < 0) || (y1 > Texture.Height && y2 > Texture.Height))
@@ -146,13 +146,43 @@ namespace lwmf
 		}
 
 		// Case 1: Straight horizontal line within screen boundaries
-		if ((x1 >= 0 && y1 >= 0) && (x2 < Texture.Width && y1 < Texture.Height) && (y1 == y2) && (x2 > x1))
+		if (y1 == y2
+			&& static_cast<std::uint_fast32_t>(y1) < static_cast<std::uint_fast32_t>(Texture.Height)
+			&& static_cast<std::uint_fast32_t>(x1) < static_cast<std::uint_fast32_t>(Texture.Width)
+			&& static_cast<std::uint_fast32_t>(x2) < static_cast<std::uint_fast32_t>(Texture.Width))
 		{
-			std::fill(Texture.Pixels.begin() + y1 * Texture.Width + x1, Texture.Pixels.begin() + y1 * Texture.Width + x2 + 1, Color);
+			if (x1 > x2)
+			{
+				std::swap(x1, x2);
+			}
+
+			const auto Temp{ Texture.Pixels.begin() + y1 * Texture.Width };
+			std::fill(Temp + x1, Temp + x2 + 1, Color);
+
+			return;
+		}
+
+		// Case 2: Straight vertical line within screen boundaries
+		if (x1 == x2
+			&& static_cast<std::uint_fast32_t>(x1) < static_cast<std::uint_fast32_t>(Texture.Width)
+			&& static_cast<std::uint_fast32_t>(y1) < static_cast<std::uint_fast32_t>(Texture.Height)
+			&& static_cast<std::uint_fast32_t>(y2) < static_cast<std::uint_fast32_t>(Texture.Height))
+		{
+			if (y1 > y2)
+			{
+				std::swap(y1, y2);
+			}
+
+			for (std::int_fast32_t y{ y1 }; y <= y2; ++y)
+			{
+				Texture.Pixels[y * Texture.Width + x1] = Color;
+			}
+
 			return;
 		}
 
 		// The two other variants use "EFLA" - "Extremely Fast Line Algorithm"
+		// Copyright 2001-2, By Po-Han Lin
 		// http://www.edepot.com/algorithm.html
 
 		bool YLonger{};
@@ -167,7 +197,7 @@ namespace lwmf
 
 		const std::int_fast32_t DecInc{ LongLength == 0 ? 0 : (ShortLength << 16) / LongLength };
 
-		// Case 2: Line is within screen boundaries, so no further checking if pixel can be set
+		// Case 3: Line is within screen boundaries, so no further checking if pixel can be set
 		if (static_cast<std::uint_fast32_t>(x1) < static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y1) < static_cast<std::uint_fast32_t>(Texture.Height)
 			&& static_cast<std::uint_fast32_t>(x2) < static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y2) < static_cast<std::uint_fast32_t>(Texture.Height))
 		{
@@ -218,7 +248,7 @@ namespace lwmf
 				j -= DecInc;
 			}
 		}
-		// Case 3: Check each pixel if it´s within screen boundaries (slowest)
+		// Case 4: Check each pixel if it´s within screen boundaries (slowest)
 		else
 		{
 			if (YLonger)

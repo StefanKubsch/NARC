@@ -69,14 +69,8 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_DEVNOTIFY;
 		RawInputDevice.hwndTarget = hWnd;
 
-		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
-		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error registering raw input device " + DeviceString(Device) + "!");
-		}
-		else
-		{
+		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0 ? LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error registering raw input device " + DeviceString(Device) + "!") :
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Successfully registered device " + DeviceString(Device));
-		}
 	}
 
 	inline void UnregisterRawInputDevice(const DeviceIdentifier Device)
@@ -89,14 +83,8 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_REMOVE;
 		RawInputDevice.hwndTarget = nullptr;
 
-		if (RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0)
-		{
-			LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error unregistering raw input device " + DeviceString(Device) + "!");
-		}
-		else
-		{
+		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0 ? LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error unregistering raw input device " + DeviceString(Device) + "!") :
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Successfully unregistered device " + DeviceString(Device));
-		}
 	}
 
 	inline void CatchMouse(const HWND hWnd)

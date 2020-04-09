@@ -104,20 +104,20 @@ namespace lwmf
 
 	inline void Gamepad::SetButtons()
 	{
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_A, "A"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_B, "B"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_X, "X"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_Y, "Y"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_LEFT, "DPLeft"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_RIGHT, "DPRight"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_UP, "DPUp"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_DOWN, "DPDown"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_SHOULDER, "LSB"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_SHOULDER, "RSB"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_BACK, "Back"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_START, "Start"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_THUMB, "LT"));
-		Buttons.insert(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_THUMB, "RT"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_A, "A"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_B, "B"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_X, "X"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_Y, "Y"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_LEFT, "DPLeft"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_RIGHT, "DPRight"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_UP, "DPUp"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_DPAD_DOWN, "DPDown"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_SHOULDER, "LSB"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_SHOULDER, "RSB"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_BACK, "Back"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_START, "Start"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_LEFT_THUMB, "LT"));
+		Buttons.emplace(std::make_pair<WORD, std::string>(XINPUT_GAMEPAD_RIGHT_THUMB, "RT"));
 	}
 
 	inline void Gamepad::SetDeadzone(const float x, const float y)
@@ -308,7 +308,7 @@ namespace lwmf
 		const AnalogMapping AnalogKeyMapping { Key, Threshold };
 
 		AnalogMap.erase(Button);
-		AnalogMap.insert(std::make_pair(Button, AnalogKeyMapping));
+		AnalogMap.emplace(std::make_pair(Button, AnalogKeyMapping));
 	}
 
 	inline void Gamepad::RemoveAnalogKeyMapping(AnalogButtons Button)
