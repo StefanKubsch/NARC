@@ -299,12 +299,12 @@ namespace Game_WeaponHandling
 
 					for (std::int_fast32_t Index{}; Index < NumberOfEntities; ++Index)
 					{
-						if (!Entities[Game_EntityHandling::EntityOrder[Index]].IsDead && !Endloop)
+						if (!Entities[Game_EntityHandling::EntityOrder[Index].first].IsDead && !Endloop)
 						{
 							const std::int_fast32_t TextureIndex{ Game_EntityHandling::GetEntityTextureIndex(Index) };
-							const lwmf::FloatPointStruct EntityPos{ Entities[Game_EntityHandling::EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[Game_EntityHandling::EntityOrder[Index]].Pos.Y - Player.Pos.Y };
+							const lwmf::FloatPointStruct EntityPos{ Entities[Game_EntityHandling::EntityOrder[Index].first].Pos.X - Player.Pos.X, Entities[Game_EntityHandling::EntityOrder[Index].first].Pos.Y - Player.Pos.Y };
 							const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
-							const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[Game_EntityHandling::EntityOrder[Index]].MoveV / TransY) };
+							const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[Game_EntityHandling::EntityOrder[Index].first].MoveV / TransY) };
 							const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
 							const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(ScreenTexture.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
 							const std::int_fast32_t LineEndX{ (std::min)((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
@@ -318,9 +318,9 @@ namespace Game_WeaponHandling
 								const std::int_fast32_t TextureX{ ((x - ((-EntitySizeTemp >> 1) + EntitySX)) * EntitySize / EntitySizeTemp) };
 
 								if ((x == ScreenTexture.WidthMid && TransY < Game_EntityHandling::ZBuffer[x]) &&
-									((EntityAssets[Entities[Entities[Game_EntityHandling::EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[Game_EntityHandling::EntityOrder[Index]].WalkAnimStep].Pixels[TextureY * TextureSize + TextureX] & lwmf::AMask) != 0))
+									((EntityAssets[Entities[Entities[Game_EntityHandling::EntityOrder[Index].first].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[Game_EntityHandling::EntityOrder[Index].first].WalkAnimStep].Pixels[TextureY * TextureSize + TextureX] & lwmf::AMask) != 0))
 								{
-									Game_EntityHandling::HandleEntityHit(Entities[Entities[Game_EntityHandling::EntityOrder[Index]].Number]);
+									Game_EntityHandling::HandleEntityHit(Entities[Entities[Game_EntityHandling::EntityOrder[Index].first].Number]);
 
 									// Shot found its way, end loop
 									Endloop = true;
@@ -506,7 +506,7 @@ namespace Game_WeaponHandling
 			WeaponHeightFadeInOut -= Weapons[Player.SelectedWeapon].FadeInOutSpeed;
 			WeaponFadeInOutY += Weapons[Player.SelectedWeapon].FadeInOutSpeed;
 
-			if (WeaponHeightFadeInOut <= 0)
+			if (WeaponHeightFadeInOut <= 0) //-V1051
 			{
 				// Change weapons in "circle" - begin at first weapon if reached last one and vice versa
 				if (CurrentWeaponState == WeaponState::ChangeUp)

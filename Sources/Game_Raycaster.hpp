@@ -174,7 +174,7 @@ namespace Game_Raycaster
 
 			float WallDist{};
 
-			if (!WallSide)
+			if (!WallSide) //-V1051
 			{
 				if (DoorNumber > -1)
 				{

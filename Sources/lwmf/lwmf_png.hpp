@@ -394,7 +394,7 @@ namespace lwmf
 					{
 						std::int_fast32_t Length{ LengthBase[Code - 257] };
 
-						if ((BP >> 3) >= InLength)
+						if ((BP >> 3) >= InLength) //-V1051
 						{
 							Error = 51;
 							return;

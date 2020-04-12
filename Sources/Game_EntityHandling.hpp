@@ -86,9 +86,8 @@ namespace Game_EntityHandling
 
 	inline std::vector<std::vector<EntityTypes>> EntityMap{};
 
-	// Vectors used to sort the entities
-	inline std::vector<std::int_fast32_t> EntityOrder{};
-	inline std::vector<float> EntityDistance{};
+	// Vector used to sort the entities
+	inline std::vector<std::pair<std::int_fast32_t, float>> EntityOrder{};
 
 	// 1D Zbuffer
 	inline std::vector<float> ZBuffer{};
@@ -281,8 +280,6 @@ namespace Game_EntityHandling
 		EntityMap.shrink_to_fit();
 		EntityOrder.clear();
 		EntityOrder.shrink_to_fit();
-		EntityDistance.clear();
-		EntityDistance.shrink_to_fit();
 		ZBuffer.clear();
 		ZBuffer.shrink_to_fit();
 		ZBuffer.resize(static_cast<size_t>(ScreenTexture.Width));
@@ -302,7 +299,6 @@ namespace Game_EntityHandling
 			if (Tools_ErrorHandling::CheckFileExistence(INIFile, ContinueOnError))
 			{
 				EntityOrder.emplace_back();
-				EntityDistance.emplace_back();
 				Entities.emplace_back();
 				Entities[Index].Number = Index;
 				Entities[Index].TypeName = lwmf::ReadINIValue<std::string>(INIFile, "ENTITY", "EntityTypeName");
@@ -371,11 +367,11 @@ namespace Game_EntityHandling
 		for (std::int_fast32_t Index{}; Index < NumberOfEntities; ++Index)
 		{
 			// Additional check if Loot is not picked up...
-			if (!Entities[EntityOrder[Index]].IsPickedUp)
+			if (!Entities[EntityOrder[Index].first].IsPickedUp)
 			{
-				const lwmf::FloatPointStruct EntityPos{ Entities[EntityOrder[Index]].Pos.X - Player.Pos.X, Entities[EntityOrder[Index]].Pos.Y - Player.Pos.Y };
+				const lwmf::FloatPointStruct EntityPos{ Entities[EntityOrder[Index].first].Pos.X - Player.Pos.X, Entities[EntityOrder[Index].first].Pos.Y - Player.Pos.Y };
 				const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
-				const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[EntityOrder[Index]].MoveV / TransY) };
+				const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[EntityOrder[Index].first].MoveV / TransY) };
 				const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
 				const std::int_fast32_t Temp{ (VerticalLookTemp >> 1) + vScreen };
 				const std::int_fast32_t LineStartY{ (std::max)(-(EntitySizeTemp >> 1) + Temp, 0) };
@@ -398,23 +394,23 @@ namespace Game_EntityHandling
 							std::int_fast32_t Color{};
 							const std::int_fast32_t PixelOffset{ ((((((y - vScreen) << 8) - Temp2 + Temp3) * EntitySize) / EntitySizeTemp) >> 8) * EntitySize + TextureX };
 
-							if (Entities[Entities[EntityOrder[Index]].Number].AttackAnimEnabled)
+							if (Entities[Entities[EntityOrder[Index].first].Number].AttackAnimEnabled)
 							{
-								Color = EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].AttackTextures[Entities[EntityOrder[Index]].AttackAnimStep].Pixels[PixelOffset];
+								Color = EntityAssets[Entities[Entities[EntityOrder[Index].first].Number].TypeNumber].AttackTextures[Entities[EntityOrder[Index].first].AttackAnimStep].Pixels[PixelOffset];
 							}
-							else if (Entities[Entities[EntityOrder[Index]].Number].KillAnimEnabled)
+							else if (Entities[Entities[EntityOrder[Index].first].Number].KillAnimEnabled)
 							{
-								Color = EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].KillTextures[Entities[EntityOrder[Index]].KillAnimStep].Pixels[PixelOffset];
+								Color = EntityAssets[Entities[Entities[EntityOrder[Index].first].Number].TypeNumber].KillTextures[Entities[EntityOrder[Index].first].KillAnimStep].Pixels[PixelOffset];
 							}
 							else
 							{
-								Color = EntityAssets[Entities[Entities[EntityOrder[Index]].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[EntityOrder[Index]].WalkAnimStep].Pixels[PixelOffset];
+								Color = EntityAssets[Entities[Entities[EntityOrder[Index].first].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[EntityOrder[Index].first].WalkAnimStep].Pixels[PixelOffset];
 							}
 
 							// Check if alphachannel of pixel ist not transparent and draw pixel
 							if ((Color & lwmf::AMask) != 0)
 							{
-								if (Entities[EntityOrder[Index]].IsHit && !Entities[EntityOrder[Index]].KillAnimEnabled)
+								if (Entities[EntityOrder[Index].first].IsHit && !Entities[EntityOrder[Index].first].KillAnimEnabled)
 								{
 									lwmf::SetPixel(ScreenTexture, x, y, Color | 0xFFFFFF00);
 								}
@@ -435,7 +431,7 @@ namespace Game_EntityHandling
 		// Get angle between player and entity without atan2
 		// Returns TextureIndex (0..7) for adressing correct texture
 
-		const lwmf::FloatPointStruct EntityTemp{ Entities[Entities[EntityOrder[EntityNumber]].Number].Pos.X - Player.Pos.X, Entities[Entities[EntityOrder[EntityNumber]].Number].Pos.Y - Player.Pos.Y };
+		const lwmf::FloatPointStruct EntityTemp{ Entities[Entities[EntityOrder[EntityNumber].first].Number].Pos.X - Player.Pos.X, Entities[Entities[EntityOrder[EntityNumber].first].Number].Pos.Y - Player.Pos.Y };
 		const float CosTheta1{ (EntityTemp.X + EntityTemp.Y) * lwmf::SQRT1_2 };
 		const float CosTheta3{ (EntityTemp.Y - EntityTemp.X) * lwmf::SQRT1_2 };
 		float ClosestTheta{ EntityTemp.X };
@@ -484,7 +480,7 @@ namespace Game_EntityHandling
 		}
 
 		// Add rotation factor to Textureindex dependent on heading direction of entity
-		const std::int_fast32_t TextureIndexTemp{ TextureIndex + Entities[Entities[EntityOrder[EntityNumber]].Number].RotationFactor };
+		const std::int_fast32_t TextureIndexTemp{ TextureIndex + Entities[Entities[EntityOrder[EntityNumber].first].Number].RotationFactor };
 		return TextureIndexTemp < 8 ? TextureIndexTemp : TextureIndexTemp - 8;
 	}
 
@@ -820,49 +816,25 @@ namespace Game_EntityHandling
 
 		for (std::int_fast32_t Index{}; Index < NumberOfEntities; ++Index)
 		{
-			EntityOrder[Index] = Index;
-			EntityDistance[Index] = lwmf::CalcEuclidianDistance<float>(Player.Pos.X, Entities[Index].Pos.X, Player.Pos.Y, Entities[Index].Pos.Y);
+			EntityOrder[Index] = { Index, lwmf::CalcEuclidianDistance<float>(Player.Pos.X, Entities[Index].Pos.X, Player.Pos.Y, Entities[Index].Pos.Y) };
 		}
 	}
 
 	inline void SortEntities(const SortOrder SortOrder)
 	{
-		const std::int_fast32_t NumberOfEntities{ static_cast<std::int_fast32_t>(Entities.size()) };
-
-		for (std::int_fast32_t Index{}; Index < NumberOfEntities - 1; ++Index)
+		switch (SortOrder)
 		{
-			std::int_fast32_t MinIndex{ Index };
-
-			for (std::int_fast32_t j{ Index + 1 }; j < NumberOfEntities; ++j)
+			case SortOrder::FrontToBack:
 			{
-				switch (SortOrder)
-				{
-					case SortOrder::FrontToBack:
-					{
-						if (EntityDistance[j] < EntityDistance[MinIndex])
-						{
-							MinIndex = j;
-						}
-						break;
-					}
-					case SortOrder::BackToFront:
-					{
-						if (EntityDistance[j] > EntityDistance[MinIndex])
-						{
-							MinIndex = j;
-						}
-						break;
-					}
-
-					default:{}
-				}
+				std::sort(EntityOrder.begin(), EntityOrder.end(), [](auto& left, auto& right) {	return left.second < right.second; });
+				break;
 			}
-
-			if (MinIndex != Index)
+			case SortOrder::BackToFront:
 			{
-				std::swap(EntityDistance[Index], EntityDistance[MinIndex]);
-				std::swap(EntityOrder[Index], EntityOrder[MinIndex]);
+				std::sort(EntityOrder.begin(), EntityOrder.end(), [](auto& left, auto& right) {	return left.second > right.second; });
+				break;
 			}
+			default: {}
 		}
 	}
 
