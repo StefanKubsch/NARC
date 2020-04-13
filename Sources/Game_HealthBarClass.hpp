@@ -41,10 +41,7 @@ inline void Game_HealthBarClass::Init()
 {
 	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init health bar...");
 
-	std::string INIFile{ GameConfigFolder };
-	INIFile += "HUDHealthBarConfig.ini";
-
-	if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ GameConfigFolder + "HUDHealthBarConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY") };
 		HealthBarWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "HealthBarWidth");

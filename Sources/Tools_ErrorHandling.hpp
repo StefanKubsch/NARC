@@ -39,9 +39,7 @@ namespace Tools_ErrorHandling
 
 		bool Result{ true };
 
-		std::ifstream File(FileName, std::ios::in);
-
-		if (File.fail())
+		if (const std::ifstream File(FileName, std::ios::in); File.fail())
 		{
 			std::array<char, 100> ErrorMessage{};
 			strerror_s(ErrorMessage.data(), 100, errno);

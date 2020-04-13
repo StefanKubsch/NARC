@@ -56,20 +56,14 @@ inline void Game_MenuClass::Init()
 {
 	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init menu...");
 
-	std::string INIFile{ GameConfigFolder };
-	INIFile += "MenuConfig.ini";
-
-	if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ GameConfigFolder + "MenuConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "MENU", "MenuPosY") };
 		Text.InitFont(GameConfigFolder + "MenuConfig.ini", "MENUFONT");
 		TextHighlight.InitFont(GameConfigFolder + "MenuConfig.ini", "MENUFONTHIGHLIGHT");
 	}
 
-	std::string MenuDefinitionFileName{ GameConfigFolder };
-	MenuDefinitionFileName += "MenuDefinition.txt";
-
-	if (Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, StopOnError))
+	if (const std::string MenuDefinitionFileName{ GameConfigFolder + "MenuDefinition.txt" }; Tools_ErrorHandling::CheckFileExistence(MenuDefinitionFileName, StopOnError))
 	{
 		std::ifstream MenuDefinitionFile(MenuDefinitionFileName, std::ios::in);
 

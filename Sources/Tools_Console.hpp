@@ -24,7 +24,7 @@ namespace Tools_Console
 	void CreateConsole();
 	void CloseConsole();
 	void ClearInputBuffer();
-	char QuestionForYesNo(const std::string& Text);
+	bool QuestionForYesNo(const std::string& Text);
 	std::int_fast32_t QuestionForValue(const std::string& Text, std::int_fast32_t BeginRange, std::int_fast32_t EndRange);
 
 	//
@@ -60,7 +60,7 @@ namespace Tools_Console
 		std::cin.rdbuf()->in_avail();
 	}
 
-	inline char QuestionForYesNo(const std::string& Text)
+	inline bool QuestionForYesNo(const std::string& Text)
 	{
 		char Response{ '\0' };
 
@@ -77,7 +77,7 @@ namespace Tools_Console
 			Response = static_cast<char>(std::tolower(Response));
 		}
 
-		return Response;
+		return Response == 'y' ? true : false;
 	}
 
 	inline std::int_fast32_t QuestionForValue(const std::string& Text, const std::int_fast32_t BeginRange, const std::int_fast32_t EndRange)

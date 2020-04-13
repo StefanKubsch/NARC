@@ -61,10 +61,7 @@ namespace HID_Gamepad
 
 		if (GameController.CheckConnection())
 		{
-			std::string INIFile{ GameConfigFolder };
-			INIFile += "InputConfig.ini";
-
-			if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+			if (const std::string INIFile{ GameConfigFolder + "InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 			{
 				const float DeadZone{ lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "DeadZone") };
 				GameController.Sensitivity = lwmf::ReadINIValue<float>(INIFile, "GAMECONTROLLER", "Sensitivity");

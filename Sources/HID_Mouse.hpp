@@ -41,10 +41,7 @@ namespace HID_Mouse
 	{
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init mouse config...");
 
-		std::string INIFile{ GameConfigFolder };
-		INIFile += "InputConfig.ini";
-
-		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "InputConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			MouseSensitivityLowerLimit = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityLowerLimit");
 			MouseSensitivityUpperLimit = lwmf::ReadINIValue<float>(INIFile, "MOUSE", "MouseSensitivityUpperLimit");

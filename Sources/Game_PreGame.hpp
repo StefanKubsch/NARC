@@ -35,10 +35,7 @@ namespace Game_PreGame
 	{
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Show intro header...");
 
-		std::string FileName{ GameConfigFolder };
-		FileName += "IntroHeader.txt";
-
-		if (Tools_ErrorHandling::CheckFileExistence(FileName, ContinueOnError))
+		if (const std::string FileName{ GameConfigFolder + "IntroHeader.txt" }; Tools_ErrorHandling::CheckFileExistence(FileName, ContinueOnError))
 		{
 			std::ifstream IntroHeaderFile(FileName, std::ios::in);
 
@@ -56,8 +53,8 @@ namespace Game_PreGame
 		std::cout << "***************\n* SET OPTIONS *\n***************\n\n";
 
 		SelectedLevel = NumberOfLevels > StartLevel ? Tools_Console::QuestionForValue("Please select Level (" + std::to_string(StartLevel) + " - " + std::to_string(NumberOfLevels) + "): ", StartLevel, NumberOfLevels) : StartLevel;
-		Fullscreen = Tools_Console::QuestionForYesNo("Fullscreen (y/n): ") == 'y' ? true : false;
-		VSync = Tools_Console::QuestionForYesNo("VSync (y/n): ") == 'y' ? true : false;
+		Fullscreen = Tools_Console::QuestionForYesNo("Fullscreen (y/n): ");
+		VSync = Tools_Console::QuestionForYesNo("VSync (y/n): ");
 	}
 
 

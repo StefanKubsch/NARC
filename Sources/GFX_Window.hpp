@@ -28,12 +28,8 @@ namespace GFX_Window
 	{
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init window...");
 
-		std::string INIFile{ GameConfigFolder };
-		INIFile += "WindowConfig.ini";
-
-		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "WindowConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
-			// Create fullscreen if VSync = true, otherwise a window
 			lwmf::CreateOpenGLWindow(lwmf::WindowInstance,
 				ScreenTexture,
 				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
@@ -42,7 +38,7 @@ namespace GFX_Window
 
 			VSync ?	lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 
-			// Fullscreenflag is always true, since window cannot be resized - so we can create faster OpenGL textures
+			// lwmf::Fullscreenflag is always true, since window cannot be resized - so we can create faster OpenGL textures
 			lwmf::FullscreenFlag = true;
 			lwmf::InitOpenGLLoader();
 

@@ -51,10 +51,7 @@ namespace Game_Raycaster
 	{
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init raycaster config...");
 
-		std::string INIFile{ GameConfigFolder };
-		INIFile += "RaycasterConfig.ini";
-
-		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "RaycasterConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			PlaneStartValue = { lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneXStartValue"), lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "PlaneYStartValue") };
 			VerticalLookUpLimit = lwmf::ReadINIValue<float>(INIFile, "RAYCASTER", "VerticalLookUpLimit");

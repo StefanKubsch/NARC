@@ -51,10 +51,7 @@ inline void Game_MinimapClass::Init()
 {
 	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init minimap...");
 
-	std::string INIFile{ GameConfigFolder };
-	INIFile += "HUDMinimapConfig.ini";
-
-	if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+	if (const std::string INIFile{ GameConfigFolder + "HUDMinimapConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 	{
 		Pos = { lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosX"), lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "GENERAL", "PosY") };
 		ShowWaypoints = lwmf::ReadINIValue<bool>(INIFile, "GENERAL", "ShowWaypoints");

@@ -41,10 +41,7 @@ namespace Game_Effects
 	{
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Init effects...");
 
-		std::string INIFile{ GameConfigFolder };
-		INIFile += "EffectsConfig.ini";
-
-		if (Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
+		if (const std::string INIFile{ GameConfigFolder + "EffectsConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			// Init the "bloodstain" effect when player is hit by an enemy
 			BloodstainDuration = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "EFFECTS", "BloodstainDuration");
