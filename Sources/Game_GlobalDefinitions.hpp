@@ -31,6 +31,7 @@ inline std::int_fast32_t NumberOfLevels{};
 
 // Options for Renderer
 inline bool VSync{};
+inline bool Fullscreen{};
 
 // Size of textures (width and height)
 inline std::int_fast32_t TextureSize{};

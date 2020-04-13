@@ -14,6 +14,8 @@
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <map>
+#include <utility>
 #include <tuple>
 
 #include "Game_GlobalDefinitions.hpp"
@@ -303,21 +305,25 @@ namespace Game_EntityHandling
 				Entities[Index].Number = Index;
 				Entities[Index].TypeName = lwmf::ReadINIValue<std::string>(INIFile, "ENTITY", "EntityTypeName");
 
-				if (const std::string EntityTypeString{ lwmf::ReadINIValue<std::string>(INIFile, "ENTITY", "EntityType") }; EntityTypeString == "Neutral")
+				const std::string EntityTypeString{ lwmf::ReadINIValue<std::string>(INIFile, "ENTITY", "EntityType") }; //-V808
+
+				const std::map<std::string, EntityTypes> EntityTypeCompare //-V808
 				{
-					Entities[Index].Type = EntityTypes::Neutral;
+					{ "Clear", EntityTypes::Clear },
+					{ "Neutral", EntityTypes::Neutral },
+					{ "Enemy", EntityTypes::Enemy },
+					{ "Player", EntityTypes::Player },
+					{ "AmmoBox", EntityTypes::AmmoBox },
+					{ "Turret", EntityTypes::Turret }
+				};
+
+				if (const auto Type{ EntityTypeCompare.find(EntityTypeString) }; Type != EntityTypeCompare.end())
+				{
+					Entities[Index].Type = Type->second;
 				}
-				else if (EntityTypeString == "Enemy")
+				else
 				{
-					Entities[Index].Type = EntityTypes::Enemy;
-				}
-				else if (EntityTypeString == "AmmoBox")
-				{
-					Entities[Index].Type = EntityTypes::AmmoBox;
-				}
-				else if (EntityTypeString == "Turret")
-				{
-					Entities[Index].Type = EntityTypes::Turret;
+					NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "Entity type wrong or not found!");
 				}
 
 				Entities[Index].WalkAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "WalkAnimStepWidth");
@@ -826,12 +832,12 @@ namespace Game_EntityHandling
 		{
 			case SortOrder::FrontToBack:
 			{
-				std::sort(EntityOrder.begin(), EntityOrder.end(), [](auto& left, auto& right) {	return left.second < right.second; });
+				std::sort(EntityOrder.begin(), EntityOrder.end(), [](auto& Left, auto& Right) {	return Left.second < Right.second; });
 				break;
 			}
 			case SortOrder::BackToFront:
 			{
-				std::sort(EntityOrder.begin(), EntityOrder.end(), [](auto& left, auto& right) {	return left.second > right.second; });
+				std::sort(EntityOrder.begin(), EntityOrder.end(), [](auto& Left, auto& Right) {	return Left.second > Right.second; });
 				break;
 			}
 			default: {}

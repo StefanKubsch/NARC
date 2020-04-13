@@ -38,7 +38,7 @@ namespace GFX_Window
 				ScreenTexture,
 				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
 				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
-				lwmf::ReadINIValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), VSync);
+				lwmf::ReadINIValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), Fullscreen);
 
 			VSync ?	lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 
