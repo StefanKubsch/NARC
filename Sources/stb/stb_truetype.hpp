@@ -1476,10 +1476,6 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 
 		switch (b0)
 		{
-			case 0x13: // hintmask
-			{
-				break;
-			}
 			case 0x14: // cntrmask
 			{
 				if (in_header != 0)
@@ -1489,23 +1485,6 @@ inline static std::int_fast32_t stbtt__run_charstring(const stbtt_fontinfo& info
 
 				in_header = 0;
 				stbtt__buf_skip(b, (maskbits + 7) >> 3);
-				break;
-			}
-			case 0x01: // hstem
-			{
-				break;
-			}
-			case 0x03: // vstem
-			{
-				break;
-			}
-			case 0x12: // hstemhm
-			{
-				break;
-			}
-			case 0x17: // vstemhm
-			{
-				maskbits += (sp >> 1);
 				break;
 			}
 			case 0x15: // rmoveto
@@ -2242,23 +2221,13 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 						stbtt__handle_clipped_edge(scanline.data(), x, e, x2, y2, x1, y1);
 						stbtt__handle_clipped_edge(scanline.data(), x, e, x1, y1, xb, y_bottom);
 					}
-					else if (x0 < x1 && xb > x1)
+					else if ((x0 < x1 && xb > x1) || (xb < x1 && x0 > x1))
 					{	// two segments across x, down-right
 						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x1, y1);
 						stbtt__handle_clipped_edge(scanline.data(), x, e, x1, y1, xb, y_bottom);
 					}
-					else if (xb < x1 && x0 > x1)
-					{	// two segments across x, down-left
-						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x1, y1);
-						stbtt__handle_clipped_edge(scanline.data(), x, e, x1, y1, xb, y_bottom);
-					}
-					else if (x0 < x2 && xb > x2)
+					else if ((x0 < x2 && xb > x2) || (xb < x2 && x0 > x2))
 					{	// two segments across x+1, down-right
-						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x2, y2);
-						stbtt__handle_clipped_edge(scanline.data(), x, e, x2, y2, xb, y_bottom);
-					}
-					else if (xb < x2 && x0 > x2)
-					{	// two segments across x+1, down-left
 						stbtt__handle_clipped_edge(scanline.data(), x, e, x0, y_top, x2, y2);
 						stbtt__handle_clipped_edge(scanline.data(), x, e, x2, y2, xb, y_bottom);
 					}
