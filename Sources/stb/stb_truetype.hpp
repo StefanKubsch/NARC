@@ -2456,7 +2456,7 @@ inline static void stbtt__sort_edges(std::vector<stbtt__edge>& p, const std::int
 	stbtt__sort_edges_ins_sort(p, n);
 }
 
-using stbtt__point = struct
+struct stbtt__point
 {
 	float x{};
 	float y{};
@@ -2489,7 +2489,7 @@ inline static void stbtt__rasterize(stbtt__bitmap& result, std::vector<stbtt__po
 			std::int_fast32_t b{ j };
 
 			// skip the edge if horizontal
-			if (p[j].y == p[k].y)
+			if (fabs(p[j].y - p[k].y) < FLT_EPSILON)
 			{
 				continue;
 			}
