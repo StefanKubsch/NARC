@@ -118,8 +118,6 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 	const std::int_fast32_t BlackNoAlpha{ lwmf::RGBAtoINT(0, 0, 0, 0) };
 	const std::int_fast32_t White{ lwmf::RGBAtoINT(255, 255, 255, 255) };
 
-	lwmf::CatchMouse(lwmf::MainWindow);
-
 	// Main game loop
 	// fixed timestep method
 	// loop until ESC is pressed
@@ -130,6 +128,8 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 
 	while (!QuitGameFlag)
 	{
+		lwmf::CatchMouse(lwmf::MainWindow);
+
 		if (Game_LevelHandling::BackgroundMusicEnabled && !Game_LevelHandling::BackgroundMusic[0].IsFinished())
 		{
 			Game_LevelHandling::PlayBackgroundMusic(0);

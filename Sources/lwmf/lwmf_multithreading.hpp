@@ -44,7 +44,10 @@ namespace lwmf
 
 	inline Multithreading::Multithreading()
 	{
-		for (std::size_t i{}; i < std::thread::hardware_concurrency(); ++i)
+		const std::size_t NumberOfThreads{ static_cast<std::size_t>(std::thread::hardware_concurrency()) };
+		Workers.reserve(NumberOfThreads);
+
+		for (std::size_t i{}; i < NumberOfThreads; ++i)
 		{
 			Workers.emplace_back([this]
 			{
@@ -52,10 +55,10 @@ namespace lwmf
 				{
 					std::packaged_task<void()> Task;
 					{
-						std::unique_lock<std::mutex> lock(this->QueueMutex);
-						this->Condition.wait(lock, [this] { return this->Stop || !this->Tasks.empty(); });
+						std::unique_lock<std::mutex> lock(QueueMutex);
+						Condition.wait(lock, [this] { return Stop || !Tasks.empty(); });
 
-						if (this->Stop && this->Tasks.empty())
+						if (Stop && Tasks.empty())
 						{
 							return;
 						}
@@ -88,14 +91,9 @@ namespace lwmf
 	template<class F, class... Args>void Multithreading::AddThread(F&& f, Args&& ... args)
 	{
 		std::packaged_task<std::invoke_result_t<F, Args...>()> Task(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-
 		Results.emplace_back(Task.get_future());
-
-		{
-			std::unique_lock<std::mutex> lock(QueueMutex);
-			Tasks.emplace(std::move(Task));
-		}
-
+		std::unique_lock<std::mutex> lock(QueueMutex);
+		Tasks.emplace(std::move(Task));
 		Condition.notify_one();
 	}
 
