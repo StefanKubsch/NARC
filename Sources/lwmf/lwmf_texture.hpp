@@ -21,6 +21,7 @@
 namespace lwmf
 {
 
+
 	struct TextureStruct final
 	{
 		std::vector<std::int_fast32_t> Pixels{};

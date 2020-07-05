@@ -77,7 +77,7 @@ namespace Game_SkyboxHandling
 	{
 		if (SkyBoxEnabled)
 		{
-			const std::int_fast32_t Left{ static_cast<std::int_fast32_t>(std::atan2f(Plane.X, Plane.Y) / lwmf::DoublePI * -SkyboxWidth) };
+			const std::int_fast32_t Left{ static_cast<std::int_fast32_t>(lwmf::FastAtan2Approx(Plane.X, Plane.Y) / lwmf::DoublePI * -SkyboxWidth) };
 			const std::int_fast32_t Top{ static_cast<std::int_fast32_t>(VerticalLookCamera * 360.0F - 180.0F) };
 
 			SkyboxShader.RenderTexture(&SkyboxShader.OGLTextureID, Left, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);

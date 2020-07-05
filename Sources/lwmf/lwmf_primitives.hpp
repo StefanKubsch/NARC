@@ -329,6 +329,35 @@ namespace lwmf
 			return;
 		}
 
+		// First case; Rectangle = Full Screen/Texture
+		if (PosX == 0 && PosY == 0 && Width == Texture.Width && Height == Texture.Height)
+		{
+			ClearTexture(Texture, FillColor);
+
+			if (BorderColor != FillColor)
+			{
+				Rectangle(Texture, PosX, PosY, Width, Height, BorderColor);
+			}
+
+			return;
+		}
+
+		// Second case; we can use std::fill here...
+		if (PosX == 0 && PosY >= 0 && PosY < Texture.Height && Width == Texture.Width && Height <= Texture.Height)
+		{
+			const auto Begin{ Texture.Pixels.begin() + PosY * Texture.Width };
+
+			std::fill(Begin, Begin + Texture.Width * Height, FillColor);
+
+			if (BorderColor != FillColor)
+			{
+				Rectangle(Texture, PosX, PosY, Width, Height, BorderColor);
+			}
+
+			return;
+		}
+
+		// Third case; all the rest...
 		for (std::int_fast32_t y{ PosY }; y < PosY + Height; ++y)
 		{
 			Line(Texture, PosX, y, PosX + Width - 1, y, FillColor);
