@@ -85,8 +85,8 @@ namespace Game_PathFinding
 
 	inline bool CalculatePath(std::vector<float>& Map, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Start, const std::int_fast32_t Target, bool Diagonal, std::list<lwmf::IntPointStruct>& WayPoints)
 	{
-		NodeStruct StartNode(Start, 0.0F);
-		NodeStruct TargetNode(Target, 0.0F);
+		const NodeStruct StartNode(Start, 0.0F);
+		const NodeStruct TargetNode(Target, 0.0F);
 
 		const std::int_fast32_t MapSize{ Width * Height };
 		const std::int_fast32_t TargetCalc1{ Target / Width };

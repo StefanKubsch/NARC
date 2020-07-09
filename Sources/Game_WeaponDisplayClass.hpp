@@ -65,10 +65,14 @@ inline void Game_WeaponDisplayClass::Init()
 
 inline void Game_WeaponDisplayClass::Display()
 {
+	static const lwmf::IntPointStruct WeaponTextPos{ WeaponHUDRect.X + WeaponText.GetOffset().X, WeaponHUDRect.Y + WeaponText.GetOffset().Y };
+	static const lwmf::IntPointStruct CarriedAmmoTextPos{ WeaponHUDRect.X + CarriedAmmoText.GetOffset().X, WeaponHUDRect.Y + CarriedAmmoText.GetOffset().Y };
+	static const lwmf::IntPointStruct AmmoTextPos{ WeaponHUDRect.X + AmmoText.GetOffset().X, WeaponHUDRect.Y + AmmoText.GetOffset().Y };
+
 	CrosshairShader.RenderStaticTexture(&CrosshairShader.OGLTextureID, true, 1.0F);
 	WeaponHUDShader.RenderStaticTexture(&WeaponHUDShader.OGLTextureID, true, 1.0F);
 
-	WeaponText.RenderText(Weapons[Player.SelectedWeapon].Name, WeaponHUDRect.X + WeaponText.GetOffset().X, WeaponHUDRect.Y + WeaponText.GetOffset().Y);
-	CarriedAmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo, WeaponHUDRect.X + CarriedAmmoText.GetOffset().X, WeaponHUDRect.Y + CarriedAmmoText.GetOffset().Y);
-	AmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDAmmoInfo, WeaponHUDRect.X + AmmoText.GetOffset().X, WeaponHUDRect.Y + AmmoText.GetOffset().Y);
+	WeaponText.RenderText(Weapons[Player.SelectedWeapon].Name, WeaponTextPos.X, WeaponTextPos.Y);
+	CarriedAmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDCarriedAmmoInfo, CarriedAmmoTextPos.X, CarriedAmmoTextPos.Y);
+	AmmoText.RenderText(Weapons[Player.SelectedWeapon].HUDAmmoInfo, AmmoTextPos.X, AmmoTextPos.Y);
 }
