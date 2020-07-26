@@ -34,7 +34,7 @@ namespace lwmf
 
 	inline void LoadBMP(TextureStruct& Texture, const std::string& Filename)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Load file " + Filename + "...");
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Load BMP file " + Filename + "...");
 
 		std::ifstream File(Filename, std::ios::in | std::ios::binary);
 
