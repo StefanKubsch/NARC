@@ -27,6 +27,8 @@ namespace lwmf
 	std::int_fast32_t GetPixel(const TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y);
 	std::int_fast32_t GetPixelSafe(const TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y);
 	void ScanlineFill(TextureStruct& Texture, const IntPointStruct& CenterPoint, std::int_fast32_t FillColor);
+	std::int_fast32_t FindRegion(std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t x, std::int_fast32_t y);
+	bool ClipLine(std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t& x3, std::int_fast32_t& y3, std::int_fast32_t& x4, std::int_fast32_t& y4);
 	void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
 	void Rectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
 	void FilledRectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
@@ -137,9 +139,106 @@ namespace lwmf
 	// Lines
 	//
 
+	// FindRegion and ClipLine provide the "Cohen Sutherland Clipping" algorithm for lines
+
+	inline std::int_fast32_t FindRegion(const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t x, const std::int_fast32_t y)
+	{
+		int_fast32_t Code{};
+
+		if (y >= Height)
+		{
+			Code |= 1;
+		}
+		else if (y < 0)
+		{
+			Code |= 2;
+		}
+
+		if (x >= Width)
+		{
+			Code |= 4;
+		}
+		else if (x < 0)
+		{
+			Code |= 8;
+		}
+
+		return Code;
+	}
+
+	inline bool ClipLine(const std::int_fast32_t Width, const std::int_fast32_t Height, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t& x3, std::int_fast32_t& y3, std::int_fast32_t& x4, std::int_fast32_t& y4)
+	{
+		bool Accept{};
+		bool Done{};
+		std::int_fast32_t Code1{ FindRegion(Width, Height, x1, y1) };
+		std::int_fast32_t Code2{ FindRegion(Width, Height, x2, y2) };
+
+		do
+		{
+			if ((Code1 | Code2) == 0)
+			{
+				Accept = true;
+				Done = true;
+			}
+			else if ((Code1 & Code2) != 0)
+			{
+				Done = true;
+			}
+			else
+			{
+				IntPointStruct Point{};
+				const std::int_fast32_t Codeout{ Code1 != 0 ? Code1 : Code2 };
+
+				if ((Codeout & 1) != 0)
+				{
+					Point.X = x1 + (x2 - x1) * (Height - y1) / (y2 - y1);
+					Point.Y = Height - 1;
+				}
+				else if ((Codeout & 2) != 0)
+				{
+					Point.X = x1 + (x2 - x1) * -y1 / (y2 - y1);
+				}
+				else if ((Codeout & 4) != 0)
+				{
+					Point.Y = y1 + (y2 - y1) * (Width - x1) / (x2 - x1);
+					Point.X = Width - 1;
+				}
+				else
+				{
+					Point.Y = y1 + (y2 - y1) * -x1 / (x2 - x1);
+				}
+
+				if (Codeout == Code1)
+				{
+					x1 = Point.X;
+					y1 = Point.Y;
+					Code1 = FindRegion(Width, Height, x1, y1);
+				}
+				else
+				{
+					x2 = Point.X;
+					y2 = Point.Y;
+					Code2 = FindRegion(Width, Height, x2, y2);
+				}
+			}
+		} while (!Done);
+
+		if (Accept)
+		{
+			x3 = x1;
+			x4 = x2;
+			y3 = y1;
+			y4 = y2;
+
+			return true;
+		}
+
+		return false;
+	}
+
 	inline void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, const std::int_fast32_t Color)
 	{
-		// Exit early if coords are out of visual boundaries
+		// Exit early if coords are completely out of visual boundaries
 		if ((x1 < 0 && x2 < 0) || (x1 > Texture.Width && x2 > Texture.Width) || (y1 < 0 && y2 < 0) || (y1 > Texture.Height && y2 > Texture.Height))
 		{
 			return;
@@ -181,9 +280,20 @@ namespace lwmf
 			return;
 		}
 
-		// The two other variants use "EFLA" - "Extremely Fast Line Algorithm"
+		// Case 3: All other line variants
+
+		// I use "EFLA" - "Extremely Fast Line Algorithm"
 		// Copyright 2001-2, By Po-Han Lin
 		// http://www.edepot.com/algorithm.html
+
+		//
+		// Clip line coordinates to fit into screen boundaries
+		//
+
+		if (!ClipLine(Texture.Width, Texture.Height, x1, y1, x2, y2, x1, y1, x2, y2))
+		{
+			return;
+		}
 
 		bool YLonger{};
 		std::int_fast32_t ShortLength{ y2 - y1 };
@@ -197,106 +307,51 @@ namespace lwmf
 
 		const std::int_fast32_t DecInc{ LongLength == 0 ? 0 : (ShortLength << 16) / LongLength };
 
-		// Case 3: Line is within screen boundaries, so no further checking if pixel can be set
-		if (static_cast<std::uint_fast32_t>(x1) < static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y1) < static_cast<std::uint_fast32_t>(Texture.Height)
-			&& static_cast<std::uint_fast32_t>(x2) < static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(y2) < static_cast<std::uint_fast32_t>(Texture.Height))
+		if (YLonger)
 		{
-			if (YLonger)
+			if (LongLength > 0)
 			{
-				if (LongLength > 0)
-				{
-					LongLength += y1;
-
-					for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
-					{
-						Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
-						j += DecInc;
-					}
-
-					return;
-				}
-
 				LongLength += y1;
 
-				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
+				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
 				{
 					Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
-					j -= DecInc;
-				}
-
-				return;
-			}
-
-			if (LongLength > 0)
-			{
-				LongLength += x1;
-
-				for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
-				{
-					Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
 					j += DecInc;
 				}
 
 				return;
 			}
 
+			LongLength += y1;
+
+			for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
+			{
+				Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
+				j -= DecInc;
+			}
+
+			return;
+		}
+
+		if (LongLength > 0)
+		{
 			LongLength += x1;
 
-			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
+			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
 			{
 				Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
-				j -= DecInc;
+				j += DecInc;
 			}
+
+			return;
 		}
-		// Case 4: Check each pixel if it´s within screen boundaries (slowest)
-		else
+
+		LongLength += x1;
+
+		for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
 		{
-			if (YLonger)
-			{
-				if (LongLength > 0)
-				{
-					LongLength += y1;
-
-					for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
-					{
-						SetPixelSafe(Texture, j >> 16, y1, Color);
-						j += DecInc;
-					}
-
-					return;
-				}
-
-				LongLength += y1;
-
-				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
-				{
-					SetPixelSafe(Texture, j >> 16, y1, Color);
-					j -= DecInc;
-				}
-
-				return;
-			}
-
-			if (LongLength > 0)
-			{
-				LongLength += x1;
-
-				for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
-				{
-					SetPixelSafe(Texture, x1, j >> 16, Color);
-					j += DecInc;
-				}
-
-				return;
-			}
-
-			LongLength += x1;
-
-			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
-			{
-				SetPixelSafe(Texture, x1, j >> 16, Color);
-				j -= DecInc;
-			}
+			Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
+			j -= DecInc;
 		}
 	}
 
