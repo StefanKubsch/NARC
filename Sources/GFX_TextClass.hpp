@@ -81,11 +81,10 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 
 			FontHeight = static_cast<std::int_fast32_t>(FontSize + 1.0F);
 			const std::int_fast32_t Height{ FontHeight + 5 };
-			constexpr std::int_fast32_t FirstASCIIChar{ 32 };
-			constexpr std::int_fast32_t LastASCIIChar{ 127 };
+			constexpr std::int_fast32_t LastASCIIChar{ 127 }; // All ASCII chars except DEL (127)
 			std::int_fast32_t Width{};
 
-			for (char Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
+			for (char Char{}; Char < LastASCIIChar; ++Char)
 			{
 				lwmf::IntPointStruct i0{};
 				lwmf::IntPointStruct i1{};
@@ -96,9 +95,8 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 
 			const std::size_t Size{ static_cast<std::size_t>(Width) * static_cast<std::size_t>(Height) };
 			std::vector<unsigned char> BakedFontGreyscale(Size);
-			constexpr std::int_fast32_t NumberOfASCIIChars{ LastASCIIChar - FirstASCIIChar };
-			std::vector<stbtt_bakedchar> CharData(NumberOfASCIIChars);
-			stbtt_BakeFontBitmap(FontBuffer, 0, static_cast<float>(FontSize), BakedFontGreyscale, Width, Height, FirstASCIIChar, NumberOfASCIIChars, CharData);
+			std::vector<stbtt_bakedchar> CharData(LastASCIIChar);
+			stbtt_BakeFontBitmap(FontBuffer, 0, static_cast<float>(FontSize), BakedFontGreyscale, Width, Height, 0, LastASCIIChar, CharData);
 
 			// Since the glyphs were rendered in greyscale, they need to be colored...
 			std::vector<std::int_fast32_t> FontColor(Size);
@@ -108,15 +106,15 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				FontColor[i] = lwmf::RGBAtoINT(FontColorRed, FontColorGreen, FontColorBlue, BakedFontGreyscale[i]);
 			}
 
-			Glyphs.resize(static_cast<std::size_t>(NumberOfASCIIChars));
+			Glyphs.resize(static_cast<std::size_t>(LastASCIIChar));
 
-			for (std::int_fast32_t Char{ FirstASCIIChar }; Char < LastASCIIChar; ++Char)
+			for (std::int_fast32_t Char{}; Char < LastASCIIChar; ++Char)
 			{
 				lwmf::FloatPointStruct QuadPos{};
 				stbtt_aligned_quad Quad{};
-				stbtt_GetBakedQuad(CharData, Width, Height, Char - FirstASCIIChar, QuadPos.X, QuadPos.Y, Quad, 1);
+				stbtt_GetBakedQuad(CharData, Width, Height, Char, QuadPos.X, QuadPos.Y, Quad, 1);
 
-				const std::int_fast32_t TargetChar{ Char - FirstASCIIChar };
+				const std::int_fast32_t TargetChar{ Char };
 				const lwmf::IntPointStruct Pos{ static_cast<std::int_fast32_t>(Quad.s0 * Width), static_cast<std::int_fast32_t>(Quad.t0 * Height) };
 				Glyphs[TargetChar].Width = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.s1 - Quad.s0) * Width) + 1.0F));
 				Glyphs[TargetChar].Height = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.t1 - Quad.t0) * Height) + 1.0F));
@@ -135,7 +133,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 					}
 				}
 
-				GlyphShader.LoadTextureInGPU(TempGlyphTexture, &Glyphs[Char - FirstASCIIChar].Texture);
+				GlyphShader.LoadTextureInGPU(TempGlyphTexture, &Glyphs[Char].Texture);
 			}
 		}
 	}
@@ -145,8 +143,8 @@ inline void GFX_TextClass::RenderText(const std::string& Text, std::int_fast32_t
 {
 	for (const char& Char : Text)
 	{
-		GlyphShader.RenderTexture(&Glyphs[Char - 32].Texture, x, y - Glyphs[Char - 32].Baseline + FontHeight, Glyphs[Char - 32].Width, Glyphs[Char - 32].Height, true, 1.0F);
-		x += Glyphs[Char - 32].Advance;
+		GlyphShader.RenderTexture(&Glyphs[Char].Texture, x, y - Glyphs[Char].Baseline + FontHeight, Glyphs[Char].Width, Glyphs[Char].Height, true, 1.0F);
+		x += Glyphs[Char].Advance;
 	}
 }
 
@@ -156,7 +154,7 @@ inline void GFX_TextClass::RenderTextCentered(const std::string& Text, const std
 
 	for (const char& Char : Text)
 	{
-		TextLengthInPixels += Glyphs[Char - 32].Advance;
+		TextLengthInPixels += Glyphs[Char].Advance;
 	}
 
 	RenderText(Text, ScreenTexture.WidthMid - (TextLengthInPixels >> 1), y);
