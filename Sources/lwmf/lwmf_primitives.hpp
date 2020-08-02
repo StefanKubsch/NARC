@@ -524,9 +524,12 @@ namespace lwmf
 
 		const std::int_fast32_t RadiusYTemp{ RadiusY * RadiusY };
 		const std::int_fast32_t RadiusXTemp{ RadiusX * RadiusX };
+		const std::int_fast32_t TwoRadiusYTemp{ RadiusYTemp << 1 };
+		const std::int_fast32_t TwoRadiusXTemp{ RadiusXTemp << 1 };
+
 		IntPointStruct Point{ 0, RadiusY };
-		IntPointStruct Temp{ 2 * RadiusYTemp * Point.X, 2 * RadiusXTemp * Point.Y };
-		float p1{ static_cast<float>(RadiusYTemp - (RadiusXTemp * RadiusY) + RadiusXTemp / 4) };
+		IntPointStruct Temp{ TwoRadiusYTemp * Point.X, TwoRadiusXTemp * Point.Y };
+		float p1{ static_cast<float>(RadiusYTemp - (RadiusXTemp * RadiusY) + (RadiusXTemp >> 2)) };
 		bool SafeFlag{};
 
 		// if complete ellipse is within texture boundaries, there is no reason to use SetPixelSafe...
@@ -556,13 +559,13 @@ namespace lwmf
 
 			if (p1 < 0.0F)
 			{
-				Temp.X = 2 * RadiusYTemp * Point.X;
+				Temp.X = TwoRadiusYTemp * Point.X;
 				p1 = p1 + Temp.X + RadiusYTemp;
 			}
 			else
 			{
 				--Point.Y;
-				Temp = { 2 * RadiusYTemp * Point.X,2 * RadiusXTemp * Point.Y };
+				Temp = { TwoRadiusYTemp * Point.X, TwoRadiusXTemp * Point.Y };
 				p1 = p1 + Temp.X - Temp.Y + RadiusYTemp;
 			}
 
@@ -607,12 +610,12 @@ namespace lwmf
 			if (p2 < 0.0F)
 			{
 				++Point.X;
-				Temp = { 2 * RadiusYTemp * Point.X, 2 * RadiusXTemp * Point.Y };;
+				Temp = { TwoRadiusYTemp * Point.X, TwoRadiusXTemp * Point.Y };;
 				p2 = p2 + Temp.X - Temp.Y + RadiusXTemp;
 			}
 			else
 			{
-				Temp.Y = 2 * RadiusXTemp * Point.Y;
+				Temp.Y = TwoRadiusXTemp * Point.Y;
 				p2 = p2 - Temp.Y + RadiusXTemp;
 			}
 

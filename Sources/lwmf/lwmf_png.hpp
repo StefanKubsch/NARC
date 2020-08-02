@@ -865,12 +865,12 @@ namespace lwmf
 					{
 						for (std::int_fast32_t i{}; i < ByteWidth; ++i)
 						{
-							Recon[i] = ScanLine[i] + PreCon[i] / 2;
+							Recon[i] = ScanLine[i] + (PreCon[i] >> 1);
 						}
 
 						for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
 						{
-							Recon[i] = ScanLine[i] + ((Recon[i - ByteWidth] + PreCon[i]) / 2);
+							Recon[i] = ScanLine[i] + ((Recon[i - ByteWidth] + PreCon[i]) >> 1);
 						}
 					}
 					else
@@ -882,7 +882,7 @@ namespace lwmf
 
 						for (std::int_fast32_t i{ ByteWidth }; i < Length; ++i)
 						{
-							Recon[i] = ScanLine[i] + Recon[i - ByteWidth] / 2;
+							Recon[i] = ScanLine[i] + (Recon[i - ByteWidth] >> 1);
 						}
 					}
 					break;
