@@ -290,7 +290,14 @@ namespace lwmf
 
 	inline void ClearTexture(TextureStruct& Texture, const std::int_fast32_t Color)
 	{
-		std::fill(Texture.Pixels.begin(), Texture.Pixels.end(), Color);
+		if (Color == 0)
+		{
+			memset(&Texture.Pixels[0], 0, sizeof(Texture.Pixels[0]) * Texture.Pixels.size());
+		}
+		else
+		{
+			std::fill(Texture.Pixels.begin(), Texture.Pixels.end(), Color);
+		}
 	}
 
 
