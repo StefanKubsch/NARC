@@ -160,8 +160,8 @@ namespace lwmf
 
 		const FloatPointStruct NormalizedL{ (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX), (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
 
-		LeftStick.X = (std::abs(NormalizedL.X) < DeadZone.X ? 0.0F : (std::abs(NormalizedL.X) - DeadZone.X) * (NormalizedL.X / std::abs(NormalizedL.X)));
-		LeftStick.Y = (std::abs(NormalizedL.Y) < DeadZone.Y ? 0.0F : (std::abs(NormalizedL.Y) - DeadZone.Y) * (NormalizedL.Y / std::abs(NormalizedL.Y)));
+		LeftStick.X = (std::fabs(NormalizedL.X) < DeadZone.X ? 0.0F : (std::fabs(NormalizedL.X) - DeadZone.X) * (NormalizedL.X / std::fabs(NormalizedL.X)));
+		LeftStick.Y = (std::fabs(NormalizedL.Y) < DeadZone.Y ? 0.0F : (std::fabs(NormalizedL.Y) - DeadZone.Y) * (NormalizedL.Y / std::fabs(NormalizedL.Y)));
 
 		if (DeadZone.X > 0.0F)
 		{
@@ -175,8 +175,8 @@ namespace lwmf
 
 		const FloatPointStruct NormalizedR{ (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX), (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
 
-		RightStick.X = (std::abs(NormalizedR.X) < DeadZone.X ? 0.0F : (std::abs(NormalizedR.X) - DeadZone.X) * (NormalizedR.X / std::abs(NormalizedR.X)));
-		RightStick.Y = (std::abs(NormalizedR.Y) < DeadZone.Y ? 0.0F : (std::abs(NormalizedR.Y) - DeadZone.Y) * (NormalizedR.Y / std::abs(NormalizedR.Y)));
+		RightStick.X = (std::fabs(NormalizedR.X) < DeadZone.X ? 0.0F : (std::fabs(NormalizedR.X) - DeadZone.X) * (NormalizedR.X / std::fabs(NormalizedR.X)));
+		RightStick.Y = (std::fabs(NormalizedR.Y) < DeadZone.Y ? 0.0F : (std::fabs(NormalizedR.Y) - DeadZone.Y) * (NormalizedR.Y / std::fabs(NormalizedR.Y)));
 
 		if (DeadZone.X > 0.0F)
 		{
@@ -195,10 +195,10 @@ namespace lwmf
 		{
 			if ((State.Gamepad.wButtons & Button.first) != 0)
 			{
-				const WORD Mapping{ (KeyMap.find(Button.first) != KeyMap.end() ? static_cast<WORD>(KeyMap.find(Button.first)->second) : static_cast<WORD>(Button.first)) };
 				const DWORD Now{ GetTickCount() };
 				const DWORD Last{ (LastPress.find(Button.first) != LastPress.end() ? LastPress.find(Button.first)->second : 0) };
 				const std::uint_fast32_t Time{ Repeat.find(Button.first)->second };
+				const WORD Mapping{ (KeyMap.find(Button.first) != KeyMap.end() ? static_cast<WORD>(KeyMap.find(Button.first)->second) : static_cast<WORD>(Button.first)) };
 
 				if ((Now - Last >= Time && Time > 0) || Last == 0 || (Time == 0 && (Previous.Gamepad.wButtons & Button.first) == 0))
 				{

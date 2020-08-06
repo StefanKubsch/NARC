@@ -104,7 +104,6 @@ namespace lwmf
 
 			bool Above{};
 			bool Below{};
-
 			const std::int_fast32_t TempY{ Points.Y * Texture.Width };
 
 			while (x1 < Texture.Width && Texture.Pixels[TempY + x1] != FillColor)
@@ -255,8 +254,8 @@ namespace lwmf
 				std::swap(x1, x2);
 			}
 
-			const auto Temp{ Texture.Pixels.begin() + y1 * Texture.Width };
-			std::fill(Temp + x1, Temp + x2 + 1, Color);
+			const auto Begin{ Texture.Pixels.begin() + y1 * Texture.Width };
+			std::fill(Begin + x1, Begin + x2 + 1, Color);
 
 			return;
 		}
@@ -282,9 +281,11 @@ namespace lwmf
 
 		// Case 3: All other line variants
 
-		// I use "EFLA" - "Extremely Fast Line Algorithm"
+		// I use "EFLA" - "Extremely Fast Line Algorithm" variant E
 		// Copyright 2001-2, By Po-Han Lin
 		// http://www.edepot.com/algorithm.html
+		//
+		// I modified the algorithm slightly...
 
 		//
 		// Clip line coordinates to fit into screen boundaries
@@ -309,11 +310,13 @@ namespace lwmf
 
 		if (YLonger)
 		{
+			const std::int_fast32_t StartY{ 0x8000 + (x1 << 16) };
+
 			if (LongLength > 0)
 			{
 				LongLength += y1;
 
-				for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 <= LongLength; ++y1)
+				for (std::int_fast32_t j{ StartY }; y1 <= LongLength; ++y1)
 				{
 					Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
 					j += DecInc;
@@ -324,7 +327,7 @@ namespace lwmf
 
 			LongLength += y1;
 
-			for (std::int_fast32_t j{ 0x8000 + (x1 << 16) }; y1 >= LongLength; --y1)
+			for (std::int_fast32_t j{ StartY }; y1 >= LongLength; --y1)
 			{
 				Texture.Pixels[y1 * Texture.Width + (j >> 16)] = Color;
 				j -= DecInc;
@@ -333,11 +336,13 @@ namespace lwmf
 			return;
 		}
 
+		const std::int_fast32_t StartX{ 0x8000 + (y1 << 16) };
+
 		if (LongLength > 0)
 		{
 			LongLength += x1;
 
-			for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 <= LongLength; ++x1)
+			for (std::int_fast32_t j{ StartX }; x1 <= LongLength; ++x1)
 			{
 				Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
 				j += DecInc;
@@ -348,7 +353,7 @@ namespace lwmf
 
 		LongLength += x1;
 
-		for (std::int_fast32_t j{ 0x8000 + (y1 << 16) }; x1 >= LongLength; --x1)
+		for (std::int_fast32_t j{ StartX }; x1 >= LongLength; --x1)
 		{
 			Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
 			j -= DecInc;
@@ -529,7 +534,6 @@ namespace lwmf
 
 		IntPointStruct Point{ 0, RadiusY };
 		IntPointStruct Temp{ TwoRadiusYTemp * Point.X, TwoRadiusXTemp * Point.Y };
-		float p1{ static_cast<float>(RadiusYTemp - (RadiusXTemp * RadiusY) + (RadiusXTemp >> 2)) };
 		bool SafeFlag{};
 
 		// if complete ellipse is within texture boundaries, there is no reason to use SetPixelSafe...
@@ -537,6 +541,8 @@ namespace lwmf
 		{
 			SafeFlag = true;
 		}
+
+		float p1{ static_cast<float>(RadiusYTemp - (RadiusXTemp * RadiusY) + (RadiusXTemp >> 2)) };
 
 		while (Temp.X <= Temp.Y)
 		{
@@ -644,7 +650,6 @@ namespace lwmf
 	{
 		float SignedArea{};
 		FloatPointStruct Centroid{};
-
 		const std::size_t NumberOfPoints{ Points.size() };
 
 		for (std::size_t i{}; i < NumberOfPoints; ++i)
