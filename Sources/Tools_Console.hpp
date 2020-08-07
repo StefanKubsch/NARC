@@ -47,9 +47,9 @@ namespace Tools_Console
 	{
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Close console...");
 
-		fclose(stdout);
-		fclose(stdin);
-		fclose(stderr);
+		std::fclose(stdout);
+		std::fclose(stdin);
+		std::fclose(stderr);
 		FreeConsole();
 	}
 

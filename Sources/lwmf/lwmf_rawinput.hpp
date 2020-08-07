@@ -59,7 +59,7 @@ namespace lwmf
 		return DevString;
 	}
 
-	inline void RegisterRawInputDevice(const HWND hWnd, const DeviceIdentifier Device)
+	inline void RegisterRawInputDevice(HWND hWnd, const DeviceIdentifier Device)
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Register device " + DeviceString(Device) + "...");
 
@@ -87,7 +87,7 @@ namespace lwmf
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Successfully unregistered device " + DeviceString(Device));
 	}
 
-	inline void CatchMouse(const HWND hWnd)
+	inline void CatchMouse(HWND hWnd)
 	{
 		RECT WindowRect{};
 		GetClientRect(hWnd, &WindowRect);

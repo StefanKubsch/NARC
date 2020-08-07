@@ -46,7 +46,7 @@ namespace lwmf
 		glViewport(0, 0, Texture.Width, Texture.Height);
 	}
 
-	inline void CreateOpenGLWindow(const HINSTANCE hInstance, TextureStruct& RenderTarget, const std::int_fast32_t Width, const std::int_fast32_t Height, const LPCSTR WindowName, const bool Fullscreen)
+	inline void CreateOpenGLWindow( HINSTANCE hInstance, TextureStruct& RenderTarget, const std::int_fast32_t Width, const std::int_fast32_t Height, const LPCSTR WindowName, const bool Fullscreen)
 	{
 		// Create window
 
@@ -191,7 +191,7 @@ namespace lwmf
 	{
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Delete OpenGL context...");
 
-		const HGLRC OpenGLContext{ wglGetCurrentContext() };
+		HGLRC OpenGLContext{ wglGetCurrentContext() };
 
 		if (OpenGLContext != nullptr)
 		{

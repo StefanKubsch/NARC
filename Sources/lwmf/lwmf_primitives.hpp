@@ -566,13 +566,13 @@ namespace lwmf
 			if (p1 < 0.0F)
 			{
 				Temp.X = TwoRadiusYTemp * Point.X;
-				p1 = p1 + Temp.X + RadiusYTemp;
+				p1 += static_cast<float>(Temp.X + RadiusYTemp);
 			}
 			else
 			{
 				--Point.Y;
 				Temp = { TwoRadiusYTemp * Point.X, TwoRadiusXTemp * Point.Y };
-				p1 = p1 + Temp.X - Temp.Y + RadiusYTemp;
+				p1 += static_cast<float>(Temp.X - Temp.Y + RadiusYTemp);
 			}
 
 			if (SafeFlag)
@@ -591,7 +591,7 @@ namespace lwmf
 			}
 		}
 
-		float p2{ (RadiusYTemp * (Point.X + 0.5F) * (Point.X + 0.5F)) + (RadiusXTemp * (Point.Y - 1) * (Point.Y - 1)) - (RadiusXTemp * RadiusYTemp) };
+		float p2{ (static_cast<float>(RadiusYTemp) * (static_cast<float>(Point.X) + 0.5F) * (static_cast<float>(Point.X) + 0.5F)) + static_cast<float>((RadiusXTemp * (Point.Y - 1) * (Point.Y - 1)) - (RadiusXTemp * RadiusYTemp)) };
 		Temp = { 0, 0 };
 
 		while (Point.Y >= 0)
@@ -617,12 +617,12 @@ namespace lwmf
 			{
 				++Point.X;
 				Temp = { TwoRadiusYTemp * Point.X, TwoRadiusXTemp * Point.Y };;
-				p2 = p2 + Temp.X - Temp.Y + RadiusXTemp;
+				p2 += static_cast<float>(Temp.X - Temp.Y + RadiusXTemp);
 			}
 			else
 			{
 				Temp.Y = TwoRadiusXTemp * Point.Y;
-				p2 = p2 - Temp.Y + RadiusXTemp;
+				p2 -= static_cast<float>(Temp.Y + RadiusXTemp);
 			}
 
 			if (SafeFlag)

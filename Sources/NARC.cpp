@@ -14,9 +14,6 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-// Disable "unreferenced formal parameter" warning in WinMain
-#pragma warning(disable: 4100)
-
 #include <cstdint>
 #include <cmath>
 #include <chrono>
@@ -100,6 +97,10 @@ inline bool HUDEnabled{ true };
 
 std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nShowCmd);
+
 	lwmf::WindowInstance = hInstance;
 
 	try
