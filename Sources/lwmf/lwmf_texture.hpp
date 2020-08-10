@@ -106,8 +106,6 @@ namespace lwmf
 			SourceVerticalOffset += Texture.Width;
 		}
 
-		Texture.Pixels.clear();
-		Texture.Pixels.shrink_to_fit();
 		Texture.Pixels = std::move(TempBuffer);
 		SetTextureMetrics(Texture, Width, Height);
 	}
@@ -178,8 +176,6 @@ namespace lwmf
 			default: {}
 		}
 
-		Texture.Pixels.clear();
-		Texture.Pixels.shrink_to_fit();
 		Texture.Pixels = std::move(TempBuffer);
 		SetTextureMetrics(Texture, TargetWidth, TargetHeight);
 	}
