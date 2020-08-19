@@ -20,7 +20,6 @@
 //
 // WHAT I DID SO FAR:
 //	- fixed all warnings reported by PVS-Studio and clang-tidy (use brackets etc.)
-//	- replaced all "typedef" with "using"
 //	- replaced "malloc/free" with "new/delete"
 //	- replaced all C-style casts with modern-style C++ cast (e.g. static_cast)
 //	- initialised all variables and narrowed their scopes if possible
@@ -1945,12 +1944,12 @@ inline void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo& font, const std::i
 //
 //  Rasterizer
 
-using stbtt__hheap_chunk = struct stbtt__hheap_chunk
+struct stbtt__hheap_chunk
 {
 	struct stbtt__hheap_chunk* next{};
 };
 
-using stbtt__hheap = struct stbtt__hheap
+struct stbtt__hheap
 {
 	struct stbtt__hheap_chunk* head{};
 	void* first_free{};
@@ -2003,7 +2002,7 @@ inline static void stbtt__hheap_cleanup(stbtt__hheap& hh, void* userdata)
 	}
 }
 
-using stbtt__edge = struct stbtt__edge
+struct stbtt__edge
 {
 	float x0{};
 	float y0{};
@@ -2012,7 +2011,7 @@ using stbtt__edge = struct stbtt__edge
 	std::int_fast32_t invert{};
 };
 
-using stbtt__active_edge = struct stbtt__active_edge
+struct stbtt__active_edge
 {
 	struct stbtt__active_edge* next{};
 	float fx{};

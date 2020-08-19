@@ -75,7 +75,6 @@ using GLintptr = std::ptrdiff_t;
 	OG(void,	glUniformMatrix4fv,			GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) \
 	OG(void,	glUseProgram,				GLuint program) \
 	OG(void,	glVertexAttribPointer,		GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer)
-
 #define OG(Return, Name, ...) typedef Return WINAPI Name##proc(__VA_ARGS__); extern Name##proc* Name;
 	OGL
 #undef OG

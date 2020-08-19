@@ -14,6 +14,7 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <cmath>
 
 #include "lwmf_general.hpp"
 #include "lwmf_math.hpp"
@@ -30,6 +31,9 @@ namespace lwmf
 	std::int_fast32_t FindRegion(std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t x, std::int_fast32_t y);
 	bool ClipLine(std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t& x3, std::int_fast32_t& y3, std::int_fast32_t& x4, std::int_fast32_t& y4);
 	void Line(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
+	void DrawPixelAA(TextureStruct& Texture, std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Color, float Brightness);
+	float FracPart(float x);
+	void LineAA(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, std::int_fast32_t Color);
 	void Rectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Color);
 	void FilledRectangle(TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t BorderColor, std::int_fast32_t FillColor);
 	void Circle(TextureStruct& Texture, std::int_fast32_t CenterX, std::int_fast32_t CenterY, std::int_fast32_t Radius, std::int_fast32_t Color);
@@ -287,28 +291,25 @@ namespace lwmf
 		//
 		// I modified the algorithm slightly...
 
-		//
 		// Clip line coordinates to fit into screen boundaries
-		//
-
 		if (!ClipLine(Texture.Width, Texture.Height, x1, y1, x2, y2, x1, y1, x2, y2))
 		{
 			return;
 		}
 
-		bool YLonger{};
 		std::int_fast32_t ShortLength{ y2 - y1 };
 		std::int_fast32_t LongLength{ x2 - x1 };
 
-		if (std::abs(ShortLength) > std::abs(LongLength))
+		const bool Steep{ std::abs(ShortLength) > std::abs(LongLength) };
+
+		if (Steep)
 		{
 			std::swap(ShortLength, LongLength);
-			YLonger = true;
 		}
 
 		const std::int_fast32_t DecInc{ LongLength == 0 ? 0 : (ShortLength << 16) / LongLength };
 
-		if (YLonger)
+		if (Steep)
 		{
 			const std::int_fast32_t StartY{ 0x8000 + (x1 << 16) };
 
@@ -357,6 +358,111 @@ namespace lwmf
 		{
 			Texture.Pixels[(j >> 16) * Texture.Width + x1] = Color;
 			j -= DecInc;
+		}
+	}
+
+	//
+	// Anti-aliased Line
+	//
+
+	// This is my implementation of Xiaolin Wu´s line algorithm
+	// https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm
+
+	inline void DrawPixelAA(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color, const float Brightness)
+	{
+		const ColorStruct ModColor{ INTtoRGBA(Color) };
+
+		SetPixelSafe(Texture, x, y, RGBAtoINT(static_cast<std::int_fast32_t>(static_cast<float>(ModColor.Red) * Brightness),
+			static_cast<std::int_fast32_t>(static_cast<float>(ModColor.Green) * Brightness),
+			static_cast<std::int_fast32_t>(static_cast<float>(ModColor.Blue) * Brightness),
+			ModColor.Alpha));
+	}
+
+	inline float FracPart(const float x)
+	{
+		const float n{ std::fabs(x) };
+		return n - std::floorf(n);
+	}
+
+	inline void LineAA(TextureStruct& Texture, std::int_fast32_t x1, std::int_fast32_t y1, std::int_fast32_t x2, std::int_fast32_t y2, const std::int_fast32_t Color)
+	{
+		// Exit early if coords are completely out of texture boundaries
+		if ((x1 < 0 && x2 < 0) || (x1 > Texture.Width && x2 > Texture.Width) || (y1 < 0 && y2 < 0) || (y1 > Texture.Height && y2 > Texture.Height))
+		{
+			return;
+		}
+
+		// Clip line coordinates to fit into screen boundaries
+		if (!ClipLine(Texture.Width, Texture.Height, x1, y1, x2, y2, x1, y1, x2, y2))
+		{
+			return;
+		}
+
+		const bool Steep{ std::abs(y2 - y1) > std::abs(x2 - x1) };
+
+		if (Steep)
+		{
+			std::swap(x1, y1);
+			std::swap(x2, y2);
+		}
+
+		if (x1 > x2)
+		{
+			std::swap(x1, x2);
+			std::swap(y1, y2);
+		}
+
+		const float Gradient{ static_cast<float>((y2 - y1)) / static_cast<float>((x2 - x1)) };
+		float EndY{ static_cast<float>(y1) + Gradient };
+		float GapX{ 1.0F - FracPart(static_cast<float>(x1) + 0.5F) };
+		const std::int_fast32_t ypxl1{ static_cast<std::int_fast32_t>(std::nearbyintf(EndY)) };
+		float FracEndY{ FracPart(EndY) };
+
+		if (Steep)
+		{
+			DrawPixelAA(Texture, ypxl1, x1, Color, 1.0F - FracEndY * GapX);
+			DrawPixelAA(Texture, ypxl1 + 1, x1, Color, FracEndY * GapX);
+		}
+		else
+		{
+			DrawPixelAA(Texture, x1, ypxl1, Color, 1.0F - FracEndY * GapX);
+			DrawPixelAA(Texture, x1, ypxl1 + 1, Color, FracEndY * GapX);
+		}
+
+		float Intersection{ EndY + Gradient };
+		EndY = static_cast<float>(y2) + Gradient;
+		GapX = FracPart(static_cast<float>(x2) + 0.5F);
+		const std::int_fast32_t ypxl2{ static_cast<std::int_fast32_t>(std::nearbyintf(EndY)) };
+		FracEndY = FracPart(EndY);
+
+		if (Steep)
+		{
+			DrawPixelAA(Texture, ypxl2, x2, Color, 1.0F - FracEndY * GapX);
+			DrawPixelAA(Texture, ypxl2 + 1, x2, Color, FracEndY * GapX);
+		}
+		else
+		{
+			DrawPixelAA(Texture, x2, ypxl2, Color, 1.0F - FracEndY * GapX);
+			DrawPixelAA(Texture, x2, ypxl2 + 1, Color, FracEndY * GapX);
+		}
+
+		for (std::int_fast32_t x{ x1 + 1 }; x < x2; ++x)
+		{
+			const std::int_fast32_t Integral{ static_cast<std::int_fast32_t>(std::nearbyintf(Intersection)) };
+			const float FracInt{ FracPart(Intersection) };
+
+			if (Steep)
+			{
+				DrawPixelAA(Texture, Integral, x, Color, 1.0F - FracInt);
+				DrawPixelAA(Texture, Integral + 1, x, Color, FracInt);
+			}
+			else
+			{
+				DrawPixelAA(Texture, x, Integral, Color, 1.0F - FracInt);
+				DrawPixelAA(Texture, x, Integral + 1, Color, FracInt);
+			}
+
+			Intersection += Gradient;
 		}
 	}
 
