@@ -2100,7 +2100,7 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 
 		// compute intersection points with top & bottom
 
-		if (e->fdx == 0.0F)
+		if (std::fabs(e->fdx) < FLT_EPSILON)
 		{
 			if (const float x0{ e->fx }; x0 < len)
 			{
@@ -2156,7 +2156,6 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 						std::swap(x_bottom, x_top);
 						std::swap(x0, xb);
 
-						dx = -dx;
 						dy = -dy;
 					}
 
@@ -2291,7 +2290,7 @@ inline static void stbtt__rasterize_sorted_edges(stbtt__bitmap& result, stbtt__e
 		// insert all edges that start before the bottom of this scanline
 		while (e->y0 <= scan_y_bottom)
 		{
-			if (e->y0 != e->y1)
+			if (std::fabs(e->y0 - e->y1) >= FLT_EPSILON)
 			{
 				if (stbtt__active_edge* z{ stbtt__new_active(hh, e, off_x, scan_y_top) }; z != nullptr)
 				{
