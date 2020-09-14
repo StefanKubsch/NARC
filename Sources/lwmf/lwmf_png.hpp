@@ -738,7 +738,7 @@ namespace lwmf
 			{
 				const std::array<std::int_fast32_t, 7> PassWidth{ (PNGInfo.Width + 7) >> 3, (PNGInfo.Width + 3) >> 3, (PNGInfo.Width + 3) >> 2, (PNGInfo.Width + 1) >> 2, (PNGInfo.Width + 1) >> 1, (PNGInfo.Width + 0) >> 1, (PNGInfo.Width + 0) / 1 };
 				const std::array<std::int_fast32_t, 7> PassHeight{ (PNGInfo.Height + 7) >> 3, (PNGInfo.Height + 7) >> 3, (PNGInfo.Height + 3) >> 3, (PNGInfo.Height + 3) >> 2, (PNGInfo.Height + 1) >> 2, (PNGInfo.Height + 1) >> 1, (PNGInfo.Height + 0) >> 1 };
-				static constexpr std::array<std::int_fast32_t, 28> Pattern{ 0,4,0,2,0,1,0,0,0,4,0,2,0,1,8,8,4,4,2,2,1,8,8,8,4,4,2,2 };
+				constexpr std::array<std::int_fast32_t, 28> Pattern{ 0,4,0,2,0,1,0,0,0,4,0,2,0,1,8,8,4,4,2,2,1,8,8,8,4,4,2,2 };
 				std::array<std::int_fast32_t, 7> PassStart{};
 
 				for (std::int_fast32_t i{}; i < 6; ++i)

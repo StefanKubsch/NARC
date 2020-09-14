@@ -22,6 +22,7 @@
 #include "lwmf_general.hpp"
 #include "lwmf_logging.hpp"
 
+// Since we use XInput from Windows for the gamepad control, we need to include it!
 #pragma comment(lib, "xinput")
 
 namespace lwmf

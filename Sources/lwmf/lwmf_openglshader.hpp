@@ -322,8 +322,6 @@ namespace lwmf
 
 	inline void ShaderClass::UpdateVertices(const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
 	{
-		static const auto Size{ Vertices.size() * sizeof(GLfloat) };
-
 		glBindVertexArray(VertexArrayObject);
 		glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
 
@@ -339,7 +337,7 @@ namespace lwmf
 		Vertices[12] = static_cast<GLfloat>(PosX);
 		Vertices[13] = static_cast<GLfloat>(PosY + Height);
 
-		glBufferSubData(GL_ARRAY_BUFFER, 0, Size, Vertices.data());
+		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
 	}
 
 	inline std::string ShaderClass::LoadShaderSource(const std::string& SourceName)

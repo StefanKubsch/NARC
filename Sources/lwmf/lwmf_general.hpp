@@ -41,7 +41,10 @@ namespace lwmf
 		std::int_fast32_t Height{};
 	};
 
+	// WindowInstance is used throughout lwmf - thus, it´s global
 	inline HINSTANCE WindowInstance{};
+
+	// ...and so is FullscreenFlag!
 	inline bool FullscreenFlag{};
 
 
