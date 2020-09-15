@@ -22,7 +22,6 @@ namespace lwmf
 
 	template<typename T>T Lerp(T t, T a, T b);
 	template<typename T>T CalcEuclidianDistance(T x1, T x2, T y1, T y2);
-	template<>float CalcEuclidianDistance(float x1, float x2, float y1, float y2);
 	template<typename T>T CalcChebyshevDistance(T x1, T x2, T y1, T y2);
 	template<typename T>T CalcChebyshevDistance(std::int_fast32_t x1, std::int_fast32_t x2, std::int_fast32_t y1, std::int_fast32_t y2);
 	template<typename T>T CalcManhattanDistance(T x1, T x2, T y1, T y2);
@@ -54,11 +53,6 @@ namespace lwmf
 	template<typename T>T CalcEuclidianDistance(const T x1, const T x2, const T y1, const T y2)
 	{
 		return std::hypot(x1 - x2, y1 - y2);
-	}
-
-	template<>inline float CalcEuclidianDistance(const float x1, const float x2, const float y1, const float y2)
-	{
-		return std::hypotf(x1 - x2, y1 - y2);
 	}
 
 	template<typename T>T CalcChebyshevDistance(T x1, T x2, T y1, T y2)

@@ -12,7 +12,7 @@ The project began with GDI+ and pure software rendering, but I switched to OpenG
 
 There is a long way to go with the engine, from entity AI to weapon handling, level editor etc. The project is still at the very beginning, although the render engine itself is stable and powerful, but lacking features, which will come in the near future.
 
-The whole engine is modular and written in C++ v17.
+The whole engine is modular and written in C++ 17/20.
 
 All low-level functions for OpenGL, graphics, audio, bitmap and input handling, multithreading, logging, game-relevant math etc. is provided by my own C++ library, "lwmf - lightweight media framework". This framework is still under development, but already stable and fast.
 
