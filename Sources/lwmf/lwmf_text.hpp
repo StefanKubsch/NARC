@@ -1,7 +1,7 @@
 /*
 ********************************************************************
 *                                                                  *
-* lwmf - lightweight media framework                               *
+* lwmf_text - lightweight media framework                          *
 *                                                                  *
 * (C) 2019 - present by Stefan Kubsch                              *
 *                                                                  *
@@ -14,7 +14,7 @@
 #include <string>
 #include <array>
 
-#include "lwmf_primitives.hpp"
+#include "lwmf_pixel.hpp"
 #include "lwmf_texture.hpp"
 
 namespace lwmf

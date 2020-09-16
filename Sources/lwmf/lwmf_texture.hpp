@@ -11,9 +11,9 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 #include <vector>
 #include <algorithm>
+#include <utility>
 
 #include "lwmf_general.hpp"
 #include "lwmf_logging.hpp"
@@ -52,11 +52,6 @@ namespace lwmf
 
 	inline void SetTextureMetrics(TextureStruct& Texture, const std::int_fast32_t Width, const std::int_fast32_t Height)
 	{
-		if (Width <= 0 || Height <= 0)
-		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::SetTextureMetrics()!");
-		}
-
 		Texture.Width = Width;
 		Texture.Height = Height;
 		Texture.WidthMid = Width >> 1;
@@ -66,6 +61,11 @@ namespace lwmf
 
 	inline void CreateTexture(TextureStruct& Texture, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
+		if (Width <= 0 || Height <= 0)
+		{
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::CreateTexture()!");
+		}
+
 		SetTextureMetrics(Texture, Width, Height);
 		Texture.Pixels.clear();
 		Texture.Pixels.shrink_to_fit();
@@ -182,7 +182,7 @@ namespace lwmf
 
 	inline void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY)
 	{
-		// Exit early if coords are out of visual boundaries
+		// Exit early if coords are out of target texture boundaries
 		if (PosX + SourceTexture.Width < 0 || PosY + SourceTexture.Height < 0 || PosX > TargetTexture.Width || PosY > TargetTexture.Height)
 		{
 			return;
@@ -225,7 +225,7 @@ namespace lwmf
 
 	inline void BlitTransTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY, const std::int_fast32_t TransparentColor)
 	{
-		// Exit early if coords are out of visual boundaries
+		// Exit early if coords are out of target texture boundaries
 		if (PosX + SourceTexture.Width < 0 || PosY + SourceTexture.Height < 0 || PosX > TargetTexture.Width || PosY > TargetTexture.Height)
 		{
 			return;
@@ -286,14 +286,7 @@ namespace lwmf
 
 	inline void ClearTexture(TextureStruct& Texture, const std::int_fast32_t Color)
 	{
-		if (Color == 0)
-		{
-			memset(&Texture.Pixels[0], 0, sizeof(Texture.Pixels[0]) * Texture.Pixels.size());
-		}
-		else
-		{
-			std::fill(Texture.Pixels.begin(), Texture.Pixels.end(), Color);
-		}
+		std::fill(Texture.Pixels.begin(), Texture.Pixels.end(), Color);
 	}
 
 
