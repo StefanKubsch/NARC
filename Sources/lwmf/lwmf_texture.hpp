@@ -14,6 +14,7 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
+#include <cmath>
 
 #include "lwmf_general.hpp"
 #include "lwmf_logging.hpp"
@@ -44,6 +45,7 @@ namespace lwmf
 	void ResizeTexture(TextureStruct& Texture, std::int_fast32_t TargetWidth, std::int_fast32_t TargetHeight, FilterModes FilterMode);
 	void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, std::int_fast32_t PosX, std::int_fast32_t PosY);
 	void BlitTransTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t TransparentColor);
+	void RotateTexture(TextureStruct& Texture, std::int_fast32_t RotCenterX, std::int_fast32_t RotCenterY, float Angle);
 	void ClearTexture(TextureStruct& Texture, std::int_fast32_t Color);
 
 	//
@@ -61,9 +63,10 @@ namespace lwmf
 
 	inline void CreateTexture(TextureStruct& Texture, const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t Color)
 	{
+		// Exit early if texture size would be zero
 		if (Width <= 0 || Height <= 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::CreateTexture()!");
+			return;
 		}
 
 		SetTextureMetrics(Texture, Width, Height);
@@ -74,36 +77,38 @@ namespace lwmf
 
 	inline void CropTexture(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, std::int_fast32_t Width, std::int_fast32_t Height)
 	{
+		// Exit early if crop start position would be out of texture boundaries
 		if ((static_cast<std::uint_fast32_t>(x) > static_cast<std::uint_fast32_t>(Texture.Width) || static_cast<std::uint_fast32_t>(y) > static_cast<std::uint_fast32_t>(Texture.Height)))
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture x or y is out of range! Check your parameters used with lwmf::CropTexture()!");
+			return;
 		}
 
-		// Make sure that Width and Height are within texture size limits!
+		// Make sure that Width and Height are within texture size limits
 		Width = std::clamp(Width, 1, Texture.Width);
 		Height = std::clamp(Height, 1, Texture.Height);
 
+		// Exit early if cropped rectangle would be out of texture boundaries
 		if (x + Width > Texture.Width || y + Height > Texture.Height)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for width or height is out of range! Check your parameters used with lwmf::CropTexture()!");
+			return;
 		}
 
 		std::vector<std::int_fast32_t>TempBuffer(Width * Height);
-		std::int_fast32_t SourceVerticalOffset{ y * Texture.Width };
+		std::int_fast32_t SrcVerticalOffset{ y * Texture.Width };
 		std::int_fast32_t DestVerticalOffset{};
 
 		for (std::int_fast32_t i{}; i < Height; ++i)
 		{
 			for (std::int_fast32_t DestHorizontalOffset{}, SourceHorizontalOffset{ x }, j{}; j < Width; ++j)
 			{
-				TempBuffer[static_cast<std::size_t>(DestVerticalOffset) + static_cast<std::size_t>(DestHorizontalOffset)] = Texture.Pixels[static_cast<std::size_t>(SourceVerticalOffset) + static_cast<std::size_t>(SourceHorizontalOffset)];
+				TempBuffer[static_cast<std::size_t>(DestVerticalOffset) + static_cast<std::size_t>(DestHorizontalOffset)] = Texture.Pixels[static_cast<std::size_t>(SrcVerticalOffset) + static_cast<std::size_t>(SourceHorizontalOffset)];
 
 				++DestHorizontalOffset;
 				++SourceHorizontalOffset;
 			}
 
 			DestVerticalOffset += Width;
-			SourceVerticalOffset += Texture.Width;
+			SrcVerticalOffset += Texture.Width;
 		}
 
 		Texture.Pixels = std::move(TempBuffer);
@@ -112,9 +117,10 @@ namespace lwmf
 
 	inline void ResizeTexture(TextureStruct& Texture, const std::int_fast32_t TargetWidth, const std::int_fast32_t TargetHeight, const FilterModes FilterMode)
 	{
+		// Exit early if texture size would be zero
 		if (TargetWidth <= 0 || TargetHeight <= 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Value for texture width or height is zero or negative! Check your parameters in lwmf::ResizeTexture()!");
+			return;
 		}
 
 		std::vector<std::int_fast32_t> TempBuffer(TargetWidth * TargetHeight);
@@ -200,8 +206,8 @@ namespace lwmf
 		{
 			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
 			{
-				const auto SourceY{ SourceTexture.Pixels.begin() + y * SourceTexture.Width };
-				std::copy(SourceY, SourceY + SourceTexture.Width, TargetTexture.Pixels.begin() + PosY * TargetTexture.Width + PosX);
+				const auto SrcY{ SourceTexture.Pixels.begin() + y * SourceTexture.Width };
+				std::copy(SrcY, SrcY + SourceTexture.Width, TargetTexture.Pixels.begin() + PosY * TargetTexture.Width + PosX);
 			}
 		}
 		// Case 3: Each pixel has to be checked if within boundaries
@@ -282,6 +288,40 @@ namespace lwmf
 				}
 			}
 		}
+	}
+
+	inline void RotateTexture(TextureStruct& Texture, const std::int_fast32_t RotCenterX, const std::int_fast32_t RotCenterY, const float Angle)
+	{
+		// if Angle ist zero degrees, we can exit early - nothing to do!
+		if (Angle < FLT_EPSILON)
+		{
+			return;
+		}
+
+		std::vector<std::int_fast32_t> TempBuffer(Texture.Size);
+
+		const float c{ std::cosf(Angle) };
+		const float s{ std::sinf(Angle) };
+
+		for (std::int_fast32_t y{}; y < Texture.Height; ++y)
+		{
+			const float fy{ static_cast<float>(y - RotCenterY) };
+			const std::int_fast32_t DestOffset{ y * Texture.Width };
+
+			for (std::int_fast32_t x{}; x < Texture.Width; ++x)
+			{
+				const float fx{ static_cast<float>(x - RotCenterX) };
+				const std::int_fast32_t SrcX{ static_cast<std::int_fast32_t>((+(fx * c) + (fy * s))) + RotCenterX };
+				const std::int_fast32_t SrcY{ static_cast<std::int_fast32_t>((-(fx * s) + (fy * c))) + RotCenterY };
+
+				if ((SrcX >= 0) && (SrcX < Texture.Width) && (SrcY >= 0) && (SrcY < Texture.Height))
+				{
+					TempBuffer[DestOffset + x] = Texture.Pixels[SrcY * Texture.Width + SrcX];
+				}
+			}
+		}
+
+		Texture.Pixels = std::move(TempBuffer);
 	}
 
 	inline void ClearTexture(TextureStruct& Texture, const std::int_fast32_t Color)

@@ -42,6 +42,7 @@ namespace GFX_Window
 			lwmf::FullscreenFlag = true;
 			lwmf::InitOpenGLLoader();
 
+			// Prepare main shader and texture for rendering
 			ScreenTextureShader.LoadShader("Default", ScreenTexture);
 			ScreenTextureShader.PrepareLWMFTexture(ScreenTexture, 0, 0);
 

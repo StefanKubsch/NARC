@@ -65,9 +65,9 @@ inline void Game_WeaponDisplayClass::Init()
 
 inline void Game_WeaponDisplayClass::Display()
 {
-	static const lwmf::IntPointStruct WeaponTextPos{ WeaponHUDRect.X + WeaponText.GetOffset().X, WeaponHUDRect.Y + WeaponText.GetOffset().Y };
-	static const lwmf::IntPointStruct CarriedAmmoTextPos{ WeaponHUDRect.X + CarriedAmmoText.GetOffset().X, WeaponHUDRect.Y + CarriedAmmoText.GetOffset().Y };
-	static const lwmf::IntPointStruct AmmoTextPos{ WeaponHUDRect.X + AmmoText.GetOffset().X, WeaponHUDRect.Y + AmmoText.GetOffset().Y };
+	const lwmf::IntPointStruct WeaponTextPos{ WeaponHUDRect.X + WeaponText.GetOffset().X, WeaponHUDRect.Y + WeaponText.GetOffset().Y };
+	const lwmf::IntPointStruct CarriedAmmoTextPos{ WeaponHUDRect.X + CarriedAmmoText.GetOffset().X, WeaponHUDRect.Y + CarriedAmmoText.GetOffset().Y };
+	const lwmf::IntPointStruct AmmoTextPos{ WeaponHUDRect.X + AmmoText.GetOffset().X, WeaponHUDRect.Y + AmmoText.GetOffset().Y };
 
 	CrosshairShader.RenderStaticTexture(&CrosshairShader.OGLTextureID, true, 1.0F);
 	WeaponHUDShader.RenderStaticTexture(&WeaponHUDShader.OGLTextureID, true, 1.0F);

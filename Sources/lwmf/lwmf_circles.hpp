@@ -118,8 +118,8 @@ namespace lwmf
 
 	inline void Ellipse(TextureStruct& Texture, const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, const std::int_fast32_t RadiusX, const std::int_fast32_t RadiusY, const std::int_fast32_t Color)
 	{
-		// Exit early if coords are out of texture boundaries
-		if (CenterX + RadiusX < 0 || CenterX - RadiusX > Texture.Width || CenterY + RadiusY < 0 || CenterY - RadiusY > Texture.Height)
+		// Exit early if ellipse would not be visible (to small or coords out of texture boundaries)
+		if ((RadiusX <= 0 && RadiusY <= 0) || CenterX + RadiusX < 0 || CenterX - RadiusX > Texture.Width || CenterY + RadiusY < 0 || CenterY - RadiusY > Texture.Height)
 		{
 			return;
 		}

@@ -144,7 +144,7 @@ namespace Game_Doors
 	inline void ModifyDoorTexture(DoorStruct& Door)
 	{
 		// TextureOffset is not correct - works only when MaximumOpenPercent = 100% !
-		static const float TextureOffset{ 100.0F / static_cast<float>(TextureSize) };
+		const float TextureOffset{ 100.0F / static_cast<float>(TextureSize) };
 		const std::int_fast32_t OpenPercent{ static_cast<std::int_fast32_t>(Door.CurrentOpenPercent / TextureOffset) };
 
 		for (std::int_fast32_t y{}; y < TextureSize; ++y)

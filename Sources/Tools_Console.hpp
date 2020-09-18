@@ -82,7 +82,7 @@ namespace Tools_Console
 
 	inline std::int_fast32_t QuestionForValue(const std::string& Text, const std::int_fast32_t BeginRange, const std::int_fast32_t EndRange)
 	{
-		static const std::regex DigitsOnlyPattern(R"(\d+)", std::regex::optimize | std::regex::icase);
+		const std::regex DigitsOnlyPattern(R"(\d+)", std::regex::optimize | std::regex::icase);
 
 		while (true)
 		{

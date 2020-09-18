@@ -73,8 +73,8 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 			FontFile.seekg(0, std::ios::beg);
 			FontFile.read(reinterpret_cast<char*>(FontBuffer.data()), FontBuffer.size());
 
-			// Render the glyphs for ASCII chars from 32 ("space") to 127 (last official ASCII char)
-			// This makes 96 printable chars
+			// Render the glyphs for ASCII chars
+			// This makes 128 chars, the last 96 are printable (from 32 = "space" on)
 
 			stbtt_fontinfo FontInfo{};
 			stbtt_InitFont(FontInfo, FontBuffer, 0);
@@ -114,22 +114,24 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 				stbtt_aligned_quad Quad{};
 				stbtt_GetBakedQuad(CharData, Width, Height, Char, QuadPos.X, QuadPos.Y, Quad, 1);
 
-				const std::int_fast32_t TargetChar{ Char };
 				const lwmf::IntPointStruct Pos{ static_cast<std::int_fast32_t>(Quad.s0 * Width), static_cast<std::int_fast32_t>(Quad.t0 * Height) };
-				Glyphs[TargetChar].Width = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.s1 - Quad.s0) * Width) + 1.0F));
-				Glyphs[TargetChar].Height = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.t1 - Quad.t0) * Height) + 1.0F));
-				Glyphs[TargetChar].Advance = static_cast<std::int_fast32_t>(std::round(QuadPos.X));
-				Glyphs[TargetChar].Baseline = static_cast<std::int_fast32_t>(-Quad.y0);
+				Glyphs[Char].Width = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.s1 - Quad.s0) * Width) + 1.0F));
+				Glyphs[Char].Height = static_cast<std::int_fast32_t>(static_cast<std::int_fast32_t>(((Quad.t1 - Quad.t0) * Height) + 1.0F));
+				Glyphs[Char].Advance = static_cast<std::int_fast32_t>(std::round(QuadPos.X));
+				Glyphs[Char].Baseline = static_cast<std::int_fast32_t>(-Quad.y0);
 
 				// Blit single glyphs to individual textures
 				lwmf::TextureStruct TempGlyphTexture{};
-				lwmf::CreateTexture(TempGlyphTexture, Glyphs[TargetChar].Width, Glyphs[TargetChar].Height, 0x00000000);
+				lwmf::CreateTexture(TempGlyphTexture, Glyphs[Char].Width, Glyphs[Char].Height, 0x00000000);
 
-				for (std::int_fast32_t TargetY{}, y{ Pos.Y }; y < Pos.Y + Glyphs[TargetChar].Height; ++y, ++TargetY)
+				for (std::int_fast32_t DestY{}, SrcY{ Pos.Y }; SrcY < Pos.Y + Glyphs[Char].Height; ++SrcY, ++DestY)
 				{
-					for (std::int_fast32_t TargetX{}, x{ Pos.X }; x < Pos.X + Glyphs[TargetChar].Width; ++x, ++TargetX)
+					const std::int_fast32_t TempDestY{ DestY * TempGlyphTexture.Width };
+					const std::int_fast32_t TempSrcY{ SrcY * Width };
+
+					for (std::int_fast32_t DestX{}, SrcX{ Pos.X }; SrcX < Pos.X + Glyphs[Char].Width; ++SrcX, ++DestX)
 					{
-						TempGlyphTexture.Pixels[TargetY * TempGlyphTexture.Width + TargetX] = FontColor[y * Width + x];
+						TempGlyphTexture.Pixels[TempDestY + DestX] = FontColor[TempSrcY + SrcX];
 					}
 				}
 

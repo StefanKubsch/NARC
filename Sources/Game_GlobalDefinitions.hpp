@@ -51,5 +51,4 @@ inline bool QuitGameFlag{};
 
 // Random Number Generator
 // C++ 11 Mersenne-Twister-Engine
-inline std::random_device Seed;
-inline std::mt19937 RNG(Seed());
+inline std::mt19937 RNG(std::random_device{}());
