@@ -22,7 +22,6 @@ namespace Game_PathFinding
 {
 
 
-	std::int_fast32_t SetPathFindingPoint(std::int_fast32_t x, std::int_fast32_t y, std::int_fast32_t Width);
 	void GenerateFlattenedMap(std::vector<float>& Map, std::int_fast32_t Width, std::int_fast32_t Height);
 	bool CalculatePath(std::vector<float>& Map, std::int_fast32_t Width, std::int_fast32_t Height, std::int_fast32_t Start, std::int_fast32_t Target, bool Diagonal, std::list<lwmf::IntPointStruct>& WayPoints);
 
@@ -47,11 +46,6 @@ namespace Game_PathFinding
 	inline bool operator < (const NodeStruct& Node1, const NodeStruct& Node2)
 	{
 		return Node1.Cost > Node2.Cost;
-	}
-
-	inline std::int_fast32_t SetPathFindingPoint(const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Width)
-	{
-		return Width * y + x;
 	}
 
 	inline void GenerateFlattenedMap(std::vector<float>& Map, const std::int_fast32_t Width, const std::int_fast32_t Height)

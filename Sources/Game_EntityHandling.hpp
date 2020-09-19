@@ -641,8 +641,8 @@ namespace Game_EntityHandling
 		{
 			Entity.PathFindingWayPoints.clear();
 
-			Entity.PathFindingStart = Game_PathFinding::SetPathFindingPoint(static_cast<std::int_fast32_t>(Entity.Pos.X), static_cast<std::int_fast32_t>(Entity.Pos.Y), Game_LevelHandling::LevelMapWidth);
-			Entity.PathFindingTarget = Game_PathFinding::SetPathFindingPoint(static_cast<std::int_fast32_t>(Player.Pos.X), static_cast<std::int_fast32_t>(Player.Pos.Y), Game_LevelHandling::LevelMapWidth); //-V778
+			Entity.PathFindingStart = Game_LevelHandling::LevelMapWidth * static_cast<std::int_fast32_t>(Entity.Pos.Y) + static_cast<std::int_fast32_t>(Entity.Pos.X);
+			Entity.PathFindingTarget = Game_LevelHandling::LevelMapWidth * static_cast<std::int_fast32_t>(Player.Pos.Y) + static_cast<std::int_fast32_t>(Player.Pos.X); //-V778
 
 			Entity.ValidPathFound = Game_PathFinding::CalculatePath(Game_PathFinding::FlattenedMap, Game_LevelHandling::LevelMapWidth, Game_LevelHandling::LevelMapHeight, Entity.PathFindingStart, Entity.PathFindingTarget, false, Entity.PathFindingWayPoints);
 		}

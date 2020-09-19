@@ -47,7 +47,6 @@ namespace GFX_Window
 			ScreenTextureShader.PrepareLWMFTexture(ScreenTexture, 0, 0);
 
 			// Inital clearance of window. Looks better while loading the rest of the game...
-			lwmf::ClearTexture(ScreenTexture, 0x00000000);
 			lwmf::ClearBuffer();
 			lwmf::SwapBuffer();
 		}

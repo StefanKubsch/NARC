@@ -2351,7 +2351,7 @@ inline static void stbtt__sort_edges_ins_sort(std::vector<stbtt__edge>& p, const
 	for (std::int_fast32_t i{ 1 }; i < n; ++i)
 	{
 		stbtt__edge t{ p[i] };
-		stbtt__edge* a{ &t };
+		const stbtt__edge* a{ &t };
 		std::int_fast32_t j{ i };
 
 		while (j > 0) //-V712 //-V654

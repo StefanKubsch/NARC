@@ -269,7 +269,7 @@ namespace Game_WeaponHandling
 			const float Camera{ (ScreenTexture.WidthMid << 1) / static_cast<float>(ScreenTexture.Width) - 1 };
 			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera , Player.Dir.Y + Plane.Y * Camera };
 			lwmf::FloatPointStruct MapPos{ std::floorf(Player.Pos.X), std::floorf(Player.Pos.Y) };
-			const lwmf::FloatPointStruct DeltaDist{ std::abs(1.0F / RayDir.X), std::abs(1.0F / RayDir.Y) };
+			const lwmf::FloatPointStruct DeltaDist{ std::fabs(1.0F / RayDir.X), std::fabs(1.0F / RayDir.Y) };
 			lwmf::FloatPointStruct SideDist{};
 			lwmf::FloatPointStruct Step{};
 
