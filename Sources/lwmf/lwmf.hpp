@@ -38,6 +38,7 @@ inline lwmf::Logging LWMFSystemLog("lwmf_systemlog.log");
 #include "lwmf_fill.hpp"
 #include "lwmf_rectangles.hpp"
 #include "lwmf_circles.hpp"
+#include "lwmf_ellipses.hpp"
 #include "lwmf_polygons.hpp"
 #include "lwmf_texture.hpp"
 #include "lwmf_bmp.hpp"

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <cstdint>
-#include <vector>
 #include <algorithm>
 
 #include "lwmf_general.hpp"
@@ -36,6 +35,9 @@ namespace lwmf
 
 	// FindRegion and ClipLine provide the "Cohen Sutherland Clipping" algorithm for lines
 	// https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+	//
+	// The algorithm is also described in "Computer Graphics - Principles and Practice, Second Edition in C" by Foley/van Dam/Feiner/Hughs
+	// Chapter 3.12.3, page 113ff
 
 	inline std::int_fast32_t FindRegion(const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t x, const std::int_fast32_t y)
 	{

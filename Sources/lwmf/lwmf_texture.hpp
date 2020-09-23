@@ -186,7 +186,7 @@ namespace lwmf
 		SetTextureMetrics(Texture, TargetWidth, TargetHeight);
 	}
 
-	inline void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY)
+	inline void BlitTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, const std::int_fast32_t PosY)
 	{
 		// Exit early if coords are out of target texture boundaries
 		if (PosX + SourceTexture.Width < 0 || PosY + SourceTexture.Height < 0 || PosX > TargetTexture.Width || PosY > TargetTexture.Height)
@@ -198,38 +198,26 @@ namespace lwmf
 		if (PosX == 0 && PosY == 0 && TargetTexture.Width == SourceTexture.Width && TargetTexture.Height == SourceTexture.Height)
 		{
 			TargetTexture.Pixels = SourceTexture.Pixels;
-			return;
 		}
-
-		// Case 2: Bitmap fits (= smaller than target texture and within boundaries)
-		if (PosX >= 0 && PosY >= 0 && SourceTexture.Width + PosX <= TargetTexture.Width && SourceTexture.Height + PosY <= TargetTexture.Height)
-		{
-			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
-			{
-				const auto SrcY{ SourceTexture.Pixels.begin() + y * SourceTexture.Width };
-				std::copy(SrcY, SrcY + SourceTexture.Width, TargetTexture.Pixels.begin() + PosY * TargetTexture.Width + PosX);
-			}
-		}
-		// Case 3: Each pixel has to be checked if within boundaries
+		// All the rest: Clip position and width/height to fit within boundaries
 		else
 		{
-			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
-			{
-				const std::int_fast32_t DestOffset{ PosY * TargetTexture.Width };
-				const std::int_fast32_t SrcOffset{ y * SourceTexture.Width };
+			const std::int_fast32_t StartX{ (PosX < 0 && (std::abs(0 - PosX) < SourceTexture.Width)) ? std::abs(0 - PosX) : 0 };
+			const std::int_fast32_t TargetHeight{ (PosY + SourceTexture.Height >= TargetTexture.Height) ? TargetTexture.Height - PosY : SourceTexture.Height };
+			const std::int_fast32_t TargetWidth{ (PosX + SourceTexture.Width >= TargetTexture.Width) ? TargetTexture.Width - PosX : SourceTexture.Width };
 
-				for (std::int_fast32_t x{}; x < SourceTexture.Width; ++x)
+			for (std::int_fast32_t y{}, TempPosY{ PosY }; y < TargetHeight; ++y, ++TempPosY)
+			{
+				if (static_cast<std::uint_fast32_t>(TempPosY) < static_cast<std::uint_fast32_t>(TargetTexture.Height))
 				{
-					if (static_cast<std::uint_fast32_t>(PosX + x) < static_cast<std::uint_fast32_t>(TargetTexture.Width) && static_cast<std::uint_fast32_t>(PosY) < static_cast<std::uint_fast32_t>(TargetTexture.Height))
-					{
-						TargetTexture.Pixels[DestOffset + PosX + x] = SourceTexture.Pixels[SrcOffset + x];
-					}
+					const auto SrcY{ SourceTexture.Pixels.begin() + y * SourceTexture.Width + StartX};
+					std::copy(SrcY, SrcY + TargetWidth - StartX, TargetTexture.Pixels.begin() + TempPosY * TargetTexture.Width + PosX + StartX);
 				}
 			}
 		}
 	}
 
-	inline void BlitTransTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, std::int_fast32_t PosY, const std::int_fast32_t TransparentColor)
+	inline void BlitTransTexture(const TextureStruct& SourceTexture, TextureStruct& TargetTexture, const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t TransparentColor)
 	{
 		// Exit early if coords are out of target texture boundaries
 		if (PosX + SourceTexture.Width < 0 || PosY + SourceTexture.Height < 0 || PosX > TargetTexture.Width || PosY > TargetTexture.Height)
@@ -247,16 +235,13 @@ namespace lwmf
 					TargetTexture.Pixels[i] = SourceTexture.Pixels[i];
 				}
 			}
-
-			return;
 		}
-
 		// Case 2: Bitmap fits (= smaller than target texture and within boundaries)
-		if (PosX >= 0 && PosY >= 0 && SourceTexture.Width + PosX <= TargetTexture.Width && SourceTexture.Height + PosY <= TargetTexture.Height)
+		else if (PosX >= 0 && PosY >= 0 && SourceTexture.Width + PosX <= TargetTexture.Width && SourceTexture.Height + PosY <= TargetTexture.Height)
 		{
-			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
+			for (std::int_fast32_t y{}, TempPosY{ PosY }; y < SourceTexture.Height; ++y, ++TempPosY)
 			{
-				const std::int_fast32_t DestOffset{ PosY * TargetTexture.Width };
+				const std::int_fast32_t DestOffset{ TempPosY * TargetTexture.Width };
 				const std::int_fast32_t SrcOffset{ y * SourceTexture.Width };
 
 				for (std::int_fast32_t x{}; x < SourceTexture.Width; ++x)
@@ -271,9 +256,9 @@ namespace lwmf
 		// Case 3: Each pixel has to be checked if within boundaries
 		else
 		{
-			for (std::int_fast32_t y{}; y < SourceTexture.Height; ++y, ++PosY)
+			for (std::int_fast32_t y{}, TempPosY{ PosY }; y < SourceTexture.Height; ++y, ++TempPosY)
 			{
-				const std::int_fast32_t DestOffset{ PosY * TargetTexture.Width };
+				const std::int_fast32_t DestOffset{ TempPosY * TargetTexture.Width };
 				const std::int_fast32_t SrcOffset{ y * SourceTexture.Width };
 
 				for (std::int_fast32_t x{}; x < SourceTexture.Width; ++x)
