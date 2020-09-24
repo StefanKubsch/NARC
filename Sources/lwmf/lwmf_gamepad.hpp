@@ -10,6 +10,7 @@
 
 #pragma once
 
+#define NOMINMAX
 #include <Windows.h>
 #include <Xinput.h>
 #include <cstdint>
@@ -159,7 +160,7 @@ namespace lwmf
 		SecureZeroMemory(&State, sizeof(XINPUT_STATE));
 		XInputGetState(ControllerID, &State);
 
-		const FloatPointStruct NormalizedL{ (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX), (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
+		const FloatPointStruct NormalizedL{ std::max(-1.0F, static_cast<float>(State.Gamepad.sThumbLX) / SHRT_MAX), std::max(-1.0F, static_cast<float>(State.Gamepad.sThumbLY) / SHRT_MAX) };
 
 		LeftStick.X = (std::fabs(NormalizedL.X) < DeadZone.X ? 0.0F : (std::fabs(NormalizedL.X) - DeadZone.X) * (NormalizedL.X / std::fabs(NormalizedL.X)));
 		LeftStick.Y = (std::fabs(NormalizedL.Y) < DeadZone.Y ? 0.0F : (std::fabs(NormalizedL.Y) - DeadZone.Y) * (NormalizedL.Y / std::fabs(NormalizedL.Y)));
@@ -174,7 +175,7 @@ namespace lwmf
 			LeftStick.Y *= 1.0F / (1.0F - DeadZone.Y);
 		}
 
-		const FloatPointStruct NormalizedR{ (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX), (std::max)(-1.0F, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
+		const FloatPointStruct NormalizedR{ std::max(-1.0F, static_cast<float>(State.Gamepad.sThumbRX) / SHRT_MAX), std::max(-1.0F, static_cast<float>(State.Gamepad.sThumbRY) / SHRT_MAX) };
 
 		RightStick.X = (std::fabs(NormalizedR.X) < DeadZone.X ? 0.0F : (std::fabs(NormalizedR.X) - DeadZone.X) * (NormalizedR.X / std::fabs(NormalizedR.X)));
 		RightStick.Y = (std::fabs(NormalizedR.Y) < DeadZone.Y ? 0.0F : (std::fabs(NormalizedR.Y) - DeadZone.Y) * (NormalizedR.Y / std::fabs(NormalizedR.Y)));

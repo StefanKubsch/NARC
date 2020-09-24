@@ -307,7 +307,7 @@ namespace Game_WeaponHandling
 							const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[Game_EntityHandling::EntityOrder[Index].first].MoveV / TransY) };
 							const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
 							const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(ScreenTexture.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
-							const std::int_fast32_t LineEndX{ (std::min)((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
+							const std::int_fast32_t LineEndX{ std::min((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
 							const std::int_fast32_t TextureY{ (((((ScreenTexture.HeightMid - vScreen) << 8) - ((ScreenTexture.Height + VerticalLook) << 7) + (EntitySizeTemp << 7)) * EntitySize) / EntitySizeTemp) >> 8 };
 
 							for (std::int_fast32_t x{ -(EntitySizeTemp >> 1) + EntitySX }; x < LineEndX; ++x)

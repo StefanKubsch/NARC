@@ -10,6 +10,7 @@
 
 #pragma once
 
+#define NOMINMAX
 #include <windows.h>
 #include <cstdint>
 #include <string>

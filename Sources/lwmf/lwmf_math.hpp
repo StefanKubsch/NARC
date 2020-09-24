@@ -57,12 +57,12 @@ namespace lwmf
 
 	template<typename T>T CalcChebyshevDistance(T x1, T x2, T y1, T y2)
 	{
-		return (std::max)(std::abs(x1 - x2), std::abs(y1 - y2));
+		return std::max(std::abs(x1 - x2), std::abs(y1 - y2));
 	}
 
 	template<typename T>T CalcChebyshevDistance(const std::int_fast32_t x1, const std::int_fast32_t x2, const std::int_fast32_t y1, const std::int_fast32_t y2)
 	{
-		return static_cast<T>((std::max)(std::abs(x1 - x2), std::abs(y1 - y2)));
+		return static_cast<T>(std::max(std::abs(x1 - x2), std::abs(y1 - y2)));
 	}
 
 	template<typename T>T CalcManhattanDistance(T x1, T x2, T y1, T y2)

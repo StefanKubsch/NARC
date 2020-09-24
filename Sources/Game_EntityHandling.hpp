@@ -380,10 +380,10 @@ namespace Game_EntityHandling
 				const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[EntityOrder[Index].first].MoveV / TransY) };
 				const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
 				const std::int_fast32_t Temp{ (VerticalLookTemp >> 1) + vScreen };
-				const std::int_fast32_t LineStartY{ (std::max)(-(EntitySizeTemp >> 1) + Temp, 0) };
-				const std::int_fast32_t LineEndY{ (std::min)((EntitySizeTemp >> 1) + Temp, ScreenTexture.Height) };
+				const std::int_fast32_t LineStartY{ std::max(-(EntitySizeTemp >> 1) + Temp, 0) };
+				const std::int_fast32_t LineEndY{ std::min((EntitySizeTemp >> 1) + Temp, ScreenTexture.Height) };
 				const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(ScreenTexture.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
-				const std::int_fast32_t LineEndX{ (std::min)((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
+				const std::int_fast32_t LineEndX{ std::min((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
 				const std::int_fast32_t Temp1{ (-EntitySizeTemp >> 1) + EntitySX };
 				const std::int_fast32_t Temp2{ VerticalLookTemp << 7 };
 				const std::int_fast32_t Temp3{ EntitySizeTemp << 7 };

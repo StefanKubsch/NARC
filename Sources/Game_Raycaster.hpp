@@ -192,8 +192,8 @@ namespace Game_Raycaster
 
 			const std::int_fast32_t LineHeight{ static_cast<std::int_fast32_t>(ScreenTexture.Height / WallDist) };
 			const std::int_fast32_t Temp{ VerticalLookTemp >> 1 };
-			const std::int_fast32_t LineStart{ (std::max)(-(LineHeight >> 1) + Temp, 0) };
-			std::int_fast32_t LineEnd{ (std::min)((LineHeight >> 1) + Temp, ScreenTexture.Height) };
+			const std::int_fast32_t LineStart{ std::max(-(LineHeight >> 1) + Temp, 0) };
+			std::int_fast32_t LineEnd{ std::min((LineHeight >> 1) + Temp, ScreenTexture.Height) };
 			float WallX{ WallSide ? Player.Pos.X + WallDist * RayDir.X : Player.Pos.Y + WallDist * RayDir.Y };
 			WallX -= static_cast<std::int_fast32_t>(WallX);
 

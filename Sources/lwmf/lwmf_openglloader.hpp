@@ -10,6 +10,7 @@
 
 #pragma once
 
+#define NOMINMAX
 #include <Windows.h>
 #include <cstddef>
 #include <GL/gl.h>
