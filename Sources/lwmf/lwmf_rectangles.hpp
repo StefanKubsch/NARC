@@ -58,7 +58,7 @@ namespace lwmf
 		// All the rest; we can use std::fill here...
 		else
 		{
-			const std::int_fast32_t StartX{ (PosX < 0 && (std::abs(0 - PosX) < Width)) ? std::abs(0 - PosX) : 0 };
+			const std::int_fast32_t StartX{ (PosX < 0 && (std::abs(0 - PosX) <= Width)) ? std::abs(0 - PosX) : 0 };
 			const std::int_fast32_t TargetHeight{ (PosY + Height >= Texture.Height) ? Texture.Height - PosY : Height };
 			const std::int_fast32_t TargetWidth{ (PosX + Width >= Texture.Width) ? Texture.Width - PosX : Width };
 

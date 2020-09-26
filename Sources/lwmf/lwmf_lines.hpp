@@ -36,7 +36,7 @@ namespace lwmf
 	// FindRegion and ClipLine provide the "Cohen Sutherland Clipping" algorithm for lines
 	// https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 	//
-	// The algorithm is also described in "Computer Graphics - Principles and Practice, Second Edition in C" by Foley/van Dam/Feiner/Hughs
+	// The algorithm is also described in "Computer Graphics - Principles and Practice, Second Edition in C" by Foley/van Dam/Feiner/Hughs (Addison Wesley)
 	// Chapter 3.12.3, page 113ff
 
 	inline std::int_fast32_t FindRegion(const std::int_fast32_t Width, const std::int_fast32_t Height, const std::int_fast32_t x, const std::int_fast32_t y)
@@ -260,6 +260,9 @@ namespace lwmf
 
 	// This is my implementation of Xiaolin Wu´s line algorithm
 	// https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm
+	//
+	// The algorithm is also described in "Graphics Gems" by Andrew S. Glassner (Academic Press)
+	// Chapter "Symmetric Double Step Line Algorithm", Brian Wyvill, page 101ff
 
 	inline void DrawPixelAA(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color, const float Brightness)
 	{

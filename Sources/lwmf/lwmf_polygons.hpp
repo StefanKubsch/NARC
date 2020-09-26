@@ -49,7 +49,7 @@ namespace lwmf
 
 		SignedArea *= 3.0F;
 
-		return { Centroid.X /= SignedArea, Centroid.Y /= SignedArea };
+		return { Centroid.X / SignedArea, Centroid.Y / SignedArea };
 	}
 
 	inline bool PointInsidePolygon(const std::vector<FloatPointStruct>& Points, const FloatPointStruct& Point)
@@ -99,13 +99,7 @@ namespace lwmf
 		}
 
 		// We need to draw a polygon (lines only) with the fillcolor first, so we get some proper boundaries
-		for (std::size_t i{}; i < NumberOfPoints - 1; ++i)
-		{
-			Line(Texture, Points[i].X, Points[i].Y, Points[i + 1].X, Points[i + 1].Y, FillColor);
-		}
-
-		// Connect last point with first point
-		Line(Texture, Points[NumberOfPoints - 1].X, Points[NumberOfPoints - 1].Y, Points[0].X, Points[0].Y, FillColor);
+		Polygon(Texture, Points, FillColor);
 
 		// From now on, we work with floats to get the polygon centroid
 		// Also we check if the found point is REALLY inside the polygon
@@ -127,16 +121,7 @@ namespace lwmf
 		}
 
 		// Last step - draw a border if needed
-		if (BorderColor != FillColor)
-		{
-			for (std::size_t i{}; i < NumberOfPoints - 1; ++i)
-			{
-				Line(Texture, Points[i].X, Points[i].Y, Points[i + 1].X, Points[i + 1].Y, BorderColor);
-			}
-
-			// Connect last point with first point
-			Line(Texture, Points[NumberOfPoints - 1].X, Points[NumberOfPoints - 1].Y, Points[0].X, Points[0].Y, BorderColor);
-		}
+		Polygon(Texture, Points, BorderColor);
 	}
 
 

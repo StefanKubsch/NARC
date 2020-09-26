@@ -202,7 +202,7 @@ namespace lwmf
 		// All the rest: Clip position and width/height to fit within boundaries
 		else
 		{
-			const std::int_fast32_t StartX{ (PosX < 0 && (std::abs(0 - PosX) < SourceTexture.Width)) ? std::abs(0 - PosX) : 0 };
+			const std::int_fast32_t StartX{ (PosX < 0 && (std::abs(0 - PosX) <= SourceTexture.Width)) ? std::abs(0 - PosX) : 0 };
 			const std::int_fast32_t TargetHeight{ (PosY + SourceTexture.Height >= TargetTexture.Height) ? TargetTexture.Height - PosY : SourceTexture.Height };
 			const std::int_fast32_t TargetWidth{ (PosX + SourceTexture.Width >= TargetTexture.Width) ? TargetTexture.Width - PosX : SourceTexture.Width };
 
