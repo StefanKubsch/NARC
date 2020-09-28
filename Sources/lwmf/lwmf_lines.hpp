@@ -104,18 +104,8 @@ namespace lwmf
 					Point.Y = y1 + (y2 - y1) * -x1 / (x2 - x1);
 				}
 
-				if (Codeout == Code1)
-				{
-					x1 = Point.X;
-					y1 = Point.Y;
-					Code1 = FindRegion(Width, Height, x1, y1);
-				}
-				else
-				{
-					x2 = Point.X;
-					y2 = Point.Y;
-					Code2 = FindRegion(Width, Height, x2, y2);
-				}
+				Codeout == Code1 ? ( x1 = Point.X, y1 = Point.Y, Code1 = FindRegion(Width, Height, x1, y1) ) :
+					( x2 = Point.X, y2 = Point.Y, Code2 = FindRegion(Width, Height, x2, y2) );
 			}
 		} while (!Done);
 
@@ -314,16 +304,8 @@ namespace lwmf
 		const std::int_fast32_t ypxl1{ static_cast<std::int_fast32_t>(std::nearbyintf(EndY)) };
 		float FracEndY{ FracPart(EndY) };
 
-		if (Steep)
-		{
-			DrawPixelAA(Texture, ypxl1, x1, Color, 1.0F - FracEndY * GapX);
-			DrawPixelAA(Texture, ypxl1 + 1, x1, Color, FracEndY * GapX);
-		}
-		else
-		{
-			DrawPixelAA(Texture, x1, ypxl1, Color, 1.0F - FracEndY * GapX);
-			DrawPixelAA(Texture, x1, ypxl1 + 1, Color, FracEndY * GapX);
-		}
+		Steep ? ( DrawPixelAA(Texture, ypxl1, x1, Color, 1.0F - FracEndY * GapX), DrawPixelAA(Texture, ypxl1 + 1, x1, Color, FracEndY * GapX) ) :
+			( DrawPixelAA(Texture, x1, ypxl1, Color, 1.0F - FracEndY * GapX), DrawPixelAA(Texture, x1, ypxl1 + 1, Color, FracEndY * GapX) );
 
 		float Intersection{ EndY + Gradient };
 		EndY = static_cast<float>(y2) + Gradient;
@@ -331,32 +313,16 @@ namespace lwmf
 		const std::int_fast32_t ypxl2{ static_cast<std::int_fast32_t>(std::nearbyintf(EndY)) };
 		FracEndY = FracPart(EndY);
 
-		if (Steep)
-		{
-			DrawPixelAA(Texture, ypxl2, x2, Color, 1.0F - FracEndY * GapX);
-			DrawPixelAA(Texture, ypxl2 + 1, x2, Color, FracEndY * GapX);
-		}
-		else
-		{
-			DrawPixelAA(Texture, x2, ypxl2, Color, 1.0F - FracEndY * GapX);
-			DrawPixelAA(Texture, x2, ypxl2 + 1, Color, FracEndY * GapX);
-		}
+		Steep ? ( DrawPixelAA(Texture, ypxl2, x2, Color, 1.0F - FracEndY * GapX), DrawPixelAA(Texture, ypxl2 + 1, x2, Color, FracEndY * GapX) ) :
+			( DrawPixelAA(Texture, x2, ypxl2, Color, 1.0F - FracEndY * GapX),  DrawPixelAA(Texture, x2, ypxl2 + 1, Color, FracEndY * GapX) );
 
 		for (std::int_fast32_t x{ x1 + 1 }; x < x2; ++x)
 		{
 			const std::int_fast32_t Integral{ static_cast<std::int_fast32_t>(std::nearbyintf(Intersection)) };
 			const float FracInt{ FracPart(Intersection) };
 
-			if (Steep)
-			{
-				DrawPixelAA(Texture, Integral, x, Color, 1.0F - FracInt);
-				DrawPixelAA(Texture, Integral + 1, x, Color, FracInt);
-			}
-			else
-			{
-				DrawPixelAA(Texture, x, Integral, Color, 1.0F - FracInt);
-				DrawPixelAA(Texture, x, Integral + 1, Color, FracInt);
-			}
+			Steep ? ( DrawPixelAA(Texture, Integral, x, Color, 1.0F - FracInt), DrawPixelAA(Texture, Integral + 1, x, Color, FracInt) ) :
+				( DrawPixelAA(Texture, x, Integral, Color, 1.0F - FracInt), DrawPixelAA(Texture, x, Integral + 1, Color, FracInt) );
 
 			Intersection += Gradient;
 		}

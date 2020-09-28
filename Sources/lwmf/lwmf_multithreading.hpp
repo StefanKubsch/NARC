@@ -14,8 +14,8 @@
 #include <thread>
 #include <future>
 #include <memory>
+#include <tuple>
 #include <utility>
-#include <functional>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
@@ -90,7 +90,11 @@ namespace lwmf
 
 	template<class F, class... Args>void Multithreading::AddThread(F&& f, Args&& ... args)
 	{
-		std::packaged_task<std::invoke_result_t<F, Args...>()> Task(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+		std::packaged_task<std::invoke_result_t<F, Args...>()> Task([func = std::forward<F>(f),	args = std::make_tuple(std::forward<Args>(args)...)]()
+		{
+			return std::apply(func, std::move(args));
+		});
+
 		Results.emplace_back(Task.get_future());
 		std::unique_lock<std::mutex> lock(QueueMutex);
 		Tasks.emplace(std::move(Task));

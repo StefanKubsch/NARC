@@ -299,7 +299,7 @@ namespace lwmf
 				const std::int_fast32_t SrcX{ static_cast<std::int_fast32_t>((+(fx * c) + (fy * s))) + RotCenterX };
 				const std::int_fast32_t SrcY{ static_cast<std::int_fast32_t>((-(fx * s) + (fy * c))) + RotCenterY };
 
-				if ((SrcX >= 0) && (SrcX < Texture.Width) && (SrcY >= 0) && (SrcY < Texture.Height))
+				if (static_cast<std::uint_fast32_t>(SrcX) < static_cast<std::uint_fast32_t>(Texture.Width) && static_cast<std::uint_fast32_t>(SrcY) < static_cast<std::uint_fast32_t>(Texture.Height))
 				{
 					TempBuffer[DestOffset + x] = Texture.Pixels[SrcY * Texture.Width + SrcX];
 				}
