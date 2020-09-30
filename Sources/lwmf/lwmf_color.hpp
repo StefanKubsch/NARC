@@ -17,7 +17,7 @@ namespace lwmf
 {
 
 
-	struct ColorStruct final
+	struct ColorStructRGBA final
 	{
 		std::int_fast32_t Red{};
 		std::int_fast32_t Green{};
@@ -26,7 +26,7 @@ namespace lwmf
 	};
 
 	std::int_fast32_t RGBAtoINT(std::int_fast32_t Red, std::int_fast32_t Green, std::int_fast32_t Blue, std::int_fast32_t Alpha);
-	ColorStruct INTtoRGBA(std::int_fast32_t Color);
+	ColorStructRGBA INTtoRGBA(std::int_fast32_t Color);
 	std::int_fast32_t ShadeColor(std::int_fast32_t Color, float ShadeFactor, float Limit);
 	std::int_fast32_t BlendColor(std::int_fast32_t Color1, std::int_fast32_t Color2, float Ratio);
 
@@ -49,7 +49,7 @@ namespace lwmf
 		return static_cast<std::int_fast32_t>(static_cast<std::uint_fast32_t>(Red) + (static_cast<std::uint_fast32_t>(Green) << 8) + (static_cast<std::uint_fast32_t>(Blue) << 16) + (static_cast<std::uint_fast32_t>(Alpha) << 24));
 	}
 
-	inline ColorStruct INTtoRGBA(const std::int_fast32_t Color)
+	inline ColorStructRGBA INTtoRGBA(const std::int_fast32_t Color)
 	{
 		return { (Color & static_cast<std::int_fast32_t>(RMask)), (Color & static_cast<std::int_fast32_t>(GMask)) >> 8, (Color & static_cast<std::int_fast32_t>(BMask)) >> 16, (Color & static_cast<std::int_fast32_t>(AMask)) >> 24 };
 	}

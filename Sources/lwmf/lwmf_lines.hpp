@@ -256,7 +256,7 @@ namespace lwmf
 
 	inline void DrawPixelAA(TextureStruct& Texture, const std::int_fast32_t x, const std::int_fast32_t y, const std::int_fast32_t Color, const float Brightness)
 	{
-		const ColorStruct ModColor{ INTtoRGBA(Color) };
+		const ColorStructRGBA ModColor{ INTtoRGBA(Color) };
 
 		SetPixelSafe(Texture, x, y, RGBAtoINT(static_cast<std::int_fast32_t>(static_cast<float>(ModColor.Red) * Brightness),
 			static_cast<std::int_fast32_t>(static_cast<float>(ModColor.Green) * Brightness),
