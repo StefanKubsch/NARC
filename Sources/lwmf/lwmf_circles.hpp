@@ -37,7 +37,7 @@ namespace lwmf
 		}
 
 		// if complete circle is within texture boundaries, there is no reason to use SetPixelSafe...
-		const bool SafeFlag{ ((CenterX - Radius >= 0 && CenterX + Radius < Texture.Width) && (CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)) ? true : false };
+		const bool SafeFlag{ ((CenterX - Radius >= 0 && CenterX + Radius < Texture.Width) && (CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)) };
 
 		IntPointStruct Point{ -Radius, 0 };
 		std::int_fast32_t Error{ 2 - (Radius << 1) };
