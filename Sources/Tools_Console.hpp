@@ -78,7 +78,7 @@ namespace Tools_Console
 			Response = static_cast<char>(std::tolower(Response));
 		}
 
-		return Response == 'y' ? true : false;
+		return Response == 'y';
 	}
 
 	inline std::int_fast32_t QuestionForValue(const std::string& Text, const std::int_fast32_t BeginRange, const std::int_fast32_t EndRange)
