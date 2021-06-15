@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <fstream>
 #include <istream>
@@ -25,8 +26,8 @@ class GFX_TextClass final
 {
 public:
 	void InitFont(const std::string& INIFileName, const std::string& Section);
-	void RenderText(const std::string& Text, std::int_fast32_t x, std::int_fast32_t y);
-	void RenderTextCentered(const std::string& Text, std::int_fast32_t y);
+	void RenderText(const std::string_view& Text, std::int_fast32_t x, std::int_fast32_t y);
+	void RenderTextCentered(const std::string_view& Text, std::int_fast32_t y);
 	lwmf::IntPointStruct GetOffset();
 	std::int_fast32_t GetFontHeight();
 
@@ -141,7 +142,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 	}
 }
 
-inline void GFX_TextClass::RenderText(const std::string& Text, std::int_fast32_t x, const std::int_fast32_t y)
+inline void GFX_TextClass::RenderText(const std::string_view& Text, std::int_fast32_t x, const std::int_fast32_t y)
 {
 	for (const char& Char : Text)
 	{
@@ -150,7 +151,7 @@ inline void GFX_TextClass::RenderText(const std::string& Text, std::int_fast32_t
 	}
 }
 
-inline void GFX_TextClass::RenderTextCentered(const std::string& Text, const std::int_fast32_t y)
+inline void GFX_TextClass::RenderTextCentered(const std::string_view& Text, const std::int_fast32_t y)
 {
 	std::int_fast32_t TextLengthInPixels{};
 

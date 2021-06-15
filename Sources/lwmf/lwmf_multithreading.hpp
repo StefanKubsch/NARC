@@ -28,6 +28,10 @@ namespace lwmf
 	{
 	public:
 		Multithreading();
+		Multithreading(const Multithreading&) = delete;
+		Multithreading(Multithreading&&) = delete;
+		Multithreading& operator = (const Multithreading&) = delete;
+		Multithreading& operator = (Multithreading&&) = delete;
 		~Multithreading();
 
 		template<class F, class... Args>void AddThread(F&& f, Args&& ... args);

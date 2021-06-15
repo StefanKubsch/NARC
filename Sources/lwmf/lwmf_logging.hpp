@@ -15,7 +15,7 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <string>
+#include <string_view>
 #include <array>
 #include <map>
 #include <exception>
@@ -55,8 +55,13 @@ namespace lwmf
 	{
 	public:
 		Logging(const std::string& Logfilename);
+		Logging(const Logging&) = delete;
+		Logging(Logging&&) = delete;
+		Logging& operator = (const Logging&) = delete;
+		Logging& operator = (Logging&&) = delete;
 		~Logging();
-		void AddEntry(LogLevel Level, const char* Filename, std::int_fast32_t LineNumber, const std::string& Message);
+
+		void AddEntry(LogLevel Level, const char* Filename, std::int_fast32_t LineNumber, const std::string_view& Message);
 
 	private:
 		static std::string GetTimeStamp();
@@ -95,20 +100,20 @@ namespace lwmf
 		}
 	}
 
-	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::int_fast32_t LineNumber, const std::string& Message)
+	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::int_fast32_t LineNumber, const std::string_view& Message)
 	{
 		if (LoggingEnabled && Logfile.is_open())
 		{
-			std::map<LogLevel, std::string> ErrorTable
+			std::map<LogLevel, std::string_view> ErrorTable
 			{
 				{ LogLevel::Info, "** INFO ** " },
 				{ LogLevel::Debug, "** DEBUG ** " },
 				{ LogLevel::Warn, "** WARNING ** " },
 				{ LogLevel::Error, "** ERROR ** " },
-				{ LogLevel::Critical, "** CRITICAL ERROR ** " },
+				{ LogLevel::Critical, "** CRITICAL ERROR ** " }
 			};
 
-			const std::map<LogLevel, std::string>::iterator ItErrorTable{ ErrorTable.find(Level) };
+			const std::map<LogLevel, std::string_view>::iterator ItErrorTable{ ErrorTable.find(Level) };
 
 			if (ItErrorTable != ErrorTable.end())
 			{
@@ -124,7 +129,7 @@ namespace lwmf
 					Logfile << "\n" << GetTimeStamp() << MessageString << std::endl;
 					Logfile.close();
 
-					ThrowExceptions ? throw std::runtime_error(Message) : std::exit(EXIT_FAILURE);
+					ThrowExceptions ? throw std::runtime_error(std::string(Message)) : std::exit(EXIT_FAILURE);
 				}
 				else
 				{

@@ -12,6 +12,7 @@
 
 #define NOMINMAX
 #include <Windows.h>
+#include <cstdint>
 #include <cstddef>
 #include <GL/gl.h>
 
@@ -25,20 +26,20 @@
 // Definitions can be found here:
 // https://www.khronos.org/registry/OpenGL/api/GL/glext.h
 
-#define GL_ARRAY_BUFFER						0x8892
-#define GL_COMPILE_STATUS					0x8B81
-#define GL_CONTEXT_LOST						0x0507
-#define GL_DYNAMIC_DRAW						0x88E8
-#define GL_ELEMENT_ARRAY_BUFFER				0x8893
-#define GL_FRAGMENT_SHADER					0x8B30
-#define GL_INVALID_FRAMEBUFFER_OPERATION	0x0506
-#define GL_LINK_STATUS						0x8B82
-#define GL_MAJOR_VERSION					0x821B
-#define GL_MINOR_VERSION					0x821C
-#define GL_SHADING_LANGUAGE_VERSION			0x8B8C
-#define GL_STATIC_DRAW						0x88E4
-#define GL_TEXTURE0							0x84C0
-#define GL_VERTEX_SHADER					0x8B31
+inline constexpr std::int_fast32_t GL_ARRAY_BUFFER						{ 0x8892 };
+inline constexpr std::int_fast32_t GL_COMPILE_STATUS					{ 0x8B81 };
+inline constexpr std::int_fast32_t GL_CONTEXT_LOST						{ 0x0507 };
+inline constexpr std::int_fast32_t GL_DYNAMIC_DRAW						{ 0x88E8 };
+inline constexpr std::int_fast32_t GL_ELEMENT_ARRAY_BUFFER				{ 0x8893 };
+inline constexpr std::int_fast32_t GL_FRAGMENT_SHADER					{ 0x8B30 };
+inline constexpr std::int_fast32_t GL_INVALID_FRAMEBUFFER_OPERATION	{ 0x0506 };
+inline constexpr std::int_fast32_t GL_LINK_STATUS						{ 0x8B82 };
+inline constexpr std::int_fast32_t GL_MAJOR_VERSION					{ 0x821B };
+inline constexpr std::int_fast32_t GL_MINOR_VERSION					{ 0x821C };
+inline constexpr std::int_fast32_t GL_SHADING_LANGUAGE_VERSION			{ 0x8B8C };
+inline constexpr std::int_fast32_t GL_STATIC_DRAW						{ 0x88E4 };
+inline constexpr std::int_fast32_t GL_TEXTURE0							{ 0x84C0 };
+inline constexpr std::int_fast32_t GL_VERTEX_SHADER					{ 0x8B31 };
 
 using GLchar = char;
 using GLsizeiptr = std::ptrdiff_t;
