@@ -102,7 +102,7 @@ namespace lwmf
 				WAVEOUTCAPS WaveOutCaps{};
 				CheckMMRESError(waveOutGetDevCaps(i, &WaveOutCaps, sizeof(WAVEOUTCAPS)), "waveOutGetDevCaps", LogLevel::Info); //-V106
 
-				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Found audio device: " + std::string(WaveOutCaps.szPname));
+				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Found audio device: " + std::string(static_cast<char*>(WaveOutCaps.szPname)));
 				LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Number of channels: " + std::to_string(WaveOutCaps.wChannels));
 			}
 		}
