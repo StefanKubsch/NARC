@@ -567,7 +567,7 @@ namespace Game_EntityHandling
 						SwitchDirection(Entity, 'S');
 						break;
 					}
-					default: {};
+					default: {}
 				}
 				break;
 			}
@@ -599,7 +599,7 @@ namespace Game_EntityHandling
 						SwitchDirection(Entity, 'N');
 						break;
 					}
-					default: {};
+					default: {}
 				}
 				break;
 			}
