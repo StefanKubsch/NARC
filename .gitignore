@@ -964,3 +964,7 @@ x64/Release/NARC.pgd
 x64/Release/NARC.exe.recipe
 x64/Debug/NARC.exe.recipe
 Sources/.clang-tidy
+.vs/NARC/project-colors.json
+.vs/NARC/v17/.suo
+.vs/NARC/v17/Browse.VC.db
+.vs/NARC/v17/ipch/AutoPCH/76faef2bba29c72f/NARC.ipch
