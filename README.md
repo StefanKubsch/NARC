@@ -6,7 +6,7 @@ A raycasting game engine in C++, built using my own library lwmf and OpenGL.
 
 I am working on a 2.5D, "Wolfenstein 3D"-like game engine, written in modern C++.
 
-Currently I´m developing in Visual Studio 2019, for Windows as the target platform.
+Currently I´m developing in Visual Studio 2022, for Windows as the target platform.
 
 The project began with GDI+ and pure software rendering, but I switched to OpenGL for better handling and performance.
 
