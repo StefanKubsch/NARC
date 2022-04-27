@@ -1,6 +1,6 @@
 Development:
 
-	Microsoft Visual Studio 2019 Community Edition
+	Microsoft Visual Studio 2022 Community Edition
 		https://visualstudio.microsoft.com/de/vs/community/
 
 	PVS Studio (Static Code Analyzer)
