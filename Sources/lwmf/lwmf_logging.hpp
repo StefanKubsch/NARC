@@ -144,7 +144,7 @@ namespace lwmf
 		const auto CurrentTime{ std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) };
 		std::array<char, 26> TimeString{};
 		ctime_s(TimeString.data(), TimeString.size(), &CurrentTime);
-		return std::string(TimeString.data());
+		return { TimeString.data() };
 	}
 
 

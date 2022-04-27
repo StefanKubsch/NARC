@@ -205,7 +205,7 @@ namespace lwmf
 				if ((Now - Last >= Time && Time > 0) || Last == 0 || (Time == 0 && (Previous.Gamepad.wButtons & Button.first) == 0))
 				{
 					LastPress.erase(Button.first);
-					LastPress.insert(std::map<WORD, DWORD>::value_type(Button.first, Now));
+					LastPress.emplace(std::map<WORD, DWORD>::value_type(Button.first, Now));
 
 					SendMessage(MainWindow, WM_KEYDOWN, Mapping, ((Previous.Gamepad.wButtons & Button.first) == 0 ? 0 << 30 : 1 << 30));
 				}
@@ -285,7 +285,7 @@ namespace lwmf
 	inline void Gamepad::AddKeyMapping(const WORD Button, const std::int_fast32_t Key)
 	{
 		KeyMap.erase(Button);
-		KeyMap.insert(std::map<WORD, std::int_fast32_t>::value_type(Button, Key));
+		KeyMap.emplace(std::map<WORD, std::int_fast32_t>::value_type(Button, Key));
 	}
 
 	inline void Gamepad::RemoveKeyMapping(const std::int_fast32_t Key)
@@ -330,27 +330,27 @@ namespace lwmf
 
 		for (const auto& Button : Buttons)
 		{
-			Repeat.insert(std::map<WORD, std::uint_fast32_t>::value_type(Button.first, Time));
+			Repeat.emplace(std::map<WORD, std::uint_fast32_t>::value_type(Button.first, Time));
 		}
 
 		AnalogRepeat.clear();
 
 		for (std::int_fast32_t i{}; i < static_cast<std::int_fast32_t>(AnalogButtons::Counter); ++i)
 		{
-			AnalogRepeat.insert(std::map<AnalogButtons, std::uint_fast32_t>::value_type(static_cast<AnalogButtons>(i), Time));
+			AnalogRepeat.emplace(std::map<AnalogButtons, std::uint_fast32_t>::value_type(static_cast<AnalogButtons>(i), Time));
 		}
 	}
 
 	inline void Gamepad::SetInterval(const WORD Button, const std::uint_fast32_t Time)
 	{
 		Repeat.erase(Button);
-		Repeat.insert(std::map<WORD, std::uint_fast32_t>::value_type(Button, Time));
+		Repeat.emplace(std::map<WORD, std::uint_fast32_t>::value_type(Button, Time));
 	}
 
 	inline void Gamepad::SetAnalogInterval(const AnalogButtons& Button, const std::uint_fast32_t Time)
 	{
 		AnalogRepeat.erase(Button);
-		AnalogRepeat.insert(std::map<AnalogButtons, std::uint_fast32_t>::value_type(Button, Time));
+		AnalogRepeat.emplace(std::map<AnalogButtons, std::uint_fast32_t>::value_type(Button, Time));
 	}
 
 	inline void Gamepad::SendAnalogKeys(const AnalogButtons& Button, const float Now, const float Before, const float Threshold, const std::int_fast32_t Key)
@@ -367,7 +367,7 @@ namespace lwmf
 			if ((TempNow - TempBefore >= Time && Time > 0) || TempBefore == 0 || (Time == 0 && !WasPressed))
 			{
 				AnalogLastPress.erase(Button);
-				AnalogLastPress.insert(std::map<AnalogButtons, DWORD>::value_type(Button, TempNow));
+				AnalogLastPress.emplace(std::map<AnalogButtons, DWORD>::value_type(Button, TempNow));
 				SendMessage(MainWindow, WM_KEYDOWN, static_cast<WPARAM>(Key), (WasPressed ? 1 << 30 : 0 << 30));
 			}
 		}
