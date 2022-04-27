@@ -14,7 +14,7 @@ There is a long way to go with the engine, from entity AI to weapon handling, le
 
 The whole engine is modular and written in C++ 17/20.
 
-All low-level functions for OpenGL, graphics, audio, bitmap and input handling, multithreading, logging, game-relevant math etc. is provided by my own C++ library, "lwmf - lightweight media framework". This framework is still under development, but already stable and fast.
+All low-level functions for OpenGL, graphics, audio, bitmap and input handling, multithreading, logging, game-relevant math etc. are provided by my own C++ library, "lwmf - lightweight media framework". This framework is still under development, but already stable and fast.
 
 Due to (partial) use of SIMD Intrinsics a CPU with SSE 4.2 support is needed (virtually all Intel CPUs from 2007 on).
 
@@ -32,7 +32,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - vsync by option (vsync implies fullscreen mode!)
   - changed options will be saved
   - indoor & outdoor levels (ceilings and/or skybox, lighting or not)
-  - you can shoot entities and they will vanish after they lose their hitpoints
+  - you can shoot entities and they will die in a nice animation after they lose their hitpoints
   - entities will attack you - and you can die...DIE...
   - pixel-precise detection of hits on enemies (used technique here is "hitscan")
   - A* pathfinding algorithm (started, path between entities and player is calculated)
