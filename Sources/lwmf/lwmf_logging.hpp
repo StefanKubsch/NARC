@@ -54,7 +54,7 @@ namespace lwmf
 	class Logging final
 	{
 	public:
-		Logging(const std::string& Logfilename);
+		explicit Logging(const std::string& Logfilename);
 		Logging(const Logging&) = delete;
 		Logging(Logging&&) = delete;
 		Logging& operator = (const Logging&) = delete;
