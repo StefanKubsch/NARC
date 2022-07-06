@@ -36,41 +36,54 @@ namespace lwmf
 			return;
 		}
 
-		// if complete circle is within texture boundaries, there is no reason to use SetPixelSafe...
-		const bool SafeFlag{ ((CenterX - Radius >= 0 && CenterX + Radius < Texture.Width) && (CenterY - Radius >= 0 && CenterY + Radius < Texture.Height)) };
-
 		IntPointStruct Point{ -Radius, 0 };
 		std::int_fast32_t Error{ 2 - (Radius << 1) };
 
-		do
+		// if complete circle is within texture boundaries, there is no reason to use SetPixelSafe...
+		if ((CenterX - Radius >= 0 && CenterX + Radius < Texture.Width) && (CenterY - Radius >= 0 && CenterY + Radius < Texture.Height))
 		{
-			if (SafeFlag)
+			do
 			{
 				Texture.Pixels[((CenterY + Point.Y) * Texture.Width) + (CenterX - Point.X)] = Color;
 				Texture.Pixels[((CenterY - Point.X) * Texture.Width) + (CenterX - Point.Y)] = Color;
 				Texture.Pixels[((CenterY - Point.Y) * Texture.Width) + (CenterX + Point.X)] = Color;
 				Texture.Pixels[((CenterY + Point.X) * Texture.Width) + (CenterX + Point.Y)] = Color;
-			}
-			else
+
+				Radius = Error;
+
+				if (Radius <= Point.Y)
+				{
+					Error += (++Point.Y << 1) + 1;
+				}
+
+				if (Radius > Point.X || Error > Point.Y)
+				{
+					Error += (++Point.X << 1) + 1;
+				}
+			} while (Point.X < 0);
+		}
+		else
+		{
+			do
 			{
 				SetPixelSafe(Texture, CenterX - Point.X, CenterY + Point.Y, Color);
 				SetPixelSafe(Texture, CenterX - Point.Y, CenterY - Point.X, Color);
 				SetPixelSafe(Texture, CenterX + Point.X, CenterY - Point.Y, Color);
 				SetPixelSafe(Texture, CenterX + Point.Y, CenterY + Point.X, Color);
-			}
 
-			Radius = Error;
+				Radius = Error;
 
-			if (Radius <= Point.Y)
-			{
-				Error += (++Point.Y << 1) + 1;
-			}
+				if (Radius <= Point.Y)
+				{
+					Error += (++Point.Y << 1) + 1;
+				}
 
-			if (Radius > Point.X || Error > Point.Y)
-			{
-				Error += (++Point.X << 1) + 1;
-			}
-		} while (Point.X < 0);
+				if (Radius > Point.X || Error > Point.Y)
+				{
+					Error += (++Point.X << 1) + 1;
+				}
+			} while (Point.X < 0);
+		}
 	}
 
 	inline void FilledCircle(TextureStruct& Texture, const std::int_fast32_t CenterX, const std::int_fast32_t CenterY, const std::int_fast32_t Radius, const std::int_fast32_t BorderColor, const std::int_fast32_t FillColor)

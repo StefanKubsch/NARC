@@ -180,7 +180,7 @@ struct stbtt_aligned_quad
 
 void stbtt_GetBakedQuad(const std::vector<stbtt_bakedchar>& chardata, std::int_fast32_t pw, std::int_fast32_t ph,	// same data as above
 						std::int_fast32_t char_index,																// character to display
-						float& xpos, const float& ypos,																// pointers to current position in screen pixel space
+						float& xpos, float ypos,																// pointers to current position in screen pixel space
 						stbtt_aligned_quad& q,																		// output: quad to draw
 						std::int_fast32_t opengl_fillrule);															// true if opengl fill rule; false if DX9 or earlier
 // Call GetBakedQuad with char_index = 'character - first_char', and it
@@ -2813,7 +2813,7 @@ inline static std::int_fast32_t stbtt_BakeFontBitmap_internal(std::vector<unsign
 	return bottom_y;
 }
 
-inline void stbtt_GetBakedQuad(const std::vector<stbtt_bakedchar>& chardata, const std::int_fast32_t pw, const std::int_fast32_t ph, const std::int_fast32_t char_index, float& xpos, const float& ypos, stbtt_aligned_quad& q, const std::int_fast32_t opengl_fillrule)
+inline void stbtt_GetBakedQuad(const std::vector<stbtt_bakedchar>& chardata, const std::int_fast32_t pw, const std::int_fast32_t ph, const std::int_fast32_t char_index, float& xpos, float ypos, stbtt_aligned_quad& q, const std::int_fast32_t opengl_fillrule)
 {
 	const float d3d_bias{ (opengl_fillrule != 0) ? 0.0F : -0.5F };
 	const float ipw{ 1.0F / pw };

@@ -22,7 +22,7 @@ namespace lwmf
 {
 
 
-	void RenderText(TextureStruct& Texture, const std::string_view& Text, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Color);
+	void RenderText(TextureStruct& Texture, const std::string_view Text, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Color);
 
 	//
 	// Variables and constants
@@ -170,7 +170,7 @@ namespace lwmf
 	// Functions
 	//
 
-	inline void RenderText(TextureStruct& Texture, const std::string_view& Text, std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
+	inline void RenderText(TextureStruct& Texture, const std::string_view Text, std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Color)
 	{
 		for (const std::_String_const_iterator<std::_String_val<std::_Simple_types<char>>>::value_type& Char: Text)
 		{

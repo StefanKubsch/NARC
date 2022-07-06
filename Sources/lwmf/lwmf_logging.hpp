@@ -61,7 +61,7 @@ namespace lwmf
 		Logging& operator = (Logging&&) = delete;
 		~Logging();
 
-		void AddEntry(LogLevel Level, const char* Filename, std::int_fast32_t LineNumber, const std::string_view& Message);
+		void AddEntry(LogLevel Level, const char* Filename, std::int_fast32_t LineNumber, const std::string_view Message);
 
 	private:
 		static std::string GetTimeStamp();
@@ -100,7 +100,7 @@ namespace lwmf
 		}
 	}
 
-	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::int_fast32_t LineNumber, const std::string_view& Message)
+	inline void Logging::AddEntry(const LogLevel Level, const char* Filename, const std::int_fast32_t LineNumber, const std::string_view Message)
 	{
 		if (LoggingEnabled && Logfile.is_open())
 		{

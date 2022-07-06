@@ -62,12 +62,12 @@ namespace lwmf
 		void AddKeyMapping(WORD Button, std::int_fast32_t Key);
 		void RemoveKeyMappingByButton(WORD Button);
 		void RemoveKeyMapping(std::int_fast32_t Key);
-		void AddAnalogKeyMapping(const AnalogButtons& Button, float Threshold, std::int_fast32_t Key);
+		void AddAnalogKeyMapping(const AnalogButtons Button, float Threshold, std::int_fast32_t Key);
 		void RemoveAnalogKeyMapping(AnalogButtons Button);
 		void DeleteMappings();
 		void SetIntervalAll(std::uint_fast32_t Time);
 		void SetInterval(WORD Button, std::uint_fast32_t Time);
-		void SetAnalogInterval(const AnalogButtons& Button, std::uint_fast32_t Time);
+		void SetAnalogInterval(const AnalogButtons Button, std::uint_fast32_t Time);
 
 		std::map<WORD, std::string> Buttons{};
 		lwmf::IntPointStruct RightStickPos{};
@@ -78,7 +78,7 @@ namespace lwmf
 		float Sensitivity{ 0.3F };
 
 	private:
-		void SendAnalogKeys(const AnalogButtons& Button, float Now, float Before, float Threshold, std::int_fast32_t Key);
+		void SendAnalogKeys(const AnalogButtons Button, float Now, float Before, float Threshold, std::int_fast32_t Key);
 
 		XINPUT_STATE State{};
 		XINPUT_STATE Previous{};
@@ -305,7 +305,7 @@ namespace lwmf
 		KeyMap.erase(Button);
 	}
 
-	inline void Gamepad::AddAnalogKeyMapping(const AnalogButtons& Button, const float Threshold, const std::int_fast32_t Key)
+	inline void Gamepad::AddAnalogKeyMapping(const AnalogButtons Button, const float Threshold, const std::int_fast32_t Key)
 	{
 		const AnalogMapping AnalogKeyMapping { Key, Threshold };
 
@@ -347,13 +347,13 @@ namespace lwmf
 		Repeat.emplace(std::map<WORD, std::uint_fast32_t>::value_type(Button, Time));
 	}
 
-	inline void Gamepad::SetAnalogInterval(const AnalogButtons& Button, const std::uint_fast32_t Time)
+	inline void Gamepad::SetAnalogInterval(const AnalogButtons Button, const std::uint_fast32_t Time)
 	{
 		AnalogRepeat.erase(Button);
 		AnalogRepeat.emplace(std::map<AnalogButtons, std::uint_fast32_t>::value_type(Button, Time));
 	}
 
-	inline void Gamepad::SendAnalogKeys(const AnalogButtons& Button, const float Now, const float Before, const float Threshold, const std::int_fast32_t Key)
+	inline void Gamepad::SendAnalogKeys(const AnalogButtons Button, const float Now, const float Before, const float Threshold, const std::int_fast32_t Key)
 	{
 		const bool IsPressed{ (Now >= Threshold && Threshold > 0.0F) || (Now <= Threshold && Threshold < 0.0F) };
 		const bool WasPressed{ (Before >= Threshold && Threshold > 0.0F) || (Before <= Threshold && Threshold < 0.0F) };
