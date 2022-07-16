@@ -25,8 +25,8 @@ namespace Tools_Console
 	void CreateConsole();
 	void CloseConsole();
 	void ClearInputBuffer();
-	bool QuestionForYesNo(const std::string& Text);
-	std::int_fast32_t QuestionForValue(const std::string& Text, std::int_fast32_t BeginRange, std::int_fast32_t EndRange);
+	bool QuestionForYesNo(const std::string_view Text);
+	std::int_fast32_t QuestionForValue(const std::string_view Text, std::int_fast32_t BeginRange, std::int_fast32_t EndRange);
 
 	//
 	// Functions
@@ -61,7 +61,7 @@ namespace Tools_Console
 		std::cin.rdbuf()->in_avail();
 	}
 
-	inline bool QuestionForYesNo(const std::string& Text)
+	inline bool QuestionForYesNo(const std::string_view Text)
 	{
 		char Response{ '\0' };
 
@@ -81,7 +81,7 @@ namespace Tools_Console
 		return Response == 'y';
 	}
 
-	inline std::int_fast32_t QuestionForValue(const std::string& Text, const std::int_fast32_t BeginRange, const std::int_fast32_t EndRange)
+	inline std::int_fast32_t QuestionForValue(const std::string_view Text, const std::int_fast32_t BeginRange, const std::int_fast32_t EndRange)
 	{
 		const std::regex DigitsOnlyPattern(R"(\d+)", std::regex::optimize | std::regex::icase);
 

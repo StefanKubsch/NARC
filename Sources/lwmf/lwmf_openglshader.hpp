@@ -29,7 +29,7 @@ namespace lwmf
 	// Shader source codes
 	//
 
-	inline const std::string DefaultFragmentShaderSource
+	inline const std::string_view DefaultFragmentShaderSource
 	{
 		"#version 430 core\n"
 		"in vec2 Texcoord;\n"
@@ -43,7 +43,7 @@ namespace lwmf
 		"}"
 	};
 
-	inline const std::string DefaultVertexShaderSource
+	inline const std::string_view DefaultVertexShaderSource
 	{
 		"#version 430 core\n"
 		"in vec2 position;\n"
@@ -83,7 +83,7 @@ namespace lwmf
 
 		static void Ortho2D(std::array<GLfloat, 16>& Matrix, GLfloat Left, GLfloat Right, GLfloat Bottom, GLfloat Top);
 		void UpdateVertices(std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-		static std::string LoadShaderSource(const std::string& SourceName);
+		static std::string_view LoadShaderSource(const std::string_view SourceName);
 		static void CheckError(std::int_fast32_t Line);
 		static void CheckCompileError(GLuint Task, Components Component);
 
@@ -340,11 +340,11 @@ namespace lwmf
 		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
 	}
 
-	inline std::string ShaderClass::LoadShaderSource(const std::string& SourceName)
+	inline std::string_view ShaderClass::LoadShaderSource(const std::string_view SourceName)
 	{
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Loading shader source: " + SourceName);
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Loading shader source: " + std::string(SourceName));
 
-		std::string Result;
+		std::string_view Result;
 
 		if (SourceName == "DefaultFrag")
 		{
