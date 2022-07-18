@@ -35,10 +35,10 @@ namespace lwmf
 	//
 
 	// Define little-endian bitmasks
-	constexpr std::uint_fast32_t RMask{ 0x000000FF };
-	constexpr std::uint_fast32_t GMask{ 0x0000FF00 };
-	constexpr std::uint_fast32_t BMask{ 0x00FF0000 };
-	constexpr std::uint_fast32_t AMask{ 0xFF000000 };
+	inline constexpr std::uint_fast32_t RMask{ 0x000000FF };
+	inline constexpr std::uint_fast32_t GMask{ 0x0000FF00 };
+	inline constexpr std::uint_fast32_t BMask{ 0x00FF0000 };
+	inline constexpr std::uint_fast32_t AMask{ 0xFF000000 };
 
 	//
 	// Functions

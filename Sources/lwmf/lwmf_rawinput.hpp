@@ -12,7 +12,7 @@
 
 #define NOMINMAX
 #include <Windows.h>
-#include <cstring>
+#include <string>
 #include <map>
 
 #include "lwmf_logging.hpp"

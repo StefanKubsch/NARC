@@ -26,7 +26,6 @@
 #include <shlwapi.h>
 #include <wmsdk.h>
 #include <atlcomcli.h>
-#include <cstring>
 
 #pragma comment(lib, "msacm32.lib")
 #pragma comment(lib, "wmvcore.lib")

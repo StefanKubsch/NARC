@@ -39,10 +39,10 @@ namespace Game_Doors
 	// Variables and constants
 	//
 
-	constexpr float MaximumOpenPercentLowerLimit{ 0.0F };
-	constexpr float MaximumOpenPercentUpperLimit{ 100.0F };
-	constexpr float MinimumOpenPercentLowerLimit{ 0.0F };
-	constexpr float MinimumOpenPercentUpperLimit{ 100.0F };
+	inline constexpr float MaximumOpenPercentLowerLimit{ 0.0F };
+	inline constexpr float MaximumOpenPercentUpperLimit{ 100.0F };
+	inline constexpr float MinimumOpenPercentLowerLimit{ 0.0F };
+	inline constexpr float MinimumOpenPercentUpperLimit{ 100.0F };
 
 	//
 	// Functions

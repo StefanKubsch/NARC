@@ -62,12 +62,12 @@ namespace lwmf
 		void AddKeyMapping(WORD Button, std::int_fast32_t Key);
 		void RemoveKeyMappingByButton(WORD Button);
 		void RemoveKeyMapping(std::int_fast32_t Key);
-		void AddAnalogKeyMapping(const AnalogButtons Button, float Threshold, std::int_fast32_t Key);
+		void AddAnalogKeyMapping(AnalogButtons Button, float Threshold, std::int_fast32_t Key);
 		void RemoveAnalogKeyMapping(AnalogButtons Button);
 		void DeleteMappings();
 		void SetIntervalAll(std::uint_fast32_t Time);
 		void SetInterval(WORD Button, std::uint_fast32_t Time);
-		void SetAnalogInterval(const AnalogButtons Button, std::uint_fast32_t Time);
+		void SetAnalogInterval(AnalogButtons Button, std::uint_fast32_t Time);
 
 		std::map<WORD, std::string> Buttons{};
 		lwmf::IntPointStruct RightStickPos{};
@@ -78,7 +78,7 @@ namespace lwmf
 		float Sensitivity{ 0.3F };
 
 	private:
-		void SendAnalogKeys(const AnalogButtons Button, float Now, float Before, float Threshold, std::int_fast32_t Key);
+		void SendAnalogKeys(AnalogButtons Button, float Now, float Before, float Threshold, std::int_fast32_t Key);
 
 		XINPUT_STATE State{};
 		XINPUT_STATE Previous{};

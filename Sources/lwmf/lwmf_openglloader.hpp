@@ -25,6 +25,8 @@
 
 // Definitions can be found here:
 // https://www.khronos.org/registry/OpenGL/api/GL/glext.h
+//
+// Please take care: Only things used in lwmf are defined here - of course, there are much more possible definitions!
 
 inline constexpr std::int_fast32_t GL_ARRAY_BUFFER						{ 0x8892 };
 inline constexpr std::int_fast32_t GL_COMPILE_STATUS					{ 0x8B81 };
@@ -32,21 +34,22 @@ inline constexpr std::int_fast32_t GL_CONTEXT_LOST						{ 0x0507 };
 inline constexpr std::int_fast32_t GL_DYNAMIC_DRAW						{ 0x88E8 };
 inline constexpr std::int_fast32_t GL_ELEMENT_ARRAY_BUFFER				{ 0x8893 };
 inline constexpr std::int_fast32_t GL_FRAGMENT_SHADER					{ 0x8B30 };
-inline constexpr std::int_fast32_t GL_INVALID_FRAMEBUFFER_OPERATION	{ 0x0506 };
+inline constexpr std::int_fast32_t GL_INVALID_FRAMEBUFFER_OPERATION		{ 0x0506 };
 inline constexpr std::int_fast32_t GL_LINK_STATUS						{ 0x8B82 };
-inline constexpr std::int_fast32_t GL_MAJOR_VERSION					{ 0x821B };
-inline constexpr std::int_fast32_t GL_MINOR_VERSION					{ 0x821C };
+inline constexpr std::int_fast32_t GL_MAJOR_VERSION						{ 0x821B };
+inline constexpr std::int_fast32_t GL_MINOR_VERSION						{ 0x821C };
 inline constexpr std::int_fast32_t GL_SHADING_LANGUAGE_VERSION			{ 0x8B8C };
 inline constexpr std::int_fast32_t GL_STATIC_DRAW						{ 0x88E4 };
 inline constexpr std::int_fast32_t GL_TEXTURE0							{ 0x84C0 };
-inline constexpr std::int_fast32_t GL_VERTEX_SHADER					{ 0x8B31 };
+inline constexpr std::int_fast32_t GL_VERTEX_SHADER						{ 0x8B31 };
 
 using GLchar = char;
 using GLsizeiptr = std::ptrdiff_t;
 using GLintptr = std::ptrdiff_t;
 
-// And all those nice functions definitions can be found here:
+// And all those nice function definitions can be found here:
 // https://www.khronos.org/registry/OpenGL-Refpages/gl4/
+// and also here - please take care: Only functions used in lwmf are defined here - of course, there are much more!
 
 #define OGL \
 	OG(void,	glAttachShader,				GLuint program, GLuint shader) \

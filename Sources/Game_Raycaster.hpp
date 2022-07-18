@@ -40,8 +40,8 @@ namespace Game_Raycaster
 	// Variables and constants
 	//
 
-	constexpr float VerticalLookLimitMin{ 0.0F };
-	constexpr float VerticalLookLimitMax{ 0.4F };
+	inline constexpr float VerticalLookLimitMin{ 0.0F };
+	inline constexpr float VerticalLookLimitMax{ 0.4F };
 
 	//
 	// Functions

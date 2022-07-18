@@ -25,8 +25,8 @@ namespace Tools_Console
 	void CreateConsole();
 	void CloseConsole();
 	void ClearInputBuffer();
-	bool QuestionForYesNo(const std::string_view Text);
-	std::int_fast32_t QuestionForValue(const std::string_view Text, std::int_fast32_t BeginRange, std::int_fast32_t EndRange);
+	bool QuestionForYesNo(std::string_view Text);
+	std::int_fast32_t QuestionForValue(std::string_view Text, std::int_fast32_t BeginRange, std::int_fast32_t EndRange);
 
 	//
 	// Functions

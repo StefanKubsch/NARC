@@ -33,12 +33,12 @@ namespace lwmf
 	// Variables and constants
 	//
 
-	constexpr float PI{ 3.14159265358979F };
-	constexpr float DoublePI{ PI * 2.0F };
-	constexpr float HalfPI{ PI / 2.0F };
-	constexpr float OneQrtPI{ PI / 4.0F };
-	constexpr float RAD2DEG{ PI / 180.0F };
-	constexpr float ThreeQrtPI{ 3.0F * (PI / 4.0F) };
+	inline constexpr float PI{ 3.14159265358979F };
+	inline constexpr float DoublePI{ PI * 2.0F };
+	inline constexpr float HalfPI{ PI / 2.0F };
+	inline constexpr float OneQrtPI{ PI / 4.0F };
+	inline constexpr float RAD2DEG{ PI / 180.0F };
+	inline constexpr float ThreeQrtPI{ 3.0F * (PI / 4.0F) };
 	inline const float SQRT1_2{ 1.0F / std::sqrtf(2.0F) };
 
 	//

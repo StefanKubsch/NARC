@@ -26,8 +26,8 @@ class GFX_TextClass final
 {
 public:
 	void InitFont(const std::string& INIFileName, const std::string& Section);
-	void RenderText(const std::string_view Text, std::int_fast32_t x, std::int_fast32_t y);
-	void RenderTextCentered(const std::string_view Text, std::int_fast32_t y);
+	void RenderText(std::string_view Text, std::int_fast32_t x, std::int_fast32_t y);
+	void RenderTextCentered(std::string_view Text, std::int_fast32_t y);
 	lwmf::IntPointStruct GetOffset();
 	std::int_fast32_t GetFontHeight();
 

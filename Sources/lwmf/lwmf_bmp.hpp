@@ -17,7 +17,6 @@
 #include <vector>
 #include <array>
 #include <fstream>
-#include <cstring>
 
 #include "lwmf_logging.hpp"
 #include "lwmf_color.hpp"
