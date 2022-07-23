@@ -33,6 +33,8 @@ namespace lwmf
 	// Author: Marcel Sondaar
 	// International Business Machines (public domain VGA fonts)
 	// License: Public Domain
+	//
+	// Rendering improved by Stefan Kubsch
 
 	inline constexpr std::array<std::array<std::int_fast32_t, 8>, 128> ASCIIFont8x8
 	{ {
@@ -176,12 +178,18 @@ namespace lwmf
 		{
 			for (std::int_fast32_t y{}; y < 8; ++y)
 			{
+				const std::int_fast32_t CharLine{ ASCIIFont8x8[Char][y] };
+
+				if (CharLine == 0x00)
+				{
+					continue;
+				}
+
 				const std::int_fast32_t TempY{ PosY + y };
-				const std::int_fast32_t TempChar{ ASCIIFont8x8[Char][y] };
 
 				for (std::int_fast32_t x{}; x < 8; ++x)
 				{
-					if ((TempChar & 1 << x) != 0)
+					if ((CharLine & 1 << x) != 0)
 					{
 						SetPixelSafe(Texture, PosX + x, TempY, Color);
 					}

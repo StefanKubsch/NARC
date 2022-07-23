@@ -26,12 +26,20 @@ namespace lwmf
 
 
 	//
+	// Official OpenGL 4.5 Core Profile documentation:
+	// https://registry.khronos.org/OpenGL/specs/gl/glspec45.core.pdf
+	//
+	// We are using DSA (Direct-State-Access)
+	// https://www.khronos.org/opengl/wiki/Direct_State_Access
+	//
+
+	//
 	// Shader source codes
 	//
 
 	inline constexpr std::string_view DefaultFragmentShaderSource
 	{
-		"#version 430 core\n"
+		"#version 450 core\n"
 		"in vec2 Texcoord;\n"
 		"out vec4 outColor;\n"
 		"uniform float Opacity;\n"
@@ -45,7 +53,7 @@ namespace lwmf
 
 	inline constexpr std::string_view DefaultVertexShaderSource
 	{
-		"#version 430 core\n"
+		"#version 450 core\n"
 		"in vec2 position;\n"
 		"in vec2 texcoord;\n"
 		"out vec2 Texcoord;\n"
@@ -109,35 +117,25 @@ namespace lwmf
 	{
 		const std::string ShaderNameString{ "(Shadername " + ShaderName + ") - " };
 
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create vertex buffer object...");
+		glCreateBuffers(1, &VertexBufferObject);
+		glCheckError();
+		glNamedBufferStorage(VertexBufferObject, Vertices.size() * sizeof(GLfloat), Vertices.data(), GL_DYNAMIC_STORAGE_BIT);
+		glCheckError();
+
+		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create element buffer object...");
+
+		GLuint ElementBufferObject{};
+
 		constexpr std::array<GLint, 6> Elements
 		{
 			0, 1, 2,
 			2, 3, 0
 		};
 
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create vertex buffer object...");
-		glGenBuffers(1, &VertexBufferObject);
+		glCreateBuffers(1, &ElementBufferObject);
 		glCheckError();
-		glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
-		glCheckError();
-		glBufferData(GL_ARRAY_BUFFER, 2048, nullptr, GL_DYNAMIC_DRAW);
-		glCheckError();
-		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
-		glCheckError();
-
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create vertex array object...");
-		glGenVertexArrays(1, &VertexArrayObject);
-		glCheckError();
-		glBindVertexArray(VertexArrayObject);
-		glCheckError();
-
-		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create element buffer object...");
-		GLuint ElementBufferObject{};
-		glGenBuffers(1, &ElementBufferObject);
-		glCheckError();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
-		glCheckError();
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Elements.size() * sizeof(GLint), Elements.data(), GL_STATIC_DRAW);
+		glNamedBufferStorage(ElementBufferObject, Elements.size() * sizeof(GLint), Elements.data(), GL_DYNAMIC_STORAGE_BIT);
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create and compile the vertex shader...");
@@ -165,7 +163,7 @@ namespace lwmf
 		CheckCompileError(FragmentShader, Components::Shader);
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Link the vertex and fragment shader into a shader program...");
-		ShaderProgram = static_cast<GLuint>(glCreateProgram());
+		ShaderProgram = glCreateProgram();
 		glCheckError();
 		glAttachShader(ShaderProgram, VertexShader);
 		glCheckError();
@@ -175,7 +173,6 @@ namespace lwmf
 		glCheckError();
 		glLinkProgram(ShaderProgram);
 		glCheckError();
-
 		CheckCompileError(ShaderProgram, Components::Program);
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Use shader program...");
@@ -183,25 +180,37 @@ namespace lwmf
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Specify the layout of the vertex data...");
-		const GLuint PositionAttrib{ static_cast<GLuint>(glGetAttribLocation(ShaderProgram, "position")) };
+
+		glCreateVertexArrays(1, &VertexArrayObject);
+
+		const auto PositionAttrib{ glGetAttribLocation(ShaderProgram, "position") };
 		glCheckError();
-		glEnableVertexAttribArray(PositionAttrib);
+		glEnableVertexArrayAttrib(VertexArrayObject, PositionAttrib);
 		glCheckError();
-		glVertexAttribPointer(PositionAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
+		glVertexArrayAttribFormat(VertexArrayObject, PositionAttrib, 2, GL_FLOAT, GL_FALSE, 0);
+		glCheckError();
+		glVertexArrayAttribBinding(VertexArrayObject, PositionAttrib, 0);
 		glCheckError();
 
-		const GLuint TextureAttrib{ static_cast<GLuint>(glGetAttribLocation(ShaderProgram, "texcoord")) };
+		const auto TextureAttrib{ glGetAttribLocation(ShaderProgram, "texcoord") };
 		glCheckError();
-		glEnableVertexAttribArray(TextureAttrib);
+		glEnableVertexArrayAttrib(VertexArrayObject, TextureAttrib);
 		glCheckError();
-		glVertexAttribPointer(TextureAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), reinterpret_cast<char*>(0 + (2 * sizeof(GLfloat))));
+		glVertexArrayAttribFormat(VertexArrayObject, TextureAttrib, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat));
+		glCheckError();
+		glVertexArrayAttribBinding(VertexArrayObject, TextureAttrib, 0);
+		glCheckError();
+
+		glVertexArrayVertexBuffer(VertexArrayObject, 0, VertexBufferObject, 0, 4 * sizeof(GLfloat));
+		glCheckError();
+		glVertexArrayElementBuffer(VertexArrayObject, ElementBufferObject);
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create projection matrix...");
 		std::array<GLfloat, 16> ProjectionMatrix{};
 		Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(Texture.Width), static_cast<GLfloat>(Texture.Height), 0.0F);
 		glCheckError();
-		const GLint Projection{ glGetUniformLocation(ShaderProgram, "MVP") };
+		const auto Projection{ glGetUniformLocation(ShaderProgram, "MVP") };
 		glCheckError();
 		glUniformMatrix4fv(Projection, 1, GL_FALSE, ProjectionMatrix.data());
 		glCheckError();
@@ -231,15 +240,15 @@ namespace lwmf
 
 	inline void ShaderClass::LoadTextureInGPU(const lwmf::TextureStruct& Texture, GLuint *TextureID)
 	{
-		glGenTextures(1, TextureID);
+		glCreateTextures(GL_TEXTURE_2D, 1, TextureID);
 		glCheckError();
 		glBindTexture(GL_TEXTURE_2D, *TextureID);
 		glCheckError();
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
 		glCheckError();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(*TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glCheckError();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(*TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glCheckError();
 	}
 
@@ -272,20 +281,20 @@ namespace lwmf
 	inline void ShaderClass::PrepareLWMFTexture(const lwmf::TextureStruct& Texture, const std::int_fast32_t PosX, const std::int_fast32_t PosY)
 	{
 		UpdateVertices(PosX, PosY, Texture.Width, Texture.Height);
-		glGenTextures(1, &OGLTextureID);
+		glCreateTextures(GL_TEXTURE_2D, 1, &OGLTextureID);
 		glCheckError();
 		glBindTexture(GL_TEXTURE_2D, OGLTextureID);
 		glCheckError();
 
 		if (FullscreenFlag)
 		{
-			glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, Texture.Width, Texture.Height);
+			glTextureStorage2D(OGLTextureID, 1, GL_RGBA8, Texture.Width, Texture.Height);
 			glCheckError();
 		}
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(OGLTextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glCheckError();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(OGLTextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glCheckError();
 	}
 
@@ -296,7 +305,14 @@ namespace lwmf
 		glUniform1f(OpacityLocation, Opacity);
 		glBindVertexArray(VertexArrayObject);
 		glBindTexture(GL_TEXTURE_2D, OGLTextureID);
-		FullscreenFlag ? glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data()) : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
+
+		if (!FullscreenFlag)
+		{
+			glTextureStorage2D(OGLTextureID, 1, GL_RGBA8, Texture.Width, Texture.Height);
+		}
+
+		glTextureSubImage2D(OGLTextureID, 0, 0, 0, Texture.Width, Texture.Height, GL_RGBA, GL_UNSIGNED_BYTE, Texture.Pixels.data());
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 	}
 
@@ -322,9 +338,6 @@ namespace lwmf
 
 	inline void ShaderClass::UpdateVertices(const std::int_fast32_t PosX, const std::int_fast32_t PosY, const std::int_fast32_t Width, const std::int_fast32_t Height)
 	{
-		glBindVertexArray(VertexArrayObject);
-		glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
-
 		Vertices[0] = static_cast<GLfloat>(PosX);
 		Vertices[1] = static_cast<GLfloat>(PosY);
 
@@ -337,7 +350,8 @@ namespace lwmf
 		Vertices[12] = static_cast<GLfloat>(PosX);
 		Vertices[13] = static_cast<GLfloat>(PosY + Height);
 
-		glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
+		glBindVertexArray(VertexArrayObject);
+		glNamedBufferSubData(VertexBufferObject, 0, Vertices.size() * sizeof(GLfloat), Vertices.data());
 	}
 
 	inline std::string_view ShaderClass::LoadShaderSource(const std::string_view SourceName)
