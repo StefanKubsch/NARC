@@ -70,7 +70,7 @@ namespace lwmf
 		else
 		{
 			DWORD dwExStyle{ WS_EX_APPWINDOW | WS_EX_WINDOWEDGE };
-			DWORD dwStyle{ WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN };
+			DWORD dwStyle{ WS_OVERLAPPED | WS_CAPTION | WS_DLGFRAME | WS_SYSMENU };
 
 			if (Fullscreen)
 			{

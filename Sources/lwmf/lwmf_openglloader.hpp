@@ -69,14 +69,13 @@ using GLintptr = std::ptrdiff_t;
 	OG(GLint,	glGetUniformLocation,		GLuint program, const GLchar* name) \
 	OG(void,	glLinkProgram,				GLuint program) \
 	OG(void,	glNamedBufferStorage,		GLuint buffer, GLsizeiptr size, const void* data, GLbitfield flags) \
-	OG(void,	glNamedBufferData,			GLuint buffer, GLsizeiptr size, const void* data, GLenum usage) \
 	OG(void,	glNamedBufferSubData,		GLuint buffer, GLintptr offset, GLsizeiptr size, const void* data) \
+	OG(void,	glProgramUniform1f,			GLuint program, GLint location, GLfloat v0) \
+	OG(void,	glProgramUniformMatrix4fv,	GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) \
 	OG(void,	glShaderSource,				GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length) \
 	OG(void,	glTextureParameteri,		GLuint texture, GLenum pname, GLint param) \
 	OG(void,	glTextureStorage2D,			GLuint texture, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) \
 	OG(void,	glTextureSubImage2D,		GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) \
-	OG(void,	glUniform1f,				GLint location, GLfloat v0) \
-	OG(void,	glUniformMatrix4fv,			GLint location, GLsizei count, GLboolean transpose, const GLfloat* value) \
 	OG(void,	glUseProgram,				GLuint program) \
 	OG(void,	glVertexArrayAttribBinding,	GLuint vaobj, GLuint attribindex, GLuint bindingindex) \
 	OG(void,	glVertexArrayAttribFormat,	GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) \

@@ -176,6 +176,13 @@ namespace lwmf
 	{
 		for (const std::_String_const_iterator<std::_String_val<std::_Simple_types<char>>>::value_type& Char: Text)
 		{
+			// Edge case: space " " char
+			if (Char == 32)
+			{
+				PosX += 8;
+				continue;
+			}
+
 			for (std::int_fast32_t y{}; y < 8; ++y)
 			{
 				const std::int_fast32_t CharLine{ ASCIIFont8x8[Char][y] };

@@ -614,7 +614,7 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		default: {}
 	}
 
-	return DefWindowProc(hWnd, message, wParam, lParam);
+	return DefWindowProcA(hWnd, message, wParam, lParam);
 }
 
 inline void InitAndLoadGameConfig()
