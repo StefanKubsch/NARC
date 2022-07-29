@@ -140,11 +140,10 @@ namespace lwmf
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create and compile the vertex shader...");
 		const std::string VertexShaderString{ LoadShaderSource(ShaderName + "Vert") };
-		const GLchar* VertexShaderSource{ VertexShaderString.c_str() };
-		const GLint VertexShaderSourceLength{ static_cast<GLint>(VertexShaderString.size()) };
-		const GLuint VertexShader{ static_cast<GLuint>(glCreateShader(GL_VERTEX_SHADER)) };
+		const auto VertexShaderSource{ VertexShaderString.c_str() };
+		const auto VertexShader{ glCreateShader(GL_VERTEX_SHADER) };
 		glCheckError();
-		glShaderSource(VertexShader, 1, &VertexShaderSource, &VertexShaderSourceLength);
+		glShaderSource(VertexShader, 1, &VertexShaderSource, nullptr);
 		glCheckError();
 		glCompileShader(VertexShader);
 		glCheckError();
@@ -152,11 +151,10 @@ namespace lwmf
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create and compile the fragment shader...");
 		const std::string FragmentShaderString{ LoadShaderSource(ShaderName + "Frag") };
-		const GLchar* FragmentShaderSource{ FragmentShaderString.c_str() };
-		const GLint FragmentShaderSourceLength{ static_cast<GLint>(FragmentShaderString.size()) };
-		const GLuint FragmentShader{ static_cast<GLuint>(glCreateShader(GL_FRAGMENT_SHADER)) };
+		const auto FragmentShaderSource{ FragmentShaderString.c_str() };
+		const auto FragmentShader{ glCreateShader(GL_FRAGMENT_SHADER) };
 		glCheckError();
-		glShaderSource(FragmentShader, 1, &FragmentShaderSource, &FragmentShaderSourceLength);
+		glShaderSource(FragmentShader, 1, &FragmentShaderSource, nullptr);
 		glCheckError();
 		glCompileShader(FragmentShader);
 		glCheckError();
@@ -205,10 +203,7 @@ namespace lwmf
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create projection matrix...");
 		std::array<GLfloat, 16> ProjectionMatrix{};
 		Ortho2D(ProjectionMatrix, 0.0F, static_cast<GLfloat>(Texture.Width), static_cast<GLfloat>(Texture.Height), 0.0F);
-		glCheckError();
-		const auto Projection{ glGetUniformLocation(ShaderProgram, "MVP") };
-		glCheckError();
-		glProgramUniformMatrix4fv(ShaderProgram, Projection, 1, GL_FALSE, ProjectionMatrix.data());
+		glProgramUniformMatrix4fv(ShaderProgram, glGetUniformLocation(ShaderProgram, "MVP"), 1, GL_FALSE, ProjectionMatrix.data());
 		glCheckError();
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Get opacity uniform location...");
