@@ -63,7 +63,7 @@ inline void Game_MinimapClass::Init()
 		DoorColor = lwmf::ReadINIValueRGBA(INIFile, "DOORS");
 		WayPointColor = lwmf::ReadINIValueRGBA(INIFile, "WAYPOINT");
 
-		MiniMapShader.LoadShader("Default", ScreenTexture);
+		MiniMapShader.LoadShader("Default", Canvas);
 	}
 }
 
@@ -85,7 +85,7 @@ inline void Game_MinimapClass::PreRender()
 	}
 
 	// ...and the lower the resolution, the smaller the whole map...
-	if (TileSize > 6 && ScreenTexture.Width <= 640)
+	if (TileSize > 6 && Canvas.Width <= 640)
 	{
 		TileSize >>= 1;
 	}
@@ -113,7 +113,7 @@ inline void Game_MinimapClass::PreRender()
 	}
 
 	// Set map position
-	StartPosY = ScreenTexture.Height - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
+	StartPosY = Canvas.Height - Game_LevelHandling::LevelMapWidth * TileSize - Pos.Y;
 
 	NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Load minimap texture into GPU RAM...");
 	MiniMapShader.LoadStaticTextureInGPU(MiniMapTexture, &MiniMapShader.OGLTextureID, Pos.X, StartPosY, MiniMapTexture.Width, MiniMapTexture.Height);
@@ -130,22 +130,22 @@ inline void Game_MinimapClass::DisplayRealtimeMap()
 			{
 				case EntityTypes::Player:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, PlayerColor, PlayerColor);
+					lwmf::FilledRectangle(Canvas, x, y, TileSize, TileSize, PlayerColor, PlayerColor);
 					break;
 				}
 				case EntityTypes::Enemy: case EntityTypes::Turret:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, EnemyColor, EnemyColor);
+					lwmf::FilledRectangle(Canvas, x, y, TileSize, TileSize, EnemyColor, EnemyColor);
 					break;
 				}
 				case EntityTypes::Neutral:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, NeutralColor, NeutralColor);
+					lwmf::FilledRectangle(Canvas, x, y, TileSize, TileSize, NeutralColor, NeutralColor);
 					break;
 				}
 				case EntityTypes::AmmoBox:
 				{
-					lwmf::FilledRectangle(ScreenTexture, x, y, TileSize, TileSize, AmmoBoxColor, AmmoBoxColor);
+					lwmf::FilledRectangle(Canvas, x, y, TileSize, TileSize, AmmoBoxColor, AmmoBoxColor);
 					break;
 				}
 				default: {}
@@ -161,7 +161,7 @@ inline void Game_MinimapClass::DisplayRealtimeMap()
 						{
 							if (WayPoint.X == MapPosX && WayPoint.Y == MapPosY)
 							{
-								lwmf::SetPixel(ScreenTexture, x + WaypointOffset, y + WaypointOffset, WayPointColor);
+								lwmf::SetPixel(Canvas, x + WaypointOffset, y + WaypointOffset, WayPointColor);
 								break;
 							}
 						}

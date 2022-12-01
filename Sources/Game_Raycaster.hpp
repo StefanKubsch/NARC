@@ -77,29 +77,29 @@ namespace Game_Raycaster
 	inline void CastGraphics(const Renderpart Part)
 	{
 		std::int_fast32_t Start{};
-		std::int_fast32_t End{ ScreenTexture.Width };
+		std::int_fast32_t End{ Canvas.Width };
 
 		switch (Part)
 		{
 			case Renderpart::WallLeft:
 			{
-				End = ScreenTexture.WidthMid;
+				End = Canvas.WidthMid;
 				break;
 			}
 			case Renderpart::WalLRight:
 			{
-				Start = ScreenTexture.WidthMid;
+				Start = Canvas.WidthMid;
 				break;
 			}
 			default: {}
 		}
 
 		const float FloorCeilingShading{ FogOfWarDistance + FogOfWarDistance * VerticalLookCamera };
-		const std::int_fast32_t VerticalLookTemp{ ScreenTexture.Height + VerticalLook };
+		const std::int_fast32_t VerticalLookTemp{ Canvas.Height + VerticalLook };
 
 		for (std::int_fast32_t x{ Start }; x < End; ++x)
 		{
-			const float Camera{ static_cast<float>(x + x) / static_cast<float>(ScreenTexture.Width) - 1.0F };
+			const float Camera{ static_cast<float>(x + x) / static_cast<float>(Canvas.Width) - 1.0F };
 			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera, Player.Dir.Y + Plane.Y * Camera };
 
 			const lwmf::FloatPointStruct TempRayDir{ RayDir.X * RayDir.X, RayDir.Y * RayDir.Y };
@@ -190,10 +190,10 @@ namespace Game_Raycaster
 				WallDist = (MapPos.Y - Player.Pos.Y + (1.0F - Step.Y) * 0.5F) / RayDir.Y;
 			}
 
-			const std::int_fast32_t LineHeight{ static_cast<std::int_fast32_t>(ScreenTexture.Height / WallDist) };
+			const std::int_fast32_t LineHeight{ static_cast<std::int_fast32_t>(Canvas.Height / WallDist) };
 			const std::int_fast32_t Temp{ VerticalLookTemp >> 1 };
 			const std::int_fast32_t LineStart{ std::max(-(LineHeight >> 1) + Temp, 0) };
-			std::int_fast32_t LineEnd{ std::min((LineHeight >> 1) + Temp, ScreenTexture.Height) };
+			std::int_fast32_t LineEnd{ std::min((LineHeight >> 1) + Temp, Canvas.Height) };
 			float WallX{ WallSide ? Player.Pos.X + WallDist * RayDir.X : Player.Pos.Y + WallDist * RayDir.Y };
 			WallX -= static_cast<std::int_fast32_t>(WallX);
 
@@ -234,11 +234,11 @@ namespace Game_Raycaster
 							}
 						}
 
-						lwmf::SetPixel(ScreenTexture, x, y, ShadedTexel);
+						lwmf::SetPixel(Canvas, x, y, ShadedTexel);
 					}
 					else
 					{
-						lwmf::SetPixel(ScreenTexture, x, y, WallTexel);
+						lwmf::SetPixel(Canvas, x, y, WallTexel);
 					}
 				}
 			}
@@ -267,8 +267,8 @@ namespace Game_Raycaster
 				// Needs only to be calculated once
 				Game_EntityHandling::ZBuffer[x] = WallDist;
 
-				LineEnd = std::clamp(LineEnd, 0, ScreenTexture.Height);
-				const std::int_fast32_t TotalHeight{ ScreenTexture.Height + std::abs(VerticalLook) };
+				LineEnd = std::clamp(LineEnd, 0, Canvas.Height);
+				const std::int_fast32_t TotalHeight{ Canvas.Height + std::abs(VerticalLook) };
 				const float WallDistTemp{ WallDist + WallDist * VerticalLookCamera };
 
 				for (std::int_fast32_t y{ LineEnd + 1 }; y <= TotalHeight; ++y)
@@ -282,7 +282,7 @@ namespace Game_Raycaster
 						case Renderpart::Floor:
 						{
 							// Draw floor
-							if (y < ScreenTexture.Height)
+							if (y < Canvas.Height)
 							{
 								const std::int_fast32_t FloorTexel{ Game_LevelHandling::LevelTextures[Game_LevelHandling::LevelMap[static_cast<std::int_fast32_t>(Game_LevelHandling::LevelMapLayers::Floor)][static_cast<std::int_fast32_t>(Floor.X)][static_cast<std::int_fast32_t>(Floor.Y)] - 1].Pixels[(static_cast<std::int_fast32_t>(Floor.Y * TextureSize) & (TextureSize - 1)) * TextureSize + (static_cast<std::int_fast32_t>(Floor.X * TextureSize) & (TextureSize - 1))] };
 
@@ -301,11 +301,11 @@ namespace Game_Raycaster
 										}
 									}
 
-									lwmf::SetPixel(ScreenTexture, x, y, ShadedTexel);
+									lwmf::SetPixel(Canvas, x, y, ShadedTexel);
 								}
 								else
 								{
-									lwmf::SetPixel(ScreenTexture, x, y, FloorTexel);
+									lwmf::SetPixel(Canvas, x, y, FloorTexel);
 								}
 							}
 
@@ -338,11 +338,11 @@ namespace Game_Raycaster
 										}
 									}
 
-									lwmf::SetPixel(ScreenTexture, x, TempY, ShadedTexel);
+									lwmf::SetPixel(Canvas, x, TempY, ShadedTexel);
 								}
 								else
 								{
-									lwmf::SetPixel(ScreenTexture, x, TempY, CeilingTexel);
+									lwmf::SetPixel(Canvas, x, TempY, CeilingTexel);
 								}
 							}
 

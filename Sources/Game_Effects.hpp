@@ -45,7 +45,7 @@ namespace Game_Effects
 		{
 			// Init the "bloodstain" effect when player is hit by an enemy
 			BloodstainDuration = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "EFFECTS", "BloodstainDuration");
-			BloodstainShader.LoadShader("Default", ScreenTexture);
+			BloodstainShader.LoadShader("Default", Canvas);
 
 			const lwmf::TextureStruct TempTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "TEXTURES", "Bloodstains")) };
 			BloodstainShader.LoadStaticTextureInGPU(TempTexture, &BloodstainShader.OGLTextureID, 0, 0, TempTexture.Width, TempTexture.Height);

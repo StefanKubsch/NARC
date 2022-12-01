@@ -43,8 +43,8 @@ inline void Game_WeaponDisplayClass::Init()
 		// Crosshair settings
 		const lwmf::TextureStruct TempTextureCrosshair{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "HUD", "CrosshairFileName")) };
 
-		CrosshairShader.LoadShader("Default", ScreenTexture);
-		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairShader.OGLTextureID, ScreenTexture.WidthMid - (TempTextureCrosshair.Width >> 1), ScreenTexture.HeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
+		CrosshairShader.LoadShader("Default", Canvas);
+		CrosshairShader.LoadStaticTextureInGPU(TempTextureCrosshair, &CrosshairShader.OGLTextureID, Canvas.WidthMid - (TempTextureCrosshair.Width >> 1), Canvas.HeightMid - (TempTextureCrosshair.Height >> 1), TempTextureCrosshair.Width, TempTextureCrosshair.Height);
 
 		// Weapon HUD settings
 		const lwmf::TextureStruct TempTextureWeaponHUD{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "HUD", "WeaponHUDFileName")) };
@@ -54,7 +54,7 @@ inline void Game_WeaponDisplayClass::Init()
 		WeaponHUDRect.Width = TempTextureWeaponHUD.Width;
 		WeaponHUDRect.Height = TempTextureWeaponHUD.Height;
 
-		WeaponHUDShader.LoadShader("Default", ScreenTexture);
+		WeaponHUDShader.LoadShader("Default", Canvas);
 		WeaponHUDShader.LoadStaticTextureInGPU(TempTextureWeaponHUD, &WeaponHUDShader.OGLTextureID, WeaponHUDRect.X, WeaponHUDRect.Y, WeaponHUDRect.Width, WeaponHUDRect.Height);
 
 		AmmoText.InitFont(GameConfigFolder + "HUDWeaponDisplayConfig.ini", "HUDAMMOFONT");

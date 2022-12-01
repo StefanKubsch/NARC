@@ -55,9 +55,9 @@ namespace Game_Transitions
 		NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "\n\n" + NextLevelText + "\n\n");
 
 		lwmf::ClearBuffer();
-		lwmf::ClearTexture(ScreenTexture, BlackNoAlpha);
-		GeneralText.RenderTextCentered(NextLevelText, ScreenTexture.Height - GeneralText.GetFontHeight() - 50);
-		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
+		lwmf::ClearTexture(Canvas, BlackNoAlpha);
+		GeneralText.RenderTextCentered(NextLevelText, Canvas.Height - GeneralText.GetFontHeight() - 50);
+		CanvasShader.RenderLWMFTexture(Canvas, true, 1.0F);
 		lwmf::SwapBuffer();
 	}
 
@@ -77,7 +77,7 @@ namespace Game_Transitions
 		// My version is screensize & framerate-independent since I calculate the neccessary bits and use a gameloop...
 		//
 
-		const std::int_fast32_t Bits{ static_cast<std::int_fast32_t>(std::ceilf(std::log2f(static_cast<float>(ScreenTexture.Width * ScreenTexture.Height)) * 0.5F)) << 1 };
+		const std::int_fast32_t Bits{ static_cast<std::int_fast32_t>(std::ceilf(std::log2f(static_cast<float>(Canvas.Width * Canvas.Height)) * 0.5F)) << 1 };
 		const std::int_fast32_t LastFrame{ static_cast<std::int_fast32_t>(std::pow(2, Bits)) };
 		const std::int_fast32_t HalfBits{ Bits >> 1 };
 		const std::int_fast32_t HalfMask{ static_cast<std::int_fast32_t>(std::pow(2, HalfBits)) - 1 };
@@ -108,14 +108,14 @@ namespace Game_Transitions
 					}
 
 					const std::int_fast32_t FnResult{ Right << HalfBits | (Left & (LastFrame - 1)) };
-					lwmf::SetPixelSafe(ScreenTexture, FnResult % ScreenTexture.Width, static_cast<std::int_fast32_t>(FnResult / ScreenTexture.Width), FadeColor);
+					lwmf::SetPixelSafe(Canvas, FnResult % Canvas.Width, static_cast<std::int_fast32_t>(FnResult / Canvas.Width), FadeColor);
 				}
 
 				Lag -= LengthOfFrame;
 			}
 
 			lwmf::ClearBuffer();
-			ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
+			CanvasShader.RenderLWMFTexture(Canvas, true, 1.0F);
 			lwmf::SwapBuffer();
 		}
 	}
@@ -129,15 +129,15 @@ namespace Game_Transitions
 		FizzleFade(Red, 50);
 		VSync ? lwmf::SetVSync(-1) : lwmf::SetVSync(0);
 
-		GameOverText.RenderTextCentered("You are dead. Game over...", ScreenTexture.HeightMid - (GameOverText.GetFontHeight() >> 1));
-		GameOverText1.RenderTextCentered("Press [SPACE] to continue", ScreenTexture.Height - GameOverText1.GetFontHeight() - 50);
+		GameOverText.RenderTextCentered("You are dead. Game over...", Canvas.HeightMid - (GameOverText.GetFontHeight() >> 1));
+		GameOverText1.RenderTextCentered("Press [SPACE] to continue", Canvas.Height - GameOverText1.GetFontHeight() - 50);
 
 		lwmf::SwapBuffer();
 
 		if (HID_Keyboard::WaitForKeypress(VK_SPACE))
 		{
 			GamePausedFlag = true;
-			lwmf::ClearTexture(ScreenTexture, Black);
+			lwmf::ClearTexture(Canvas, Black);
 		}
 	}
 

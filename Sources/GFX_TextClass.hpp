@@ -56,7 +56,7 @@ inline void GFX_TextClass::InitFont(const std::string& INIFileName, const std::s
 	{
 		const std::string FontName{ lwmf::ReadINIValue<std::string>(INIFileName, Section, "FontName") };
 
-		GlyphShader.LoadShader("Default", ScreenTexture);
+		GlyphShader.LoadShader("Default", Canvas);
 
 		const float FontSize{ lwmf::ReadINIValue<float>(INIFileName, Section, "FontSize") };
 		const unsigned char FontColorRed{ static_cast<unsigned char>(lwmf::ReadINIValue<std::int_fast32_t>(INIFileName, Section, "ColorRED")) };
@@ -160,7 +160,7 @@ inline void GFX_TextClass::RenderTextCentered(const std::string_view Text, const
 		TextLengthInPixels += Glyphs[Char].Advance;
 	}
 
-	RenderText(Text, ScreenTexture.WidthMid - (TextLengthInPixels >> 1), y);
+	RenderText(Text, Canvas.WidthMid - (TextLengthInPixels >> 1), y);
 }
 
 inline lwmf::IntPointStruct GFX_TextClass::GetOffset()

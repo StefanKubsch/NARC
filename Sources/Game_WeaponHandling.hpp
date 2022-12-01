@@ -151,8 +151,8 @@ namespace Game_WeaponHandling
 				Weapons[Index].HUDCarriedAmmoInfo = "Carried:" + std::string(CarriedAmmoString.data());
 
 				// Load Shader
-				Weapons[Index].WeaponShader.LoadShader("Default", ScreenTexture);
-				Weapons[Index].MuzzleFlashShader.LoadShader("Default", ScreenTexture);
+				Weapons[Index].WeaponShader.LoadShader("Default", Canvas);
+				Weapons[Index].MuzzleFlashShader.LoadShader("Default", Canvas);
 
 				++Index;
 			}
@@ -266,7 +266,7 @@ namespace Game_WeaponHandling
 			// but deleted anything used for drawing lines...
 			//
 
-			const float Camera{ (ScreenTexture.WidthMid << 1) / static_cast<float>(ScreenTexture.Width) - 1 };
+			const float Camera{ (Canvas.WidthMid << 1) / static_cast<float>(Canvas.Width) - 1 };
 			const lwmf::FloatPointStruct RayDir{ Player.Dir.X + Plane.X * Camera , Player.Dir.Y + Plane.Y * Camera };
 			lwmf::FloatPointStruct MapPos{ std::floorf(Player.Pos.X), std::floorf(Player.Pos.Y) };
 			const lwmf::FloatPointStruct DeltaDist{ std::fabs(1.0F / RayDir.X), std::fabs(1.0F / RayDir.Y) };
@@ -305,10 +305,10 @@ namespace Game_WeaponHandling
 							const lwmf::FloatPointStruct EntityPos{ Entities[Game_EntityHandling::EntityOrder[Index].first].Pos.X - Player.Pos.X, Entities[Game_EntityHandling::EntityOrder[Index].first].Pos.Y - Player.Pos.Y };
 							const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
 							const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[Game_EntityHandling::EntityOrder[Index].first].MoveV / TransY) };
-							const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
-							const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(ScreenTexture.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
-							const std::int_fast32_t LineEndX{ std::min((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
-							const std::int_fast32_t TextureY{ (((((ScreenTexture.HeightMid - vScreen) << 8) - ((ScreenTexture.Height + VerticalLook) << 7) + (EntitySizeTemp << 7)) * EntitySize) / EntitySizeTemp) >> 8 };
+							const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(Canvas.Height / TransY) };
+							const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(Canvas.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
+							const std::int_fast32_t LineEndX{ std::min((EntitySizeTemp >> 1) + EntitySX, Canvas.Width) };
+							const std::int_fast32_t TextureY{ (((((Canvas.HeightMid - vScreen) << 8) - ((Canvas.Height + VerticalLook) << 7) + (EntitySizeTemp << 7)) * EntitySize) / EntitySizeTemp) >> 8 };
 
 							for (std::int_fast32_t x{ -(EntitySizeTemp >> 1) + EntitySX }; x < LineEndX; ++x)
 							{
@@ -317,7 +317,7 @@ namespace Game_WeaponHandling
 
 								const std::int_fast32_t TextureX{ ((x - ((-EntitySizeTemp >> 1) + EntitySX)) * EntitySize / EntitySizeTemp) };
 
-								if ((x == ScreenTexture.WidthMid && TransY < Game_EntityHandling::ZBuffer[x]) &&
+								if ((x == Canvas.WidthMid && TransY < Game_EntityHandling::ZBuffer[x]) &&
 									((EntityAssets[Entities[Entities[Game_EntityHandling::EntityOrder[Index].first].Number].TypeNumber].WalkingTextures[TextureIndex][Entities[Game_EntityHandling::EntityOrder[Index].first].WalkAnimStep].Pixels[TextureY * TextureSize + TextureX] & lwmf::AMask) != 0))
 								{
 									Game_EntityHandling::HandleEntityHit(Entities[Entities[Game_EntityHandling::EntityOrder[Index].first].Number]);

@@ -284,7 +284,7 @@ namespace Game_EntityHandling
 		EntityOrder.shrink_to_fit();
 		ZBuffer.clear();
 		ZBuffer.shrink_to_fit();
-		ZBuffer.resize(static_cast<size_t>(ScreenTexture.Width));
+		ZBuffer.resize(static_cast<size_t>(Canvas.Width));
 
 		EntityMap = std::vector<std::vector<EntityTypes>>(static_cast<size_t>(Game_LevelHandling::LevelMapWidth), std::vector<EntityTypes>(static_cast<size_t>(Game_LevelHandling::LevelMapHeight), EntityTypes::Clear));
 
@@ -367,7 +367,7 @@ namespace Game_EntityHandling
 	inline void RenderEntities()
 	{
 		const float InverseMatrix{ 1.0F / (Plane.X * Player.Dir.Y - Player.Dir.X * Plane.Y) };
-		const std::int_fast32_t VerticalLookTemp{ ScreenTexture.Height + VerticalLook };
+		const std::int_fast32_t VerticalLookTemp{ Canvas.Height + VerticalLook };
 		const std::int_fast32_t NumberOfEntities{ static_cast<std::int_fast32_t>(Entities.size()) };
 
 		for (std::int_fast32_t Index{}; Index < NumberOfEntities; ++Index)
@@ -378,12 +378,12 @@ namespace Game_EntityHandling
 				const lwmf::FloatPointStruct EntityPos{ Entities[EntityOrder[Index].first].Pos.X - Player.Pos.X, Entities[EntityOrder[Index].first].Pos.Y - Player.Pos.Y };
 				const float TransY{ InverseMatrix * (-Plane.Y * EntityPos.X + Plane.X * EntityPos.Y) };
 				const std::int_fast32_t vScreen{ static_cast<std::int_fast32_t>(Entities[EntityOrder[Index].first].MoveV / TransY) };
-				const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(ScreenTexture.Height / TransY) };
+				const std::int_fast32_t EntitySizeTemp{ static_cast<std::int_fast32_t>(Canvas.Height / TransY) };
 				const std::int_fast32_t Temp{ (VerticalLookTemp >> 1) + vScreen };
 				const std::int_fast32_t LineStartY{ std::max(-(EntitySizeTemp >> 1) + Temp, 0) };
-				const std::int_fast32_t LineEndY{ std::min((EntitySizeTemp >> 1) + Temp, ScreenTexture.Height) };
-				const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(ScreenTexture.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
-				const std::int_fast32_t LineEndX{ std::min((EntitySizeTemp >> 1) + EntitySX, ScreenTexture.Width) };
+				const std::int_fast32_t LineEndY{ std::min((EntitySizeTemp >> 1) + Temp, Canvas.Height) };
+				const std::int_fast32_t EntitySX{ static_cast<std::int_fast32_t>(Canvas.WidthMid * (1.0F + InverseMatrix * (Player.Dir.Y * EntityPos.X - Player.Dir.X * EntityPos.Y) / TransY)) };
+				const std::int_fast32_t LineEndX{ std::min((EntitySizeTemp >> 1) + EntitySX, Canvas.Width) };
 				const std::int_fast32_t Temp1{ (-EntitySizeTemp >> 1) + EntitySX };
 				const std::int_fast32_t Temp2{ VerticalLookTemp << 7 };
 				const std::int_fast32_t Temp3{ EntitySizeTemp << 7 };
@@ -391,7 +391,7 @@ namespace Game_EntityHandling
 
 				for (std::int_fast32_t x{ (-EntitySizeTemp >> 1) + EntitySX }; x < LineEndX; ++x)
 				{
-					if (TransY > 0.0F && (static_cast<std::uint_fast32_t>(x) < static_cast<std::uint_fast32_t>(ScreenTexture.Width)) && TransY < ZBuffer[x])
+					if (TransY > 0.0F && (static_cast<std::uint_fast32_t>(x) < static_cast<std::uint_fast32_t>(Canvas.Width)) && TransY < ZBuffer[x])
 					{
 						const std::int_fast32_t TextureX{ (x - Temp1) * EntitySize / EntitySizeTemp };
 
@@ -418,11 +418,11 @@ namespace Game_EntityHandling
 							{
 								if (Entities[EntityOrder[Index].first].IsHit && !Entities[EntityOrder[Index].first].KillAnimEnabled)
 								{
-									lwmf::SetPixel(ScreenTexture, x, y, Color | 0xFFFFFF00);
+									lwmf::SetPixel(Canvas, x, y, Color | 0xFFFFFF00);
 								}
 								else
 								{
-									Game_LevelHandling::LightingFlag ? (lwmf::SetPixel(ScreenTexture, x, y, lwmf::ShadeColor(Color, TransY, FogOfWarDistance))) : lwmf::SetPixel(ScreenTexture, x, y, Color);
+									Game_LevelHandling::LightingFlag ? (lwmf::SetPixel(Canvas, x, y, lwmf::ShadeColor(Color, TransY, FogOfWarDistance))) : lwmf::SetPixel(Canvas, x, y, Color);
 								}
 							}
 						}

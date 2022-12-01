@@ -39,9 +39,9 @@
 // Establish logging for NARC itself - system-logging for lwmf is hardcoded!
 lwmf::Logging NARCLog("NARC.log");
 
-// "ScreenTexture" is the main render target in our game!
-inline lwmf::TextureStruct ScreenTexture{};
-inline lwmf::ShaderClass ScreenTextureShader{};
+// "Canvas" is the main render target in our game!
+inline lwmf::TextureStruct Canvas{};
+inline lwmf::ShaderClass CanvasShader{};
 
 #include "Game_Folder.hpp"
 #include "Game_GlobalDefinitions.hpp"
@@ -182,7 +182,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		// Sort entities back to front to draw them in right order
 		SortEntities(Game_EntityHandling::SortOrder::BackToFront);
 
-		lwmf::ClearTexture(ScreenTexture, BlackNoAlpha);
+		lwmf::ClearTexture(Canvas, BlackNoAlpha);
 		lwmf::FPSCounter();
 
 		ThreadPool.AddThread(&Game_Raycaster::CastGraphics, Game_Raycaster::Renderpart::WallLeft);
@@ -196,7 +196,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 		if (HUDEnabled)
 		{
 			HUDHealthBar.Display();
-			lwmf::DisplayFPSCounter(ScreenTexture, ScreenTexture.Width - 70, 7, White);
+			lwmf::DisplayFPSCounter(Canvas, Canvas.Width - 70, 7, White);
 		}
 
 		if (Player.IsDead && !GamePausedFlag)
@@ -214,7 +214,7 @@ std::int_fast32_t WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInst
 			HUDMinimap.DisplayRealtimeMap();
 		}
 
-		ScreenTextureShader.RenderLWMFTexture(ScreenTexture, true, 1.0F);
+		CanvasShader.RenderLWMFTexture(Canvas, true, 1.0F);
 		Game_WeaponHandling::DrawWeapon();
 
 		if (HUDEnabled)
@@ -760,7 +760,7 @@ inline void ControlPlayerMovement()
 			VerticalLookCamera -= LookTemp2;
 		}
 
-		VerticalLook = static_cast<std::int_fast32_t>(ScreenTexture.Height * VerticalLookCamera);
+		VerticalLook = static_cast<std::int_fast32_t>(Canvas.Height * VerticalLookCamera);
 
 		if ((VerticalLook & 1) != 0)
 		{

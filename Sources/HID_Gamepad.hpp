@@ -110,8 +110,8 @@ namespace HID_Gamepad
 
 				// Load XBoxControllerIcon
 				const lwmf::TextureStruct TempXBoxControllerIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "GAMECONTROLLER", "XBoxControllerIcon")) };
-				XBoxControllerIconShader.LoadShader("Default", ScreenTexture);
-				XBoxControllerIconShader.LoadStaticTextureInGPU(TempXBoxControllerIconTexture, &XBoxControllerIconShader.OGLTextureID, ScreenTexture.Width - 153, 0, TempXBoxControllerIconTexture.Width, TempXBoxControllerIconTexture.Height);
+				XBoxControllerIconShader.LoadShader("Default", Canvas);
+				XBoxControllerIconShader.LoadStaticTextureInGPU(TempXBoxControllerIconTexture, &XBoxControllerIconShader.OGLTextureID, Canvas.Width - 153, 0, TempXBoxControllerIconTexture.Width, TempXBoxControllerIconTexture.Height);
 			}
 		}
 	}

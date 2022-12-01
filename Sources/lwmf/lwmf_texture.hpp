@@ -284,7 +284,7 @@ namespace lwmf
 			return;
 		}
 
-		// Exit early if dest coords are of of target texture boundaries
+		// Exit early if dest coords are out of target texture boundaries
 		if (DestPosX >= TargetTexture.Width || DestPosY >= TargetTexture.Height || DestPosX < 0 || DestPosY < 0)
 		{
 			return;
@@ -315,7 +315,7 @@ namespace lwmf
 	inline void RotateTexture(TextureStruct& Texture, const std::int_fast32_t RotCenterX, const std::int_fast32_t RotCenterY, const float Angle)
 	{
 		// if Angle ist zero degrees, we can exit early - nothing to do!
-		if (Angle < FLT_EPSILON)
+		if (Angle <= FLT_EPSILON)
 		{
 			return;
 		}

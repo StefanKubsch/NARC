@@ -973,3 +973,4 @@ Sources/.clang-tidy
 .vs/NARC/FileContentIndex/read.lock
 .vs/NARC/FileContentIndex/b17bfd4a-e90c-4b96-aa1b-f98a2c22bbc9.vsidx
 *.vsidx
+x64/Release/NARC.tlog/link.write.2u.tlog

@@ -41,7 +41,7 @@ namespace Game_SkyboxHandling
 
 	inline void Init()
 	{
-		SkyboxShader.LoadShader("Default", ScreenTexture);
+		SkyboxShader.LoadShader("Default", Canvas);
 	}
 
 	inline void LoadSkyboxImage()
@@ -82,7 +82,7 @@ namespace Game_SkyboxHandling
 
 			SkyboxShader.RenderTexture(&SkyboxShader.OGLTextureID, Left, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
 
-			if (Left < SkyboxWidth - ScreenTexture.Width)
+			if (Left < SkyboxWidth - Canvas.Width)
 			{
 				SkyboxShader.RenderTexture(&SkyboxShader.OGLTextureID, Left - SkyboxWidth, Top, SkyboxWidth, SkyboxHeight, false, 1.0F);
 			}

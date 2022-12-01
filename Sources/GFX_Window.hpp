@@ -32,7 +32,7 @@ namespace GFX_Window
 		if (const std::string INIFile{ GameConfigFolder + "WindowConfig.ini" }; Tools_ErrorHandling::CheckFileExistence(INIFile, StopOnError))
 		{
 			lwmf::CreateOpenGLWindow(lwmf::WindowInstance,
-				ScreenTexture,
+				Canvas,
 				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportWidth"),
 				lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "WINDOW", "ViewportHeight"),
 				lwmf::ReadINIValue<std::string>(INIFile, "WINDOW", "WindowName").c_str(), Fullscreen);
@@ -44,8 +44,8 @@ namespace GFX_Window
 			lwmf::InitOpenGLLoader();
 
 			// Prepare main shader and texture for rendering
-			ScreenTextureShader.LoadShader("Default", ScreenTexture);
-			ScreenTextureShader.PrepareLWMFTexture(ScreenTexture, 0, 0);
+			CanvasShader.LoadShader("Default", Canvas);
+			CanvasShader.PrepareLWMFTexture(Canvas, 0, 0);
 
 			// Inital clearance of window. Looks better while loading the rest of the game...
 			lwmf::ClearBuffer();

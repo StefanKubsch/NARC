@@ -52,8 +52,8 @@ namespace HID_Mouse
 
 			// Load MouseIcon
 			const lwmf::TextureStruct TempMouseIconTexture{ GFX_ImageHandling::ImportImage(lwmf::ReadINIValue<std::string>(INIFile, "MOUSE", "MouseIcon")) };
-			MouseIconShader.LoadShader("Default", ScreenTexture);
-			MouseIconShader.LoadStaticTextureInGPU(TempMouseIconTexture, &MouseIconShader.OGLTextureID, ScreenTexture.Width - 153, 0, TempMouseIconTexture.Width, TempMouseIconTexture.Height);
+			MouseIconShader.LoadShader("Default", Canvas);
+			MouseIconShader.LoadStaticTextureInGPU(TempMouseIconTexture, &MouseIconShader.OGLTextureID, Canvas.Width - 153, 0, TempMouseIconTexture.Width, TempMouseIconTexture.Height);
 
 			lwmf::RegisterRawInputDevice(lwmf::MainWindow, lwmf::DeviceIdentifier::HID_MOUSE);
 			ShowCursor(FALSE);

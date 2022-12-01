@@ -62,9 +62,9 @@ inline void Game_HealthBarClass::Init()
 
 inline void Game_HealthBarClass::Display()
 {
-	lwmf::Rectangle(ScreenTexture, RectBlack2.X, RectBlack2.Y, RectBlack2.Width, RectBlack2.Height, Black);
-	lwmf::FilledRectangle(ScreenTexture, RectOrange.X, RectOrange.Y, RectOrange.Width, RectOrange.Height, Orange, Orange);
-	lwmf::Rectangle(ScreenTexture, RectBlack1.X, RectBlack1.Y, RectBlack1.Width, RectBlack1.Height, Black);
-	lwmf::FilledRectangle(ScreenTexture, RectRed.X, RectRed.Y, RectRed.Width, RectRed.Height, Red, Red);
-	lwmf::FilledRectangle(ScreenTexture, Pos.X, Pos.Y, Player.Hitpoints * HealthBarFactor, HealthBarWidth, Green, Green);
+	lwmf::Rectangle(Canvas, RectBlack2.X, RectBlack2.Y, RectBlack2.Width, RectBlack2.Height, Black);
+	lwmf::FilledRectangle(Canvas, RectOrange.X, RectOrange.Y, RectOrange.Width, RectOrange.Height, Orange, Orange);
+	lwmf::Rectangle(Canvas, RectBlack1.X, RectBlack1.Y, RectBlack1.Width, RectBlack1.Height, Black);
+	lwmf::FilledRectangle(Canvas, RectRed.X, RectRed.Y, RectRed.Width, RectRed.Height, Red, Red);
+	lwmf::FilledRectangle(Canvas, Pos.X, Pos.Y, Player.Hitpoints * HealthBarFactor, HealthBarWidth, Green, Green);
 }
