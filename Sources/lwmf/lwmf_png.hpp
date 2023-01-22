@@ -1003,7 +1003,7 @@ namespace lwmf
 		{
 			if ((ColorType == 2 || ColorType == 4 || ColorType == 6))
 			{
-				if (!(Depth == 8 || Depth == 16))
+				if (Depth != 8 && Depth != 16)
 				{
 					return 37;
 				}
@@ -1013,7 +1013,7 @@ namespace lwmf
 
 			if (ColorType == 0)
 			{
-				if (!(Depth == 1 || Depth == 2 || Depth == 4 || Depth == 8 || Depth == 16))
+				if (Depth != 1 && Depth != 2 && Depth != 4 && Depth != 8 && Depth != 16)
 				{
 					return 37;
 				}
@@ -1023,7 +1023,7 @@ namespace lwmf
 
 			if (ColorType == 3)
 			{
-				if (!(Depth == 1 || Depth == 2 || Depth == 4 || Depth == 8))
+				if (Depth != 1 && Depth != 2 && Depth != 4 && Depth != 8)
 				{
 					return 37;
 				}
@@ -1227,7 +1227,7 @@ namespace lwmf
 			std::array<char, 100> ErrorMessage{};
 			strerror_s(ErrorMessage.data(), 100, errno);
 
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "lwmf::LoadPNG(): Error loading " + Filename + ": " + std::string(ErrorMessage.data()));
 		}
 		else
 		{

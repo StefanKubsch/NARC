@@ -50,7 +50,7 @@ namespace lwmf
 
 		if (ItDeviceTable == DeviceTable.end())
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "Unknown HID device identifier!");
+			LWMFSystemLog.AddEntry(LogLevel::Error, __FILENAME__, __LINE__, "lwmf::DeviceString(): Unknown HID device identifier!");
 		}
 		else
 		{
@@ -70,7 +70,7 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_DEVNOTIFY;
 		RawInputDevice.hwndTarget = hWnd;
 
-		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0 ? LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error registering raw input device " + DeviceString(Device) + "!") :
+		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0 ? LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::RegisterRawInputDevice(): Error registering raw input device " + DeviceString(Device) + "!") :
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Successfully registered device " + DeviceString(Device));
 	}
 
@@ -84,7 +84,7 @@ namespace lwmf
 		RawInputDevice.dwFlags = RIDEV_REMOVE;
 		RawInputDevice.hwndTarget = nullptr;
 
-		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0 ? LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error unregistering raw input device " + DeviceString(Device) + "!") :
+		RegisterRawInputDevices(&RawInputDevice, 1, sizeof(RAWINPUTDEVICE)) == 0 ? LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "lwmf::UnregisterRawInputDevice(): Error unregistering raw input device " + DeviceString(Device) + "!") :
 			LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, "Successfully unregistered device " + DeviceString(Device));
 	}
 

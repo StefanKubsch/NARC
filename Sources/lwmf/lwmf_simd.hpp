@@ -35,7 +35,7 @@ namespace lwmf
 
 		if ((CPUInfo[2] & (1 << 20)) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "SSE 4.2 is not supported on this computer!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::CheckForSSESupport(): SSE 4.2 is not supported on this computer!");
 		}
 		else
 		{

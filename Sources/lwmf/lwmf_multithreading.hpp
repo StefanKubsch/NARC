@@ -50,6 +50,7 @@ namespace lwmf
 	{
 		const std::size_t NumberOfThreads{ static_cast<std::size_t>(std::thread::hardware_concurrency()) };
 		Workers.reserve(NumberOfThreads);
+		LWMFSystemLog.AddEntry(LogLevel::Trace, __FILENAME__, __LINE__, "lwmf::Multithreading() (variable name:NumberOfThreads, value: " + std::to_string(NumberOfThreads) + ")");
 
 		for (std::size_t i{}; i < NumberOfThreads; ++i)
 		{

@@ -323,7 +323,7 @@ namespace Game_EntityHandling
 				}
 				else
 				{
-					NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "Entity type wrong or not found!");
+					NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "InitEntities(): Entity type wrong or not found!");
 				}
 
 				Entities[Index].WalkAnimStepWidth = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "ENTITY", "WalkAnimStepWidth");
@@ -531,7 +531,7 @@ namespace Game_EntityHandling
 		else
 		{
 			// This check is only needed when the entities are initially loaded...
-			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "Entity direction error! Direction must be 'N', 'S', 'E' or 'W'!");
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "SwitchDirection(): Entity direction error! Direction must be 'N', 'S', 'E' or 'W'!");
 		}
 	}
 

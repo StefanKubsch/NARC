@@ -10,6 +10,16 @@
 
 #pragma once
 
+// Example for usage:
+//
+// Create
+// lwmf::Logging LogName("LogFilename.log");
+//
+// Add entry
+// LogName.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Here is out message");
+//
+// Will be closed on proper exit of program automatically
+
 // This macro will return the current filename without any path information
 #define __FILENAME__ (std::strrchr(__FILE__, '\\') ? std::strrchr(__FILE__, '\\') + 1 : __FILE__)
 
@@ -23,7 +33,7 @@
 #include <fstream>
 #include <sstream>
 #include <ctime>
-#include <chrono>
+#include <iomanip>
 
 // #define LWMF_LOGGINGENABLED in your application if you want to write any logsfiles
 #ifdef LWMF_LOGGINGENABLED
@@ -42,9 +52,11 @@
 namespace lwmf
 {
 
+
 	enum class LogLevel : std::int_fast32_t
 	{
 		Info,
+		Trace,
 		Debug,
 		Warn,
 		Error,
@@ -64,7 +76,7 @@ namespace lwmf
 		void AddEntry(LogLevel Level, const char* Filename, std::int_fast32_t LineNumber, std::string_view Message);
 
 	private:
-		static std::string GetTimeStamp();
+		static std::string_view GetLocalTime();
 
 		std::ofstream Logfile;
 	};
@@ -80,7 +92,7 @@ namespace lwmf
 				std::exit(EXIT_FAILURE);
 			}
 
-			Logfile << "lwmf logging\nlogging started at: " << GetTimeStamp() << std::string(150, '-') << std::endl;
+			Logfile << "lwmf logging\nlogging started at: " << GetLocalTime() << "\n" << std::string(180, '-') << std::endl;
 		}
 	}
 
@@ -90,7 +102,7 @@ namespace lwmf
 		{
 			if (LoggingEnabled && Logfile.is_open())
 			{
-				Logfile << std::string(150, '-') << "\nlogging ended at: " << GetTimeStamp() << std::endl;
+				Logfile << std::string(180, '-') << "\nlogging ended at: " << GetLocalTime() << std::endl;
 				Logfile.close();
 			}
 		}
@@ -106,18 +118,22 @@ namespace lwmf
 		{
 			std::map<LogLevel, std::string_view> ErrorTable
 			{
-				{ LogLevel::Info, "** INFO ** " },
-				{ LogLevel::Debug, "** DEBUG ** " },
-				{ LogLevel::Warn, "** WARNING ** " },
-				{ LogLevel::Error, "** ERROR ** " },
-				{ LogLevel::Critical, "** CRITICAL ERROR ** " }
+				{ LogLevel::Info, "[INFO]" },
+				{ LogLevel::Trace, "[TRACE]" },
+				{ LogLevel::Debug, "[DEBUG]" },
+				{ LogLevel::Warn, "[WARNING]" },
+				{ LogLevel::Error, "[ERROR]" },
+				{ LogLevel::Critical, "[CRITICAL ERROR]" }
 			};
 
 			const std::map<LogLevel, std::string_view>::iterator ItErrorTable{ ErrorTable.find(Level) };
 
 			if (ItErrorTable != ErrorTable.end())
 			{
-				std::string MessageString{ ItErrorTable->second };
+				std::string MessageString{ GetLocalTime() };
+				MessageString += " - ";
+				MessageString += ItErrorTable->second;
+				MessageString += " - ";
 				MessageString += Filename;
 				MessageString += "(";
 				MessageString += std::to_string(LineNumber);
@@ -126,7 +142,7 @@ namespace lwmf
 
 				if (Level == LogLevel::Error || Level == LogLevel::Critical)
 				{
-					Logfile << "\n" << GetTimeStamp() << MessageString << std::endl;
+					Logfile << "\n" << GetLocalTime() << "\n" << MessageString << std::endl;
 					Logfile.close();
 
 					ThrowExceptions ? throw std::runtime_error(std::string(Message)) : std::exit(EXIT_FAILURE);
@@ -139,12 +155,21 @@ namespace lwmf
 		}
 	}
 
-	inline std::string Logging::GetTimeStamp()
+	inline std::string_view Logging::GetLocalTime()
 	{
-		const auto CurrentTime{ std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) };
-		std::array<char, 26> TimeString{};
-		ctime_s(TimeString.data(), TimeString.size(), &CurrentTime);
-		return { TimeString.data() };
+		struct std::tm TimeObject {};
+		const std::time_t CurrentTime{ std::time(nullptr) };
+
+		localtime_s(&TimeObject, &CurrentTime);
+
+		// Format of time following ISO 8601
+		// https://de.wikipedia.org/wiki/ISO_8601
+
+		const std::string TimeFormat{ "%Y-%m-%dT%H:%M:%S" };
+
+		std::ostringstream ReturnString;
+		ReturnString << std::put_time(&TimeObject, TimeFormat.c_str());
+		return ReturnString.str();
 	}
 
 

@@ -46,11 +46,11 @@ namespace Tools_ErrorHandling
 
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "Error loading " + FileName + ": " + std::string(ErrorMessage.data()));
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "CheckFileExistence(): Error loading " + FileName + ": " + std::string(ErrorMessage.data()));
 			}
 			else
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, __LINE__, "Error loading " + FileName + ": " + std::string(ErrorMessage.data()));
+				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, __LINE__, "CheckFileExistence(): Error loading " + FileName + ": " + std::string(ErrorMessage.data()));
 				Result = false;
 			}
 		}
@@ -71,11 +71,11 @@ namespace Tools_ErrorHandling
 		{
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "Folder not found!");
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "CheckFolderExistence(): Folder not found!");
 			}
 			else
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, __LINE__, "Folder not found!");
+				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, __LINE__, "CheckFolderExistence(): Folder not found!");
 				Result = false;
 			}
 		}
@@ -93,11 +93,11 @@ namespace Tools_ErrorHandling
 		{
 			if (ActionFlag == StopOnError)
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "TextureSize is " + std::to_string(Width) + " * " + std::to_string(Height) + " pixel!");
+				NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "CheckTextureSize(): TextureSize is " + std::to_string(Width) + " * " + std::to_string(Height) + " pixel!");
 			}
 			else
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, __LINE__, "TextureSize is " + std::to_string(Width) + " * " + std::to_string(Height) + " pixel!");
+				NARCLog.AddEntry(lwmf::LogLevel::Warn, __FILENAME__, __LINE__, "CheckTextureSize(): TextureSize is " + std::to_string(Width) + " * " + std::to_string(Height) + " pixel!");
 				Result = false;
 			}
 		}

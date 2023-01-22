@@ -45,6 +45,8 @@ namespace lwmf
 	{
 		CreateTexture(Texture, Width, Height, 0x00000000);
 		glViewport(0, 0, Texture.Width, Texture.Height);
+		LWMFSystemLog.AddEntry(LogLevel::Trace, __FILENAME__, __LINE__, "lwmf::ResizeViewportAndRenderTarget() (variable name:Texture.Width, value: " + std::to_string(Texture.Width) + ")");
+		LWMFSystemLog.AddEntry(LogLevel::Trace, __FILENAME__, __LINE__, "lwmf::ResizeViewportAndRenderTarget() (variable name:Texture.Height, value: " + std::to_string(Texture.Height) + ")");
 	}
 
 	inline void CreateOpenGLWindow( HINSTANCE hInstance, TextureStruct& RenderTarget, const std::int_fast32_t Width, const std::int_fast32_t Height, const LPCSTR WindowName, const bool Fullscreen)
@@ -55,7 +57,7 @@ namespace lwmf
 
 		if (Width <= 0 || Height <= 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Value for window width or height is zero or negative! Check your parameters in lwmf::CreateOpenGLWindow()!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::CreateOpenGLWindow(): Value for window width or height is zero or negative! Check your parameters!");
 		}
 
 		WNDCLASS WindowClass{};
@@ -65,7 +67,7 @@ namespace lwmf
 
 		if (RegisterClass(&WindowClass) == 0)
 		{
-			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error registering windowclass (RegisterClass)!");
+			LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::CreateOpenGLWindow(): Error registering windowclass (RegisterClass)!");
 		}
 		else
 		{
@@ -97,7 +99,7 @@ namespace lwmf
 
 			if (MainWindow == nullptr)
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error creating window (CreateWindowEx)!");
+				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::CreateOpenGLWindow(): Error creating window (CreateWindowEx)!");
 			}
 
 			// Create OpenGL context
@@ -129,19 +131,19 @@ namespace lwmf
 
 			if (WindowHandle == nullptr)
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error creating WindowHandle (GetDC)!");
+				LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::CreateOpenGLWindow(): Error creating WindowHandle (GetDC)!");
 			}
 			else
 			{
 				if (SetPixelFormat(WindowHandle, ChoosePixelFormat(WindowHandle, &PFD), &PFD) == 0)
 				{
-					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error setting pixel format (SetPixelFormat)!");
+					LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::CreateOpenGLWindow(): Error setting pixel format (SetPixelFormat)!");
 				}
 				else
 				{
 					if (wglMakeCurrent(WindowHandle, wglCreateContext(WindowHandle)) == 0)
 					{
-						LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "Error creating OpenGL context (wglMakeCurrent)!");
+						LWMFSystemLog.AddEntry(LogLevel::Critical, __FILENAME__, __LINE__, "lwmf::CreateOpenGLWindow(): Error creating OpenGL context (wglMakeCurrent)!");
 					}
 					else
 					{
@@ -206,12 +208,12 @@ namespace lwmf
 				}
 				else
 				{
-					LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error deleting OpenGL context (wglDeleteContext)!");
+					LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "lwmf::DeleteOpenGLContext(): Error deleting OpenGL context (wglDeleteContext)!");
 				}
 			}
 			else
 			{
-				LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "Error deleting OpenGL context (ReleaseDC)!");
+				LWMFSystemLog.AddEntry(LogLevel::Warn, __FILENAME__, __LINE__, "lwmf::DeleteOpenGLContext(): Error deleting OpenGL context (ReleaseDC)!");
 			}
 		}
 	}

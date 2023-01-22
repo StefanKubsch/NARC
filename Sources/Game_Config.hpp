@@ -55,14 +55,14 @@ namespace Game_Config
 			}
 			else
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "TextureSize has an incorrect value!");
+				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "Init(): TextureSize has an incorrect value!");
 			}
 
 			EntitySize = lwmf::ReadINIValue<std::int_fast32_t>(INIFile, "TEXTURES", "EntitySize");
 
 			if (TextureCompare.find(EntitySize) == TextureCompare.end())
 			{
-				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "EntitySize has an incorrect value!");
+				NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "Init(): EntitySize has an incorrect value!");
 			}
 
 			FrameLock = lwmf::ReadINIValue<std::uint_fast32_t>(INIFile, "GENERAL", "FrameLock");
@@ -80,7 +80,7 @@ namespace Game_Config
 			++NumberOfLevels;
 		}
 
-		--NumberOfLevels == StartLevel - 1 ? NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "No Leveldata found.") :
+		--NumberOfLevels == StartLevel - 1 ? NARCLog.AddEntry(lwmf::LogLevel::Critical, __FILENAME__, __LINE__, "GatherNumberOfLevels(): No Leveldata found.") :
 			NARCLog.AddEntry(lwmf::LogLevel::Info, __FILENAME__, __LINE__, "Data of " + std::to_string(NumberOfLevels) + " level(s) was found!");
 	}
 

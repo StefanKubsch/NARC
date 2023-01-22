@@ -165,7 +165,7 @@ namespace Game_WeaponHandling
 
 		if (Weapons.empty())
 		{
-			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "No weapon data found!");
+			NARCLog.AddEntry(lwmf::LogLevel::Error, __FILENAME__, __LINE__, "InitConfig(): No weapon data found!");
 		}
 	}
 
