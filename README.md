@@ -29,7 +29,7 @@ The whole engine is public domain - you can do what you want with the code. It w
   - hardware accelerated by native OpenGL 4.5 Core (Shader, not immediate/direct mode!)
   - own OpenGL wrapper - no need for glew, glad & Co. !
   - windowed or fullscreen
-  - vsync by option (vsync implies fullscreen mode!)
+  - vsync by option
   - changed options will be saved
   - indoor & outdoor levels (ceilings and/or skybox, lighting or not)
   - you can shoot entities and they will die in a nice animation after they lose their hitpoints
