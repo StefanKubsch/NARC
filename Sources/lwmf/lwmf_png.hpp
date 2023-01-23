@@ -174,7 +174,7 @@ namespace lwmf
 			static inline void GenerateFixedTrees(HuffmanTree& Tree, HuffmanTree& TreeD)
 			{
 				std::vector<std::int_fast32_t> BitLength(288, 8);
-				std::vector<std::int_fast32_t> BitLengthD(32, 5);
+				const std::vector<std::int_fast32_t> BitLengthD(32, 5);
 
 				for (std::int_fast32_t i{ 144 }; i <= 255; ++i)
 				{
@@ -487,7 +487,7 @@ namespace lwmf
 			}
 		};
 
-		inline std::int_fast32_t DeCompress(std::vector<unsigned char>& Out, const std::vector<unsigned char>& In)
+		inline std::int_fast32_t DeCompress(std::vector<unsigned char>& Out, const std::vector<unsigned char>& In) const
 		{
 			if (In.size() < 2)
 			{
@@ -677,7 +677,7 @@ namespace lwmf
 			const std::int_fast32_t BitsPerPixel{ GetBpp(PNGInfo) };
 			std::vector<unsigned char> ScanLines(((PNGInfo.Width * (PNGInfo.Height * BitsPerPixel + 7)) >> 3) + PNGInfo.Height);
 
-			Zlib zlib{};
+			const Zlib zlib{};
 			Error = zlib.DeCompress(ScanLines, ImageData);
 
 			if (Error != 0)

@@ -414,7 +414,7 @@ inline LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		{
 			RAWINPUT RawDev{};
 			UINT DataSize{ sizeof(RAWINPUT) };
-			UINT HeaderSize{ sizeof(RAWINPUTHEADER) };
+			const UINT HeaderSize{ sizeof(RAWINPUTHEADER) };
 			HRAWINPUT Handle{ reinterpret_cast<HRAWINPUT>(lParam) };
 			GetRawInputData(Handle, RID_INPUT, &RawDev, &DataSize, HeaderSize);
 

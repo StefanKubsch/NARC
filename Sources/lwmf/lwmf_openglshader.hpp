@@ -76,9 +76,9 @@ namespace lwmf
 		static void LoadTextureInGPU(const TextureStruct& Texture, GLuint* TextureID);
 		void RenderTexture(const GLuint* Texture, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height, bool Blend, float Opacity);
 		void LoadStaticTextureInGPU(const TextureStruct& Texture, GLuint* TextureID, std::int_fast32_t PosX, std::int_fast32_t PosY, std::int_fast32_t Width, std::int_fast32_t Height);
-		void RenderStaticTexture(const GLuint* TextureID, bool Blend, float Opacity);
+		void RenderStaticTexture(const GLuint* TextureID, bool Blend, float Opacity) const;
 		void PrepareLWMFTexture(const TextureStruct& Texture, std::int_fast32_t PosX, std::int_fast32_t PosY);
-		void RenderLWMFTexture(const TextureStruct& Texture, bool Blend, float Opacity);
+		void RenderLWMFTexture(const TextureStruct& Texture, bool Blend, float Opacity) const;
 
 		GLuint OGLTextureID{};
 
@@ -271,7 +271,7 @@ namespace lwmf
 		LoadTextureInGPU(Texture, TextureID);
 	}
 
-	inline void ShaderClass::RenderStaticTexture(const GLuint* TextureID, const bool Blend, const float Opacity)
+	inline void ShaderClass::RenderStaticTexture(const GLuint* TextureID, const bool Blend, const float Opacity) const
 	{
 		Blend ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
 		glUseProgram(ShaderProgram);
@@ -294,7 +294,7 @@ namespace lwmf
 		glCheckError();
 	}
 
-	inline void ShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture, const bool Blend, const float Opacity)
+	inline void ShaderClass::RenderLWMFTexture(const lwmf::TextureStruct& Texture, const bool Blend, const float Opacity) const
 	{
 		Blend ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
 		glUseProgram(ShaderProgram);

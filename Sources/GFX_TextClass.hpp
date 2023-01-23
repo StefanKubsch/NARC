@@ -29,7 +29,7 @@ public:
 	void RenderText(std::string_view Text, std::int_fast32_t x, std::int_fast32_t y);
 	void RenderTextCentered(std::string_view Text, std::int_fast32_t y);
 	lwmf::IntPointStruct GetOffset();
-	std::int_fast32_t GetFontHeight();
+	std::int_fast32_t GetFontHeight() const;
 
 private:
 	struct GlyphStruct final
@@ -168,7 +168,7 @@ inline lwmf::IntPointStruct GFX_TextClass::GetOffset()
 	return Offset;
 }
 
-inline std::int_fast32_t GFX_TextClass::GetFontHeight()
+inline std::int_fast32_t GFX_TextClass::GetFontHeight() const
 {
 	return FontHeight;
 }

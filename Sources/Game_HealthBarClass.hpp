@@ -19,7 +19,7 @@ class Game_HealthBarClass final
 {
 public:
 	void Init();
-	void Display();
+	void Display() const;
 
 private:
 	lwmf::IntRectStruct RectRed{};
@@ -60,7 +60,7 @@ inline void Game_HealthBarClass::Init()
 	}
 }
 
-inline void Game_HealthBarClass::Display()
+inline void Game_HealthBarClass::Display() const
 {
 	lwmf::Rectangle(Canvas, RectBlack2.X, RectBlack2.Y, RectBlack2.Width, RectBlack2.Height, Black);
 	lwmf::FilledRectangle(Canvas, RectOrange.X, RectOrange.Y, RectOrange.Width, RectOrange.Height, Orange, Orange);

@@ -869,8 +869,8 @@ inline std::int_fast32_t stbtt_FindGlyphIndex(const stbtt_fontinfo& info, const 
 		while (low < high)
 		{
 			const std::int_fast32_t mid{ low + ((high - low) >> 1) }; // rounds down, so low <= mid < high
-			std::int_fast32_t start_char{ ttULONG(data.data() + index_map + 16 + mid * 12) };
-			std::int_fast32_t end_char{ ttULONG(data.data() + index_map + 16 + mid * 12 + 4) };
+			const std::int_fast32_t start_char{ ttULONG(data.data() + index_map + 16 + mid * 12) };
+			const std::int_fast32_t end_char{ ttULONG(data.data() + index_map + 16 + mid * 12 + 4) };
 
 			if (unicode_codepoint < start_char)
 			{
@@ -2118,7 +2118,7 @@ inline static void stbtt__fill_active_edges_new(std::vector<float>& scanline, fl
 		else
 		{
 			float x0{ e->fx };
-			float dx{ e->fdx };
+			const float dx{ e->fdx };
 			float xb{ x0 + dx };
 			float x_top{};
 			float x_bottom{};
@@ -2350,7 +2350,7 @@ inline static void stbtt__sort_edges_ins_sort(std::vector<stbtt__edge>& p, const
 {
 	for (std::int_fast32_t i{ 1 }; i < n; ++i)
 	{
-		stbtt__edge t{ p[i] };
+		const stbtt__edge t{ p[i] };
 		const stbtt__edge* a{ &t };
 		std::int_fast32_t j{ i };
 

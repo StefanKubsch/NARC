@@ -81,7 +81,7 @@ namespace lwmf
 	inline Multithreading::~Multithreading()
 	{
 		{
-			std::unique_lock<std::mutex> lock(QueueMutex);
+			const std::unique_lock<std::mutex> lock(QueueMutex);
 			Stop = true;
 		}
 
@@ -101,7 +101,7 @@ namespace lwmf
 		});
 
 		Results.emplace_back(Task.get_future());
-		std::unique_lock<std::mutex> lock(QueueMutex);
+		const std::unique_lock<std::mutex> lock(QueueMutex);
 		Tasks.emplace(std::move(Task));
 		Condition.notify_one();
 	}

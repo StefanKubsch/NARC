@@ -22,13 +22,13 @@ class Game_MinimapClass final
 public:
 	void Init();
 	void PreRender();
-	void DisplayRealtimeMap();
+	void DisplayRealtimeMap() const;
 	static void DisplayPreRenderedMap();
 
 	bool Enabled{ true };
 
 private:
-	void Clear();
+	void Clear() const;
 
 	static inline lwmf::ShaderClass MiniMapShader{};
 
@@ -120,7 +120,7 @@ inline void Game_MinimapClass::PreRender()
 	IsPreRendered = true;
 }
 
-inline void Game_MinimapClass::DisplayRealtimeMap()
+inline void Game_MinimapClass::DisplayRealtimeMap() const
 {
 	for (std::int_fast32_t x{ Pos.X }, MapPosY{}; MapPosY < Game_LevelHandling::LevelMapHeight; ++MapPosY, x += TileSize)
 	{
@@ -177,7 +177,7 @@ inline void Game_MinimapClass::DisplayPreRenderedMap()
 	MiniMapShader.RenderStaticTexture(&MiniMapShader.OGLTextureID, true, 1.0F);
 }
 
-inline void Game_MinimapClass::Clear()
+inline void Game_MinimapClass::Clear() const
 {
 	if (IsPreRendered)
 	{

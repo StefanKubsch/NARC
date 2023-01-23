@@ -15,7 +15,7 @@ class GFX_LightingClass final
 {
 public:
 	GFX_LightingClass(float PosX, float PosY, std::int_fast32_t Location, float Radius, float Intensity);
-	float GetIntensity(float x, float y);
+	float GetIntensity(float x, float y) const;
 
 	// Location settings:
 	// see LevelMapLayers in "Game_LevelHandling.hpp"
@@ -35,7 +35,7 @@ inline GFX_LightingClass::GFX_LightingClass(const float PosX, const float PosY, 
 	this->Intensity	= Intensity;
 }
 
-inline float GFX_LightingClass::GetIntensity(const float x, const float y)
+inline float GFX_LightingClass::GetIntensity(const float x, const float y) const
 {
 	const float Distance{ lwmf::CalcEuclidianDistance<float>(x, Pos.X, y, Pos.Y) };
 	return Distance > Radius ? 0.0F : Intensity * ((Radius - Distance) / Radius);
