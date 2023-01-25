@@ -141,7 +141,7 @@ namespace lwmf
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create and compile the vertex shader...");
 		const std::string VertexShaderString{ LoadShaderSource(ShaderName + "Vert") };
-		const auto VertexShaderSource{ VertexShaderString.c_str() };
+		const auto* VertexShaderSource{ VertexShaderString.c_str() };
 		const auto VertexShader{ glCreateShader(GL_VERTEX_SHADER) };
 		glCheckError();
 		glShaderSource(VertexShader, 1, &VertexShaderSource, nullptr);
@@ -152,7 +152,7 @@ namespace lwmf
 
 		LWMFSystemLog.AddEntry(LogLevel::Info, __FILENAME__, __LINE__, ShaderNameString + "Create and compile the fragment shader...");
 		const std::string FragmentShaderString{ LoadShaderSource(ShaderName + "Frag") };
-		const auto FragmentShaderSource{ FragmentShaderString.c_str() };
+		const auto* FragmentShaderSource{ FragmentShaderString.c_str() };
 		const auto FragmentShader{ glCreateShader(GL_FRAGMENT_SHADER) };
 		glCheckError();
 		glShaderSource(FragmentShader, 1, &FragmentShaderSource, nullptr);

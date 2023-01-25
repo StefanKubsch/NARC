@@ -76,7 +76,7 @@ namespace lwmf
 		void AddEntry(LogLevel Level, const char* Filename, std::int_fast32_t LineNumber, std::string_view Message);
 
 	private:
-		static std::string_view GetLocalTime();
+		static std::string GetLocalTime();
 
 		std::ofstream Logfile;
 	};
@@ -155,7 +155,7 @@ namespace lwmf
 		}
 	}
 
-	inline std::string_view Logging::GetLocalTime()
+	inline std::string Logging::GetLocalTime()
 	{
 		struct std::tm TimeObject {};
 		const std::time_t CurrentTime{ std::time(nullptr) };
@@ -166,10 +166,9 @@ namespace lwmf
 		// https://de.wikipedia.org/wiki/ISO_8601
 
 		const std::string TimeFormat{ "%Y-%m-%dT%H:%M:%S" };
-
-		std::ostringstream ReturnString;
-		ReturnString << std::put_time(&TimeObject, TimeFormat.c_str());
-		return ReturnString.str();
+		std::ostringstream TempStream;
+		TempStream << std::put_time(&TimeObject, TimeFormat.c_str());
+		return TempStream.str();
 	}
 
 
