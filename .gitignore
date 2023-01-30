@@ -976,3 +976,5 @@ Sources/.clang-tidy
 x64/Release/NARC.tlog/link.write.2u.tlog
 .vs/NARC/v17/fileList.bin
 .clang-tidy
+x64/Debug/vc143.idb
+x64/Debug/vc143.pdb

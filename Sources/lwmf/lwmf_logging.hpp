@@ -108,7 +108,7 @@ namespace lwmf
 		}
 		catch (...)
 		{
-			// Dummy, just catch a possible exception in case something goes wrong.
+			// Dummy, just catch a possible exception in case something went wrong.
 		}
 	}
 
@@ -165,7 +165,7 @@ namespace lwmf
 		// Format of time following ISO 8601
 		// https://de.wikipedia.org/wiki/ISO_8601
 
-		const std::string TimeFormat{ "%Y-%m-%dT%H:%M:%S" };
+		static const std::string TimeFormat{ "%Y-%m-%dT%H:%M:%S" };
 		std::ostringstream TempStream;
 		TempStream << std::put_time(&TimeObject, TimeFormat.c_str());
 		return TempStream.str();
