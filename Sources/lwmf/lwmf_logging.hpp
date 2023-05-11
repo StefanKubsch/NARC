@@ -165,7 +165,7 @@ namespace lwmf
 		// Format of time following ISO 8601
 		// https://de.wikipedia.org/wiki/ISO_8601
 
-		static const std::string TimeFormat{ "%Y-%m-%dT%H:%M:%S" };
+		const std::string TimeFormat{ "%Y-%m-%dT%H:%M:%S" };
 		std::ostringstream TempStream;
 		TempStream << std::put_time(&TimeObject, TimeFormat.c_str());
 		return TempStream.str();
