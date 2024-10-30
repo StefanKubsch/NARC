@@ -520,7 +520,7 @@ namespace Game_EntityHandling
 
 	inline void SwitchDirection(EntityStruct& Entity, const char Direction)
 	{
-		const auto it{ std::find_if(Directions.begin(), Directions.end(), [&](const auto e) {return std::get<2>(e) == Direction; }) };
+		const auto it{ std::find_if(Directions.begin(), Directions.end(), [&](const auto &e) {return std::get<2>(e) == Direction; }) };
 
 		if (it != Directions.end())
 		{

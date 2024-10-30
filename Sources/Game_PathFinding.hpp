@@ -144,7 +144,7 @@ namespace Game_PathFinding
 		{
 			if (Paths[Index] != 0)
 			{
-				WayPoints.push_front({ Paths[Index] % Width, Paths[Index] / Width });
+				WayPoints.emplace_front(Paths[Index] % Width, Paths[Index] / Width);
 			}
 
 			Index = Paths[Index];

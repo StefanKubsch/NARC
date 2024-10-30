@@ -5,6 +5,105 @@ This file contains only information about changes related to that package exclus
 The full history of changes is listed in history.txt in main 7-Zip program.
 
 
+24.08          2024-08-11
+-------------------------
+- The bug in 7-Zip 24.00-24.07 was fixed:
+  For creating a zip archive: 7-Zip could write extra zero bytes after the end of the archive,
+  if a file included to archive cannot be compressed to a size smaller than original.
+  The created zip archive is correct except for the useless zero bytes after the end of the archive.
+  When unpacking such a zip archive, 7-Zip displays a warning:
+    "WARNING: There are data after the end of archive".
+
+
+24.07          2024-06-19
+-------------------------
+- The bug was fixed: 7-Zip could crash for some incorrect ZSTD archives.
+
+
+24.06          2024-05-26
+-------------------------
+- The bug was fixed: 7-Zip could not unpack some ZSTD archives.
+
+
+24.05          2024-05-14
+-------------------------
+- New switch -myv={MMNN} to set decoder compatibility version for 7z archive creating.
+  {MMNN} is 4-digit number that represents the version of 7-Zip without a dot.
+  If -myv={MMNN} switch is specified, 7-Zip will only use compression methods that can 
+  be decoded by the specified version {MMNN} of 7-Zip and newer versions.
+  If -myv={MMNN} switch is not specified, -myv=2300 is used, and 7-Zip will only
+  use compression methods that can be decoded by 7-Zip 23.00 and newer versions.
+- New switch -myfa={FilterID} to    allow 7-Zip to use the specified filter method for 7z archive creating.
+- New switch -myfd={FilterID} to disallow 7-Zip to use the specified filter method for 7z archive creating.
+
+
+24.03          2024-03-23
+-------------------------
+- 7-Zip now can use new RISCV filter for compression to 7z and xz archives.
+  RISCV filter can increase compression ratio for data containing executable
+  files compiled for RISC-V architecture.
+- The speed for LZMA and LZMA2 decompression in ARM64 version for Windows
+  was increased by 20%-60%.
+- new switch -smemx{size}g : to set allowed memory usage limit for RAR archive unpacking.
+  RAR archives can use dictionary up 64 GB. Default allowed limit for RAR unpacking is 4 GB.
+- -slmu switch : to show timestamps as UTC instead of LOCAL TIME.
+- -slsl switch : in console 7-Zip for Windows : to show file paths with 
+  linux path separator slash '/' instead of backslash separator '\'.
+- 7-Zip supports .sha256 files that use backslash path separator '\'.
+- Some bugs were fixed.
+
+
+24.01          2024-01-31
+-------------------------
+- 7-Zip now can unpack ZSTD archives (.zst filename extension).
+- 7-Zip now can unpack ZIP archives that use ZSTD compression method.
+- 7-Zip now supports fast hash algorithm XXH64 that is used in ZSTD.
+- Speed optimizations for archive unpacking: zip, gz, cab.
+- Speed optimizations for hash caclulation: CRC-32, CRC-64.
+- arm64 binaries are included to 7-Zip Extra package.
+- The bug was fixed: 7-Zip for Linux could fail for multivolume creation in some cases.
+- Some bugs were fixed.
+
+
+23.01          2023-06-20
+-------------------------
+- Some bugs were fixed.
+
+
+23.00          2023-05-07
+-------------------------
+- 7-Zip now can use new ARM64 filter for compression to 7z and xz archives.
+  ARM64 filter can increase compression ratio for data containing executable 
+  files compiled for ARM64 (AArch64) architecture.
+  Also 7-Zip now parses executable files (that have exe and dll filename extensions) 
+  before compressing, and it selects appropriate filter for each parsed file: 
+    - BCJ or BCJ2 filter for x86 executable files,
+    - ARM64 filter for ARM64 executable files.
+  Previous versions by default used x86 filter BCJ or BCJ2 for all exe/dll files.
+- Default section size for BCJ2 filter was changed from 64 MiB to 240 MiB.
+  It can increase compression ratio for executable files larger than 64 MiB.
+- When new 7-Zip creates multivolume archive, 7-Zip keeps in open state
+  only volumes that still can be changed. Previous versions kept all volumes 
+  in open state until the end of the archive creation.
+- 7-Zip for Linux and macOS now can reduce the number of simultaneously open files,
+  when 7-Zip opens, extracts or creates multivolume archive. It allows to avoid 
+  the failures for cases with big number of volumes, bacause there is a limitation 
+  for number of open files allowed for a single program in Linux and macOS.
+- The bugs were fixed:
+  - ZIP archives: if multithreaded zip compression was performed with more than one 
+      file to stdout stream (-so switch), 7-zip didn't write "data descriptor" for some files.
+  - Some another bugs were fixed.
+
+
+22.00          2022-06-16
+-------------------------
+- 7-Zip now can create TAR archives in POSIX (pax) tar format with the switches
+    -ttar -mm=pax or -ttar -mm=posix
+- 7-Zip now can store additional file timestamps with high precision (1 ns in Linux) 
+  in tar/pax archives with the following switches:
+    -ttar -mm=pax -mtp=3 -mtc -mta
+
+
 21.07          2021-12-26
 -------------------------
 - New switches: -spm and -im!{file_path} to exclude directories from processing 
